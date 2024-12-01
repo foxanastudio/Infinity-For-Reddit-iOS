@@ -33,7 +33,6 @@ struct Infinity: App {
         WindowGroup {
             ContentView()
                 .environment(\.dependencyManager, DependencyManager.shared.container)
-                .environment(\.redditGRDBDatabasePool, RedditGRDBDatabase.shared.dbPool)
         }
         .modelContainer(sharedModelContainer)
     }
