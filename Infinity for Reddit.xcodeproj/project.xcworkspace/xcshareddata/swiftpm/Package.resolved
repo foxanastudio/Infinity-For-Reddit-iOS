@@ -1,5 +1,5 @@
 {
-  "originHash" : "2b639b04525b8fb0c65947a9b6144d14e0e5b0fbea80dd7b092b4b266ef0ff90",
+  "originHash" : "ae0bcc65dfc5bb418f313a5c1441fe5486ee7a044533f00171e0b43d1eea6cbe",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -8,6 +8,24 @@
       "state" : {
         "revision" : "513364f870f6bfc468f9d2ff0a95caccc10044c5",
         "version" : "5.10.2"
+      }
+    },
+    {
+      "identity" : "grdb.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/groue/GRDB.swift.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "3ecb5c54553559217592d21a6d9841becb891b38"
+      }
+    },
+    {
+      "identity" : "swiftyjson",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SwiftyJSON/SwiftyJSON.git",
+      "state" : {
+        "revision" : "af76cf3ef710b6ca5f8c05f3a31307d44a3c5828",
+        "version" : "5.0.2"
       }
     },
     {

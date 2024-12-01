@@ -4,10 +4,11 @@
 //
 //  Created by Docile Alligator on 2024-11-29.
 //
+
 import Swinject
 import Alamofire
 
-class DependencyManager {
+struct DependencyManager {
     static let shared = DependencyManager()
     
     let container: Container
