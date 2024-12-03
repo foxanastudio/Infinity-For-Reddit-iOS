@@ -18,8 +18,24 @@ struct SubredditData: Codable, FetchableRecord, PersistableRecord {
     let description: String?
     let sidebarDescription: String?
     let nSubscribers: Int
-    let createdUTC: Int  
+    let createdUTC: Int
     let suggestedCommentSort: String?
     let isNSFW: Bool
     var isSelected: Bool = false
+    
+    init(id: String, name: String? = nil, iconUrl: String? = nil, bannerUrl: String? = nil,
+         description: String? = nil, sidebarDescription: String? = nil, nSubscribers: Int, createdUTC: Int,
+         suggestedCommentSort: String? = nil, isNSFW: Bool, isSelected: Bool = false) {
+        self.id = id
+        self.name = name
+        self.iconUrl = iconUrl
+        self.bannerUrl = bannerUrl
+        self.description = description
+        self.sidebarDescription = sidebarDescription
+        self.nSubscribers = nSubscribers
+        self.createdUTC = createdUTC
+        self.suggestedCommentSort = suggestedCommentSort
+        self.isNSFW = isNSFW
+        self.isSelected = isSelected
+    }
 }

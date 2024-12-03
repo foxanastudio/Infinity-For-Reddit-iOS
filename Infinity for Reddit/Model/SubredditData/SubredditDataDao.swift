@@ -9,21 +9,21 @@ import GRDB
 import Combine
 
 struct SubredditDataDao {
-    private let dbQueue: DatabaseQueue
+    private let dbPool: DatabasePool
     
-    init(dbQueue: DatabaseQueue) {
-        self.dbQueue = dbQueue
+    init(dbPool: DatabasePool) {
+        self.dbPool = dbPool
     }
     
     func insert(subredditData: SubredditData) {
-        try? dbQueue.write { db in
+        try? dbPool.write { db in
             try subredditData.insert(db)
         }
     }
     
     func deleteAllSubreddits() throws {
-        _ = try dbQueue.write { db in
-            try SubredditData.deleteAll(db)
+        try dbPool.write { db in
+            try db.execute(sql: "DELETE FROM subreddits")
         }
     }
     
@@ -31,12 +31,12 @@ struct SubredditDataDao {
         ValueObservation.tracking { db in
             try SubredditData.fetchOne(db, sql: "SELECT * FROM subreddits WHERE name = ? COLLATE NOCASE LIMIT 1", arguments: [namePrefixed])
         }
-        .publisher(in: dbQueue)
+        .publisher(in: dbPool)
         .eraseToAnyPublisher()
     }
     
     func getSubredditDataByName(namePrefixed: String) throws -> [SubredditData] {
-        try dbQueue.read { db in
+        try dbPool.read { db in
             try SubredditData.fetchAll(db, sql: "SELECT * FROM subreddits WHERE name = ? COLLATE NOCASE LIMIT 1", arguments: [namePrefixed])
         }
     }

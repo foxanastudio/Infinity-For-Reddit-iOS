@@ -18,4 +18,14 @@ struct Account: Codable, FetchableRecord, PersistableRecord {
     var karma: Int
     var accessToken: String?
     var refreshToken: String?
+    
+    init(username: String, isCurrentUser: Bool, profileImageUrl: String? = nil, bannerImageUrl: String? = nil, karma: Int, accessToken: String? = nil, refreshToken: String? = nil) {
+        self.username = username
+        self.isCurrentUser = isCurrentUser
+        self.profileImageUrl = profileImageUrl
+        self.bannerImageUrl = bannerImageUrl
+        self.karma = karma
+        self.accessToken = accessToken
+        self.refreshToken = refreshToken
+    }
 }
