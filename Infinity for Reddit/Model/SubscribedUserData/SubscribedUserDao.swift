@@ -36,8 +36,7 @@ struct SubscribedUserDao {
                 FROM subscribed_users
                 WHERE username = ? AND name LIKE '%' || ? || '%' COLLATE NOCASE
                 ORDER BY name COLLATE NOCASE ASC
-                """,
-                                            arguments: [accountName, searchQuery])
+                """, arguments: [accountName, searchQuery])
         }
         .publisher(in: dbPool)
         .eraseToAnyPublisher()
@@ -50,8 +49,7 @@ struct SubscribedUserDao {
                 FROM subscribed_users
                 WHERE username = ? COLLATE NOCASE
                 ORDER BY name COLLATE NOCASE ASC
-                """,
-                                            arguments: [accountName])
+                """, arguments: [accountName])
         }
     }
     
@@ -62,8 +60,7 @@ struct SubscribedUserDao {
                 FROM subscribed_users
                 WHERE username = ? AND name LIKE '%' || ? || '%' COLLATE NOCASE AND is_favorite = 1
                 ORDER BY name COLLATE NOCASE ASC
-                """,
-                                            arguments: [accountName, searchQuery])
+                """, arguments: [accountName, searchQuery])
         }
         .publisher(in: dbPool)
         .eraseToAnyPublisher()
@@ -76,8 +73,7 @@ struct SubscribedUserDao {
                 FROM subscribed_users
                 WHERE name = ? COLLATE NOCASE AND username = ? COLLATE NOCASE
                 LIMIT 1
-                """,
-                                            arguments: [name, accountName])
+                """, arguments: [name, accountName])
         }
     }
     
@@ -86,8 +82,7 @@ struct SubscribedUserDao {
             try db.execute(sql: """
                 DELETE FROM subscribed_users
                 WHERE name = ? COLLATE NOCASE AND username = ? COLLATE NOCASE
-                """,
-                           arguments: [name, accountName])
+                """, arguments: [name, accountName])
         }
     }
     

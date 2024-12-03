@@ -38,7 +38,7 @@ struct MultiRedditDao {
                 ORDER BY name COLLATE NOCASE ASC
                 """, arguments: [username, searchQuery])
         }
-        .publisher(in: dbPool) // Use your DatabaseReader instance here
+        .publisher(in: dbPool) 
         .eraseToAnyPublisher()
     }
     
@@ -62,7 +62,7 @@ struct MultiRedditDao {
                 ORDER BY name COLLATE NOCASE ASC
                 """, arguments: [username, searchQuery])
         }
-        .publisher(in: dbPool) // Use your Database®Reader instance here
+        .publisher(in: dbPool)
         .eraseToAnyPublisher()
     }
     
