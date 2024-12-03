@@ -11,16 +11,16 @@ struct SubredditData: Codable, FetchableRecord, PersistableRecord {
     static let ANONYMOUS_ACCOUNT = "-"
     static let databaseTableName = "subreddits"
     
-    let id: String
-    let name: String?
-    let iconUrl: String?
-    let bannerUrl: String?
-    let description: String?
-    let sidebarDescription: String?
-    let nSubscribers: Int
-    let createdUTC: Int
-    let suggestedCommentSort: String?
-    let isNSFW: Bool
+    var id: String
+    var name: String?
+    var iconUrl: String?
+    var bannerUrl: String?
+    var description: String?
+    var sidebarDescription: String?
+    var nSubscribers: Int
+    var createdUTC: Int
+    var suggestedCommentSort: String?
+    var isNSFW: Bool
     var isSelected: Bool
     
     init(id: String, name: String? = nil, iconUrl: String? = nil, bannerUrl: String? = nil,

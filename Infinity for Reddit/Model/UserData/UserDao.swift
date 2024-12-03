@@ -8,7 +8,7 @@
 import GRDB
 import Combine
 
-struct UserDataDao {
+struct UserDao {
     private let dbPool: DatabasePool
     
     init(dbPool: DatabasePool) {

@@ -18,8 +18,9 @@ struct Account: Codable, FetchableRecord, PersistableRecord {
     var karma: Int
     var accessToken: String?
     var refreshToken: String?
+    var code: String?
     
-    init(username: String, isCurrentUser: Bool, profileImageUrl: String? = nil, bannerImageUrl: String? = nil, karma: Int, accessToken: String? = nil, refreshToken: String? = nil) {
+    init(username: String, isCurrentUser: Bool, profileImageUrl: String? = nil, bannerImageUrl: String? = nil, karma: Int, accessToken: String? = nil, refreshToken: String? = nil, code: String? = nil) {
         self.username = username
         self.isCurrentUser = isCurrentUser
         self.profileImageUrl = profileImageUrl
@@ -27,5 +28,6 @@ struct Account: Codable, FetchableRecord, PersistableRecord {
         self.karma = karma
         self.accessToken = accessToken
         self.refreshToken = refreshToken
+        self.code = code
     }
 }

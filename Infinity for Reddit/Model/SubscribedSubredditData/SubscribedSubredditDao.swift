@@ -8,7 +8,7 @@
 import Combine
 import GRDB
 
-struct SubscribedSubredditDataDao {
+struct SubscribedSubredditDao {
     private let dbPool: DatabasePool
     
     init(dbPool: DatabasePool) {
