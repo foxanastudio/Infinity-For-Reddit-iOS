@@ -8,6 +8,7 @@
 import Swinject
 import Alamofire
 import GRDB
+import Foundation
 
 struct DependencyManager {
     static let shared = DependencyManager()
@@ -21,7 +22,10 @@ struct DependencyManager {
     
     private func registerDependencies(_ c: Container) {
         // TODO register dependencies on container
-        c.register(Session.self) {_ in AF}
+        c.register(Session.self) {_ in
+            let configuration = URLSessionConfiguration.af.default
+            return Session(configuration: configuration)
+        }
         c.register(DatabasePool.self) {_ in
             do {
                 return try RedditGRDBDatabase.create()
