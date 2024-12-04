@@ -1,22 +1,18 @@
 //
-//  ContentView.swift
+//  SubscriptionsView.swift
 //  Infinity for Reddit
 //
-//  Created by Docile Alligator on 2024-11-27.
+//  Created by Docile Alligator on 2024-12-03.
 //
 
 import SwiftUI
 import Swinject
 import GRDB
 
-struct ContentView: View {
+struct SubscriptionsView: View {
     @Environment(\.dependencyManager) private var dependencyManager: Container
-
+    
     var body: some View {
-        NavigationSplitView {
-            
-        } detail: {
-            
-        }
+        Text("Subscriptions")
     }
 }

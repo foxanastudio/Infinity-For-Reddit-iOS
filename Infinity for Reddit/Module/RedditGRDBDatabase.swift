@@ -29,12 +29,14 @@ struct RedditGRDBDatabase {
         try dbPool.write { db in
             try db.create(table: Account.databaseTableName, ifNotExists: true) { t in
                 t.column("username", .text).primaryKey()
-                t.column("isCurrentUser", .boolean).notNull()
-                t.column("profileImageUrl", .text)
-                t.column("bannerImageUrl", .text)
+                t.column("profile_image_url", .text)
+                t.column("banner_image_url", .text)
                 t.column("karma", .integer)
-                t.column("accessToken", .text)
-                t.column("refreshToken", .text)
+                t.column("is_mod", .boolean)
+                t.column("access_token", .text)
+                t.column("refresh_token", .text)
+                t.column("is_current_user", .boolean)
+                t.column("code", .text)
             }
         }
     }

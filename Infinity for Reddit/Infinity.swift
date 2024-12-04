@@ -17,7 +17,7 @@ struct Infinity: App {
 
     var body: some Scene {
         WindowGroup {
-            LoginView()
+            HomeView()
                 .environment(\.dependencyManager, DependencyManager.shared.container)
         }
     }
