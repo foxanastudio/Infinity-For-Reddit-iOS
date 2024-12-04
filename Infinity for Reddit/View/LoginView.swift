@@ -18,6 +18,7 @@ struct LoginView: View {
     
     private let session: Session
     private let dbPool: DatabasePool
+    private let operationQueue: OperationQueue
     
     init() {
         // Resolve the session ASAP and store it in a property
@@ -27,8 +28,12 @@ struct LoginView: View {
         guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
             fatalError("Failed to resolve DatabasePool")
         }
+        guard let resolvedOperationQueue = DependencyManager.shared.container.resolve(OperationQueue.self) else {
+            fatalError("Failed to resolve OperationQueue")
+        }
         self.session = resolvedSession
         self.dbPool = resolvedDBPool
+        self.operationQueue = resolvedOperationQueue
     }
     
     
@@ -105,42 +110,48 @@ struct LoginView: View {
                                                                                 return
                                                                             }
                                                                             if let myInfo = myInfoResponse.data(using: .utf8) {
-                                                                                do {
-                                                                                    let jsonResponse = try JSON(data: myInfo)
-                                                                                    
-                                                                                    // Parse the response
-                                                                                    let name = jsonResponse[JSONUtils.NAME_KEY].stringValue
-                                                                                    let profileImageUrl = jsonResponse[JSONUtils.ICON_IMG_KEY].stringValue
-                                                                                    
-                                                                                    var bannerImageUrl: String? = nil
-                                                                                    if let subredditData = jsonResponse[JSONUtils.SUBREDDIT_KEY].dictionary {
-                                                                                        bannerImageUrl = subredditData[JSONUtils.BANNER_IMG_KEY]?.stringValue
-                                                                                    }
-                                                                                    
-                                                                                    let karma = jsonResponse[JSONUtils.TOTAL_KARMA_KEY].intValue
-                                                                                    let isMod = jsonResponse[JSONUtils.IS_MOD_KEY].boolValue
-                                                                                    
-                                                                                    let account = Account(
-                                                                                        username: name,
-                                                                                        isCurrentUser: true,
-                                                                                        profileImageUrl: profileImageUrl,
-                                                                                        bannerImageUrl: bannerImageUrl,
-                                                                                        karma: karma,
-                                                                                        isMod: isMod,
-                                                                                        accessToken: accessToken,
-                                                                                        refreshToken: refreshToken,
-                                                                                        code: authCode
-                                                                                    )
-                                                                                    
-                                                                                    let accountDao = AccountDao(dbPool: dbPool)
+                                                                                operationQueue.addOperation {
                                                                                     do {
-                                                                                        try accountDao.markAllAccountsNonCurrent()
-                                                                                        try accountDao.insert(account)
+                                                                                        let jsonResponse = try JSON(data: myInfo)
+                                                                                        
+                                                                                        // Parse the response
+                                                                                        let name = jsonResponse[JSONUtils.NAME_KEY].stringValue
+                                                                                        let profileImageUrl = jsonResponse[JSONUtils.ICON_IMG_KEY].stringValue
+                                                                                        
+                                                                                        var bannerImageUrl: String? = nil
+                                                                                        if let subredditData = jsonResponse[JSONUtils.SUBREDDIT_KEY].dictionary {
+                                                                                            bannerImageUrl = subredditData[JSONUtils.BANNER_IMG_KEY]?.stringValue
+                                                                                        }
+                                                                                        
+                                                                                        let karma = jsonResponse[JSONUtils.TOTAL_KARMA_KEY].intValue
+                                                                                        let isMod = jsonResponse[JSONUtils.IS_MOD_KEY].boolValue
+                                                                                        
+                                                                                        let account = Account(
+                                                                                            username: name,
+                                                                                            isCurrentUser: true,
+                                                                                            profileImageUrl: profileImageUrl,
+                                                                                            bannerImageUrl: bannerImageUrl,
+                                                                                            karma: karma,
+                                                                                            isMod: isMod,
+                                                                                            accessToken: accessToken,
+                                                                                            refreshToken: refreshToken,
+                                                                                            code: authCode
+                                                                                        )
+                                                                                        
+                                                                                        let accountDao = AccountDao(dbPool: dbPool)
+                                                                                        do {
+                                                                                            try accountDao.markAllAccountsNonCurrent()
+                                                                                            try accountDao.insert(account)
+                                                                                            
+                                                                                            OperationQueue.main.addOperation {
+                                                                                                
+                                                                                            }
+                                                                                        } catch {
+                                                                                            print("Error: Failed to insert account - \(error.localizedDescription)")
+                                                                                        }
                                                                                     } catch {
-                                                                                        print("Error: Failed to insert account - \(error.localizedDescription)")
+                                                                                        print("Error: Failed to parse account JSON - \(error.localizedDescription)")
                                                                                     }
-                                                                                } catch {
-                                                                                    print("Error: Failed to parse account JSON - \(error.localizedDescription)")
                                                                                 }
                                                                             }
                                                                             break
