@@ -8,7 +8,8 @@
 import GRDB
 
 struct Account: Codable, FetchableRecord, PersistableRecord {
-    static let ANONYMOUS_ACCOUNT = "-"
+    static let ANONYMOUS_ACCOUNT = Account(username: "-", isCurrentUser: false, profileImageUrl: nil, bannerImageUrl: nil, karma: 0, isMod: false, accessToken: nil, refreshToken: nil, code: nil)
+    
     static let databaseTableName = "accounts"
     
     var username: String
@@ -31,6 +32,10 @@ struct Account: Codable, FetchableRecord, PersistableRecord {
         self.accessToken = accessToken
         self.refreshToken = refreshToken
         self.code = code
+    }
+    
+    func isAnonymous() -> Bool {
+        username == "-"
     }
     
     private enum CodingKeys: String, CodingKey, ColumnExpression, CaseIterable {
