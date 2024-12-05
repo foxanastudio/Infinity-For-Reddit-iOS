@@ -76,7 +76,8 @@ struct HomeView: View {
                 }
             )
             .sheet(isPresented: $showProfile) {
-                ProfileSheet()
+                AccountSheet()
+                    .presentationDetents([.medium])
             }
         }
     }
