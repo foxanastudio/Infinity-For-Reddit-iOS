@@ -15,7 +15,7 @@ struct AccountSheet: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
-                    if let profileImageUrl = accountViewModel.account?.profileImageUrl {
+                    if let profileImageUrl = accountViewModel.account.profileImageUrl {
                         AsyncImage(url: URL(string: profileImageUrl)) { phase in
                             switch phase {
                             case .empty:
@@ -39,7 +39,7 @@ struct AccountSheet: View {
                     }
                     
                     // User's Name
-                    Text(accountViewModel.account?.isAnonymous() == true ? "Anonymous" : accountViewModel.account?.username ?? "Unknown")
+                    Text(accountViewModel.account.isAnonymous() == true ? "Anonymous" : accountViewModel.account.username)
                         .font(.largeTitle)
                         .fontWeight(.bold)
                     

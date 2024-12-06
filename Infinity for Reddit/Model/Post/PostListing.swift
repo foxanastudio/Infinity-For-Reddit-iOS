@@ -68,9 +68,9 @@ class PostListingRootClass: NSObject, NSCoding{
     }
 }
 
-class ListingData : NSObject, NSCoding{
+public class ListingData : NSObject, NSCoding{
     
-    var children : [Children]!
+    var children : [Children]! = [Children]()
     var after : String!
     var before : String!
     var dist : Int!
@@ -78,9 +78,13 @@ class ListingData : NSObject, NSCoding{
     /**
      * Instantiate the instance using the passed json values to set the properties values
      */
-    init(fromJson json: JSON!){
+    init(fromJson json: JSON!) {
         if json.isEmpty{
             return
+        }
+        let childrenArray = json["children"].arrayValue
+        for childJSON in childrenArray {
+            children.append(Children(fromJson: childJSON))
         }
         after = json["after"].stringValue
         before = json["before"].stringValue
@@ -109,7 +113,7 @@ class ListingData : NSObject, NSCoding{
      * NSCoding required initializer.
      * Fills the data from the passed decoder
      */
-    @objc required init(coder aDecoder: NSCoder)
+    @objc public required init(coder aDecoder: NSCoder)
     {
         after = aDecoder.decodeObject(forKey: "after") as? String
         before = aDecoder.decodeObject(forKey: "before") as? String
@@ -120,7 +124,7 @@ class ListingData : NSObject, NSCoding{
      * NSCoding required method.
      * Encodes mode properties into the decoder
      */
-    func encode(with aCoder: NSCoder)
+    public func encode(with aCoder: NSCoder)
     {
         if after != nil{
             aCoder.encode(after, forKey: "after")
@@ -200,7 +204,7 @@ class PostData : NSObject, NSCoding{
     var approvedBy : String!
     var archived : Bool!
     var author : String!
-    var authorFlairRichtext : [AuthorFlairRichtext]!
+    var authorFlairRichtext : [AuthorFlairRichtext]! = [AuthorFlairRichtext]()
     var authorFlairText : String!
     var authorFlairType : String!
     var authorFullname : String!
@@ -218,7 +222,7 @@ class PostData : NSObject, NSCoding{
     var isRedditMediaDomain : Bool!
     var isSelf : Bool!
     var isVideo : Bool!
-    var linkFlairRichtext : [LinkFlairRichtext]!
+    var linkFlairRichtext : [LinkFlairRichtext]! = [LinkFlairRichtext]()
     var linkFlairText : String!
     var linkFlairType : String!
     var locked : Bool!
@@ -229,7 +233,7 @@ class PostData : NSObject, NSCoding{
     var modReasonBy : String!
     var modReasonTitle : String!
     
-    var modReports : [[Any]]!
+    var modReports : [[Any]]! = [[Any]]()
     var name : String!
     var numComments : Int!
     var numCrossposts : Int!
@@ -266,7 +270,7 @@ class PostData : NSObject, NSCoding{
     var ups : Int!
     var upvoteRatio : Float!
     var url : String!
-    var userReports : [[Any]]!
+    var userReports : [[Any]]! = [[Any]]()
     
     
     /**
@@ -301,7 +305,6 @@ class PostData : NSObject, NSCoding{
         isRedditMediaDomain = json["is_reddit_media_domain"].boolValue
         isSelf = json["is_self"].boolValue
         isVideo = json["is_video"].boolValue
-        linkFlairRichtext = [LinkFlairRichtext]()
         let linkFlairRichtextArray = json["link_flair_richtext"].arrayValue
         for linkFlairRichtextJson in linkFlairRichtextArray{
             linkFlairRichtext.append(LinkFlairRichtext(fromJson: linkFlairRichtextJson))
@@ -317,7 +320,6 @@ class PostData : NSObject, NSCoding{
         modNote = json["mod_note"].stringValue
         modReasonBy = json["mod_reason_by"].stringValue
         modReasonTitle = json["mod_reason_title"].stringValue
-        modReports = [[Any]]()
         for modReportArray in json["mod_reports"].arrayValue {
             var subArray: [Any] = []
             for modReport in modReportArray.arrayValue {
@@ -368,7 +370,6 @@ class PostData : NSObject, NSCoding{
         ups = json["ups"].intValue
         upvoteRatio = json["upvote_ratio"].floatValue
         url = json["url"].stringValue
-        userReports = [[Any]]()
         for userReportArray in json["user_reports"].arrayValue {
             var subArray: [Any] = []
             for userReport in userReportArray.arrayValue {
@@ -881,7 +882,7 @@ class PostData : NSObject, NSCoding{
 class Preview : NSObject, NSCoding{
     
     var enabled : Bool!
-    var images : [Image]!
+    var images : [Image]! = [Image]()
     
     
     /**
@@ -949,7 +950,7 @@ class Preview : NSObject, NSCoding{
 
 class Image : NSObject, NSCoding{
     
-    var resolutions : [Resolution]!
+    var resolutions : [Resolution]! = [Resolution]()
     var source : Resolution!
     
     /**
@@ -1436,7 +1437,7 @@ class MediaMetadata : NSObject, NSCoding{
     var id : String!
     //MIME Type
     var m : String!
-    var p : [MediaMetadataResolution]!
+    var p : [MediaMetadataResolution]! = [MediaMetadataResolution]()
     var s : MediaMetadataResolution!
     //E.g. "Valid"
     var status : String!

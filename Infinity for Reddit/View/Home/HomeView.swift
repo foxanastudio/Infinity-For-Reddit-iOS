@@ -26,7 +26,7 @@ struct HomeView: View {
                         }
                         .tag(Tab.home)
                     
-                    SubscriptionsView()
+                    LoginView()
                         .tabItem {
                             Label("Subscriptions", systemImage: "book")
                         }
@@ -51,7 +51,7 @@ struct HomeView: View {
                 trailing: Button(action: {
                     showProfile.toggle()
                 }) {
-                    if let profileImageUrl = accountViewModel.account?.profileImageUrl {
+                    if let profileImageUrl = accountViewModel.account.profileImageUrl {
                         AsyncImage(url: URL(string: profileImageUrl)) { phase in
                             switch phase {
                             case .empty:

@@ -7,10 +7,10 @@
 
 import GRDB
 
-struct Account: Codable, FetchableRecord, PersistableRecord {
+public struct Account: Codable, FetchableRecord, PersistableRecord {
     static let ANONYMOUS_ACCOUNT = Account(username: "-", isCurrentUser: false, profileImageUrl: nil, bannerImageUrl: nil, karma: 0, isMod: false, accessToken: nil, refreshToken: nil, code: nil)
     
-    static let databaseTableName = "accounts"
+    public static let databaseTableName = "accounts"
     
     var username: String
     var isCurrentUser: Bool
@@ -50,5 +50,5 @@ struct Account: Codable, FetchableRecord, PersistableRecord {
         case code
     }
     
-    static let databaseSelection: [SQLSelectable] = CodingKeys.allCases.map { $0 }
+    public static let databaseSelection: [SQLSelectable] = CodingKeys.allCases.map { $0 }
 }
