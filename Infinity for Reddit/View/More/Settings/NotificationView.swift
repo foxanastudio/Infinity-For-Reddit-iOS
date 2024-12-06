@@ -14,6 +14,7 @@ struct NotificationView: View {
     @Environment(\.dependencyManager) private var container: Container
     @State private var enableNotifications: Bool
     @State private var checkNotificationsInterval: Int
+    private let notificationsIntervals: [String] = ["15 minutes", "30 minutes", "1 hour", "2 hours", "3 hours", "4 hours", "6 hours", "12 hours", "1 day"]
     private let userDefaults: UserDefaults
 
     init() {
@@ -25,7 +26,7 @@ struct NotificationView: View {
             userDefaults.set(true, forKey: "ENABLE_NOTIFICATION_KEY")
             }
         if userDefaults.object(forKey: "NOTIFICATION_INTERVAL_KEY") == nil {
-            userDefaults.set(60, forKey: "NOTIFICATION_INTERVAL_KEY")
+            userDefaults.set(2, forKey: "NOTIFICATION_INTERVAL_KEY")
         }
 
         _enableNotifications = State(initialValue: userDefaults.bool(forKey: "ENABLE_NOTIFICATION_KEY"))
@@ -42,14 +43,8 @@ struct NotificationView: View {
                         }
                     
                     Picker("Check Notifications Interval", systemImage: "clock.fill", selection: $checkNotificationsInterval) {
-                        ForEach([15, 30, 60, 120, 180, 240, 360, 720, 1440], id: \.self) { interval in
-                                if interval < 60 {
-                                    Text("\(interval) minutes")
-                                } else if interval < 1440 {
-                                    Text("\(interval / 60) hour\(interval >= 120 ? "s" : "")")
-                                } else {
-                                    Text("1 day")
-                                }
+                        ForEach(0..<notificationsIntervals.count, id: \.self) { index in
+                            Text(notificationsIntervals[index]).tag(index)
                             }
                     }
                     .onChange(of: checkNotificationsInterval) { _, newValue in
