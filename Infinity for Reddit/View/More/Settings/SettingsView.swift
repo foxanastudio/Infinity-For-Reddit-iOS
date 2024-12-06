@@ -68,8 +68,7 @@ struct SettingsView: View {
             NavigationLink(destination: RedditUserAgreementView()) {
                 Text("Reddit User Agreement")
             }
-            
-            .navigationTitle("Settings")
         }
+        .navigationTitle("Settings")
     }
 }

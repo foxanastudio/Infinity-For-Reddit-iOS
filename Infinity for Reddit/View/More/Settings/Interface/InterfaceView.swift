@@ -68,7 +68,7 @@ struct InterfaceView: View {
             NavigationLink(destination: InterfaceView()) {
                 Label("Font", systemImage: "textformat.size")
             }
-            NavigationLink(destination: InterfaceView()) {
+            NavigationLink(destination: ImmersiveInterfaceView()) {
                 Text("Immersive Interface").padding(.leading, 44.5)
             }
             NavigationLink(destination: InterfaceView()) {
