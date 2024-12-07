@@ -44,4 +44,8 @@ struct UserDefaultsUtils {
     static let HIDE_SUBSCRIBED_SUBREDDITS_SECTION = "hide_subscribed_subreddits_section"
     static let HIDE_ACCOUNT_KARMA_NAV_BAR = "hide_account_karma"
 
+    // TimeFormatView
+    static let SHOW_ELAPSED_TIME_KEY = "show_elapsed_time"
+    static let TIME_FORMAT_KEY = "time_format"
+    
 }

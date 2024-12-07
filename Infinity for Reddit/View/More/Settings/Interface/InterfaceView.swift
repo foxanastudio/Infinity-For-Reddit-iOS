@@ -83,12 +83,6 @@ struct InterfaceView: View {
             NavigationLink(destination: NavigationDrawerView()) {
                 Text("Navigation Drawer").padding(.leading, 44.5)
             }
-            NavigationLink(destination: InterfaceView()) {
-                Text("Customize Tabs in Main Page").padding(.leading, 44.5)
-            }
-            NavigationLink(destination: InterfaceView()) {
-                Text("Customize Bottom Navigation Bar").padding(.leading, 44.5)
-            }
             Toggle("Hide FAB in Post Feed", isOn: $hideFABInPostFeed).padding(.leading, 44.5).onChange(of: hideFABInPostFeed){
                 _, newValue in userDefaults.set(newValue, forKey: HIDE_FAB_IN_POST_FEED)
             }
@@ -110,7 +104,7 @@ struct InterfaceView: View {
             .onChange(of: defaultSearchResultTab) { _, newValue in
                 userDefaults.set(newValue, forKey: DEFAULT_SEARCH_RESULT_TAB)
             }
-            NavigationLink(destination: InterfaceView()) {
+            NavigationLink(destination: TimeFormatView()) {
                 Text("Time Format").padding(.leading, 44.5)
             }
             NavigationLink(destination: InterfaceView()) {
