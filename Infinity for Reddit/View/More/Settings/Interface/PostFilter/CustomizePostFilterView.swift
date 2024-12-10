@@ -14,6 +14,7 @@ struct CustomizePostFilterView: View {
     @Environment(\.dependencyManager) private var dependencyManager: Container
     @EnvironmentObject var postFilterViewModel: PostFilterViewModel
     
+    @State private var id: Int? = nil
     @State private var profileName: String = "New Filter"
     @State private var showText = true
     @State private var showLink = true
@@ -166,6 +167,7 @@ struct CustomizePostFilterView: View {
         .onAppear {
             if let postFilterName = postFilterName {
                 if let fetchedPostFilter: PostFilter = try? postFilterViewModel.fetchPostFilter(postFilterName){
+                    id = fetchedPostFilter.id
                     profileName = fetchedPostFilter.name
                     showText = fetchedPostFilter.containTextType
                     showLink = fetchedPostFilter.containLinkType
@@ -198,6 +200,7 @@ struct CustomizePostFilterView: View {
     
     private func handleSaveAction() {
         postFilterViewModel.savePostFilter(
+            id: id,
             originalProfileName: postFilterName,
             profileName: profileName,
             maxVote: maxVote,

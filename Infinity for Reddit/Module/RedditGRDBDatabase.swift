@@ -45,7 +45,8 @@ struct RedditGRDBDatabase {
             }
             
             try db.create(table: PostFilter.databaseTableName, ifNotExists: true) { t in
-                t.column("name", .text).primaryKey()
+                t.autoIncrementedPrimaryKey("id")
+                t.column("name", .text)
                 t.column("maxVote", .integer)
                 t.column("minVote", .integer)
                 t.column("maxComments", .integer)

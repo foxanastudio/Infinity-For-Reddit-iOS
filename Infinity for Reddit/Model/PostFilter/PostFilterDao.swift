@@ -7,6 +7,7 @@
 
 import GRDB
 import Combine
+import Foundation
 
 struct PostFilterDao {
     let dbPool: DatabasePool
@@ -25,6 +26,17 @@ struct PostFilterDao {
         try dbPool.write { db in
             for data in postFilterList {
                 try data.insert(db, onConflict: .replace)
+            }
+        }
+    }
+    
+    func updatePostFilter(updatedPostFilter: PostFilter) throws {
+        try dbPool.write { db in
+            if var existingPostFilter = try PostFilter.filter(Column("id") == updatedPostFilter.id).fetchOne(db) {
+                existingPostFilter = updatedPostFilter
+                try existingPostFilter.update(db)
+            } else {
+                throw NSError(domain: "PostFilter", code: 404, userInfo: [NSLocalizedDescriptionKey: "PostFilter with name \(updatedPostFilter.name) not found."])
             }
         }
     }

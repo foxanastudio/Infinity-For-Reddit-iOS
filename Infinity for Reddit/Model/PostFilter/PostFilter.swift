@@ -11,6 +11,8 @@ struct PostFilter: Codable, FetchableRecord, PersistableRecord, Equatable {
     static let databaseTableName = "post_filter"
     
     // Primary key
+    var id: Int?
+    
     var name: String = "New Filter"
 
     // Vote filters
@@ -55,6 +57,7 @@ struct PostFilter: Codable, FetchableRecord, PersistableRecord, Equatable {
     var containGalleryType: Bool = true
     
     init(
+            id: Int? = nil,
             name: String = "New Filterdamn",
             maxVote: Int = -1,
             minVote: Int = -1,
@@ -82,6 +85,7 @@ struct PostFilter: Codable, FetchableRecord, PersistableRecord, Equatable {
             containVideoType: Bool = true,
             containGalleryType: Bool = true
         ) {
+            self.id = id
             self.name = name
             self.maxVote = maxVote
             self.minVote = minVote
