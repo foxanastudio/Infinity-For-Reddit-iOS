@@ -13,7 +13,6 @@ import SwiftyJSON
 import GRDB
 
 struct LoginView: View {
-    @Environment(\.dependencyManager) var container: Container
     @Environment(\.dismiss) private var dismiss
     
     private let session: Session

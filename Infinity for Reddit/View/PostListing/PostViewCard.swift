@@ -9,36 +9,36 @@ import SwiftUI
 import SDWebImageSwiftUI
 
 struct PostViewCard: View {
-    @EnvironmentObject var post: Post
+    @StateObject var postViewModel: PostViewModel
     
     let formatter = DateFormatter()
     
-    init() {
+    init(account: Account, post: Post) {
         formatter.dateFormat = "y-MM-dd H:mm"
+        _postViewModel = StateObject(wrappedValue: PostViewModel(account: account, post: post))
     }
     
     var body: some View {
         VStack(alignment: .leading) {
             HStack(alignment: .center) {
                 VStack(alignment: .leading) {
-                    Text(post.subredditNamePrefixed)
-                        //.frame(maxWidth: .infinity, alignment: .leading)
-                    Text("u/\(post.author)")
+                    Text(postViewModel.post.subredditNamePrefixed)
+                    Text("u/\(postViewModel.post.author)")
                 }
                 
                 Spacer()
                 
                 Text(
-                    formatter.string(from: Date(timeIntervalSince1970: TimeInterval(post.createdUtc)))
+                    formatter.string(from: Date(timeIntervalSince1970: TimeInterval(postViewModel.post.createdUtc)))
                 )
             }
             .padding(.vertical, 8)
             
-            Text(post.title)
+            Text(postViewModel.post.title)
                 .font(.system(size: 24))
                 .padding(.bottom, 8)
             
-            if let preview = post.preview, preview.images.count > 0, let url = preview.images[0].source.url {
+            if let preview = postViewModel.post.preview, preview.images.count > 0, let url = preview.images[0].source.url {
                 WebImage(url: URL(string: url)) { image in
                     image
                         .resizable()
@@ -55,34 +55,37 @@ struct PostViewCard: View {
                 .scaledToFit()
                 .frame(maxWidth: .infinity)
                 .aspectRatio(preview.images[0].source.aspectRatio, contentMode: .fit)
-            } else if let selftextTruncated = post.selftextTruncated {
+            } else if let selftextTruncated = postViewModel.post.selftextTruncated {
                 Text(selftextTruncated)
             }
             
             HStack(alignment: .center) {
-                Button {
-                    
-                } label: {
+                Button(action: {
+                    postViewModel.votePost(vote: 1)
+                }) {
                     SwiftUI.Image("upvote")
                 }
+                .buttonStyle(.borderless)
                 
-                Text(String(post.score))
+                Text(String(postViewModel.post.score))
                     .frame(width: 50, alignment: .center)
                 
-                Button {
-                    
-                } label: {
+                Button(action: {
+                    postViewModel.votePost(vote: -1)
+                }) {
                     SwiftUI.Image("downvote")
                 }
                 .padding(.trailing, 16)
+                .buttonStyle(.borderless)
                 
                 Button {
                     
                 } label: {
                     SwiftUI.Image("comment")
                 }
+                .buttonStyle(.borderless)
                 
-                Text(String(post.numComments))
+                Text(String(postViewModel.post.numComments))
                 
                 Spacer()
                 
@@ -91,6 +94,7 @@ struct PostViewCard: View {
                 } label: {
                     SwiftUI.Image(systemName: "square.and.arrow.up")
                 }
+                .buttonStyle(.borderless)
             }
             .padding(.vertical, 8)
         }

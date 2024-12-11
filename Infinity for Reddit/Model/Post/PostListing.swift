@@ -141,7 +141,7 @@ public class ListingData : NSObject, NSCoding{
     }
 }
 
-class Post : NSObject, NSCoding, ObservableObject, Identifiable {
+public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
     var approvedAtUtc : String!
     var approvedBy : String!
     var archived : Bool!
@@ -164,6 +164,7 @@ class Post : NSObject, NSCoding, ObservableObject, Identifiable {
     var isRedditMediaDomain : Bool!
     var isSelf : Bool!
     var isVideo : Bool!
+    @Published var likes: Int!
     var linkFlairRichtext : [LinkFlairRichtext]! = [LinkFlairRichtext]()
     var linkFlairText : String!
     var linkFlairType : String!
@@ -256,6 +257,7 @@ class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         isRedditMediaDomain = json["is_reddit_media_domain"].boolValue
         isSelf = json["is_self"].boolValue
         isVideo = json["is_video"].boolValue
+        likes = json["likes"].intValue
         let linkFlairRichtextArray = json["link_flair_richtext"].arrayValue
         for linkFlairRichtextJson in linkFlairRichtextArray{
             linkFlairRichtext.append(LinkFlairRichtext(fromJson: linkFlairRichtextJson))
@@ -408,6 +410,9 @@ class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         if isVideo != nil{
             dictionary["is_video"] = isVideo
         }
+        if likes != nil {
+            dictionary["likes"] = likes
+        }
         if linkFlairRichtext != nil{
             dictionary["link_flair_richtext"] = linkFlairRichtext
         }
@@ -550,7 +555,7 @@ class Post : NSObject, NSCoding, ObservableObject, Identifiable {
      * NSCoding required initializer.
      * Fills the data from the passed decoder
      */
-    @objc required init(coder aDecoder: NSCoder)
+    @objc required public init(coder aDecoder: NSCoder)
     {
         approvedAtUtc = aDecoder.decodeObject(forKey: "approved_at_utc") as? String
         approvedBy = aDecoder.decodeObject(forKey: "approved_by") as? String
@@ -573,6 +578,7 @@ class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         isOriginalContent = aDecoder.decodeObject(forKey: "is_original_content") as? Bool
         isSelf = aDecoder.decodeObject(forKey: "is_self") as? Bool
         isVideo = aDecoder.decodeObject(forKey: "is_video") as? Bool
+        likes = aDecoder.decodeObject(forKey: "likes") as? Int
         linkFlairRichtext = aDecoder.decodeObject(forKey: "link_flair_richtext") as? [LinkFlairRichtext]
         linkFlairText = aDecoder.decodeObject(forKey: "link_flair_text") as? String
         linkFlairType = aDecoder.decodeObject(forKey: "link_flair_type") as? String
@@ -624,7 +630,7 @@ class Post : NSObject, NSCoding, ObservableObject, Identifiable {
      * NSCoding required method.
      * Encodes mode properties into the decoder
      */
-    func encode(with aCoder: NSCoder)
+    public func encode(with aCoder: NSCoder)
     {
         if approvedAtUtc != nil{
             aCoder.encode(approvedAtUtc, forKey: "approved_at_utc")
@@ -691,6 +697,9 @@ class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         }
         if isVideo != nil{
             aCoder.encode(isVideo, forKey: "is_video")
+        }
+        if likes != nil {
+            aCoder.encode(likes, forKey: "likes")
         }
         if linkFlairRichtext != nil{
             aCoder.encode(linkFlairRichtext, forKey: "link_flair_richtext")

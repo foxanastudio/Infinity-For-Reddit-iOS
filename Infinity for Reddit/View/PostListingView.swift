@@ -41,10 +41,8 @@ struct PostListingView: View {
             } else {
                 List {
                     ForEach(postListingViewModel.posts, id: \.id) { post in
-                        //Text(post.title)
-                        PostViewCard()
+                        PostViewCard(account: accountViewModel.account, post: post)
                             .id(post.id)
-                            .environmentObject(post)
                     }
                     if postListingViewModel.hasMorePages {
                         Text("Loading more pages")
