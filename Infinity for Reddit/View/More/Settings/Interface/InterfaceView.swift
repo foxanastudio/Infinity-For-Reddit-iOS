@@ -107,7 +107,7 @@ struct InterfaceView: View {
             NavigationLink(destination: TimeFormatView()) {
                 Text("Time Format").padding(.leading, 44.5)
             }
-            NavigationLink(destination: InterfaceView()) {
+            NavigationLink(destination: PostView()) {
                 Text("Post").padding(.leading, 44.5)
             }
             NavigationLink(destination: InterfaceView()) {

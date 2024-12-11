@@ -48,4 +48,19 @@ struct UserDefaultsUtils {
     static let SHOW_ELAPSED_TIME_KEY = "show_elapsed_time"
     static let TIME_FORMAT_KEY = "time_format"
     
+    // PostView
+    static let DEFAULT_POST_LAYOUT_KEY = "default_post_layout"
+    static let DEFAULT_LINK_POST_LAYOUT_KEY = "default_link_post_layout"
+    static let HIDE_POST_TYPE = "hide_post_type"
+    static let HIDE_POST_FLAIR = "hide_post_fair"
+    static let HIDE_SUBREDDIT_AND_USER_PREFIX = "hide_subreddit_and_user_prefix"
+    static let HIDE_THE_NUMBER_OF_VOTES = "hide_the_number_of_votes"
+    static let HIDE_THE_NUMBER_OF_COMMENTS = "hide_the_number_of_comments"
+    static let HIDE_TEXT_POST_CONTENT = "hide_text_post_content"
+    static let FIXED_HEIGHT_PREVIEW_IN_CARD = "fixed_height_preview_in_card"
+    static let SHOW_DIVIDER_IN_COMPACT_LAYOUT = "show_divider_in_compact_layout"
+    static let SHOW_THUMBNAIL_ON_THE_LEFT_IN_COMPACT_LAYOUT = "show_thumbnail_on_the_left_in_compact_layout"
+    static let LONG_PRESS_TO_HIDE_TOOLBAR_IN_COMPACT_LAYOUT = "long_press_to_hide_toolbar_in_compact_layout"
+    static let POST_COMPACT_LAYOUT_TOOLBAR_HIDDEN_BY_DEFAULT = "post_compact_layout_toolbar_hidden_by_default"
+    static let CLICK_TO_SHOW_MEDIA_IN_GALLERY_LAYOUT = "click_to_show_media_in_gallery_layout"
 }
