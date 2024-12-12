@@ -28,17 +28,14 @@ public class PostViewModel: ObservableObject {
         let previousVote = post.likes
         
         var point: String
-        if let likes = post.likes {
-            if vote == likes {
-                point = "0"
-                post.likes = 0
-            } else {
-                point = String(vote)
-                post.likes = vote
-            }
+        if vote == post.likes {
+            point = "0"
+            post.likes = 0
         } else {
             point = String(vote)
+            post.likes = vote
         }
+        self.objectWillChange.send()
         
         let params = ["dir": point, "id": fullName, "rank": "10"]
         session.request(RedditOAuthAPI.vote(headers: APIUtils.getOAuthHeader(accessToken: accessToken), params: params))
@@ -47,8 +44,10 @@ public class PostViewModel: ObservableObject {
                 switch response.result {
                 case .success(let data):
                     self.post.likes = Int(vote)
+                    self.objectWillChange.send()
                 case .failure(let error):
                     self.post.likes = previousVote
+                    self.objectWillChange.send()
                 }
             }
         }

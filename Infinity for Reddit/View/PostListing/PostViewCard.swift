@@ -62,8 +62,9 @@ struct PostViewCard: View {
             HStack(alignment: .center) {
                 Button(action: {
                     postViewModel.votePost(vote: 1)
+                    postViewModel.post.likes = 1
                 }) {
-                    SwiftUI.Image("upvote")
+                    SwiftUI.Image(postViewModel.post.likes == 1 ? "upvoted" : "upvote")
                 }
                 .buttonStyle(.borderless)
                 
@@ -73,7 +74,7 @@ struct PostViewCard: View {
                 Button(action: {
                     postViewModel.votePost(vote: -1)
                 }) {
-                    SwiftUI.Image("downvote")
+                    SwiftUI.Image(postViewModel.post.likes == -1 ? "downvoted" : "downvote")
                 }
                 .padding(.trailing, 16)
                 .buttonStyle(.borderless)

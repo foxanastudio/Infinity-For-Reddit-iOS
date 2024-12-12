@@ -257,7 +257,7 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         isRedditMediaDomain = json["is_reddit_media_domain"].boolValue
         isSelf = json["is_self"].boolValue
         isVideo = json["is_video"].boolValue
-        likes = json["likes"].intValue
+        likes = json["likes"] == JSON.null ? 0 : json["likes"].boolValue == true ? 1 : -1
         let linkFlairRichtextArray = json["link_flair_richtext"].arrayValue
         for linkFlairRichtextJson in linkFlairRichtextArray{
             linkFlairRichtext.append(LinkFlairRichtext(fromJson: linkFlairRichtextJson))
@@ -838,9 +838,9 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         }
     }
     
-    static func == (lhs: Post, rhs: Post) -> Bool {
-        return lhs.id == rhs.id
-    }
+//    static func == (lhs: Post, rhs: Post) -> Bool {
+//        return lhs.id == rhs.id
+//    }
 }
 
 class Preview : NSObject, NSCoding{
