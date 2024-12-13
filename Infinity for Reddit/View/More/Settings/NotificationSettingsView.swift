@@ -11,47 +11,17 @@ import Swinject
 import GRDB
 
 struct NotificationSettingsView: View {
-    @Environment(\.dependencyManager) private var container: Container
-    @State private var enableNotifications: Bool
-    @State private var checkNotificationsInterval: Int
-    
-    let ENABLE_NOTIFICATION_KEY = UserDefaultsUtils.ENABLE_NOTIFICATION_KEY
-    let NOTIFICATION_INTERVAL_KEY = UserDefaultsUtils.NOTIFICATION_INTERVAL_KEY
-    
-    private let notificationsIntervals: [String] = ["15 minutes", "30 minutes", "1 hour", "2 hours", "3 hours", "4 hours", "6 hours", "12 hours", "1 day"]
-    private let userDefaults: UserDefaults
-
-    init() {
-        guard let resolvedUserDefaults = DependencyManager.shared.container.resolve(UserDefaults.self) else {
-            fatalError("Failed to resolve UserDefaults")
-        }
-        self.userDefaults = resolvedUserDefaults
-        if userDefaults.object(forKey: ENABLE_NOTIFICATION_KEY) == nil {
-            userDefaults.set(true, forKey: ENABLE_NOTIFICATION_KEY)
-            }
-        if userDefaults.object(forKey: NOTIFICATION_INTERVAL_KEY) == nil {
-            userDefaults.set(2, forKey: NOTIFICATION_INTERVAL_KEY)
-        }
-
-        _enableNotifications = State(initialValue: userDefaults.bool(forKey: ENABLE_NOTIFICATION_KEY))
-        _checkNotificationsInterval = State(initialValue: userDefaults.integer(forKey: NOTIFICATION_INTERVAL_KEY))
-    }
+    @StateObject private var notificationSettingsViewModel = NotificationSettingsViewModel()
 
     var body: some View {
         Form {
             Section {
-                Toggle("Enable Notifications", systemImage: "bell.fill", isOn: $enableNotifications)
-                    .onChange(of: enableNotifications) { _, newValue in
-                        userDefaults.set(newValue, forKey: ENABLE_NOTIFICATION_KEY)
-                    }
+                Toggle("Enable Notifications", systemImage: "bell.fill", isOn: $notificationSettingsViewModel.enableNotifications)
                 
-                Picker("Check Notifications Interval", systemImage: "clock.fill", selection: $checkNotificationsInterval) {
-                    ForEach(0..<notificationsIntervals.count, id: \.self) { index in
-                        Text(notificationsIntervals[index]).tag(index)
+                Picker("Check Notifications Interval", systemImage: "clock.fill", selection: $notificationSettingsViewModel.checkNotificationsInterval) {
+                    ForEach(0..<notificationSettingsViewModel.notificationsIntervals.count, id: \.self) { index in
+                        Text(notificationSettingsViewModel.notificationsIntervals[index]).tag(index)
                         }
-                }
-                .onChange(of: checkNotificationsInterval) { _, newValue in
-                    userDefaults.set(newValue, forKey: NOTIFICATION_INTERVAL_KEY)
                 }
             }
         }
