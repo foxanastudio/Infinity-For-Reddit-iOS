@@ -38,7 +38,7 @@ public class PostViewModel: ObservableObject {
         self.objectWillChange.send()
         
         let params = ["dir": point, "id": fullName, "rank": "10"]
-        session.request(RedditOAuthAPI.vote(headers: APIUtils.getOAuthHeader(accessToken: accessToken), params: params))
+        session.request(RedditOAuthAPI.vote(params: params))
             .validate()
             .responseData { response in
                 switch response.result {

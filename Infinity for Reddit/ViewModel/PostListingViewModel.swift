@@ -49,7 +49,6 @@ public class PostListingViewModel: ObservableObject {
         postListingRepository.fetchPosts(
             postListingType: postListingMetadata.postListingType,
             pathComponents: postListingMetadata.pathComponents,
-            headers: postListingMetadata.headers,
             queries: ["limit": "100", "after": after ?? ""].merging(postListingMetadata.queries ?? [:], uniquingKeysWith: { _, new in new }),
             params: postListingMetadata.params
         )

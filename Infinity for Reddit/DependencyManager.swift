@@ -22,30 +22,31 @@ struct DependencyManager {
     
     private func registerDependencies(_ c: Container) {
         // TODO register dependencies on container
-        c.register(Session.self) {_ in
+        c.register(Session.self) { _ in
             let configuration = URLSessionConfiguration.af.default
-            return Session(configuration: configuration)
-        }
-        c.register(DatabasePool.self) {_ in
+            return Session(configuration: configuration, interceptor: RedditAccessTokenInterceptor())
+        }.inObjectScope(.container) // Singleton
+        
+        c.register(DatabasePool.self) { _ in
             do {
                 return try RedditGRDBDatabase.create()
             } catch {
                 fatalError("Failed to create DatabasePool: \(error)")
             }
-        }
+        }.inObjectScope(.container) // Singleton
         
         c.register(OperationQueue.self) { _ in
             let operationQueue = OperationQueue()
             operationQueue.maxConcurrentOperationCount = 4
             return operationQueue
-        }
+        }.inObjectScope(.container) // Singleton
         
         c.register(UserDefaults.self) { _ in
             UserDefaults.standard
-        }
+        }.inObjectScope(.container) // Singleton
         
         c.register(UserDefaults.self, name: "PostDetails") { _ in
             return UserDefaults(suiteName: "com.docilealligator.infinityforReddit.PostDetails")!
-        }
+        }.inObjectScope(.container) // Singleton
     }
 }

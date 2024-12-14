@@ -6,6 +6,7 @@
 //
 
 import GRDB
+import Combine
 
 struct AccountDao {
     private let dbPool: DatabasePool
@@ -72,6 +73,17 @@ struct AccountDao {
         try dbPool.read { db in
             try Account.fetchOne(db, sql: "SELECT * FROM accounts WHERE is_current_user = 1 AND username != '-'")
         }
+    }
+    
+    func getCurrentAccountObservation() throws -> AnyPublisher<Account?, Error> {
+        ValueObservation
+            .tracking { db in
+                try dbPool.read { db in // Use dbPool.read for the transaction
+                    try Account.fetchOne(db, sql: "SELECT * FROM accounts WHERE is_current_user = 1 AND username != '-'")
+                }
+            }
+            .publisher(in: dbPool)
+            .eraseToAnyPublisher()
     }
 
     func updateAccountInfo(username: String, profileImageUrl: String?, bannerImageUrl: String?, karma: Int?) throws {

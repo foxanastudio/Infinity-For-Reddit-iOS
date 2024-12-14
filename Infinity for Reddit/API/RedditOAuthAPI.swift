@@ -9,14 +9,14 @@ import Alamofire
 import Foundation
 
 enum RedditOAuthAPI: URLRequestConvertible {
-    case getMyInfo(headers: HTTPHeaders)
-    case getFrontPagePosts(pathComponents: [String: String], headers: HTTPHeaders, queries: [String: String])
-    case getSubredditPosts(pathComponents: [String: String], headers: HTTPHeaders, queries: [String: String])
-    case getUserPosts(pathComponents: [String: String], headers: HTTPHeaders, queries: [String: String])
-    case getSearchPosts(headers: HTTPHeaders, queries: [String: String])
-    case getMultiredditPosts(pathComponents: [String: String], headers: HTTPHeaders, queries: [String: String])
-    case getSubredditConcatPosts(pathComponents: [String: String], headers: HTTPHeaders, queries: [String: String])
-    case vote(headers: HTTPHeaders, params: [String: String])
+    case getMyInfo
+    case getFrontPagePosts(pathComponents: [String: String], queries: [String: String])
+    case getSubredditPosts(pathComponents: [String: String], queries: [String: String])
+    case getUserPosts(pathComponents: [String: String], queries: [String: String])
+    case getSearchPosts(queries: [String: String])
+    case getMultiredditPosts(pathComponents: [String: String], queries: [String: String])
+    case getSubredditConcatPosts(pathComponents: [String: String], queries: [String: String])
+    case vote(params: [String: String])
     
     private var baseURL: String {
         return "https://oauth.reddit.com"
@@ -37,19 +37,19 @@ enum RedditOAuthAPI: URLRequestConvertible {
         switch self {
         case .getMyInfo:
             return "/api/v1/me"
-        case .getFrontPagePosts(let pathComponents, _, _):
+        case .getFrontPagePosts(let pathComponents, _):
             return "/\(pathComponents["sortType"] ?? "best").json"
         case .vote:
             return "/api/vote"
-        case .getSubredditPosts(let pathComponents, let headers, let queries):
+        case .getSubredditPosts(let pathComponents, let queries):
             return "/r/\(pathComponents["subreddit"] ?? "popular")/\(pathComponents["sortType"] ?? "hot").json"
-        case .getUserPosts(let pathComponents, let headers, let queries):
+        case .getUserPosts(let pathComponents, let queries):
             return "/user/\(pathComponents["username"] ?? "")/\(pathComponents["where"] ?? "submitted").json"
         case .getSearchPosts:
             return "search.json"
-        case .getMultiredditPosts(let pathComponents, let headers, let queries):
+        case .getMultiredditPosts(let pathComponents, let queries):
             return "\(pathComponents["multipath"] ?? "popular").json"
-        case .getSubredditConcatPosts(let pathComponents, let headers, let queries):
+        case .getSubredditConcatPosts(let pathComponents, let queries):
             return "/r/\(pathComponents["subreddit"] ?? "popular")/\(pathComponents["sortType"] ?? "hot").json"
         }
     }
@@ -58,7 +58,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
         switch self {
         case .getMyInfo, .getFrontPagePosts:
             return nil
-        case .vote(_, let params):
+        case .vote(let params):
             return params
         case .getSubredditPosts:
             return nil
@@ -75,43 +75,43 @@ enum RedditOAuthAPI: URLRequestConvertible {
     
     var queries: [String: String]? {
         switch self {
-        case .getMyInfo(_):
+        case .getMyInfo:
             return ["raw_json": "1"]
-        case .getFrontPagePosts(_, _, let queries):
+        case .getFrontPagePosts(_, let queries):
             return ["raw_json": "1"].merging(queries, uniquingKeysWith: { _, new in new })
-        case .vote(_, _):
+        case .vote(_):
             return nil
-        case .getSubredditPosts(_, _, let queries):
+        case .getSubredditPosts(_, let queries):
             return ["raw_json": "1"].merging(queries, uniquingKeysWith: { _, new in new })
-        case .getUserPosts(_, _, let queries):
+        case .getUserPosts(_, let queries):
             return ["raw_json": "1"].merging(queries, uniquingKeysWith: { _, new in new })
-        case .getSearchPosts(_, let queries):
+        case .getSearchPosts(let queries):
             return ["raw_json": "1"].merging(queries, uniquingKeysWith: { _, new in new })
-        case .getMultiredditPosts(_, _, let queries):
+        case .getMultiredditPosts(_, let queries):
             return ["raw_json": "1"].merging(queries, uniquingKeysWith: { _, new in new })
-        case .getSubredditConcatPosts(_, _, let queries):
+        case .getSubredditConcatPosts(_, let queries):
             return ["raw_json": "1"].merging(queries, uniquingKeysWith: { _, new in new })
         }
     }
     
     var headers: HTTPHeaders? {
         switch self {
-        case .getMyInfo(let headers):
-            return headers
-        case .getFrontPagePosts(_, let headers, _):
-            return headers
-        case .vote(let headers, _):
-            return headers
-        case .getSubredditPosts(_, let headers, _):
-            return headers
-        case .getUserPosts(_, let headers, _):
-            return headers
-        case .getSearchPosts(let headers, _):
-            return headers
-        case .getMultiredditPosts(_, let headers, _):
-            return headers
-        case .getSubredditConcatPosts(_, let headers, _):
-            return headers
+        case .getMyInfo:
+            return nil
+        case .getFrontPagePosts(_, _):
+            return nil
+        case .vote(_):
+            return nil
+        case .getSubredditPosts(_, _):
+            return nil
+        case .getUserPosts(_, _):
+            return nil
+        case .getSearchPosts(_):
+            return nil
+        case .getMultiredditPosts(_, _):
+            return nil
+        case .getSubredditConcatPosts(_, _):
+            return nil
         }
     }
     

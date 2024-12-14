@@ -24,7 +24,8 @@ struct Infinity: App {
             fatalError("Failed to resolve DatabasePool")
         }
         
-        _accountViewModel = StateObject(wrappedValue: AccountViewModel(dbPool: resolvedDBPool))
+        AccountViewModel.initializeShared(using: DependencyManager.shared.container)
+        _accountViewModel = StateObject(wrappedValue: AccountViewModel.shared)
         _customThemeViewModel = StateObject(wrappedValue: CustomThemeViewModel())
     }
 

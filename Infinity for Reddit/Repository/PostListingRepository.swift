@@ -30,7 +30,6 @@ public class PostListingRepository: PostListingRepositoryProtocol {
     public func fetchPosts(
         postListingType: PostListingType,
         pathComponents: [String: String]? = nil,
-        headers: HTTPHeaders? = nil,
         queries: [String: String]? = [:],
         params: [String: String]? = [:]
     ) -> AnyPublisher<ListingData, any Error> {
@@ -38,17 +37,17 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         let apiRequest: URLRequestConvertible
         switch postListingType {
         case .frontPage:
-            apiRequest = RedditOAuthAPI.getFrontPagePosts(pathComponents: pathComponents!, headers: headers!, queries: queries!)
+            apiRequest = RedditOAuthAPI.getFrontPagePosts(pathComponents: pathComponents!, queries: queries!)
         case .subreddit:
-            apiRequest = RedditOAuthAPI.getSubredditPosts(pathComponents: pathComponents!, headers: headers!, queries: queries!)
+            apiRequest = RedditOAuthAPI.getSubredditPosts(pathComponents: pathComponents!, queries: queries!)
         case .user:
-            apiRequest = RedditOAuthAPI.getUserPosts(pathComponents: pathComponents!, headers: headers!, queries: queries!)
+            apiRequest = RedditOAuthAPI.getUserPosts(pathComponents: pathComponents!, queries: queries!)
         case .search:
-            apiRequest = RedditOAuthAPI.getSearchPosts(headers: headers!, queries: queries!)
+            apiRequest = RedditOAuthAPI.getSearchPosts(queries: queries!)
         case .multireddit:
-            apiRequest = RedditOAuthAPI.getMultiredditPosts(pathComponents: pathComponents!, headers: headers!, queries: queries!)
+            apiRequest = RedditOAuthAPI.getMultiredditPosts(pathComponents: pathComponents!, queries: queries!)
         case .subredditConcat:
-            apiRequest = RedditOAuthAPI.getSubredditConcatPosts(pathComponents: pathComponents!, headers: headers!, queries: queries!)
+            apiRequest = RedditOAuthAPI.getSubredditConcatPosts(pathComponents: pathComponents!, queries: queries!)
         }
         
         return Future<ListingData, any Error> { promise in

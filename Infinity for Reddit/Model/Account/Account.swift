@@ -7,7 +7,7 @@
 
 import GRDB
 
-public struct Account: Codable, FetchableRecord, PersistableRecord {
+public struct Account: Codable, FetchableRecord, PersistableRecord, Sendable {
     static let ANONYMOUS_ACCOUNT = Account(username: "-", isCurrentUser: false, profileImageUrl: nil, bannerImageUrl: nil, karma: 0, isMod: false, accessToken: nil, refreshToken: nil, code: nil)
     
     public static let databaseTableName = "accounts"

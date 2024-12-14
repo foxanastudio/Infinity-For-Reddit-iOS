@@ -98,8 +98,7 @@ struct LoginView: View {
                                                                     print("Access Token: \(accessToken)")
                                                                     print("Refresh Token: \(refreshToken)")
                                                                     
-                                                                    session.request(RedditOAuthAPI.getMyInfo(
-                                                                        headers: APIUtils.getOAuthHeader(accessToken: accessToken)))
+                                                                    session.request(RedditOAuthAPI.getMyInfo)
                                                                     .validate()
                                                                     .responseString { response in
                                                                         switch response.result {
