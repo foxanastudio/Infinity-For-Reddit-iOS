@@ -75,6 +75,7 @@ struct AccountDao {
         }
     }
     
+    // TODO May not work
     func getCurrentAccountObservation() throws -> AnyPublisher<Account?, Error> {
         ValueObservation
             .tracking { db in

@@ -44,9 +44,15 @@ public class AccountViewModel: ObservableObject {
     
     public func updateTokens(accessToken: String, refreshToken: String?) throws {
         account.accessToken = accessToken
-        try accountDao.updateAccessToken(username: account.username, accessToken: accessToken)
+        if let validRefreshToken = refreshToken, !validRefreshToken.isEmpty {
+            account.refreshToken = validRefreshToken
+            try accountDao.updateAccessTokenAndRefreshToken(username: account.username, accessToken: accessToken, refreshToken: validRefreshToken)
+        } else {
+            try accountDao.updateAccessToken(username: account.username, accessToken: accessToken)
+        }
     }
     
+    // TODO May not work
     private func subscribeToCurrentAccount() {
         // Subscribe to the getCurrentAccountObservation publisher
         do {
