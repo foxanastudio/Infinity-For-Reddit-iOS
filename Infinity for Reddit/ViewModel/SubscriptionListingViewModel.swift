@@ -19,12 +19,18 @@ public class SubscriptionListingViewModel: ObservableObject {
     @Published var isLoadingMyCustomFeeds: Bool = false
     private var after: String? = nil
     private var cancellables = Set<AnyCancellable>()
+    private let operationqueue: OperationQueue
     
     public let subscriptionListingRepository: SubscriptionListingRepositoryProtocol
     
     // MARK: - Initializer
     init(subscriptionListingRepository: SubscriptionListingRepositoryProtocol) {
         self.subscriptionListingRepository = subscriptionListingRepository
+        guard let resolvedOperationQueue = DependencyManager.shared.container.resolve(OperationQueue.self) else {
+            fatalError("Could not resolve OperationQueue")
+        }
+        
+        self.operationqueue = resolvedOperationQueue
     }
     
     // MARK: - Methods
@@ -141,74 +147,61 @@ public class SubscriptionListingViewModel: ObservableObject {
         loadMyCustomFeeds()
     }
     
-//    private func insertSubscribedThings(
-//        dbPool: DatabasePool,
-//        accountName: String,
-//        subscribedSubredditDataList: [SubscribedSubredditData]?,
-//        subscribedUserDataList: [SubscribedUserData]?,
-//        subredditDataList: [SubredditData]?,
-//        completion: @escaping () -> Void
-//    ) {
-//        DispatchQueue.global(qos: .background).async {
-//            do {
-//                try dbPool.write { db in
-//                    // Check if account exists
-//                    guard accountName != Account.ANONYMOUS_ACCOUNT,
-//                          let _ = try Account.fetchOne(db, key: accountName) else {
-//                        DispatchQueue.main.async {
-//                            completion()
-//                        }
-//                        return
-//                    }
-//
-//                    // Handle subscribed subreddits
-//                    if let subredditList = subscribedSubredditDataList {
-//                        let dao = SubscribedSubredditDao(dbPool: dbPool)
-//                        let existingSubreddits = try dao.getAllSubscribedSubredditsList(accountName: accountName)
-//
-//                        let unsubscribedSubreddits = existingSubreddits.filter { existing in
-//                            !subredditList.contains { $0.name == existing.name }
-//                        }
-//
-//                        for unsubscribed in unsubscribedSubreddits {
-//                            try dao.deleteSubscribedSubreddit(subredditName: unsubscribed.name ?? "", accountName: accountName)
-//                        }
-//
-//                        try dao.insertAll(subscribedSubredditData: subredditList)
-//                    }
-//
-//                    // Handle subscribed users
-//                    if let userList = subscribedUserDataList {
-//                        let dao = SubscribedUserDao(dbPool: dbPool)
-//                        let existingUsers = try dao.getAllSubscribedUsersList(accountName: accountName)
-//
-//                        let unsubscribedUsers = existingUsers.filter { existing in
-//                            !userList.contains { $0.name == existing.name }
-//                        }
-//
-//                        for unsubscribed in unsubscribedUsers {
-//                            try dao.deleteSubscribedUser(userName: unsubscribed.name ?? "", accountName: accountName)
-//                        }
-//
-//                        try dao.insertAll(subscribedUserData: userList)
-//                    }
-//
-//                    // Handle subreddit data
+    private func insertSubscribedThings(
+        dbPool: DatabasePool,
+        accountName: String,
+        subredditDataList: [SubredditData]?,
+        completion: @escaping () -> Void
+    ) {
+        operationqueue.addOperation {
+            do {
+                try dbPool.write { db in
+                    // Check if account exists
+                    guard !AccountViewModel.shared.account.isAnonymous(),
+                          let _ = try Account.fetchOne(db, key: accountName) else {
+                        DispatchQueue.main.async {
+                            completion()
+                        }
+                        return
+                    }
+
+                    // Handle subscribed subreddits
+                    let subscribedSubredditDao = SubscribedSubredditDao(dbPool: dbPool)
+                    let existingSubreddits = try subscribedSubredditDao.getAllSubscribedSubredditsList(accountName: accountName)
+
+                    let unsubscribedSubreddits = existingSubreddits.filter { existing in
+                        !self.subredditSubscriptions.contains { $0.name == existing.name }
+                    }
+
+                    for unsubscribed in unsubscribedSubreddits {
+                        try subscribedSubredditDao.deleteSubscribedSubreddit(subredditName: unsubscribed.name ?? "", accountName: accountName)
+                    }
+
+                    //try subscribedSubredditDao.insertAll(subscribedSubredditData: subredditList)
+
+                    // Handle subscribed users
+                    let subscribedUserDao = SubscribedUserDao(dbPool: dbPool)
+                    let existingUsers = try subscribedUserDao.getAllSubscribedUsersList(accountName: accountName)
+
+                    let unsubscribedUsers = existingUsers.filter { existing in
+                        !self.userSubscriptions.contains { $0.name == existing.name }
+                    }
+
+                    for unsubscribed in unsubscribedUsers {
+                        try subscribedUserDao.deleteSubscribedUser(name: unsubscribed.name, accountName: accountName)
+                    }
+
+                    //try subscribedUserDao.insertAll(subscribedUserData: userList)
+
+                    // TODO Need to save subreddit data
 //                    if let subredditList = subredditDataList {
 //                        let dao = SubredditDao(dbPool: dbPool)
 //                        try dao.insertAll(subredditData: subredditList)
 //                    }
-//                }
-//
-//                DispatchQueue.main.async {
-//                    completion()
-//                }
-//            } catch {
-//                print("Error updating subscribed things: \(error)")
-//                DispatchQueue.main.async {
-//                    completion()
-//                }
-//            }
-//        }
-//    }
+                }
+            } catch {
+                print("Error updating subscribed things: \(error)")
+            }
+        }
+    }
 }
