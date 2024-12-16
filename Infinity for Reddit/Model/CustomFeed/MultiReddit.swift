@@ -44,5 +44,4 @@ struct MultiReddit: Codable, FetchableRecord, PersistableRecord {
         self.isFavorite = isFavorite
         self.subreddits = subreddits
     }
-    
 }

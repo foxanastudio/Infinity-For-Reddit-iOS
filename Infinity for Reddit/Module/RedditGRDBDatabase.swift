@@ -73,6 +73,27 @@ struct RedditGRDBDatabase {
                 t.column("containVideoType", .boolean)
                 t.column("containGalleryType", .boolean)
             }
+            
+            try db.create(table: SubscribedSubredditData.databaseTableName, ifNotExists: true) { t in
+                t.column("full_name", .text).notNull()
+                t.column("name", .text).notNull()
+                t.column("icon_url", .text)
+                t.column("username", .text)
+                    .notNull()
+                    .references(Account.databaseTableName, onDelete: .cascade)
+                t.column("favorite", .boolean).notNull().defaults(to: false)
+                t.primaryKey(["full_name", "name"])
+            }
+            
+            try db.create(table: SubscribedUserData.databaseTableName, ifNotExists: true) { t in
+                t.column("name", .text).notNull()
+                t.column("icon_url", .text)
+                t.column("username", .text)
+                    .notNull()
+                    .references(Account.databaseTableName, onDelete: .cascade)
+                t.column("favorite", .boolean).notNull().defaults(to: false)
+                t.primaryKey(["name", "username"])
+            }
         }
     }
 }

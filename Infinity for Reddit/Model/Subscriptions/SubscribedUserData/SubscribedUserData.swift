@@ -22,4 +22,12 @@ struct SubscribedUserData: Codable, FetchableRecord, PersistableRecord {
         self.favorite = favorite
     }
     
+    private enum CodingKeys: String, CodingKey, ColumnExpression, CaseIterable {
+        case name
+        case iconUrl = "icon_url"
+        case username
+        case favorite
+    }
+    
+    public static let databaseSelection: [SQLSelectable] = CodingKeys.allCases.map { $0 }
 }

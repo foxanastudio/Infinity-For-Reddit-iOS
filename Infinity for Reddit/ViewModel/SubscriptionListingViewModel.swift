@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import GRDB
 
 public class SubscriptionListingViewModel: ObservableObject {
     // MARK: - Properties
@@ -139,4 +140,75 @@ public class SubscriptionListingViewModel: ObservableObject {
         loadSubscriptions()
         loadMyCustomFeeds()
     }
+    
+//    private func insertSubscribedThings(
+//        dbPool: DatabasePool,
+//        accountName: String,
+//        subscribedSubredditDataList: [SubscribedSubredditData]?,
+//        subscribedUserDataList: [SubscribedUserData]?,
+//        subredditDataList: [SubredditData]?,
+//        completion: @escaping () -> Void
+//    ) {
+//        DispatchQueue.global(qos: .background).async {
+//            do {
+//                try dbPool.write { db in
+//                    // Check if account exists
+//                    guard accountName != Account.ANONYMOUS_ACCOUNT,
+//                          let _ = try Account.fetchOne(db, key: accountName) else {
+//                        DispatchQueue.main.async {
+//                            completion()
+//                        }
+//                        return
+//                    }
+//
+//                    // Handle subscribed subreddits
+//                    if let subredditList = subscribedSubredditDataList {
+//                        let dao = SubscribedSubredditDao(dbPool: dbPool)
+//                        let existingSubreddits = try dao.getAllSubscribedSubredditsList(accountName: accountName)
+//
+//                        let unsubscribedSubreddits = existingSubreddits.filter { existing in
+//                            !subredditList.contains { $0.name == existing.name }
+//                        }
+//
+//                        for unsubscribed in unsubscribedSubreddits {
+//                            try dao.deleteSubscribedSubreddit(subredditName: unsubscribed.name ?? "", accountName: accountName)
+//                        }
+//
+//                        try dao.insertAll(subscribedSubredditData: subredditList)
+//                    }
+//
+//                    // Handle subscribed users
+//                    if let userList = subscribedUserDataList {
+//                        let dao = SubscribedUserDao(dbPool: dbPool)
+//                        let existingUsers = try dao.getAllSubscribedUsersList(accountName: accountName)
+//
+//                        let unsubscribedUsers = existingUsers.filter { existing in
+//                            !userList.contains { $0.name == existing.name }
+//                        }
+//
+//                        for unsubscribed in unsubscribedUsers {
+//                            try dao.deleteSubscribedUser(userName: unsubscribed.name ?? "", accountName: accountName)
+//                        }
+//
+//                        try dao.insertAll(subscribedUserData: userList)
+//                    }
+//
+//                    // Handle subreddit data
+//                    if let subredditList = subredditDataList {
+//                        let dao = SubredditDao(dbPool: dbPool)
+//                        try dao.insertAll(subredditData: subredditList)
+//                    }
+//                }
+//
+//                DispatchQueue.main.async {
+//                    completion()
+//                }
+//            } catch {
+//                print("Error updating subscribed things: \(error)")
+//                DispatchQueue.main.async {
+//                    completion()
+//                }
+//            }
+//        }
+//    }
 }
