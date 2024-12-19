@@ -42,6 +42,7 @@ struct RedditGRDBDatabase {
                 t.column("refresh_token", .text)
                 t.column("is_current_user", .boolean)
                 t.column("code", .text)
+                t.column("subscription_sync_time", .integer)
             }
             
             try db.create(table: PostFilter.databaseTableName, ifNotExists: true) { t in

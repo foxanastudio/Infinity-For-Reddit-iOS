@@ -56,7 +56,7 @@ struct HomeView: View {
                     }
                     .tag(Tab.inbox)
                     
-                    MoreView()
+                    LoginView()
                         .tabItem {
                             Label("More", systemImage: "person")
                         }

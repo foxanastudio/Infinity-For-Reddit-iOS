@@ -6,8 +6,9 @@
 //
 
 import GRDB
+import Foundation
 
-struct SubscribedUserData: Codable, FetchableRecord, PersistableRecord {
+class SubscribedUserData: Codable, FetchableRecord, PersistableRecord {
     static let databaseTableName: String = "subscribed_users"
     
     var name: String

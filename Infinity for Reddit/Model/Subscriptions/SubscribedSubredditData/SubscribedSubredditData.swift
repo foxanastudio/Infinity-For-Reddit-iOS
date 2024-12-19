@@ -7,16 +7,16 @@
 
 import GRDB
 
-struct SubscribedSubredditData: Codable, FetchableRecord, PersistableRecord {
+class SubscribedSubredditData: Codable, FetchableRecord, PersistableRecord {
     static let databaseTableName = "subscribed_subreddits"
     
     var fullName: String
-    var name: String?
+    var name: String
     var iconUrl: String?
     var username: String
     var favorite: Bool
 
-    init(fullName: String, name: String? = nil, iconUrl: String? = nil, username: String, favorite: Bool) {
+    init(fullName: String, name: String, iconUrl: String? = nil, username: String, favorite: Bool) {
         self.fullName = fullName
         self.name = name
         self.iconUrl = iconUrl

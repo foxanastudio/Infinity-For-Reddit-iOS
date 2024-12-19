@@ -21,6 +21,7 @@ public struct Account: Codable, FetchableRecord, PersistableRecord, Sendable {
     var accessToken: String?
     var refreshToken: String?
     var code: String?
+    var subscriptionSyncTime: Int64
     
     init(username: String, isCurrentUser: Bool, profileImageUrl: String? = nil, bannerImageUrl: String? = nil, karma: Int, isMod: Bool, accessToken: String? = nil, refreshToken: String? = nil, code: String? = nil) {
         self.username = username
@@ -32,6 +33,7 @@ public struct Account: Codable, FetchableRecord, PersistableRecord, Sendable {
         self.accessToken = accessToken
         self.refreshToken = refreshToken
         self.code = code
+        self.subscriptionSyncTime = 0
     }
     
     func isAnonymous() -> Bool {
@@ -48,6 +50,7 @@ public struct Account: Codable, FetchableRecord, PersistableRecord, Sendable {
         case accessToken = "access_token"
         case refreshToken = "refresh_token"
         case code
+        case subscriptionSyncTime = "subscription_sync_time"
     }
     
     public static let databaseSelection: [SQLSelectable] = CodingKeys.allCases.map { $0 }

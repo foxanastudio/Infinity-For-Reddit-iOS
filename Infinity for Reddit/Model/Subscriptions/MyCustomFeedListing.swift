@@ -327,5 +327,3 @@ class SubredditInCustomFeed : NSObject, NSCoding{
     }
     
 }
-
-

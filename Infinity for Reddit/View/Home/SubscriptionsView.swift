@@ -71,8 +71,8 @@ struct SubscriptionsView: View {
                     Text("No subscribed subreddits")
                 } else {
                     List {
-                        ForEach(subscriptionListingViewModel.subredditSubscriptions, id: \.id) { subscription in
-                            Text(subscription.displayName)
+                        ForEach(subscriptionListingViewModel.subredditSubscriptions, id: \.fullName) { subscription in
+                            Text(subscription.name)
                         }
                     }.scrollBounceBehavior(.basedOnSize)
                 }
@@ -91,8 +91,8 @@ struct SubscriptionsView: View {
                     Text("No subscribed users")
                 } else {
                     List {
-                        ForEach(subscriptionListingViewModel.userSubscriptions, id: \.id) { subscription in
-                            Text(subscription.displayName)
+                        ForEach(subscriptionListingViewModel.userSubscriptions, id: \.name) { subscription in
+                            Text(subscription.name)
                         }
                     }.scrollBounceBehavior(.basedOnSize)
                 }

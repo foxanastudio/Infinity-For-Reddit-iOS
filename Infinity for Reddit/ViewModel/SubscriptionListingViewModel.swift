@@ -11,8 +11,8 @@ import GRDB
 
 public class SubscriptionListingViewModel: ObservableObject {
     // MARK: - Properties
-    @Published var subredditSubscriptions: [Subscription] = []
-    @Published var userSubscriptions: [Subscription] = []
+    @Published var subredditSubscriptions: [SubscribedSubredditData] = []
+    @Published var userSubscriptions: [SubscribedUserData] = []
     private var subscriptionsPrivate: [Subscription] = []
     @Published var myCustomFeeds: [CustomFeed] = []
     @Published var isLoadingSubscriptions: Bool = false
@@ -75,13 +75,45 @@ public class SubscriptionListingViewModel: ObservableObject {
                 subreddits.sort { $0.displayName.lowercased() < $1.displayName.lowercased() }
                 users.sort { $0.displayName.lowercased() < $1.displayName.lowercased() }
                 
-                insertSubscribedThings(subredditSubscriptions: subreddits, userSubscriptions: users)
+                let subredditSubscriptionsTemp = subreddits.map {
+                    SubscribedSubredditData(
+                        fullName: $0.name,
+                        name: $0.displayName,
+                        iconUrl: $0.iconImg,
+                        username: AccountViewModel.shared.account.username,
+                        favorite: $0.userHasFavorited
+                    )
+                }
+                
+                let userSubscriptionsTemp = users.map {
+                    SubscribedUserData(
+                        name: $0.displayName,
+                        iconUrl: $0.iconImg,
+                        username: AccountViewModel.shared.account.username,
+                        favorite: $0.userHasFavorited
+                    )
+                }
+                
+                insertSubscribedThings(subredditSubscriptions: subredditSubscriptionsTemp, userSubscriptions: userSubscriptionsTemp, subreddits: subreddits.map {
+                    SubredditData(
+                        id: $0.id,
+                        name: $0.displayName,
+                        iconUrl: $0.iconImg,
+                        bannerUrl: $0.bannerBackgroundImage,
+                        description: $0.description,
+                        sidebarDescription: nil,
+                        nSubscribers: $0.subscribers,
+                        createdUTC: $0.createdUtc,
+                        suggestedCommentSort: $0.suggestedCommentSort,
+                        isNSFW: $0.over18
+                    )
+                })
                 
                 DispatchQueue.main.async {
                     self.after = nil
                     self.isLoadingSubscriptions = false
-                    self.subredditSubscriptions = subreddits
-                    self.userSubscriptions = users
+                    self.subredditSubscriptions = subredditSubscriptionsTemp
+                    self.userSubscriptions = userSubscriptionsTemp
                 }
             } else {
                 self.after = subscriptionListing.after
@@ -103,13 +135,45 @@ public class SubscriptionListingViewModel: ObservableObject {
                     subreddits.sort { $0.displayName.lowercased() < $1.displayName.lowercased() }
                     users.sort { $0.displayName.lowercased() < $1.displayName.lowercased() }
                     
-                    insertSubscribedThings(subredditSubscriptions: subreddits, userSubscriptions: users)
+                    let subredditSubscriptionsTemp = subreddits.map {
+                        SubscribedSubredditData(
+                            fullName: $0.name,
+                            name: $0.displayName,
+                            iconUrl: $0.iconImg,
+                            username: AccountViewModel.shared.account.username,
+                            favorite: $0.userHasFavorited
+                        )
+                    }
+                    
+                    let userSubscriptionsTemp = users.map {
+                        SubscribedUserData(
+                            name: $0.displayName,
+                            iconUrl: $0.iconImg,
+                            username: AccountViewModel.shared.account.username,
+                            favorite: $0.userHasFavorited
+                        )
+                    }
+                    
+                    insertSubscribedThings(subredditSubscriptions: subredditSubscriptionsTemp, userSubscriptions: userSubscriptionsTemp, subreddits: subreddits.map {
+                        SubredditData(
+                            id: $0.id,
+                            name: $0.displayName,
+                            iconUrl: $0.iconImg,
+                            bannerUrl: $0.bannerBackgroundImage,
+                            description: $0.description,
+                            sidebarDescription: nil,
+                            nSubscribers: $0.subscribers,
+                            createdUTC: $0.createdUtc,
+                            suggestedCommentSort: $0.suggestedCommentSort,
+                            isNSFW: $0.over18
+                        )
+                    })
                     
                     DispatchQueue.main.async {
                         self.after = nil
                         self.isLoadingSubscriptions = false
-                        self.subredditSubscriptions = subreddits
-                        self.userSubscriptions = users
+                        self.subredditSubscriptions = subredditSubscriptionsTemp
+                        self.userSubscriptions = userSubscriptionsTemp
                     }
                 } else {
                     loadSubscriptions()
@@ -157,7 +221,7 @@ public class SubscriptionListingViewModel: ObservableObject {
         loadMyCustomFeeds()
     }
     
-    private func insertSubscribedThings(subredditSubscriptions: [Subscription], userSubscriptions: [Subscription]) {
+    private func insertSubscribedThings(subredditSubscriptions: [SubscribedSubredditData], userSubscriptions: [SubscribedUserData], subreddits: [SubredditData]) {
         do {
             // Check if account exists
             guard !AccountViewModel.shared.account.isAnonymous(),
@@ -180,15 +244,7 @@ public class SubscriptionListingViewModel: ObservableObject {
             }
             
             subscribedSubredditDao.insertAll(
-                subscribedSubredditData: subredditSubscriptions.map {
-                    SubscribedSubredditData(
-                        fullName: $0.name,
-                        name: $0.displayName,
-                        iconUrl: $0.iconImg,
-                        username: accountName,
-                        favorite: $0.userHasFavorited
-                    )
-                }
+                subscribedSubredditData: subredditSubscriptions
             )
             
             do {
@@ -214,14 +270,7 @@ public class SubscriptionListingViewModel: ObservableObject {
             }
             
             subscribedUserDao.insertAll(
-                subscribedUserDataList: userSubscriptions.map {
-                    SubscribedUserData(
-                        name: $0.displayName,
-                        iconUrl: $0.iconImg,
-                        username: accountName,
-                        favorite: $0.userHasFavorited
-                    )
-                }
+                subscribedUserDataList: userSubscriptions
             )
             
             do {
@@ -234,20 +283,7 @@ public class SubscriptionListingViewModel: ObservableObject {
                 print("Error fetching row count: \(error)")
             }
             
-            SubredditDao(dbPool: dbPool).insertAll(subredditData: subredditSubscriptions.map {
-                SubredditData(
-                    id: $0.id,
-                    name: $0.displayName,
-                    iconUrl: $0.iconImg,
-                    bannerUrl: $0.bannerBackgroundImage,
-                    description: $0.description,
-                    sidebarDescription: nil,
-                    nSubscribers: $0.subscribers,
-                    createdUTC: $0.createdUtc,
-                    suggestedCommentSort: $0.suggestedCommentSort,
-                    isNSFW: $0.over18
-                )
-            })
+            SubredditDao(dbPool: dbPool).insertAll(subredditData: subreddits)
             
             do {
                 let count = try dbPool.read { db in
