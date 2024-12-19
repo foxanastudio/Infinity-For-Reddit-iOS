@@ -49,18 +49,46 @@ public class SubscriptionListingViewModel: ObservableObject {
         subscriptionListingRepository.fetchSubscriptions(
             queries: ["limit": "100", "after": after ?? ""]
         )
-            .sink(receiveCompletion: { [weak self] completion in
-                if case .failure(let error) = completion {
-                    DispatchQueue.main.async {
-                        print("Error fetching subscriptions: \(error)")
-                        self?.after = nil
-                        self?.isLoadingSubscriptions = false
+        .sink(receiveCompletion: { [weak self] completion in
+            if case .failure(let error) = completion {
+                DispatchQueue.main.async {
+                    print("Error fetching subscriptions: \(error)")
+                    self?.after = nil
+                    self?.isLoadingSubscriptions = false
+                }
+            }
+        }, receiveValue: { [weak self] subscriptionListing in
+            guard let self = self else { return }
+            if (subscriptionListing.subscriptions.isEmpty) {
+                // No more subscriptions
+                var subreddits = [Subscription]()
+                var users = [Subscription]()
+                for subscription in self.subscriptionsPrivate {
+                    if subscription.subredditType == "user" {
+                        subscription.displayName = String(subscription.displayName[subscription.displayName.index(subscription.displayName.startIndex, offsetBy: 2)...])
+                        users.append(subscription)
+                    } else {
+                        subreddits.append(subscription)
                     }
                 }
-            }, receiveValue: { [weak self] subscriptionListing in
-                guard let self = self else { return }
-                if (subscriptionListing.subscriptions.isEmpty) {
-                    // No more subscriptions
+                
+                subreddits.sort { $0.displayName.lowercased() < $1.displayName.lowercased() }
+                users.sort { $0.displayName.lowercased() < $1.displayName.lowercased() }
+                
+                insertSubscribedThings(subredditSubscriptions: subreddits, userSubscriptions: users)
+                
+                DispatchQueue.main.async {
+                    self.after = nil
+                    self.isLoadingSubscriptions = false
+                    self.subredditSubscriptions = subreddits
+                    self.userSubscriptions = users
+                }
+            } else {
+                self.after = subscriptionListing.after
+                
+                subscriptionsPrivate.append(contentsOf: subscriptionListing.subscriptions)
+                
+                if self.after == nil || self.after?.isEmpty == true {
                     var subreddits = [Subscription]()
                     var users = [Subscription]()
                     for subscription in self.subscriptionsPrivate {
@@ -84,39 +112,11 @@ public class SubscriptionListingViewModel: ObservableObject {
                         self.userSubscriptions = users
                     }
                 } else {
-                    self.after = subscriptionListing.after
-                    
-                    subscriptionsPrivate.append(contentsOf: subscriptionListing.subscriptions)
-                    
-                    if self.after == nil || self.after?.isEmpty == true {
-                        var subreddits = [Subscription]()
-                        var users = [Subscription]()
-                        for subscription in self.subscriptionsPrivate {
-                            if subscription.subredditType == "user" {
-                                subscription.displayName = String(subscription.displayName[subscription.displayName.index(subscription.displayName.startIndex, offsetBy: 2)...])
-                                users.append(subscription)
-                            } else {
-                                subreddits.append(subscription)
-                            }
-                        }
-                        
-                        subreddits.sort { $0.displayName.lowercased() < $1.displayName.lowercased() }
-                        users.sort { $0.displayName.lowercased() < $1.displayName.lowercased() }
-                        
-                        insertSubscribedThings(subredditSubscriptions: subreddits, userSubscriptions: users)
-                        
-                        DispatchQueue.main.async {
-                            self.after = nil
-                            self.isLoadingSubscriptions = false
-                            self.subredditSubscriptions = subreddits
-                            self.userSubscriptions = users
-                        }
-                    } else {
-                        loadSubscriptions()
-                    }
+                    loadSubscriptions()
                 }
-            })
-            .store(in: &cancellables)
+            }
+        })
+        .store(in: &cancellables)
     }
     
     public func loadMyCustomFeeds() {
@@ -166,19 +166,19 @@ public class SubscriptionListingViewModel: ObservableObject {
             }
             
             let accountName = AccountViewModel.shared.account.username
-
+            
             // Handle subscribed subreddits
             let subscribedSubredditDao = SubscribedSubredditDao(dbPool: dbPool)
             let existingSubreddits = try subscribedSubredditDao.getAllSubscribedSubredditsList(accountName: accountName)
-
+            
             let unsubscribedSubreddits = existingSubreddits.filter { existing in
                 !subredditSubscriptions.contains { $0.name == existing.name }
             }
-
+            
             for unsubscribed in unsubscribedSubreddits {
                 try subscribedSubredditDao.deleteSubscribedSubreddit(subredditName: unsubscribed.name ?? "", accountName: accountName)
             }
-
+            
             subscribedSubredditDao.insertAll(
                 subscribedSubredditData: subredditSubscriptions.map {
                     SubscribedSubredditData(
@@ -200,15 +200,15 @@ public class SubscriptionListingViewModel: ObservableObject {
             } catch {
                 print("Error fetching row count: \(error)")
             }
-
+            
             // Handle subscribed users
             let subscribedUserDao = SubscribedUserDao(dbPool: dbPool)
             let existingUsers = try subscribedUserDao.getAllSubscribedUsersList(accountName: accountName)
-
+            
             let unsubscribedUsers = existingUsers.filter { existing in
                 !userSubscriptions.contains { $0.name == existing.name }
             }
-
+            
             for unsubscribed in unsubscribedUsers {
                 try subscribedUserDao.deleteSubscribedUser(name: unsubscribed.name, accountName: accountName)
             }
@@ -229,16 +229,34 @@ public class SubscriptionListingViewModel: ObservableObject {
                 let count = try dbPool.read { db in
                     try SubscribedUserData.fetchCount(db)
                 }
-                print("Number of rows in SubscribedUser: \(count)")
+                print("Number of rows in SubscribedUserData: \(count)")
             } catch {
                 print("Error fetching row count: \(error)")
             }
-
-            // TODO Need to save subreddit data
-//                    if let subredditList = subredditDataList {
-//                        let dao = SubredditDao(dbPool: dbPool)
-//                        try dao.insertAll(subredditData: subredditList)
-//                    }
+            
+            SubredditDao(dbPool: dbPool).insertAll(subredditData: subredditSubscriptions.map {
+                SubredditData(
+                    id: $0.id,
+                    name: $0.displayName,
+                    iconUrl: $0.iconImg,
+                    bannerUrl: $0.bannerBackgroundImage,
+                    description: $0.description,
+                    sidebarDescription: nil,
+                    nSubscribers: $0.subscribers,
+                    createdUTC: $0.createdUtc,
+                    suggestedCommentSort: $0.suggestedCommentSort,
+                    isNSFW: $0.over18
+                )
+            })
+            
+            do {
+                let count = try dbPool.read { db in
+                    try SubredditData.fetchCount(db)
+                }
+                print("Number of rows in SubredditData: \(count)")
+            } catch {
+                print("Error fetching row count: \(error)")
+            }
         } catch {
             print("Error updating subscribed things: \(error)")
         }

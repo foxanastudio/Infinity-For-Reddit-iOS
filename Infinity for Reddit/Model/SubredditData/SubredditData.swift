@@ -17,13 +17,13 @@ struct SubredditData: Codable, FetchableRecord, PersistableRecord {
     var description: String?
     var sidebarDescription: String?
     var nSubscribers: Int
-    var createdUTC: Int
+    var createdUTC: Int64
     var suggestedCommentSort: String?
     var isNSFW: Bool
-    var isSelected: Bool
+    var isSelected: Bool = false
     
     init(id: String, name: String? = nil, iconUrl: String? = nil, bannerUrl: String? = nil,
-         description: String? = nil, sidebarDescription: String? = nil, nSubscribers: Int, createdUTC: Int,
+         description: String? = nil, sidebarDescription: String? = nil, nSubscribers: Int, createdUTC: Int64,
          suggestedCommentSort: String? = nil, isNSFW: Bool) {
         self.id = id
         self.name = name
@@ -37,4 +37,19 @@ struct SubredditData: Codable, FetchableRecord, PersistableRecord {
         self.isNSFW = isNSFW
         self.isSelected = false
     }
+    
+    private enum CodingKeys: String, CodingKey, ColumnExpression, CaseIterable {
+        case id
+        case name
+        case iconUrl = "icon_url"
+        case bannerUrl = "banner_url"
+        case description
+        case sidebarDescription = "sidebar_description"
+        case nSubscribers = "n_subscribers"
+        case createdUTC = "created_utc"
+        case suggestedCommentSort = "suggested_comment_sort"
+        case isNSFW = "is_nsfw"
+    }
+    
+    public static let databaseSelection: [SQLSelectable] = CodingKeys.allCases.map { $0 }
 }

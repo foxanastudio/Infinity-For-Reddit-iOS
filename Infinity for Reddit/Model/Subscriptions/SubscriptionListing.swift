@@ -167,8 +167,8 @@ class Subscription : NSObject, NSCoding{
     var commentScoreHideMins : Int!
     var communityIcon : String!
     var communityReviewed : Bool!
-    var created : Float!
-    var createdUtc : Float!
+    var created : Int64!
+    var createdUtc : Int64!
     var descriptionField : String!
     var descriptionHtml : String!
     var disableContributorRequests : Bool!
@@ -282,8 +282,8 @@ class Subscription : NSObject, NSCoding{
             commentScoreHideMins = dataJson["comment_score_hide_mins"].intValue
             communityIcon = dataJson["community_icon"].stringValue
             communityReviewed = dataJson["community_reviewed"].boolValue
-            created = dataJson["created"].floatValue
-            createdUtc = dataJson["created_utc"].floatValue
+            created = dataJson["created"].int64Value
+            createdUtc = dataJson["created_utc"].int64Value
             descriptionField = dataJson["description"].stringValue
             descriptionHtml = dataJson["description_html"].stringValue
             disableContributorRequests = dataJson["disable_contributor_requests"].boolValue
@@ -680,8 +680,8 @@ class Subscription : NSObject, NSCoding{
         commentScoreHideMins = aDecoder.decodeObject(forKey: "comment_score_hide_mins") as? Int
         communityIcon = aDecoder.decodeObject(forKey: "community_icon") as? String
         communityReviewed = aDecoder.decodeObject(forKey: "community_reviewed") as? Bool
-        created = aDecoder.decodeObject(forKey: "created") as? Float
-        createdUtc = aDecoder.decodeObject(forKey: "created_utc") as? Float
+        created = aDecoder.decodeObject(forKey: "created") as? Int64
+        createdUtc = aDecoder.decodeObject(forKey: "created_utc") as? Int64
         descriptionField = aDecoder.decodeObject(forKey: "description") as? String
         descriptionHtml = aDecoder.decodeObject(forKey: "description_html") as? String
         disableContributorRequests = aDecoder.decodeObject(forKey: "disable_contributor_requests") as? Bool

@@ -94,6 +94,21 @@ struct RedditGRDBDatabase {
                 t.column("favorite", .boolean).notNull().defaults(to: false)
                 t.primaryKey(["name", "username"])
             }
+            
+            try db.create(table: SubredditData.databaseTableName, ifNotExists: true) { t in
+                t.column("id", .text).notNull()
+                t.column("name", .text)
+                t.column("icon_url", .text)
+                t.column("banner_url", .text)
+                t.column("description", .text)
+                t.column("sidebar_description", .text)
+                t.column("n_subscribers", .integer).notNull()
+                t.column("created_utc", .integer).notNull()
+                t.column("suggested_comment_sort", .text)
+                t.column("is_nsfw", .boolean).notNull().defaults(to: false)
+                t.column("is_selected", .boolean).notNull().defaults(to: false)
+                t.primaryKey(["id"])
+            }
         }
     }
 }

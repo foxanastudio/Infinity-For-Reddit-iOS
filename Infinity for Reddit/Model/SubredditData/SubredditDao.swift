@@ -21,6 +21,14 @@ struct SubredditDao {
         }
     }
     
+    func insertAll(subredditData: [SubredditData]) {
+        try? dbPool.write { db in
+            for data in subredditData{
+                try data.insert(db, onConflict: .replace)
+            }
+        }
+    }
+    
     func deleteAllSubreddits() throws {
         try dbPool.write { db in
             try db.execute(sql: "DELETE FROM subreddits")
