@@ -3,7 +3,7 @@
 //  Infinity for Reddit
 //
 //  Created by joeylr2042 on 2024-12-27.
-//  
+//
 
 import MarkdownUI
 import SDWebImageSwiftUI
@@ -16,7 +16,17 @@ struct WebImageProvider: ImageProvider {
         ResizeToFit {
             WebImage(url: url)
                 .resizable()
+                .scaledToFit()
+                .onTapGesture{
+                    if let url = url {
+                        handleImageTap(url: url)
+                    }
+                }
         }
+    }
+    
+    private func handleImageTap(url: URL) {
+        print("Image tapped: \(url)")
     }
 }
 

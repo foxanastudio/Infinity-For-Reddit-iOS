@@ -44,6 +44,12 @@ public class CommentListingViewModel: ObservableObject {
         }
         
         commentListingRepository.fetchComments(commentListingType: commentListingMetadata.commentListingType, pathComponents: commentListingMetadata.pathComponents, queries: ["limit": "100", "after": after ?? ""].merging(commentListingMetadata.queries ?? [:], uniquingKeysWith: { _, new in new }), params: commentListingMetadata.params)
+            .subscribe(on: DispatchQueue.global(qos: .userInitiated))
+            .map { listingData -> (comments: [Comment], after: String?) in
+                // Perform post-processing in the background thread
+                let processedComments = self.postProcessComments(listingData.comments)
+                return (processedComments, listingData.after)
+            }
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { [weak self] completion in
                 self?.isInitialLoading = false
@@ -52,19 +58,16 @@ public class CommentListingViewModel: ObservableObject {
                 if case .failure(let error) = completion {
                     print("Error fetching comments: \(error)")
                 }
-            }, receiveValue: { [weak self] listingData in
+            }, receiveValue: { [weak self] (processedComments, after) in
                 guard let self = self else { return }
-                if (listingData.comments.isEmpty) {
+                if (processedComments.isEmpty) {
                     // No more comments
                     hasMorePages = false
-                    after = nil
+                    self.after = nil
                 } else {
-                    
-                    after = listingData.after
-                    let newComments = listingData.comments
-                    self.comments.append(contentsOf: newComments!)
-                    
-                    hasMorePages = !(newComments?.isEmpty ?? true || listingData.after == nil || listingData.after.isEmpty)
+                    self.after = after
+                    self.comments.append(contentsOf: processedComments)
+                    self.hasMorePages = !(processedComments.isEmpty || after == nil || after?.isEmpty == true)
                 }
                 print("comments")
             })
@@ -85,5 +88,16 @@ public class CommentListingViewModel: ObservableObject {
         comments = []
         
         loadComments(account: account)
+    }
+    
+    func postProcessComments(_ comments: [Comment]) -> [Comment] {
+        return comments.map { modifyCommentBody($0) }
+    }
+    
+    func modifyCommentBody(_ comment: Comment) -> Comment {
+        comment.body = MarkdownUtils.replaceImageURL(comment)
+        comment.body = MarkdownUtils.replaceGifURL(comment)
+        
+        return comment
     }
 }

@@ -35,7 +35,7 @@ struct CommentViewCard: View {
             }
             .padding(.vertical, 8)
             
-            Markdown(MarkdownUtils.modifyCommentBody(commentViewModel.comment))
+            Markdown(commentViewModel.comment.body)
                 .markdownImageProvider(.webImage)
                 .font(.system(size: 24))
                 .padding(.bottom, 8)
