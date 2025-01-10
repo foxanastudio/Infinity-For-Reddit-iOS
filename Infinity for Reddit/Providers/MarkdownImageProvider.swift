@@ -16,7 +16,9 @@ struct WebImageProvider: ImageProvider {
         ResizeToFit {
             WebImage(url: url)
                 .resizable()
+                .transition(.fade(duration: 0.5))
                 .scaledToFit()
+                .frame(maxWidth: .infinity)
                 .onTapGesture{
                     if let url = url {
                         handleImageTap(url: url)
