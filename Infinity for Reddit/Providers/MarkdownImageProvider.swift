@@ -59,36 +59,3 @@ struct WebImageProvider: ImageProvider {
         print("Image tapped: \(url)")
     }
 }
-
-//extension ImageProvider where Self == WebImageProvider {
-//    static var webImage: Self {
-//        .init()
-//    }
-//}
-
-// MARK: - ResizeToFit
-
-/// A layout that resizes its content to fit the container **only** if the content width is greater than the container width.
-struct ResizeToFit: Layout {
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        guard let view = subviews.first else {
-            return .zero
-        }
-        
-        var size = view.sizeThatFits(.unspecified)
-        
-        if size.width != 0 && size.height != 0 {
-            let aspectRatio = size.width / size.height
-            size.width = proposal.width ?? size.width
-            size.height = size.width / aspectRatio
-        }
-        return size
-    }
-    
-    func placeSubviews(
-        in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()
-    ) {
-        guard let view = subviews.first else { return }
-        view.place(at: bounds.origin, proposal: .init(bounds.size))
-    }
-}

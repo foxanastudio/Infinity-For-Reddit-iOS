@@ -1,5 +1,5 @@
 {
-  "originHash" : "7587eab8dfa0757b877966cd1b947fd54e2a7e40f6f7862720867ad0c84f731c",
+  "originHash" : "0dc435e1a038cbbb815b24801f7efddd532bfb7e98883f56235521991e418b0b",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -58,10 +58,10 @@
     {
       "identity" : "swift-markdown-ui",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/gonzalezreal/swift-markdown-ui.git",
+      "location" : "https://github.com/Docile-Alligator/swift-markdown-ui.git",
       "state" : {
-        "revision" : "5f613358148239d0292c0cef674a3c2314737f9e",
-        "version" : "2.4.1"
+        "branch" : "main",
+        "revision" : "2b2597f6d552eb81bfa38c4e93fe1576267bfec2"
       }
     },
     {

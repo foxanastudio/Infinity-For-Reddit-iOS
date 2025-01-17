@@ -35,7 +35,8 @@ struct CommentViewCard: View {
             }
             .padding(.vertical, 8)
             
-            let containsTable = MarkdownUtils.detectMarkdownTable(commentViewModel.comment.body)
+            //let containsTable = MarkdownUtils.detectMarkdownTable(commentViewModel.comment.body)
+            let containsTable = false
                     
             Group {
                 if containsTable {
@@ -70,10 +71,6 @@ struct CommentViewCard: View {
                     }
                 }
             }
-//            Markdown(commentViewModel.comment.body)
-//                .markdownImageProvider(.webImage)
-//                .font(.system(size: 24))
-//                .padding(.bottom, 8)
             
             HStack(alignment: .center) {
                 Button(action: {

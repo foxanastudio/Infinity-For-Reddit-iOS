@@ -37,7 +37,7 @@ class MarkdownUtils {
         
         print(commentBody)
         var excludedRanges = Set<NSRange>()
-        for match in imageMarkdownMatches {
+        for match in imageMarkdownMatches.reversed() {
             if let range = Range(match.range, in: commentBody) {
                 let matchedMarkdown = String(commentBody[range])
                 if let urlRange = matchedMarkdown.range(of: #"(?<=\()\S+(?=\))"#, options: .regularExpression) {
@@ -49,7 +49,7 @@ class MarkdownUtils {
         
         let previewReddItLength = "https://preview.redd.it/".count;
         
-        for match in imageURLMatches {
+        for match in imageURLMatches.reversed() {
             let matchRange = match.range
             
             // Skip matches that overlap with excluded ranges
@@ -76,7 +76,7 @@ class MarkdownUtils {
             }
         }
         
-        for match in imageMarkdownMatches {
+        for match in imageMarkdownMatches.reversed() {
             let range = Range(match.range, in: commentBody)!
             let matchedMarkdown = String(commentBody[range])
             let rangeOfCaption = Range(match.range(at: 1), in: commentBody)!
