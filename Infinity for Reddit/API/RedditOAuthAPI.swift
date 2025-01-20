@@ -9,7 +9,7 @@ import Alamofire
 import Foundation
 
 enum RedditOAuthAPI: URLRequestConvertible {
-    case getMyInfo
+    case getMyInfo(headers: HTTPHeaders)
     case getFrontPagePosts(pathComponents: [String: String], queries: [String: String])
     case getSubredditPosts(pathComponents: [String: String], queries: [String: String])
     case getUserPosts(pathComponents: [String: String], queries: [String: String])
@@ -97,7 +97,9 @@ enum RedditOAuthAPI: URLRequestConvertible {
     
     var headers: HTTPHeaders? {
         switch self {
-        case .getMyInfo, .getFrontPagePosts, .vote, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments:
+        case .getMyInfo(let headers):
+            return headers
+        case .getFrontPagePosts, .vote, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments:
             return nil
         }
     }

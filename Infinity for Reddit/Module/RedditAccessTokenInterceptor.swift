@@ -13,7 +13,7 @@ final class RedditAccessTokenInterceptor: RequestInterceptor {
     private let lock = NSLock()
     
     func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
-        guard urlRequest.url?.absoluteString.hasPrefix("https://oauth.reddit.com") == true else {
+        guard urlRequest.url?.absoluteString.hasPrefix("https://oauth.reddit.com") == true && urlRequest.headers["Authorization"] == nil else {
             return completion(.success(urlRequest))
         }
         var urlRequest = urlRequest
