@@ -86,6 +86,11 @@ struct AccountSheet: View {
                         
                         Button(action: {
                             // Handle Sign Out Logic
+                            do {
+                                try accountViewModel.logoutToAnonymous()
+                            } catch {
+                                print("Failed to log out: \(error)")
+                            }
                         }) {
                             Text("Anonymous")
                                 .frame(maxWidth: .infinity)
@@ -103,6 +108,7 @@ struct AccountSheet: View {
                             } catch {
                                 print("Failed to log out: \(error)")
                             }
+                            accountViewModel.shouldDismissAccountSheet = true
                         }) {
                             Text("Log out")
                                 .frame(maxWidth: .infinity)
@@ -132,12 +138,11 @@ struct AccountSheet: View {
                     dismiss() // Close the sheet
                 }
             )
-            .onAppear {
-                if accountViewModel.shouldDismissAccountSheet {
-                    accountViewModel.shouldDismissAccountSheet = false
-                    dismiss()
-                }
+            .onChange(of: accountViewModel.shouldDismissAccountSheet) {
+                accountViewModel.shouldDismissAccountSheet = false
+                dismiss()
             }
+            
         }
     }
 }
