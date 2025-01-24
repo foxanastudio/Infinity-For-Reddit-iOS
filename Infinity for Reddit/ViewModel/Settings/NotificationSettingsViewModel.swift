@@ -23,7 +23,7 @@ class NotificationSettingsViewModel: ObservableObject {
     private var cancellables: Set<AnyCancellable> = []
     
     // MARK: - Initializer
-    init(){
+    init() {
         guard let resolvedUserDefaults = DependencyManager.shared.container.resolve(UserDefaults.self) else {
             fatalError("Failed to resolve UserDefaults")
         }

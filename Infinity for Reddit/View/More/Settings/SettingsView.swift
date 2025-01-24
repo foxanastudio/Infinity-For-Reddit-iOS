@@ -20,7 +20,7 @@ struct SettingsView: View {
             NavigationLink(destination: InterfaceSettingsView()) {
                 Text("Interface")
             }
-            NavigationLink(destination: ThemeSettingsView()) {
+            NavigationLink(destination: CustomThemeSettingsView()) {
                 Text("Theme")
             }
             NavigationLink(destination: GestureButtonsSettingsView()) {

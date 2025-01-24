@@ -12,7 +12,7 @@ import GRDB
 
 struct NotificationSettingsView: View {
     @StateObject private var notificationSettingsViewModel = NotificationSettingsViewModel()
-
+    
     var body: some View {
         Form {
             Section {
@@ -21,7 +21,7 @@ struct NotificationSettingsView: View {
                 Picker("Check Notifications Interval", systemImage: "clock.fill", selection: $notificationSettingsViewModel.checkNotificationsInterval) {
                     ForEach(0..<notificationSettingsViewModel.notificationsIntervals.count, id: \.self) { index in
                         Text(notificationSettingsViewModel.notificationsIntervals[index]).tag(index)
-                        }
+                    }
                 }
             }
         }

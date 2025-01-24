@@ -20,6 +20,10 @@ struct UserDefaultsUtils {
     static let SHOW_ABSOLUTE_NUMBER_OF_VOTES = "show_absolute_number_of_votes"
     static let DEFAULT_SEARCH_RESULT_TAB = "default_search_result_tab"
     
+    //CustomThemeSettingsView
+    static let THEME_KEY = "theme"
+    static let AMOLED_DARK_KEY = "amoled_dark"
+    
     // FontInterfaceView
     static let FONT_FAMILY_KEY = "font_family"
     static let FONT_SIZE_KEY = "font_size"
