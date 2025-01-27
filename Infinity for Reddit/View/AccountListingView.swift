@@ -13,8 +13,10 @@ import SwiftUI
 struct AccountListingView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject var accountListingViewModel: AccountListingViewModel
+    var dismissAccountSheet: () -> Void
     
-    init() {
+    init(dismissAccountSheet: @escaping () -> Void) {
+        self.dismissAccountSheet = dismissAccountSheet
         guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
             fatalError("Failed to resolve DatabasePool")
         }
@@ -26,19 +28,20 @@ struct AccountListingView: View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
                 // Current Account
-                AccountRow(account: accountListingViewModel.currentAccount, isCurrent: true)
+                AccountRow(dismissAccountSheet: dismissAccountSheet, account: accountListingViewModel.currentAccount, isCurrent: true)
                 
                 // Other Accounts
                 if !accountListingViewModel.otherAccounts.isEmpty {
-                    // Divider
-                    Rectangle()
-                        .frame(height: 1)
-                        .frame(maxWidth: .infinity)
-                        .foregroundColor(Color.gray.opacity(0.5))
-                        .padding(.horizontal, -7)
                     
                     ForEach(accountListingViewModel.otherAccounts, id: \.username) { account in
-                        AccountRow(account: account, isCurrent: false)
+                        // Divider
+                        Rectangle()
+                            .frame(height: 1)
+                            .frame(maxWidth: .infinity)
+                            .foregroundColor(Color.gray.opacity(0.5))
+                            .padding(.horizontal, -7)
+                        
+                        AccountRow(dismissAccountSheet: dismissAccountSheet, account: account, isCurrent: false)
                     }
                 }
                 

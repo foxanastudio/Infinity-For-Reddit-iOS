@@ -8,9 +8,10 @@ import SwiftUI
 
 struct AccountRow: View {
     @Environment(\.dismiss) var dismiss
+    var dismissAccountSheet: () -> Void
     @State var account: Account
     let isCurrent: Bool
-
+    
     var body: some View {
         HStack {
             SwiftUI.Image(systemName: account.isAnonymous() ? "person.crop.circle.badge.questionmark" : "person.crop.circle.fill")
@@ -34,7 +35,9 @@ struct AccountRow: View {
             do {
                 AccountViewModel.shared.switchAccount(newAccount: account)
                 try AccountViewModel.shared.updateTokens(accessToken: account.accessToken ?? "", refreshToken: account.refreshToken ?? "")
-                dismiss()}
+                dismissAccountSheet()
+                dismiss()
+            }
             catch{
                 print("Error: switching account failed")
             }

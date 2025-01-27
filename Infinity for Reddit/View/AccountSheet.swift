@@ -70,7 +70,9 @@ struct AccountSheet: View {
                         }
                         .padding(.horizontal)
                         
-                        NavigationLink(destination: AccountListingView()) {
+                        NavigationLink(destination: AccountListingView(dismissAccountSheet: {
+                            self.dismiss()
+                        })) {
                             Text("Switch account")
                                 .frame(maxWidth: .infinity)
                                 .padding()
@@ -120,6 +122,18 @@ struct AccountSheet: View {
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .background(Color.blue)
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                        }
+                        .padding(.horizontal)
+                        
+                        NavigationLink(destination: AccountListingView(dismissAccountSheet: {
+                            self.dismiss()
+                        })) {
+                            Text("Switch account")
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.red)
                                 .foregroundColor(.white)
                                 .cornerRadius(10)
                         }
