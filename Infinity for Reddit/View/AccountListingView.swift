@@ -45,6 +45,21 @@ struct AccountListingView: View {
                     }
                 }
                 
+                Rectangle()
+                    .frame(height: 1)
+                    .frame(maxWidth: .infinity)
+                    .foregroundColor(Color.gray.opacity(0.5))
+                    .padding(.horizontal, -7)
+                
+                NavigationLink(destination: LoginView()){
+                    HStack {
+                        SwiftUI.Image(systemName: "plus.circle.fill")
+                        Text("Add an account")
+                            .font(.headline)
+                    }
+                    .padding(.vertical, 8)
+                }
+                
             }
             .padding(.horizontal, 24)
             .background(Color.white)

@@ -58,17 +58,7 @@ struct AccountSheet: View {
                         .padding(.horizontal)
                         
                         Spacer()
-                        
-                        // Sign Out Button
-                        NavigationLink(destination: LoginView()) {
-                            Text("Add an account")
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.red)
-                                .foregroundColor(.white)
-                                .cornerRadius(10)
-                        }
-                        .padding(.horizontal)
+
                         
                         NavigationLink(destination: AccountListingView(dismissAccountSheet: {
                             self.dismiss()
