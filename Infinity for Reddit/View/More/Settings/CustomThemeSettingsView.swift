@@ -33,20 +33,35 @@ struct CustomThemeSettingsView: View {
             
             Section(header: Text("Customization")) {
                 List {
-                    themeListItem(
-                        themeType: "Light Theme",
-                        themeName: customThemeViewModel.currentLightCustomTheme?.name ?? "default value",
-                        icon: "upvoted")
+                    NavigationLink(destination: CustomizeCustomThemeView(customTheme: customThemeViewModel.currentLightCustomTheme ?? CustomTheme.getIndigo())) {
+                        themeListItem(
+                            themeType: "Light Theme",
+                            themeName: customThemeViewModel.currentLightCustomTheme?.name ?? "Indigo",
+                            icon: "upvoted")
+                    }
                     
-                    themeListItem(
-                        themeType: "Dark Theme",
-                        themeName: customThemeViewModel.currentDarkCustomTheme?.name ?? "default value",
-                        icon: "upvoted")
+                    NavigationLink(destination: CustomizeCustomThemeView(customTheme: customThemeViewModel.currentLightCustomTheme ?? CustomTheme.getIndigoDark())) {
+                        themeListItem(
+                            themeType: "Dark Theme",
+                            themeName: customThemeViewModel.currentDarkCustomTheme?.name ?? "Indigo Dark",
+                            icon: "upvoted")
+                    }
                     
-                    themeListItem(
-                        themeType: "Amoled Theme",
-                        themeName: customThemeViewModel.currentAmoledCustomTheme?.name ?? "default value",
-                        icon: "upvoted")
+                    NavigationLink(destination: CustomizeCustomThemeView(customTheme: customThemeViewModel.currentLightCustomTheme ?? CustomTheme.getIndigoAmoled())) {
+                        themeListItem(
+                            themeType: "Amoled Theme",
+                            themeName: customThemeViewModel.currentAmoledCustomTheme?.name ?? "Indigo Amoled",
+                            icon: "upvoted")
+                    }
+                    
+                    HStack {
+                        SwiftUI.Image("upvote")
+                        
+                        Spacer()
+                            .frame(width: 16)
+                        
+                        Text("Manage Themes")
+                    }
                 }
             }
         }

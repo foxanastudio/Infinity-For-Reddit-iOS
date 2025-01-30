@@ -1,0 +1,543 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    "About" : {
+
+    },
+    "Account" : {
+
+    },
+    "Add an account" : {
+
+    },
+    "Advanced" : {
+
+    },
+    "Always Show the Number of Child Comments" : {
+
+    },
+    "AMOLED Dark" : {
+
+    },
+    "Anonymous" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Check Notifications Interval" : {
+
+    },
+    "Click to Show Media in Gallery Layout" : {
+
+    },
+    "Click to Show/Hide Comment Toolbar" : {
+
+    },
+    "Close" : {
+
+    },
+    "Collapse Account Section" : {
+
+    },
+    "Collapse Favorite Subreddits Section" : {
+
+    },
+    "Collapse Post Section" : {
+
+    },
+    "Collapse Preferences Section" : {
+
+    },
+    "Collapse Reddit Section" : {
+
+    },
+    "Collapse Subscribed Subreddits Section" : {
+
+    },
+    "Comment" : {
+
+    },
+    "Comment Filter" : {
+
+    },
+    "Comment Toolbar Hidden by Default" : {
+
+    },
+    "Compact Layout" : {
+
+    },
+    "Contain domains" : {
+
+    },
+    "Contain flairs (e.g., flair1,flair2)" : {
+
+    },
+    "Content" : {
+
+    },
+    "Content Font Family" : {
+
+    },
+    "Content Font Size" : {
+
+    },
+    "Content Sensitivity Filter" : {
+
+    },
+    "Custom Feed" : {
+
+    },
+    "Customization" : {
+
+    },
+    "Customize" : {
+
+    },
+    "Customize Post Filter" : {
+
+    },
+    "Data Saving Mode" : {
+
+    },
+    "Default Link Post Layout" : {
+
+    },
+    "Default Post Layout" : {
+
+    },
+    "Default Search Result Tab" : {
+
+    },
+    "Delete" : {
+
+    },
+    "Does Not Apply to All Pages" : {
+
+    },
+    "Download Location" : {
+
+    },
+    "Downvoted" : {
+
+    },
+    "Edit" : {
+
+    },
+    "Embedded Media Type" : {
+
+    },
+    "Enable Bottom Navigation" : {
+
+    },
+    "Enable Notifications" : {
+
+    },
+    "Exclude domains" : {
+
+    },
+    "Exclude flairs (e.g., flair1,flair2)" : {
+
+    },
+    "Exclude subreddits (e.g., funny,AskReddit)" : {
+
+    },
+    "Exclude users (e.g., Hostilenemy,random)" : {
+
+    },
+    "Fixed Height in Card" : {
+
+    },
+    "Font" : {
+
+    },
+    "Font Family" : {
+
+    },
+    "Font Preview" : {
+
+    },
+    "Font Size" : {
+
+    },
+    "Fully Collapse Comment" : {
+
+    },
+    "Gallery" : {
+
+    },
+    "Gallery Layout" : {
+
+    },
+    "Gesture & Buttons" : {
+
+    },
+    "Gif" : {
+
+    },
+    "Hidden" : {
+
+    },
+    "Hide Account Karma" : {
+
+    },
+    "Hide FAB in Post Feed" : {
+
+    },
+    "Hide Favorite Subreddits Section" : {
+
+    },
+    "Hide Post Flair" : {
+
+    },
+    "Hide Post Type" : {
+
+    },
+    "Hide Subreddit and User Prefix" : {
+
+    },
+    "Hide Subreddit Description" : {
+
+    },
+    "Hide Subscribed Subreddits Section" : {
+
+    },
+    "Hide Text Post Content" : {
+
+    },
+    "Hide the Number of Comments" : {
+
+    },
+    "Hide the Number of Votes" : {
+
+    },
+    "Hide Toolbar by Default" : {
+
+    },
+    "Hide Upvote Ratio" : {
+
+    },
+    "History" : {
+
+    },
+    "Home" : {
+
+    },
+    "Ignore Navigation Bar in Immersive Interface" : {
+
+    },
+    "Image" : {
+
+    },
+    "Immersive Interface" : {
+
+    },
+    "Inbox" : {
+
+    },
+    "Interface" : {
+
+    },
+    "Is loading" : {
+
+    },
+    "Lazy Mode Interval" : {
+
+    },
+    "Link" : {
+
+    },
+    "Link posts that do not have the following urls will be filtered out." : {
+
+    },
+    "Link posts that have the following urls will be filtered out." : {
+
+    },
+    "Loading more pages" : {
+
+    },
+    "Log in" : {
+
+    },
+    "Log out" : {
+
+    },
+    "Login" : {
+
+    },
+    "Long Press to Hide Toolbar" : {
+
+    },
+    "Manage" : {
+
+    },
+    "Manage Subscription" : {
+
+    },
+    "Manage Themes" : {
+
+    },
+    "Max comments (-1: no restriction)" : {
+
+    },
+    "Max vote (-1: no restriction)" : {
+
+    },
+    "Min comments (-1: no restriction)" : {
+
+    },
+    "Min vote (-1: no restriction)" : {
+
+    },
+    "Miscellaneous" : {
+
+    },
+    "More" : {
+
+    },
+    "Multireddit" : {
+
+    },
+    "Navigation Drawer" : {
+
+    },
+    "No Comments" : {
+
+    },
+    "No custom feeds" : {
+
+    },
+    "No post filters found. Create a new one!" : {
+
+    },
+    "No posts" : {
+
+    },
+    "No subscribed subreddits" : {
+
+    },
+    "No subscribed users" : {
+
+    },
+    "Notification" : {
+
+    },
+    "Only Sensitive Content" : {
+
+    },
+    "Only Spoiler" : {
+
+    },
+    "Options" : {
+
+    },
+    "Post" : {
+
+    },
+    "Post and Comment" : {
+
+    },
+    "Post Details" : {
+
+    },
+    "Post Filter" : {
+
+    },
+    "Post Filter Name" : {
+
+    },
+    "Post History" : {
+
+    },
+    "Posts from the following subreddits will be filtered out." : {
+
+    },
+    "Posts submitted by the following users will be filtered out." : {
+
+    },
+    "Posts that do not have the following flairs will be filtered out." : {
+
+    },
+    "Posts that have a score higher than the following value will be filtered out (-1 means no restriction)." : {
+
+    },
+    "Posts that have a score lower than the following value will be filtered out (-1 means no restriction)." : {
+
+    },
+    "Posts that have the following flairs will be filtered out." : {
+
+    },
+    "Posts will be filtered out if the number of their comments is larger than the following value. (-1 means no restriction)." : {
+
+    },
+    "Posts will be filtered out if the number of their comments is less than the following value. (-1 means no restriction)." : {
+
+    },
+    "Posts will be filtered out if their title does not match the following regular expression." : {
+
+    },
+    "Posts will be filtered out if their title matches the following regular expression." : {
+
+    },
+    "Posts will be filtered out if they contain the following" : {
+
+    },
+    "Posts will be filtered out if they contain the following keywords in their title." : {
+
+    },
+    "Posts will be filtered out if they do not contain the following keywords in their title." : {
+
+    },
+    "Preferences" : {
+
+    },
+    "Prevent the Bottom Navigation Bar Having Extra Padding" : {
+
+    },
+    "Privacy Policy" : {
+
+    },
+    "Profile" : {
+
+    },
+    "Reddit User Agreement" : {
+
+    },
+    "Restart the app to see the changes" : {
+
+    },
+    "Save" : {
+
+    },
+    "Saved" : {
+
+    },
+    "Security" : {
+
+    },
+    "Separate Post And Comments in Landscape Mode" : {
+
+    },
+    "Settings" : {
+
+    },
+    "Show Absolute Number of Votes" : {
+
+    },
+    "Show Author Avatar" : {
+
+    },
+    "Show Avatar on the Right" : {
+
+    },
+    "Show Comment Divider" : {
+
+    },
+    "Show Divider" : {
+
+    },
+    "Show Elapsed Time in Posts and Comments" : {
+
+    },
+    "Show Fewer Toolbar Options Starting From Level" : {
+
+    },
+    "Show Only One Comment Level Indicator" : {
+
+    },
+    "Show Thumbnail on the Left" : {
+
+    },
+    "Show Top-level Comments First" : {
+
+    },
+    "Sort Type" : {
+
+    },
+    "Subreddits" : {
+
+    },
+    "Subscriptions" : {
+
+    },
+    "Switch account" : {
+
+    },
+    "Switch Account" : {
+
+    },
+    "Text" : {
+
+    },
+    "The Number of Columns in Post Feed" : {
+
+    },
+    "The post filter name should be unique." : {
+
+    },
+    "Theme" : {
+
+    },
+    "This is where you will add UI for filtering out content." : {
+
+    },
+    "Time Format" : {
+
+    },
+    "Title" : {
+
+    },
+    "Title Font Family" : {
+
+    },
+    "Title Font Size" : {
+
+    },
+    "Title: contains keywords (key1,key2)" : {
+
+    },
+    "Title: contains regex" : {
+
+    },
+    "Title: excludes keywords (key1,key2)" : {
+
+    },
+    "Title: excludes regex" : {
+
+    },
+    "To only see sensitive or spoiler posts, please turn on the corresponding switch." : {
+
+    },
+    "To see certain types of posts, please turn on the switch corresponding to the types." : {
+
+    },
+    "u/%@" : {
+
+    },
+    "Upvoted" : {
+
+    },
+    "Use Bottom Toolbar in Media Viewer" : {
+
+    },
+    "Users" : {
+
+    },
+    "Video" : {
+
+    },
+    "Video autoplay will be disabled in the post detail page" : {
+
+    },
+    "View User Details" : {
+
+    },
+    "Vote Buttons on the Right" : {
+
+    }
+  },
+  "version" : "1.0"
+}
