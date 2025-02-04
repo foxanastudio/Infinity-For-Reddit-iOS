@@ -17,7 +17,7 @@ struct CustomizeCustomThemeView: View {
     var body: some View {
         List {
             ForEach(customizeCustomThemeViewModel.customThemeFields, id: \.self) { fieldName in
-                ColorEntry(fieldName: fieldName, title: fieldName, description: "description", color: 0x000000)
+                ColorEntry(fieldName: fieldName, title: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.title ?? "", description: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.description ?? "", color: 0x000000)
             }
         }
     }

@@ -290,12 +290,19 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
         self.isChangeStatusBarIconColorAfterToolbarCollapsedInImmersiveInterface = isChangeStatusBarIconColorAfterToolbarCollapsedInImmersiveInterface
     }
     
-    func getPropertyNames() -> [String] {
+    func getProperties(customThemeFields: inout [String], customThemeFieldsBoolType: inout Set<String>) {
         let mirror = Mirror(reflecting: self)
-        return mirror.children.compactMap {
-            $0.label
-        }.filter {
-            $0 != "id"
+            
+        for child in mirror.children {
+            guard let label = child.label else { continue }
+            
+            if child.value is Bool {
+                customThemeFieldsBoolType.insert(label)
+            }
+            
+            if child.label != "id" {
+                customThemeFields.append(label)
+            }
         }
     }
     

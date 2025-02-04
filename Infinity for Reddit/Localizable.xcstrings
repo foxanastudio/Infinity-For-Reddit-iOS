@@ -478,6 +478,522 @@
     "Theme" : {
 
     },
+    "theme_item_archived_tint" : {
+
+    },
+    "theme_item_archived_tint_detail" : {
+
+    },
+    "theme_item_author_flair_text_color" : {
+
+    },
+    "theme_item_author_flair_text_color_detail" : {
+
+    },
+    "theme_item_awarded_comment_background_color" : {
+
+    },
+    "theme_item_awarded_comment_background_color_detail" : {
+
+    },
+    "theme_item_awards_background_color" : {
+
+    },
+    "theme_item_awards_background_color_detail" : {
+
+    },
+    "theme_item_awards_text_color" : {
+
+    },
+    "theme_item_awards_text_color_detail" : {
+
+    },
+    "theme_item_background_color" : {
+
+    },
+    "theme_item_background_color_detail" : {
+
+    },
+    "theme_item_bottom_app_bar_background_color" : {
+
+    },
+    "theme_item_bottom_app_bar_background_color_detail" : {
+
+    },
+    "theme_item_bottom_app_bar_icon_color" : {
+
+    },
+    "theme_item_bottom_app_bar_icon_color_detail" : {
+
+    },
+    "theme_item_button_text_color" : {
+
+    },
+    "theme_item_button_text_color_detail" : {
+
+    },
+    "theme_item_card_view_background_color" : {
+
+    },
+    "theme_item_card_view_background_color_detail" : {
+
+    },
+    "theme_item_change_status_bar_icon_color_after_toolbar_collapsed_in_immersive_interface" : {
+
+    },
+    "theme_item_chip_text_color" : {
+
+    },
+    "theme_item_chip_text_color_detail" : {
+
+    },
+    "theme_item_circular_progress_bar_background_color" : {
+
+    },
+    "theme_item_circular_progress_bar_background_color_detail" : {
+
+    },
+    "theme_item_color_accent" : {
+
+    },
+    "theme_item_color_accent_detail" : {
+
+    },
+    "theme_item_color_primary" : {
+
+    },
+    "theme_item_color_primary_dark" : {
+
+    },
+    "theme_item_color_primary_dark_detail" : {
+
+    },
+    "theme_item_color_primary_detail" : {
+
+    },
+    "theme_item_color_primary_light_theme" : {
+
+    },
+    "theme_item_color_primary_light_theme_detail" : {
+
+    },
+    "theme_item_comment_background_color" : {
+
+    },
+    "theme_item_comment_background_color_detail" : {
+
+    },
+    "theme_item_comment_color" : {
+
+    },
+    "theme_item_comment_color_detail" : {
+
+    },
+    "theme_item_comment_icon_and_info_color" : {
+
+    },
+    "theme_item_comment_icon_and_info_color_detail" : {
+
+    },
+    "theme_item_comment_vertical_bar_color_1" : {
+
+    },
+    "theme_item_comment_vertical_bar_color_1_detail" : {
+
+    },
+    "theme_item_comment_vertical_bar_color_2" : {
+
+    },
+    "theme_item_comment_vertical_bar_color_2_detail" : {
+
+    },
+    "theme_item_comment_vertical_bar_color_3" : {
+
+    },
+    "theme_item_comment_vertical_bar_color_3_detail" : {
+
+    },
+    "theme_item_comment_vertical_bar_color_4" : {
+
+    },
+    "theme_item_comment_vertical_bar_color_4_detail" : {
+
+    },
+    "theme_item_comment_vertical_bar_color_5" : {
+
+    },
+    "theme_item_comment_vertical_bar_color_5_detail" : {
+
+    },
+    "theme_item_comment_vertical_bar_color_6" : {
+
+    },
+    "theme_item_comment_vertical_bar_color_6_detail" : {
+
+    },
+    "theme_item_comment_vertical_bar_color_7" : {
+
+    },
+    "theme_item_comment_vertical_bar_color_7_detail" : {
+
+    },
+    "theme_item_crosspost_icon_tint" : {
+
+    },
+    "theme_item_crosspost_icon_tint_detail" : {
+
+    },
+    "theme_item_current_user_color" : {
+
+    },
+    "theme_item_current_user_color_detail" : {
+
+    },
+    "theme_item_divider_color" : {
+
+    },
+    "theme_item_divider_color_detail" : {
+
+    },
+    "theme_item_downvoted_color" : {
+
+    },
+    "theme_item_downvoted_color_detail" : {
+
+    },
+    "theme_item_fab_icon_color" : {
+
+    },
+    "theme_item_fab_icon_color_detail" : {
+
+    },
+    "theme_item_filled_card_view_background_color" : {
+
+    },
+    "theme_item_filled_card_view_background_color_detail" : {
+
+    },
+    "theme_item_flair_background_color" : {
+
+    },
+    "theme_item_flair_background_color_detail" : {
+
+    },
+    "theme_item_flair_text_color" : {
+
+    },
+    "theme_item_flair_text_color_detail" : {
+
+    },
+    "theme_item_fully_collapsed_comment_background_color" : {
+
+    },
+    "theme_item_fully_collapsed_comment_background_color_detail" : {
+
+    },
+    "theme_item_is_amoled_theme" : {
+
+    },
+    "theme_item_is_dark_theme" : {
+
+    },
+    "theme_item_is_light_theme" : {
+
+    },
+    "theme_item_light_nav_bar" : {
+
+    },
+    "theme_item_light_status_bar" : {
+
+    },
+    "theme_item_link_color" : {
+
+    },
+    "theme_item_link_color_detail" : {
+
+    },
+    "theme_item_locked_icon_tint" : {
+
+    },
+    "theme_item_locked_icon_tint_detail" : {
+
+    },
+    "theme_item_media_indicator_background_color" : {
+
+    },
+    "theme_item_media_indicator_background_color_detail" : {
+
+    },
+    "theme_item_media_indicator_icon_color" : {
+
+    },
+    "theme_item_media_indicator_icon_color_detail" : {
+
+    },
+    "theme_item_moderator_color" : {
+
+    },
+    "theme_item_moderator_color_detail" : {
+
+    },
+    "theme_item_nav_bar_color" : {
+
+    },
+    "theme_item_nav_bar_color_detail" : {
+
+    },
+    "theme_item_no_preview_post_type_background_color" : {
+
+    },
+    "theme_item_no_preview_post_type_background_color_detail" : {
+
+    },
+    "theme_item_no_preview_post_type_icon_tint" : {
+
+    },
+    "theme_item_no_preview_post_type_icon_tint_detail" : {
+
+    },
+    "theme_item_nsfw_background_color" : {
+
+    },
+    "theme_item_nsfw_background_color_detail" : {
+
+    },
+    "theme_item_nsfw_text_color" : {
+
+    },
+    "theme_item_nsfw_text_color_detail" : {
+
+    },
+    "theme_item_post_content_color" : {
+
+    },
+    "theme_item_post_content_color_detail" : {
+
+    },
+    "theme_item_post_icon_and_info_color" : {
+
+    },
+    "theme_item_post_icon_and_info_color_detail" : {
+
+    },
+    "theme_item_post_title_color" : {
+
+    },
+    "theme_item_post_title_color_detail" : {
+
+    },
+    "theme_item_post_type_background_color" : {
+
+    },
+    "theme_item_post_type_background_color_detail" : {
+
+    },
+    "theme_item_post_type_text_color" : {
+
+    },
+    "theme_item_post_type_text_color_detail" : {
+
+    },
+    "theme_item_primary_icon_color" : {
+
+    },
+    "theme_item_primary_icon_color_detail" : {
+
+    },
+    "theme_item_primary_text_color" : {
+
+    },
+    "theme_item_primary_text_color_detail" : {
+
+    },
+    "theme_item_read_post_card_view_background_color" : {
+
+    },
+    "theme_item_read_post_card_view_background_color_detail" : {
+
+    },
+    "theme_item_read_post_content_color" : {
+
+    },
+    "theme_item_read_post_content_color_detail" : {
+
+    },
+    "theme_item_read_post_filled_card_view_background_color" : {
+
+    },
+    "theme_item_read_post_filled_card_view_background_color_detail" : {
+
+    },
+    "theme_item_read_post_title_color" : {
+
+    },
+    "theme_item_read_post_title_color_detail" : {
+
+    },
+    "theme_item_received_message_background_color" : {
+
+    },
+    "theme_item_received_message_background_color_detail" : {
+
+    },
+    "theme_item_received_message_text_color" : {
+
+    },
+    "theme_item_received_message_text_color_detail" : {
+
+    },
+    "theme_item_secondary_text_color" : {
+
+    },
+    "theme_item_secondary_text_color_detail" : {
+
+    },
+    "theme_item_send_message_icon_color" : {
+
+    },
+    "theme_item_send_message_icon_color_detail" : {
+
+    },
+    "theme_item_sent_message_background_color" : {
+
+    },
+    "theme_item_sent_message_background_color_detail" : {
+
+    },
+    "theme_item_sent_message_text_color" : {
+
+    },
+    "theme_item_sent_message_text_color_detail" : {
+
+    },
+    "theme_item_single_comment_thread_background_color" : {
+
+    },
+    "theme_item_single_comment_thread_background_color_detail" : {
+
+    },
+    "theme_item_spoiler_background_color" : {
+
+    },
+    "theme_item_spoiler_background_color_detail" : {
+
+    },
+    "theme_item_spoiler_text_color" : {
+
+    },
+    "theme_item_spoiler_text_color_detail" : {
+
+    },
+    "theme_item_stickied_post_icon_tint" : {
+
+    },
+    "theme_item_stickied_post_icon_tint_detail" : {
+
+    },
+    "theme_item_submitter_color" : {
+
+    },
+    "theme_item_submitter_color_detail" : {
+
+    },
+    "theme_item_subreddit_color" : {
+
+    },
+    "theme_item_subreddit_color_detail" : {
+
+    },
+    "theme_item_subscribed_color" : {
+
+    },
+    "theme_item_subscribed_color_detail" : {
+
+    },
+    "theme_item_tab_layout_with_collapsed_collapsing_toolbar_tab_background" : {
+
+    },
+    "theme_item_tab_layout_with_collapsed_collapsing_toolbar_tab_background_detail" : {
+
+    },
+    "theme_item_tab_layout_with_collapsed_collapsing_toolbar_tab_indicator" : {
+
+    },
+    "theme_item_tab_layout_with_collapsed_collapsing_toolbar_tab_indicator_detail" : {
+
+    },
+    "theme_item_tab_layout_with_collapsed_collapsing_toolbar_text_color" : {
+
+    },
+    "theme_item_tab_layout_with_collapsed_collapsing_toolbar_text_color_detail" : {
+
+    },
+    "theme_item_tab_layout_with_expanded_collapsing_toolbar_tab_background" : {
+
+    },
+    "theme_item_tab_layout_with_expanded_collapsing_toolbar_tab_background_detail" : {
+
+    },
+    "theme_item_tab_layout_with_expanded_collapsing_toolbar_tab_indicator" : {
+
+    },
+    "theme_item_tab_layout_with_expanded_collapsing_toolbar_tab_indicator_detail" : {
+
+    },
+    "theme_item_tab_layout_with_expanded_collapsing_toolbar_text_color" : {
+
+    },
+    "theme_item_tab_layout_with_expanded_collapsing_toolbar_text_color_detail" : {
+
+    },
+    "theme_item_toolbar_primary_text_and_icon_color" : {
+
+    },
+    "theme_item_toolbar_primary_text_and_icon_color_detail" : {
+
+    },
+    "theme_item_toolbar_secondary_text_color" : {
+
+    },
+    "theme_item_toolbar_secondary_text_color_detail" : {
+
+    },
+    "theme_item_unread_message_background_color" : {
+
+    },
+    "theme_item_unread_message_background_color_detail" : {
+
+    },
+    "theme_item_unsubscribed_color" : {
+
+    },
+    "theme_item_unsubscribed_color_detail" : {
+
+    },
+    "theme_item_upvote_ratio_icon_tint" : {
+
+    },
+    "theme_item_upvote_ratio_icon_tint_detail" : {
+
+    },
+    "theme_item_upvoted_color" : {
+
+    },
+    "theme_item_upvoted_color_detail" : {
+
+    },
+    "theme_item_username_color" : {
+
+    },
+    "theme_item_username_color_detail" : {
+
+    },
+    "theme_item_vote_and_reply_unavailable_button_color" : {
+
+    },
+    "theme_item_vote_and_reply_unavailable_button_color_detail" : {
+
+    },
     "This is where you will add UI for filtering out content." : {
 
     },
