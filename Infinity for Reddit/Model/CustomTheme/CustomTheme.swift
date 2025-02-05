@@ -290,6 +290,78 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
         self.isChangeStatusBarIconColorAfterToolbarCollapsedInImmersiveInterface = isChangeStatusBarIconColorAfterToolbarCollapsedInImmersiveInterface
     }
     
+    func fieldToKeyPath(fieldName: String) -> AnyKeyPath? {
+        switch fieldName {
+        case "name":
+            return \CustomTheme.name
+        case "isLightTheme":
+            return \CustomTheme.isLightTheme
+        case "isDarkTheme":
+            return \CustomTheme.isDarkTheme
+        case "isAmoledTheme":
+            return \CustomTheme.isAmoledTheme
+        case "colorPrimary":
+            return \CustomTheme.colorPrimary
+        case "colorPrimaryDark":
+            return \CustomTheme.colorPrimaryDark
+        case "colorAccent":
+            return \CustomTheme.colorAccent
+        case "colorPrimaryLightTheme":
+            return \CustomTheme.colorPrimaryLightTheme
+        case "primaryTextColor":
+            return \CustomTheme.primaryTextColor
+        case "secondaryTextColor":
+            return \CustomTheme.secondaryTextColor
+        case "postTitleColor":
+            return \CustomTheme.postTitleColor
+        case "postContentColor":
+            return \CustomTheme.postContentColor
+        case "readPostTitleColor":
+            return \CustomTheme.readPostTitleColor
+        case "readPostContentColor":
+            return \CustomTheme.readPostContentColor
+        case "commentColor":
+            return \CustomTheme.commentColor
+        case "buttonTextColor":
+            return \CustomTheme.buttonTextColor
+        case "backgroundColor":
+            return \CustomTheme.backgroundColor
+        case "cardViewBackgroundColor":
+            return \CustomTheme.cardViewBackgroundColor
+        case "readPostCardViewBackgroundColor":
+            return \CustomTheme.readPostCardViewBackgroundColor
+        case "filledCardViewBackgroundColor":
+            return \CustomTheme.filledCardViewBackgroundColor
+        case "readPostFilledCardViewBackgroundColor":
+            return \CustomTheme.readPostFilledCardViewBackgroundColor
+        case "commentBackgroundColor":
+            return \CustomTheme.commentBackgroundColor
+        case "bottomAppBarBackgroundColor":
+            return \CustomTheme.bottomAppBarBackgroundColor
+        case "primaryIconColor":
+            return \CustomTheme.primaryIconColor
+        case "bottomAppBarIconColor":
+            return \CustomTheme.bottomAppBarIconColor
+        case "postIconAndInfoColor":
+            return \CustomTheme.postIconAndInfoColor
+        case "commentIconAndInfoColor":
+            return \CustomTheme.commentIconAndInfoColor
+        case "toolbarPrimaryTextAndIconColor":
+            return \CustomTheme.toolbarPrimaryTextAndIconColor
+        case "toolbarSecondaryTextColor":
+            return \CustomTheme.toolbarSecondaryTextColor
+        case "circularProgressBarBackground":
+            return \CustomTheme.circularProgressBarBackground
+        case "mediaIndicatorIconColor":
+            return \CustomTheme.mediaIndicatorIconColor
+        case "mediaIndicatorBackgroundColor":
+            return \CustomTheme.mediaIndicatorBackgroundColor
+        // Add more cases here for each field
+        default:
+            return nil
+        }
+    }
+    
     func getProperties(customThemeFields: inout [String], customThemeFieldsBoolType: inout Set<String>) {
         let mirror = Mirror(reflecting: self)
             
@@ -300,7 +372,7 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
                 customThemeFieldsBoolType.insert(label)
             }
             
-            if child.label != "id" {
+            if child.label != "id" && child.label != "name" {
                 customThemeFields.append(label)
             }
         }
