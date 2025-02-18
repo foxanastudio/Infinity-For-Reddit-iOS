@@ -88,7 +88,7 @@ struct UserDetailsView: View {
                         CommentListingView(
                             commentListingMetadata: CommentListingMetadata(
                                 commentListingType:.user,
-                                pathComponents: ["sortType": "best"],
+                                pathComponents: ["sortType": "best", "username": "\(accountViewModel.account.username)"],
                                 headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
                                 queries: nil,
                                 params: nil
@@ -100,7 +100,17 @@ struct UserDetailsView: View {
                     Spacer()
                 } else {
                     VStack{
-                        Text("Posts")
+                        PostListingView(
+                            account: accountViewModel.account,
+                            postListingMetadata:PostListingMetadata(
+                                postListingType:.user,
+                                pathComponents: ["sortType": "best", "username": "\(accountViewModel.account.username)"],
+                                headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
+                                queries: nil,
+                                params: nil
+                            )
+                        )
+                        .id(accountViewModel.account.username)
                     }.frame(maxHeight:.infinity)
                     Spacer()
                 }

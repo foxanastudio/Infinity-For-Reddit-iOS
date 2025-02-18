@@ -45,7 +45,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
         case .getSubredditPosts(let pathComponents, _):
             return "/r/\(pathComponents["subreddit"] ?? "popular")/\(pathComponents["sortType"] ?? "hot").json"
         case .getUserPosts(let pathComponents, _):
-            return "/user/\(pathComponents["username"] ?? "")/\(pathComponents["where"] ?? "submitted").json"
+            return "/user/\(pathComponents["username"] ?? "infinityAN")/\(pathComponents["where"] ?? "submitted").json"
         case .getSearchPosts:
             return "search.json"
         case .getMultiredditPosts(let pathComponents, _):
