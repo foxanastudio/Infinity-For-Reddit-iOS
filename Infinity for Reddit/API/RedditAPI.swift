@@ -10,6 +10,7 @@ import Foundation
 
 enum RedditAPI: URLRequestConvertible {
     case getAccessToken(queries: [String: String]?, headers: HTTPHeaders, params: [String: String]?)
+    case getUserData(username: String, queries: [String: String]?)
     
     private var baseURL: String {
         return "https://www.reddit.com"
@@ -19,6 +20,8 @@ enum RedditAPI: URLRequestConvertible {
         switch self {
         case .getAccessToken:
             return .post
+        case .getUserData:
+            return .get
         }
     }
     
@@ -26,6 +29,8 @@ enum RedditAPI: URLRequestConvertible {
         switch self {
         case .getAccessToken:
             return "/api/v1/access_token"
+        case .getUserData(let username, _):
+            return "/user/\(username)/about.json"
         }
     }
     
@@ -33,12 +38,16 @@ enum RedditAPI: URLRequestConvertible {
         switch self {
         case .getAccessToken(_, _, let params):
             return params
+        case .getUserData(_, _):
+            return nil
         }
     }
     
     var queries: [String: String]? {
         switch self {
         case .getAccessToken(queries: let queries, _, _):
+            return queries
+        case .getUserData(_, queries: let queries):
             return queries
         }
     }
@@ -47,12 +56,16 @@ enum RedditAPI: URLRequestConvertible {
         switch self {
         case .getAccessToken(_, let headers, _):
             return headers
+        case .getUserData(_, _):
+            return nil
         }
     }
     
     var encoding: ParameterEncoding {
         switch self {
         case .getAccessToken:
+            return URLEncoding.default
+        case .getUserData:
             return URLEncoding.default
         }
     }
@@ -69,7 +82,7 @@ enum RedditAPI: URLRequestConvertible {
                 url = updatedURL
             }
         }
-        
+        print(url)
         //Set up method and headers
         var request = URLRequest(url: url)
         request.method = method

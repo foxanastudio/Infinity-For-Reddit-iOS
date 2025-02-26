@@ -177,4 +177,6 @@ public struct JSONUtils {
     public static let INCLUDE_SUBREDDIT_INFO_KEY = "include_subreddit_info"
     public static let PREFERENCES_KEY = "preferences"
     public static let IS_MOD_KEY = "is_mod"
+    public static let CAN_BE_FOLLOWED_KEY = "accept_followers"
+    
 }

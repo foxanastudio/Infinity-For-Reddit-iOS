@@ -20,6 +20,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
     case getSubscribedThings(queries: [String: String])
     case getMyCustomFeeds
     case getUserComments(pathComponents: [String: String], queries: [String: String])
+    case subsrcribeToSubreddit(params: [String: String])
     
     private var baseURL: String {
         return "https://oauth.reddit.com"
@@ -29,7 +30,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
         switch self {
         case .getMyInfo, .getFrontPagePosts, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments:
             return .get
-        case .vote:
+        case .vote, .subsrcribeToSubreddit:
             return .post
         }
     }
@@ -58,6 +59,8 @@ enum RedditOAuthAPI: URLRequestConvertible {
             return "/api/multi/mine"
         case .getUserComments(let pathComponents, _):
             return "/user/\(pathComponents["username"] ?? "infinityAN")/comments.json"
+        case .subsrcribeToSubreddit:
+            return "/api/subscribe"
         }
     }
     
@@ -65,7 +68,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
         switch self {
         case .getMyInfo, .getFrontPagePosts, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments:
             return nil
-        case .vote(let params):
+        case .vote(let params), .subsrcribeToSubreddit(let params):
             return params
         }
     }
@@ -92,6 +95,8 @@ enum RedditOAuthAPI: URLRequestConvertible {
             return ["raw_json": "1"].merging(queries, uniquingKeysWith: { _, new in new })
         case .getUserComments(_, let queries):
             return ["raw_json": "1", "sort": "best"].merging(queries, uniquingKeysWith: { _, new in new })
+        case .subsrcribeToSubreddit(let params):
+            return params
         }
     }
     
@@ -99,14 +104,14 @@ enum RedditOAuthAPI: URLRequestConvertible {
         switch self {
         case .getMyInfo(let headers):
             return headers
-        case .getFrontPagePosts, .vote, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments:
+        case .getFrontPagePosts, .vote, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .subsrcribeToSubreddit:
             return nil
         }
     }
     
     var encoding: ParameterEncoding {
         switch self {
-        case .getMyInfo, .getFrontPagePosts, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .vote, .getSubscribedThings, .getMyCustomFeeds, .getUserComments:
+        case .getMyInfo, .getFrontPagePosts, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .vote, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .subsrcribeToSubreddit:
             return URLEncoding.default
         }
     }
