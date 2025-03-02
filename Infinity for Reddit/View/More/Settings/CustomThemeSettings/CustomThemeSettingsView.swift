@@ -28,9 +28,11 @@ struct CustomThemeSettingsView: View {
                     Text(customThemeSettingsViewModel.themeOptions[index]).tag(index)
                 }
             }
+            .themedPicker()
             .listPlainItem()
             
             Toggle("AMOLED Dark", systemImage: "moon.fill", isOn: $customThemeSettingsViewModel.amoledDark)
+                .themedToggle()
                 .listPlainItem()
 
             Section(header: Text("Customization")) {

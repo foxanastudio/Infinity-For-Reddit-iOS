@@ -91,4 +91,12 @@ extension View {
     func primaryIcon() -> some View {
         self.modifier(PrimaryIconImageViewModifier())
     }
+    
+    func themedPicker() -> some View {
+        self.modifier(PickerCustomThemeViewModifier())
+    }
+    
+    func themedToggle() -> some View {
+        self.modifier(ToggleCustomThemeViewModifier())
+    }
 }

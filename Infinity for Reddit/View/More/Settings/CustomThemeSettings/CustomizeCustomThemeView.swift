@@ -62,12 +62,14 @@ struct CustomizeCustomThemeView: View {
         return HStack(alignment: .center) {
             VStack(alignment: .leading) {
                 Text(customizeCustomThemeViewModel.customTheme.name)
+                    .primaryText()
                 
                 Spacer()
                     .frame(height: 8)
                 
                 Text(NSLocalizedString("theme_name_description", comment: ""))
                     .font(.system(size: 14))
+                    .secondaryText()
             }
         }
     }
@@ -76,12 +78,14 @@ struct CustomizeCustomThemeView: View {
         return HStack(alignment: .center) {
             VStack(alignment: .leading) {
                 Text(title)
+                    .primaryText()
                 
                 Spacer()
                     .frame(height: 8)
                 
                 Text(description)
                     .font(.system(size: 14))
+                    .secondaryText()
             }
             
             Spacer()
@@ -102,18 +106,21 @@ struct CustomizeCustomThemeView: View {
         return HStack(alignment: .center) {
             VStack(alignment: .leading) {
                 Text(title)
+                    .primaryText()
                 
                 Spacer()
                     .frame(height: 8)
                 
                 Text(description)
                     .font(.system(size: 14))
+                    .secondaryText()
             }
             
             Spacer()
             
             Toggle(isOn: isEnabled) {}
                 .labelsHidden()
+                .themedToggle()
         }
         .frame(maxWidth: .infinity)
     }
