@@ -12,7 +12,16 @@ struct NavigationBarImageViewModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            //.font()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.toolbarPrimaryTextAndIconColor))
+    }
+}
+
+struct PostIconImageViewModifier: ViewModifier {
+    @EnvironmentObject var themeViewModel: CustomThemeViewModel
+    
+    func body(content: Content) -> some View {
+        content
+            .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.postIconAndInfoColor))
+            .colorMultiply(Color(hex: themeViewModel.currentCustomTheme.postIconAndInfoColor))
     }
 }

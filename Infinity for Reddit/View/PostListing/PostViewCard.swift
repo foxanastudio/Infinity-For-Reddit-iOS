@@ -23,20 +23,23 @@ struct PostViewCard: View {
             HStack(alignment: .center) {
                 VStack(alignment: .leading) {
                     Text(postViewModel.post.subredditNamePrefixed)
+                        .subreddit()
+                    
                     Text("u/\(postViewModel.post.author)")
+                        .username()
                 }
                 
                 Spacer()
                 
-                Text(
-                    formatter.string(from: Date(timeIntervalSince1970: TimeInterval(postViewModel.post.createdUtc)))
-                )
+                Text(formatter.string(from: Date(timeIntervalSince1970: TimeInterval(postViewModel.post.createdUtc))))
+                    .secondaryText()
             }
             .padding(.vertical, 8)
             
             Text(postViewModel.post.title)
                 .font(.system(size: 24))
                 .padding(.bottom, 8)
+                .postTitle()
             
             if let preview = postViewModel.post.preview, preview.images.count > 0, let url = preview.images[0].source.url {
                 WebImage(url: URL(string: url)) { image in
@@ -65,16 +68,21 @@ struct PostViewCard: View {
                     postViewModel.post.likes = 1
                 }) {
                     SwiftUI.Image(postViewModel.post.likes == 1 ? "upvoted" : "upvote")
+                        .postIconTemplateRendering()
+                        .postIcon()
                 }
                 .buttonStyle(.borderless)
                 
                 Text(String(postViewModel.post.score))
                     .frame(width: 50, alignment: .center)
+                    .postInfo()
                 
                 Button(action: {
                     postViewModel.votePost(vote: -1)
                 }) {
                     SwiftUI.Image(postViewModel.post.likes == -1 ? "downvoted" : "downvote")
+                        .postIconTemplateRendering()
+                        .postIcon()
                 }
                 .padding(.trailing, 16)
                 .buttonStyle(.borderless)
@@ -83,10 +91,13 @@ struct PostViewCard: View {
                     
                 } label: {
                     SwiftUI.Image("comment")
+                        .postIconTemplateRendering()
+                        .postIcon()
                 }
                 .buttonStyle(.borderless)
                 
                 Text(String(postViewModel.post.numComments))
+                    .postInfo()
                 
                 Spacer()
                 
@@ -94,6 +105,8 @@ struct PostViewCard: View {
                     
                 } label: {
                     SwiftUI.Image(systemName: "square.and.arrow.up")
+                        .postIconTemplateRendering()
+                        .postIcon()
                 }
                 .buttonStyle(.borderless)
             }

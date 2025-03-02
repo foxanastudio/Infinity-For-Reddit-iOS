@@ -20,6 +20,10 @@ extension View {
         self.modifier(PrimaryTextViewModifier())
     }
     
+    func secondaryText() -> some View {
+        self.modifier(PrimaryTextViewModifier())
+    }
+    
     func navigationBarPrimaryText() -> some View {
         self.modifier(NavigationBarPrimaryTextViewModifier())
     }
@@ -50,5 +54,37 @@ extension View {
     
     func themedTabViewGroup() -> some View {
         self.modifier(TabViewGroupViewModifier())
+    }
+    
+    func themedListSection() -> some View {
+        self.modifier(ListSectionViewModifier())
+    }
+    
+    func postIcon() -> some View {
+        self.modifier(PostIconImageViewModifier())
+    }
+    
+    func postInfo() -> some View {
+        self.modifier(PostInfoTextViewModifier())
+    }
+    
+    func username() -> some View {
+        self.modifier(UsernameTextViewModifier())
+    }
+    
+    func subreddit() -> some View {
+        self.modifier(SubredditTextViewModifier())
+    }
+    
+    func postTitle() -> some View {
+        self.modifier(PostTitleTextViewModifier())
+    }
+    
+    func postContent() -> some View {
+        self.modifier(PostContentTextViewModifier())
+    }
+    
+    func commentText() -> some View {
+        self.modifier(CommentTextViewModifier())
     }
 }

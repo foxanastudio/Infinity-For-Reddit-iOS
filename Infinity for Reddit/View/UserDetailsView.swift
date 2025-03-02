@@ -142,8 +142,6 @@ struct UserDetailsView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 1.0)))
         .edgesIgnoringSafeArea(.bottom)
-        
-        .navigationTitle("User Details")
     }
 }
 

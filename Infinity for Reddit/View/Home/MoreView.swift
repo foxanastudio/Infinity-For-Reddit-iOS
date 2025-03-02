@@ -26,6 +26,8 @@ struct MoreView: View {
                 }
             }
             .listPlainItem()
+            .themedListSection()
+            
             Section(header: Text("Post")) {
                 NavigationLink(destination: UpvotedView()) {
                     Text("Upvoted")
@@ -41,6 +43,8 @@ struct MoreView: View {
                 }
             }
             .listPlainItem()
+            .themedListSection()
+            
             Section(header: Text("Preferences")) {
                 NavigationLink(destination: SettingsView()) {
                     Text("Settings")
@@ -50,6 +54,7 @@ struct MoreView: View {
                 }
             }
             .listPlainItem()
+            .themedListSection()
         }
         .themedList()
     }
