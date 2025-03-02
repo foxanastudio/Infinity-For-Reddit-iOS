@@ -14,47 +14,32 @@ struct MoreView: View {
     
     var body: some View {
         List {
-            Section(header: Text("Account")) {
-                NavigationLink(destination: ProfileView()) {
-                    Text("Profile")
-                }
-                NavigationLink(destination: MultiredditView()) {
-                    Text("Multireddit")
-                }
-                NavigationLink(destination: HistoryView()) {
-                    Text("History")
-                }
+            Section(header: Text("Account").listSectionHeader()) {
+                CustomNavigationLink("Profile", destination: ProfileView())
+                
+                CustomNavigationLink("Multireddit", destination: MultiredditView())
+                
+                CustomNavigationLink("History", destination: HistoryView())
             }
             .listPlainItem()
-            .themedListSection()
             
-            Section(header: Text("Post")) {
-                NavigationLink(destination: UpvotedView()) {
-                    Text("Upvoted")
-                }
-                NavigationLink(destination: DownvotedView()) {
-                    Text("Downvoted")
-                }
-                NavigationLink(destination: HiddenView()) {
-                    Text("Hidden")
-                }
-                NavigationLink(destination: SavedView()) {
-                    Text("Saved")
-                }
+            Section(header: Text("Post").listSectionHeader()) {
+                CustomNavigationLink("Upvoted", destination: UpvotedView())
+                
+                CustomNavigationLink("Downvoted", destination: DownvotedView())
+                
+                CustomNavigationLink("Hidden", destination: HiddenView())
+                
+                CustomNavigationLink("Saved", destination: SavedView())
             }
             .listPlainItem()
-            .themedListSection()
             
-            Section(header: Text("Preferences")) {
-                NavigationLink(destination: SettingsView()) {
-                    Text("Settings")
-                }
-                NavigationLink(destination: TestView()) {
-                    Text("Test")
-                }
+            Section(header: Text("Preferences").listSectionHeader()) {
+                CustomNavigationLink("Settings", destination: SettingsView())
+                
+                CustomNavigationLink("Test", destination: TestView())
             }
             .listPlainItem()
-            .themedListSection()
         }
         .themedList()
     }

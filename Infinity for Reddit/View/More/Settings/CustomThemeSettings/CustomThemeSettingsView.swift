@@ -34,28 +34,34 @@ struct CustomThemeSettingsView: View {
                 .listPlainItem()
 
             Section(header: Text("Customization")) {
-                NavigationLink(destination: CustomizeCustomThemeView(customTheme: customThemeViewModel.currentLightCustomTheme ?? CustomTheme.getIndigo())) {
+                CustomNavigationLink(destination: CustomizeCustomThemeView(customTheme: customThemeViewModel.currentLightCustomTheme ?? CustomTheme.getIndigo())) {
+                    themeListItem(
+                        themeType: "Light Theme",
+                        themeName: customThemeViewModel.currentLightCustomTheme?.name ?? "Indigo",
+                        icon: "upvoted")
+                }
+                CustomNavigationLink(destination: CustomizeCustomThemeView(customTheme: customThemeViewModel.currentLightCustomTheme ?? CustomTheme.getIndigo())) {
                     themeListItem(
                         themeType: "Light Theme",
                         themeName: customThemeViewModel.currentLightCustomTheme?.name ?? "Indigo",
                         icon: "upvoted")
                 }
                 
-                NavigationLink(destination: CustomizeCustomThemeView(customTheme: customThemeViewModel.currentDarkCustomTheme ?? CustomTheme.getIndigoDark())) {
+                CustomNavigationLink(destination: CustomizeCustomThemeView(customTheme: customThemeViewModel.currentDarkCustomTheme ?? CustomTheme.getIndigoDark())) {
                     themeListItem(
                         themeType: "Dark Theme",
                         themeName: customThemeViewModel.currentDarkCustomTheme?.name ?? "Indigo Dark",
                         icon: "upvoted")
                 }
                 
-                NavigationLink(destination: CustomizeCustomThemeView(customTheme: customThemeViewModel.currentAmoledCustomTheme ?? CustomTheme.getIndigoAmoled())) {
+                CustomNavigationLink(destination: CustomizeCustomThemeView(customTheme: customThemeViewModel.currentAmoledCustomTheme ?? CustomTheme.getIndigoAmoled())) {
                     themeListItem(
                         themeType: "Amoled Theme",
                         themeName: customThemeViewModel.currentAmoledCustomTheme?.name ?? "Indigo Amoled",
                         icon: "upvoted")
                 }
                 
-                NavigationLink(destination: CustomThemeListingView()) {
+                CustomNavigationLink(destination: CustomThemeListingView()) {
                     HStack {
                         SwiftUI.Image("upvote")
                         
@@ -69,7 +75,8 @@ struct CustomThemeSettingsView: View {
             .listPlainItem()
         }
         .themedList()
-        .navigationTitle("Theme")
+        .themedNavigationBar()
+        .addTitleToInlineNavigationBar("Theme")
     }
     
     func themeListItem(themeType: String, themeName: String, icon: String) -> some View {

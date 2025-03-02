@@ -56,8 +56,8 @@ extension View {
         self.modifier(TabViewGroupViewModifier())
     }
     
-    func themedListSection() -> some View {
-        self.modifier(ListSectionViewModifier())
+    func listSectionHeader() -> some View {
+        self.modifier(ListSectionHeaderViewModifier())
     }
     
     func postIcon() -> some View {
@@ -86,5 +86,9 @@ extension View {
     
     func commentText() -> some View {
         self.modifier(CommentTextViewModifier())
+    }
+    
+    func primaryIcon() -> some View {
+        self.modifier(PrimaryIconImageViewModifier())
     }
 }
