@@ -16,9 +16,11 @@ struct PostDetailsView: View {
     
     @StateObject var postDetailsViewModel: PostDetailsViewModel
     private let account: Account
+    private let post: Post
     
     init(account: Account, post: Post) {
         self.account = account
+        self.post = post
         
         _postDetailsViewModel = StateObject(
             wrappedValue: PostDetailsViewModel(
@@ -31,25 +33,28 @@ struct PostDetailsView: View {
     
     var body: some View {
         Group {
-            if postDetailsViewModel.isInitialLoading {
-                Text("Is loading")
-            } else if postDetailsViewModel.comments.isEmpty {
-                Text("No comments")
-            } else {
-                Text(String(postDetailsViewModel.comments.count))
-//                List {
-//                    ForEach(postDetailsViewModel.posts, id: \.id) { post in
-//                        PostViewCard(account: account, post: post)
-//                            .id(post.id)
-//                    }
-//                    if postDetailsViewModel.hasMorePages {
-//                        Text("Loading more pages")
-//                            .onAppear {
-//                                postDetailsViewModel.loadPosts()
-//                            }
-//                    }
-//                }.scrollBounceBehavior(.basedOnSize)
-            }
+            List {
+                PostViewCard(account: account, post: post)
+                
+                if postDetailsViewModel.isInitialLoading {
+                    Text("Is loading")
+                } else if postDetailsViewModel.comments.isEmpty {
+                    Text("No comments")
+                } else {
+                    ForEach(postDetailsViewModel.comments, id: \.id) { comment in
+                        CommentViewCard(account: account, comment: comment)
+                            .id(comment.id)
+                    }
+                    if postDetailsViewModel.hasMoreComments {
+                        Text("Loading more comments")
+                            .onAppear {
+                                postDetailsViewModel.fetchComments()
+                            }
+                    }
+                }
+            }.scrollBounceBehavior(.basedOnSize)
+            
+            
         }
         .onChange(of: colorScheme) {
             //print(colorScheme == .dark)
@@ -58,5 +63,6 @@ struct PostDetailsView: View {
             postDetailsViewModel.fetchComments()
         }
         .themedList()
+        .themedNavigationBar()
     }
 }
