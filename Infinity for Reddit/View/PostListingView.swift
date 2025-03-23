@@ -38,8 +38,10 @@ struct PostListingView: View {
             } else {
                 List {
                     ForEach(postListingViewModel.posts, id: \.id) { post in
-                        PostViewCard(account: account, post: post)
-                            .id(post.id)
+                        CustomNavigationLink(destination: PostDetailsView(account: self.account, post: post), showArrow: false) {
+                            PostViewCard(account: account, post: post)
+                                .id(post.id)
+                        }
                     }
                     if postListingViewModel.hasMorePages {
                         Text("Loading more pages")

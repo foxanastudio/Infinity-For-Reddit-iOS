@@ -1,5 +1,5 @@
 //
-//  PostDetailsViewmodel.swift
+//  PostDetailsViewModel.swift
 //  Infinity for Reddit
 //
 //  Created by Docile Alligator on 2025-03-23.
@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-public class PostDetailsViewmodel: ObservableObject {
+public class PostDetailsViewModel: ObservableObject {
     // MARK: - Properties
     @Published var post: Post
     @Published var comments: [Comment] = []
@@ -62,29 +62,9 @@ public class PostDetailsViewmodel: ObservableObject {
             }
         }, receiveValue: { [weak self] postDetails in
             guard let self = self else { return }
-//            if (postDetails.postListing.posts.isEmpty) {
-//                // No more posts
-//                hasMoreComments = false
-//                after = nil
-//            } else {
-//                let realNewPosts = postDetails.posts.filter {
-//                    !self.allPostIds.contains($0.id)
-//                }
-//                
-//                after = postDetails.after
-//                
-//                self.posts.append(contentsOf: realNewPosts)
-//                
-//                allPostIds.formUnion(
-//                    realNewPosts
-//                        .compactMap {
-//                            $0.id
-//                        }
-//                )
-//                
-//                hasMorePages = !(realNewPosts.isEmpty || postDetails.after == nil || postDetails.after.isEmpty)
-//            }
-//            print("fuck")
+            self.comments.append(contentsOf: postDetails.commentListing.comments)
+            
+            hasMoreComments = postDetails.commentListing.commentMore?.children.isEmpty == false
             print(postDetails.commentListing.comments.count)
         })
         .store(in: &cancellables)

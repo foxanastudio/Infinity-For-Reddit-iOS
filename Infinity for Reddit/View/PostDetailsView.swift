@@ -14,47 +14,48 @@ struct PostDetailsView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dependencyManager) private var dependencyManager: Container
     
-    @StateObject var postListingViewModel: PostListingViewModel
+    @StateObject var postDetailsViewModel: PostDetailsViewModel
     private let account: Account
     
-    init(account: Account, postListingMetadata: PostListingMetadata) {
+    init(account: Account, post: Post) {
         self.account = account
         
-        _postListingViewModel = StateObject(
-            wrappedValue: PostListingViewModel(
+        _postDetailsViewModel = StateObject(
+            wrappedValue: PostDetailsViewModel(
                 account: account,
-                postListingMetadata: postListingMetadata,
-                postListingRepository: PostListingRepository()
+                post: post,
+                postDetailsRepository: PostDetailsRepository()
             )
         )
     }
     
     var body: some View {
         Group {
-            if postListingViewModel.isInitialLoading {
+            if postDetailsViewModel.isInitialLoading {
                 Text("Is loading")
-            } else if postListingViewModel.posts.isEmpty {
-                Text("No posts")
+            } else if postDetailsViewModel.comments.isEmpty {
+                Text("No comments")
             } else {
-                List {
-                    ForEach(postListingViewModel.posts, id: \.id) { post in
-                        PostViewCard(account: account, post: post)
-                            .id(post.id)
-                    }
-                    if postListingViewModel.hasMorePages {
-                        Text("Loading more pages")
-                            .onAppear {
-                                postListingViewModel.loadPosts()
-                            }
-                    }
-                }.scrollBounceBehavior(.basedOnSize)
+                Text(String(postDetailsViewModel.comments.count))
+//                List {
+//                    ForEach(postDetailsViewModel.posts, id: \.id) { post in
+//                        PostViewCard(account: account, post: post)
+//                            .id(post.id)
+//                    }
+//                    if postDetailsViewModel.hasMorePages {
+//                        Text("Loading more pages")
+//                            .onAppear {
+//                                postDetailsViewModel.loadPosts()
+//                            }
+//                    }
+//                }.scrollBounceBehavior(.basedOnSize)
             }
         }
         .onChange(of: colorScheme) {
             //print(colorScheme == .dark)
         }
         .onAppear {
-            postListingViewModel.loadPosts()
+            postDetailsViewModel.fetchComments()
         }
         .themedList()
     }

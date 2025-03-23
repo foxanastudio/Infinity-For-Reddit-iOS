@@ -63,7 +63,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
         case .subsrcribeToSubreddit:
             return "/api/subscribe"
         case .getPostAndCommentsById(let postId, _):
-            return "/comments/\(postId).json?raw_json=1"
+            return "/comments/\(postId).json"
         }
     }
     
