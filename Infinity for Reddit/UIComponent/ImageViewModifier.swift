@@ -36,6 +36,74 @@ struct CommentIconImageViewModifier: ViewModifier {
     }
 }
 
+struct PostUpvoteIconImageViewModifier: ViewModifier {
+    @EnvironmentObject var themeViewModel: CustomThemeViewModel
+    let isUpvoted: Bool
+    
+    func body(content: Content) -> some View {
+        if (isUpvoted) {
+            content
+                .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.upvoted))
+                .colorMultiply(Color(hex: themeViewModel.currentCustomTheme.upvoted))
+        } else {
+            content
+                .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.postIconAndInfoColor))
+                .colorMultiply(Color(hex: themeViewModel.currentCustomTheme.postIconAndInfoColor))
+        }
+    }
+}
+
+struct CommentUpvoteIconImageViewModifier: ViewModifier {
+    @EnvironmentObject var themeViewModel: CustomThemeViewModel
+    let isUpvoted: Bool
+    
+    func body(content: Content) -> some View {
+        if (isUpvoted) {
+            content
+                .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.upvoted))
+                .colorMultiply(Color(hex: themeViewModel.currentCustomTheme.upvoted))
+        } else {
+            content
+                .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.commentIconAndInfoColor))
+                .colorMultiply(Color(hex: themeViewModel.currentCustomTheme.commentIconAndInfoColor))
+        }
+    }
+}
+
+struct PostDownvoteIconImageViewModifier: ViewModifier {
+    @EnvironmentObject var themeViewModel: CustomThemeViewModel
+    let isDownVoted: Bool
+    
+    func body(content: Content) -> some View {
+        if isDownVoted {
+            content
+                .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.downvoted))
+                .colorMultiply(Color(hex: themeViewModel.currentCustomTheme.downvoted))
+        } else {
+            content
+                .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.postIconAndInfoColor))
+                .colorMultiply(Color(hex: themeViewModel.currentCustomTheme.postIconAndInfoColor))
+        }
+    }
+}
+
+struct CommentDownvoteIconImageViewModifier: ViewModifier {
+    @EnvironmentObject var themeViewModel: CustomThemeViewModel
+    let isDownVoted: Bool
+    
+    func body(content: Content) -> some View {
+        if isDownVoted {
+            content
+                .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.downvoted))
+                .colorMultiply(Color(hex: themeViewModel.currentCustomTheme.downvoted))
+        } else {
+            content
+                .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.commentIconAndInfoColor))
+                .colorMultiply(Color(hex: themeViewModel.currentCustomTheme.commentIconAndInfoColor))
+        }
+    }
+}
+
 struct PrimaryIconImageViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
     

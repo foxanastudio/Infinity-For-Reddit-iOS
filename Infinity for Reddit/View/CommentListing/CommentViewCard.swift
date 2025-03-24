@@ -68,7 +68,7 @@ struct CommentViewCard: View {
                 }) {
                     SwiftUI.Image(commentViewModel.comment.likes == 1 ? "upvoted" : "upvote")
                         .commentIconTemplateRendering()
-                        .commentIcon()
+                        .commentUpvoteIcon(isUpvoted: commentViewModel.comment.likes == 1)
                 }
                 .buttonStyle(.borderless)
                 
@@ -81,7 +81,7 @@ struct CommentViewCard: View {
                 }) {
                     SwiftUI.Image(commentViewModel.comment.likes == -1 ? "downvoted" : "downvote")
                         .commentIconTemplateRendering()
-                        .commentIcon()
+                        .commentDownvoteIcon(isDownvoted: commentViewModel.comment.likes == -1)
                 }
                 .padding(.trailing, 16)
                 .buttonStyle(.borderless)

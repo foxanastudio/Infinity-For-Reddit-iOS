@@ -69,7 +69,7 @@ struct PostViewCard: View {
                 }) {
                     SwiftUI.Image(postViewModel.post.likes == 1 ? "upvoted" : "upvote")
                         .postIconTemplateRendering()
-                        .postIcon()
+                        .postUpvoteIcon(isUpvoted: postViewModel.post.likes == 1)
                 }
                 .buttonStyle(.borderless)
                 
@@ -82,7 +82,7 @@ struct PostViewCard: View {
                 }) {
                     SwiftUI.Image(postViewModel.post.likes == -1 ? "downvoted" : "downvote")
                         .postIconTemplateRendering()
-                        .postIcon()
+                        .postDownvoteIcon(isDownvoted: postViewModel.post.likes == -1)
                 }
                 .padding(.trailing, 16)
                 .buttonStyle(.borderless)

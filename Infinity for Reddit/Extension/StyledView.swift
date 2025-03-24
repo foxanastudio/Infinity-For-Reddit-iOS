@@ -76,6 +76,22 @@ extension View {
         self.modifier(CommentInfoTextViewModifier())
     }
     
+    func postUpvoteIcon(isUpvoted: Bool) -> some View {
+        self.modifier(PostUpvoteIconImageViewModifier(isUpvoted: isUpvoted))
+    }
+    
+    func postDownvoteIcon(isDownvoted: Bool) -> some View {
+        self.modifier(PostDownvoteIconImageViewModifier(isDownVoted: isDownvoted))
+    }
+    
+    func commentUpvoteIcon(isUpvoted: Bool) -> some View {
+        self.modifier(CommentUpvoteIconImageViewModifier(isUpvoted: isUpvoted))
+    }
+    
+    func commentDownvoteIcon(isDownvoted: Bool) -> some View {
+        self.modifier(CommentDownvoteIconImageViewModifier(isDownVoted: isDownvoted))
+    }
+    
     func username() -> some View {
         self.modifier(UsernameTextViewModifier())
     }
