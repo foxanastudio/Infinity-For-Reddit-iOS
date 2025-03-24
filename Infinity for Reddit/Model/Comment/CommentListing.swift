@@ -82,7 +82,7 @@ public class CommentListing : NSObject, NSCoding, Validatable {
     init(fromJson json: JSON!) throws {
         try Self.validate(json: json)
         
-        if json.isEmpty{
+        if json.isEmpty {
             return
         }
         
@@ -323,7 +323,7 @@ public class Comment : NSObject, NSCoding, Validatable {
         if (json["replies"].string == nil) {
             // It has replies
             do {
-                replies = try CommentListing(fromJson: json["replies"])
+                replies = try CommentListing(fromJson: json["replies"]["data"])
             } catch {
                 // Ignore
             }

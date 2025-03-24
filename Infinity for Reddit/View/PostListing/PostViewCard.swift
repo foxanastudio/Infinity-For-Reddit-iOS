@@ -110,6 +110,9 @@ struct PostViewCard: View {
                 .buttonStyle(.borderless)
             }
             .padding(.vertical, 8)
+            
+            Divider()
         }
+        .padding(.vertical, -11)
     }
 }

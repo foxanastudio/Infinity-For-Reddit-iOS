@@ -43,6 +43,7 @@ struct PostListingView: View {
                                 .id(post.id)
                         }
                         .listPlainItem()
+                        //.listRowInsets(EdgeInsets(top: 0, bottom: 0, trailing: 0))
                     }
                     if postListingViewModel.hasMorePages {
                         Text("Loading more pages")

@@ -12,6 +12,7 @@ import MarkdownUI
 public class PostDetailsRootClass: NSObject, NSCoding, Validatable {
     var postListing: PostListing!
     var commentListing: CommentListing!
+    var comments: [Comment] = []
     
     /**
      * Instantiate the instance using the passed json values to set the properties values
@@ -30,6 +31,24 @@ public class PostDetailsRootClass: NSObject, NSCoding, Validatable {
         let commentListingJson = json[1]
         if !commentListingJson.isEmpty {
             commentListing = try CommentListingRootClass(fromJson: commentListingJson).data
+        }
+    }
+    
+    func makeCommentList() {
+        comments = []
+        makeCommentList(commentListing: commentListing)
+    }
+    
+    private func makeCommentList(commentListing: CommentListing) {
+        guard !commentListing.comments.isEmpty else { return }
+        for comment in commentListing.comments {
+            guard let childrenCommentListing = comment.replies else {
+                comments.append(comment)
+                continue
+            }
+            
+            comments.append(comment)
+            makeCommentList(commentListing: childrenCommentListing)
         }
     }
     

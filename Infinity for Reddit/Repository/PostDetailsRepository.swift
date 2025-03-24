@@ -42,6 +42,8 @@ public class PostDetailsRepository: PostDetailsRepositoryProtocol {
                                 throw PostDetailsRepositoryError.JSONDecodingError(error.localizedDescription)
                             } else {
                                 let postDetails = try PostDetailsRootClass(fromJson: json)
+                                postDetails.makeCommentList()
+                                print(postDetails.comments.count)
                                 promise(.success(postDetails))
                             }
                         } catch {

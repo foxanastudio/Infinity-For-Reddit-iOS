@@ -62,10 +62,9 @@ public class PostDetailsViewModel: ObservableObject {
             }
         }, receiveValue: { [weak self] postDetails in
             guard let self = self else { return }
-            self.comments.append(contentsOf: postDetails.commentListing.comments)
+            self.comments.append(contentsOf: postDetails.comments)
             
             hasMoreComments = postDetails.commentListing.commentMore?.children.isEmpty == false
-            print(postDetails.commentListing.comments.count)
         })
         .store(in: &cancellables)
     }
