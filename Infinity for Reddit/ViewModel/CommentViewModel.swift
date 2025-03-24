@@ -27,11 +27,14 @@ public class CommentViewModel: ObservableObject {
         let previousVote = comment.likes
         
         var point: String
+        let finalVote: Int
         if vote == comment.likes {
             point = "0"
+            finalVote = 0
             comment.likes = 0
         } else {
             point = String(vote)
+            finalVote = vote
             comment.likes = vote
         }
         self.objectWillChange.send()
@@ -41,10 +44,10 @@ public class CommentViewModel: ObservableObject {
             .validate()
             .responseData { response in
                 switch response.result {
-                case .success(let _):
-                    self.comment.likes = Int(vote)
+                case .success(_):
+                    self.comment.likes = finalVote
                     self.objectWillChange.send()
-                case .failure(let _):
+                case .failure(_):
                     self.comment.likes = previousVote
                     self.objectWillChange.send()
                 }

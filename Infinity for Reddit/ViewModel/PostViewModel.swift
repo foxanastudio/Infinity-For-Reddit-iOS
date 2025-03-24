@@ -24,16 +24,19 @@ public class PostViewModel: ObservableObject {
     }
     
     func votePost(vote: Int) {
-        guard let _ = account.accessToken, let fullName = post.name else { return }
+        guard let _ = account.accessToken, let _ = post.name else { return }
         
         let previousVote = post.likes
         
         var point: String
+        let finalVote: Int
         if vote == post.likes {
             point = "0"
+            finalVote = 0
             post.likes = 0
         } else {
             point = String(vote)
+            finalVote = vote
             post.likes = vote
         }
         self.objectWillChange.send()
@@ -41,13 +44,12 @@ public class PostViewModel: ObservableObject {
         postRepository.votePost(post: post, point: point)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { [weak self] completion in
-                if case .failure(let error) = completion {
+                if case .failure(_) = completion {
                     self?.post.likes = previousVote
-                    self?.objectWillChange.send()
                 } else {
-                    self?.post.likes = vote
-                    self?.objectWillChange.send()
+                    self?.post.likes = finalVote
                 }
+                self?.objectWillChange.send()
             }, receiveValue: {})
             .store(in: &cancellables)
         }

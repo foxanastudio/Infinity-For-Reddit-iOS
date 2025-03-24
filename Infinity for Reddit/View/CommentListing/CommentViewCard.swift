@@ -64,7 +64,6 @@ struct CommentViewCard: View {
             HStack(alignment: .center) {
                 Button(action: {
                     commentViewModel.voteComment(vote: 1)
-                    commentViewModel.comment.likes = 1
                 }) {
                     SwiftUI.Image(commentViewModel.comment.likes == 1 ? "upvoted" : "upvote")
                         .commentIconTemplateRendering()

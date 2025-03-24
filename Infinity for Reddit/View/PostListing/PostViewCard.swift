@@ -65,7 +65,6 @@ struct PostViewCard: View {
             HStack(alignment: .center) {
                 Button(action: {
                     postViewModel.votePost(vote: 1)
-                    postViewModel.post.likes = 1
                 }) {
                     SwiftUI.Image(postViewModel.post.likes == 1 ? "upvoted" : "upvote")
                         .postIconTemplateRendering()
