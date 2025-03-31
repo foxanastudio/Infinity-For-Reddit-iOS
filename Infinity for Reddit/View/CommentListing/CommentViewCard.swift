@@ -46,14 +46,14 @@ struct CommentViewCard: View {
             Group {
                 if commentViewModel.comment.bodyProcessedMarkdown != nil {
                     Markdown(commentViewModel.comment.bodyProcessedMarkdown!)
-                        .markdownImageProvider(WebImageProvider(mediaMetadata: commentViewModel.comment.mediaMetadata, comment: commentViewModel.comment))
+                        .markdownImageProvider(WebImageProvider(mediaMetadata: commentViewModel.comment.mediaMetadata))
                         .font(.system(size: 24))
                         .padding(.bottom, 8)
                         .themedMarkdown()
                         .id(commentViewModel.comment.id)
                 } else {
                     Markdown(commentViewModel.comment.body)
-                        .markdownImageProvider(WebImageProvider(mediaMetadata: commentViewModel.comment.mediaMetadata, comment: commentViewModel.comment))
+                        .markdownImageProvider(WebImageProvider(mediaMetadata: commentViewModel.comment.mediaMetadata))
                         .font(.system(size: 24))
                         .padding(.bottom, 8)
                         .themedMarkdown()

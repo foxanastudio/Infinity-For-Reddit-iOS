@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import MarkdownUI
 
 public class PostListingViewModel: ObservableObject {
     // MARK: - Properties
@@ -53,6 +54,12 @@ public class PostListingViewModel: ObservableObject {
             queries: ["limit": "100", "after": after ?? ""].merging(postListingMetadata.queries ?? [:], uniquingKeysWith: { _, new in new }),
             params: postListingMetadata.params
         )
+        .subscribe(on: DispatchQueue.global(qos: .userInitiated))
+        .map { listingData -> (posts: [Post], after: String) in
+            // Perform post-processing in the background thread
+            let processedPosts = self.postProcessPosts(listingData.posts)
+            return (processedPosts, listingData.after)
+        }
         .receive(on: DispatchQueue.main)
         .sink(receiveCompletion: { [weak self] completion in
             self?.isInitialLoading = false
@@ -61,18 +68,18 @@ public class PostListingViewModel: ObservableObject {
             if case .failure(let error) = completion {
                 print("Error fetching posts: \(error)")
             }
-        }, receiveValue: { [weak self] listingData in
+        }, receiveValue: { [weak self] (processedPosts, after) in
             guard let self = self else { return }
-            if (listingData.posts.isEmpty) {
+            if (processedPosts.isEmpty) {
                 // No more posts
                 hasMorePages = false
-                after = nil
+                self.after = nil
             } else {
-                let realNewPosts = listingData.posts.filter {
+                let realNewPosts = processedPosts.filter {
                     !self.allPostIds.contains($0.id)
                 }
                 
-                after = listingData.after
+                self.after = after
                 
                 self.posts.append(contentsOf: realNewPosts)
                 
@@ -83,7 +90,7 @@ public class PostListingViewModel: ObservableObject {
                         }
                 )
                 
-                hasMorePages = !(realNewPosts.isEmpty || listingData.after == nil || listingData.after.isEmpty)
+                hasMorePages = !(realNewPosts.isEmpty || after == nil || after.isEmpty)
             }
             print("fuck")
         })
@@ -104,5 +111,17 @@ public class PostListingViewModel: ObservableObject {
         posts = []
         
         loadPosts()
+    }
+    
+    func postProcessPosts(_ posts: [Post]) -> [Post] {
+        return posts.map {
+            modifyPostBody($0)
+            $0.selftextProcessedMarkdown = MarkdownContent($0.selftext)
+            return $0
+        }
+    }
+    
+    func modifyPostBody(_ post: Post) {
+        MarkdownUtils.parseRedditImagesBlock(post)
     }
 }

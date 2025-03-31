@@ -13,11 +13,9 @@ import SwiftUI
 
 struct WebImageProvider: ImageProvider {
     var mediaMetadata: [String: MediaMetadata]?
-    var comment: Comment
     
-    init(mediaMetadata: [String: MediaMetadata]?, comment: Comment) {
+    init(mediaMetadata: [String: MediaMetadata]?) {
         self.mediaMetadata = mediaMetadata
-        self.comment = comment
     }
     
     func makeImage(url: URL?) -> some View {

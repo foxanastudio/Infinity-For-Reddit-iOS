@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftyJSON
+import MarkdownUI
 
 
 class PostListingRootClass: NSObject, NSCoding{
@@ -69,7 +70,6 @@ class PostListingRootClass: NSObject, NSCoding{
 }
 
 public class PostListing : NSObject, NSCoding{
-    
     var posts : [Post]! = [Post]()
     var after : String!
     var before : String!
@@ -170,6 +170,7 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
     var linkFlairType : String!
     var locked : Bool!
     var media : PostMedia!
+    var mediaMetadata: [String: MediaMetadata]?
     var mediaOnly : Bool!
     // TODO Fix type, may not be String
     var modNote : String!
@@ -196,6 +197,7 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
     var saved : Bool!
     var score : Int!
     var selftext : String!
+    var selftextProcessedMarkdown : MarkdownContent?
     var selftextHtml : String!
     var selftextTruncated: String! {
         if selftext == nil {
@@ -269,6 +271,15 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         if !mediaJson.isEmpty {
             media = PostMedia(fromJson: mediaJson)
         }
+        if let mediaMetaData = json["media_metadata"].dictionary {
+            var parsedMediaMetadata = [String: MediaMetadata]()
+            
+            for (key, value) in mediaMetaData {
+                let media = MediaMetadata(fromJson: value)
+                parsedMediaMetadata[key] = media
+            }
+            mediaMetadata = parsedMediaMetadata
+        }
         mediaOnly = json["media_only"].boolValue
         modNote = json["mod_note"].stringValue
         modReasonBy = json["mod_reason_by"].stringValue
@@ -285,7 +296,7 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
                 }
             }
             modReports.append(subArray)
-        }       
+        }
         name = json["name"].stringValue
         numComments = json["num_comments"].intValue
         numCrossposts = json["num_crossposts"].intValue
@@ -427,6 +438,9 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         }
         if media != nil{
             dictionary["media"] = media
+        }
+        if mediaMetadata != nil{
+            dictionary["media_metadata"] = mediaMetadata
         }
         if mediaOnly != nil{
             dictionary["media_only"] = mediaOnly
@@ -584,6 +598,7 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         linkFlairType = aDecoder.decodeObject(forKey: "link_flair_type") as? String
         locked = aDecoder.decodeObject(forKey: "locked") as? Bool
         media = aDecoder.decodeObject(forKey: "media") as? PostMedia
+        mediaMetadata = aDecoder.decodeObject(forKey: "media_metadata") as? [String: MediaMetadata]
         mediaOnly = aDecoder.decodeObject(forKey: "media_only") as? Bool
         modNote = aDecoder.decodeObject(forKey: "mod_note") as? String
         modReasonBy = aDecoder.decodeObject(forKey: "mod_reason_by") as? String
@@ -715,6 +730,9 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         }
         if media != nil{
             aCoder.encode(media, forKey: "media")
+        }
+        if mediaMetadata != nil{
+            aCoder.encode(mediaMetadata, forKey: "media_metadata")
         }
         if mediaOnly != nil{
             aCoder.encode(mediaOnly, forKey: "media_only")

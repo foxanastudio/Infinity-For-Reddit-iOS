@@ -56,6 +56,42 @@ class MarkdownUtils {
             comment.body = markdownString
         }
     }
+    
+    static func parseRedditImagesBlock(_ post: Post) {
+        guard let mediaMetadataMap = post.mediaMetadata else {
+            return
+        }
+        
+        guard var markdownString = post.selftext else {
+            return
+        }
+        
+        let previewRedditLength = "https://preview.redd.it/".count
+        let iRedditLength = "https://i.redd.it/".count
+
+        var startIndex = 0
+        
+        while true {
+            // Apply regex starting from the current index
+            let rangeToSearch = NSRange(location: startIndex, length: markdownString.count - startIndex)
+            guard let match = REGEX_PATTERNS[3].firstMatch(in: markdownString, options: [], range: rangeToSearch) else {
+                break
+            }
+            
+            if let group1Range = Range(match.range(at: 1), in: markdownString) {
+                // Handle preview.redd.it
+                startIndex = processMediaMatch(matchRange: group1Range, markdownString: &markdownString, baseURLLength: previewRedditLength, mediaMetadataMap: mediaMetadataMap)
+            } else if let group2Range = Range(match.range(at: 2), in: markdownString) {
+                // Handle i.redd.it
+                startIndex = processMediaMatch(matchRange: group2Range, markdownString: &markdownString, baseURLLength: iRedditLength, mediaMetadataMap: mediaMetadataMap)
+            } else {
+                // If no groups matched, move the index past this match
+                startIndex = match.range.location + match.range.length
+            }
+            
+            post.selftext = markdownString
+        }
+    }
 
     private static func processMediaMatch(
         matchRange: Range<String.Index>,

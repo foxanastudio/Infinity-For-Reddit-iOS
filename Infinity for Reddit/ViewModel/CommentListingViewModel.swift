@@ -44,7 +44,11 @@ public class CommentListingViewModel: ObservableObject {
             isInitialLoad = false
         }
         
-        commentListingRepository.fetchComments(commentListingType: commentListingMetadata.commentListingType, pathComponents: commentListingMetadata.pathComponents, queries: ["limit": "100", "after": after ?? ""].merging(commentListingMetadata.queries ?? [:], uniquingKeysWith: { _, new in new }), params: commentListingMetadata.params)
+        commentListingRepository.fetchComments(
+            commentListingType: commentListingMetadata.commentListingType,
+            pathComponents: commentListingMetadata.pathComponents,
+            queries: ["limit": "100", "after": after ?? ""].merging(commentListingMetadata.queries ?? [:], uniquingKeysWith: { _, new in new }),
+            params: commentListingMetadata.params)
             .subscribe(on: DispatchQueue.global(qos: .userInitiated))
             .map { listingData -> (comments: [Comment], after: String?) in
                 // Perform post-processing in the background thread

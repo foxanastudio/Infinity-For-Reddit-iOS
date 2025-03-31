@@ -34,7 +34,7 @@ struct PostDetailsView: View {
     var body: some View {
         Group {
             List {
-                PostViewCard(account: account, post: post)
+                PostDetailsViewCard(account: account, post: post)
                     .listPlainItem()
                 
                 if postDetailsViewModel.isInitialLoading {
