@@ -68,8 +68,11 @@ struct SubscriptionsView: View {
                     List {
                         ForEach(subscriptionListingViewModel.subredditSubscriptions, id: \.fullName) { subscription in
                             Text(subscription.name)
+                                .listPlainItem()
                         }
-                    }.scrollBounceBehavior(.basedOnSize)
+                    }
+                    .scrollBounceBehavior(.basedOnSize)
+                    .themedList()
                 }
             }
         }
@@ -88,8 +91,11 @@ struct SubscriptionsView: View {
                     List {
                         ForEach(subscriptionListingViewModel.userSubscriptions, id: \.name) { subscription in
                             Text(subscription.name)
+                                .listPlainItem()
                         }
-                    }.scrollBounceBehavior(.basedOnSize)
+                    }
+                    .scrollBounceBehavior(.basedOnSize)
+                    .themedList()
                 }
             }
         }
@@ -107,9 +113,12 @@ struct SubscriptionsView: View {
                 } else {
                     List {
                         ForEach(subscriptionListingViewModel.myCustomFeeds, id: \.path) { customFeed in
-                            return Text(customFeed.displayName)
+                            Text(customFeed.displayName)
+                                .listPlainItem()
                         }
-                    }.scrollBounceBehavior(.basedOnSize)
+                    }
+                    .scrollBounceBehavior(.basedOnSize)
+                    .themedList()
                 }
             }
         }
