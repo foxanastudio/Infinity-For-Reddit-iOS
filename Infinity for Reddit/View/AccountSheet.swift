@@ -16,27 +16,40 @@ struct AccountSheet: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 20) {
-                    if let profileImageUrl = accountViewModel.account.profileImageUrl {
-                        WebImage(url: URL(string: profileImageUrl)) { image in
-                            image
+                    CustomWebImage(
+                        accountViewModel.account.profileImageUrl,
+                        width: 96,
+                        height: 96,
+                        circleClipped: true,
+                        fallbackView: {
+                            SwiftUI.Image(systemName: "person.crop.circle")
                                 .resizable()
-                        }  placeholder: {
-                            
+                                .frame(width: 96, height: 96)
                         }
-                        .onSuccess { image, data, cacheType in
-                            // Success
-                            // Note: Data exist only when queried from disk cache or network. Use `.queryMemoryData` if you really need data
-                        }
-                        .indicator(.activity)
-                        .clipShape(Circle())
-                        .transition(.fade(duration: 0.5))
-                        .scaledToFit()
-                        .frame(width: 96, height: 96)
-                    } else {
-                        SwiftUI.Image(systemName: "person.crop.circle")
-                            .resizable()
-                            .frame(width: 30, height: 30)
-                    }
+                    )
+                    
+//                    if let profileImageUrl = accountViewModel.account.profileImageUrl {
+//                        WebImage(url: URL(string: profileImageUrl)) { image in
+//                            image
+//                                .resizable()
+//                        }  placeholder: {
+//                            
+//                        }
+//                        .onSuccess { image, data, cacheType in
+//                            // Success
+//                            // Note: Data exist only when queried from disk cache or network. Use `.queryMemoryData` if you really need data
+//                        }
+//                        .indicator(.activity)
+//                        
+//                        .clipShape(Circle())
+//                        .transition(.fade(duration: 0.5))
+//                        .scaledToFit()
+//                        .frame(width: 96, height: 96)
+//                    } else {
+//                        SwiftUI.Image(systemName: "person.crop.circle")
+//                            .resizable()
+//                            .frame(width: 96, height: 96)
+//                    }
                     
                     // User's Name
                     Text(accountViewModel.account.isAnonymous() == true ? "Anonymous" : accountViewModel.account.username)
