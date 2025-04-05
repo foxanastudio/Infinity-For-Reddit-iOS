@@ -10,64 +10,135 @@ import Swinject
 import GRDB
 
 struct SettingsView: View {
+    @EnvironmentObject var navigationManager: NavigationManager
     @Environment(\.dependencyManager) private var dependencyManager: Container
     @State private var selectedItem: Int? = nil
     
     var body: some View {
         List {
-            CustomNavigationLink("Notification", destination: NotificationSettingsView())
+            Text("Notification")
+                .primaryText()
                 .listPlainItem()
-
-            CustomNavigationLink("Interface", destination: InterfaceSettingsView())
+                .onTapGesture {
+                    navigationManager.path.append(SettingsViewNavigation.notification)
+                    //navigationManager.path.append(AppNavigation.userDetails(username: "Hostilenemy"))
+                }
+            
+            Text("Interface")
+                .primaryText()
                 .listPlainItem()
-
-            CustomNavigationLink("Theme", destination: CustomThemeSettingsView())
+                .onTapGesture {
+                    navigationManager.path.append(SettingsViewNavigation.interface)
+                }
+            
+            Text("Theme")
+                .primaryText()
                 .listPlainItem()
-
-            CustomNavigationLink("Gesture & Buttons", destination: GestureButtonsSettingsView())
+                .onTapGesture {
+                    navigationManager.path.append(SettingsViewNavigation.theme)
+                }
+            
+            Text("Gesture & Buttons")
+                .primaryText()
                 .listPlainItem()
-
-            CustomNavigationLink("Video", destination: VideoSettingsView())
+                .onTapGesture {
+                    navigationManager.path.append(SettingsViewNavigation.gestureAndButtons)
+                }
+            
+            Text("Video")
+                .primaryText()
                 .listPlainItem()
-
-            CustomNavigationLink("Lazy Mode Interval", destination: LazyModeIntervalSettingsView())
+                .onTapGesture {
+                    navigationManager.path.append(SettingsViewNavigation.video)
+                }
+            
+            Text("Lazy Mode Interval")
+                .primaryText()
                 .listPlainItem()
-
-            CustomNavigationLink("Download Location", destination: DownloadLocationSettingsView())
+            
+            Text("Download Location")
+                .primaryText()
                 .listPlainItem()
-
-            CustomNavigationLink("Security", destination: SecuritySettingsView())
+                .onTapGesture {
+                    navigationManager.path.append(SettingsViewNavigation.downloadLocation)
+                }
+            
+            Text("Security")
+                .primaryText()
                 .listPlainItem()
-
-            CustomNavigationLink("Content Sensitivity Filter", destination: ContentSensitivityFilterSettingsView())
+                .onTapGesture {
+                    navigationManager.path.append(SettingsViewNavigation.security)
+                }
+            
+            Text("Content Sensitivity Filter")
+                .primaryText()
                 .listPlainItem()
-
-            CustomNavigationLink("Post History", destination: PostHistorySettingsView())
+                .onTapGesture {
+                    navigationManager.path.append(SettingsViewNavigation.contentSensitivityFilter)
+                }
+            
+            Text("Post History")
+                .primaryText()
                 .listPlainItem()
-
-            CustomNavigationLink("Post Filter", destination: PostFilterSettingsView())
+                .onTapGesture {
+                    navigationManager.path.append(SettingsViewNavigation.postHistory)
+                }
+            
+            Text("Post Filter")
+                .primaryText()
                 .listPlainItem()
-
-            CustomNavigationLink("Comment Filter", destination: CommentFilterSettingsView())
+                .onTapGesture {
+                    navigationManager.path.append(SettingsViewNavigation.postFilter)
+                }
+            
+            Text("Comment Filter")
+                .primaryText()
                 .listPlainItem()
-
-            CustomNavigationLink("Miscellaneous", destination: MiscellaneousSettingsView())
+                .onTapGesture {
+                    navigationManager.path.append(SettingsViewNavigation.commentFilter)
+                }
+            
+            Text("Miscellaneous")
+                .primaryText()
                 .listPlainItem()
-
-            CustomNavigationLink("Advanced", destination: AdvancedSettingsView())
+                .onTapGesture {
+                    navigationManager.path.append(SettingsViewNavigation.miscellaneous)
+                }
+            
+            Text("Advanced")
+                .primaryText()
                 .listPlainItem()
-
-            CustomNavigationLink("Manage Subscription", destination: ManageSubscriptionSettingsView())
+                .onTapGesture {
+                    navigationManager.path.append(SettingsViewNavigation.advanced)
+                }
+            
+            Text("Manage Subscription")
+                .primaryText()
                 .listPlainItem()
-
-            CustomNavigationLink("About", destination: AboutSettingsView())
+                .onTapGesture {
+                    navigationManager.path.append(SettingsViewNavigation.manageSubscription)
+                }
+            
+            Text("About")
+                .primaryText()
                 .listPlainItem()
-
-            CustomNavigationLink("Privacy Policy", destination: PrivacyPolicySettingsView())
+                .onTapGesture {
+                    navigationManager.path.append(SettingsViewNavigation.about)
+                }
+            
+            Text("Privacy Policy")
+                .primaryText()
                 .listPlainItem()
-
-            CustomNavigationLink("Reddit User Agreement", destination: RedditUserAgreementSettingsView())
+                .onTapGesture {
+                    navigationManager.path.append(SettingsViewNavigation.privacyPolicy)
+                }
+            
+            Text("Reddit User Agreement")
+                .primaryText()
                 .listPlainItem()
+                .onTapGesture {
+                    navigationManager.path.append(SettingsViewNavigation.redditUserAgreement)
+                }
         }
         .themedList()
         .themedNavigationBar()

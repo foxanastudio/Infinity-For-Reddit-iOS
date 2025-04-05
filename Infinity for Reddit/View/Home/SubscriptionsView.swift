@@ -108,6 +108,7 @@ struct SubscriptionsView: View {
     }
 
     struct UsersView: View {
+        @EnvironmentObject var navigationManager: NavigationManager
         @ObservedObject var subscriptionListingViewModel: SubscriptionListingViewModel
         
         var body: some View {
@@ -119,38 +120,39 @@ struct SubscriptionsView: View {
                 } else {
                     List {
                         ForEach(subscriptionListingViewModel.userSubscriptions, id: \.name) { subscription in
-                            CustomNavigationLink(destination: UserDetailsView(username: subscription.name), showArrow: false) {
-                                HStack {
-                                    if let iconUrl = subscription.iconUrl, iconUrl.count > 0 {
-                                        WebImage(url: URL(string: iconUrl)) { image in
-                                            image
-                                                .resizable()
-                                                
-                                        }  placeholder: {
-                                            
-                                        }
-                                        .onSuccess { image, data, cacheType in
-                                            // Success
-                                            // Note: Data exist only when queried from disk cache or network. Use `.queryMemoryData` if you really need data
-                                        }
-                                        .indicator(.activity)
-                                        .clipShape(Circle())
-                                        .transition(.fade(duration: 0.5))
-                                        .scaledToFit()
-                                        .frame(width: 30, height: 30)
-                                    } else {
-                                        SwiftUI.Image(systemName: "person.crop.circle")
+                            HStack {
+                                if let iconUrl = subscription.iconUrl, iconUrl.count > 0 {
+                                    WebImage(url: URL(string: iconUrl)) { image in
+                                        image
                                             .resizable()
-                                            .frame(width: 30, height: 30)
+                                            
+                                    }  placeholder: {
+                                        
                                     }
-                                    
-                                    Spacer()
-                                        .frame(width: 16)
-                                    
-                                    Text(subscription.name)
+                                    .onSuccess { image, data, cacheType in
+                                        // Success
+                                        // Note: Data exist only when queried from disk cache or network. Use `.queryMemoryData` if you really need data
+                                    }
+                                    .indicator(.activity)
+                                    .clipShape(Circle())
+                                    .transition(.fade(duration: 0.5))
+                                    .scaledToFit()
+                                    .frame(width: 30, height: 30)
+                                } else {
+                                    SwiftUI.Image(systemName: "person.crop.circle")
+                                        .resizable()
+                                        .frame(width: 30, height: 30)
                                 }
+                                
+                                Spacer()
+                                    .frame(width: 16)
+                                
+                                Text(subscription.name)
                             }
                             .listPlainItem()
+                            .onTapGesture {
+                                navigationManager.path.append(AppNavigation.userDetails(username: subscription.name))
+                            }
                         }
                     }
                     .scrollBounceBehavior(.basedOnSize)

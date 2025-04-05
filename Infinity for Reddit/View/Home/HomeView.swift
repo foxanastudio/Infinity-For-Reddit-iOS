@@ -131,6 +131,64 @@ struct HomeView: View {
                     UserDetailsView(username: username)
                 }
             }
+            .navigationDestination(for: MoreViewNavigation.self) { destination in
+                switch destination {
+                case .profile:
+                    ProfileView()
+                case .history:
+                    HistoryView()
+                case .upvoted:
+                    UpvotedView()
+                case .downvoted:
+                    DownvotedView()
+                case .hidden:
+                    HiddenView()
+                case .saved:
+                    SavedView()
+                case .settings:
+                    SettingsView()
+                case .test:
+                    TestView()
+                }
+            }
+            .navigationDestination(for: SettingsViewNavigation.self) { destination in
+                switch destination {
+                case .notification:
+                    NotificationSettingsView()
+                case .interface:
+                    InterfaceSettingsView()
+                case .theme:
+                    CustomThemeSettingsView()
+                case .gestureAndButtons:
+                    GestureButtonsSettingsView()
+                case .video:
+                    VideoSettingsView()
+                case .downloadLocation:
+                    DownloadLocationSettingsView()
+                case .security:
+                    SecuritySettingsView()
+                case .contentSensitivityFilter:
+                    ContentSensitivityFilterSettingsView()
+                case .postHistory:
+                    PostHistorySettingsView()
+                case .postFilter:
+                    PostFilterSettingsView()
+                case .commentFilter:
+                    CommentFilterSettingsView()
+                case .miscellaneous:
+                    MiscellaneousSettingsView()
+                case .advanced:
+                    AdvancedSettingsView()
+                case .manageSubscription:
+                    ManageSubscriptionSettingsView()
+                case .about:
+                    AboutSettingsView()
+                case .privacyPolicy:
+                    PrivacyPolicySettingsView()
+                case .redditUserAgreement:
+                    RedditUserAgreementSettingsView()
+                }
+            }
         }
         .onChange(of: colorScheme) {
             customThemeViewModel.isDarkTheme = colorScheme == .dark

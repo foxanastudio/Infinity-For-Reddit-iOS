@@ -11,9 +11,9 @@ import GRDB
 import Alamofire
 
 struct PostDetailsView: View {
+    @EnvironmentObject var navigationManager: NavigationManager
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dependencyManager) private var dependencyManager: Container
-    @EnvironmentObject var navigationManager: NavigationManager
     
     @StateObject var postDetailsViewModel: PostDetailsViewModel
     private let account: Account

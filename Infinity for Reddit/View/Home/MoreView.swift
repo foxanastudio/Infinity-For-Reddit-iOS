@@ -10,34 +10,65 @@ import Swinject
 import GRDB
 
 struct MoreView: View {
+    @EnvironmentObject var navigationManager: NavigationManager
     @Environment(\.dependencyManager) private var dependencyManager: Container
     
     var body: some View {
         List {
             Section(header: Text("Account").listSectionHeader()) {
-                CustomNavigationLink("Profile", destination: ProfileView())
+                Text("Profile")
+                    .primaryText()
+                    .onTapGesture {
+                        navigationManager.path.append(MoreViewNavigation.profile)
+                    }
                 
-                CustomNavigationLink("Multireddit", destination: MultiredditView())
-                
-                CustomNavigationLink("History", destination: HistoryView())
+                Text("History")
+                    .primaryText()
+                    .onTapGesture {
+                        navigationManager.path.append(MoreViewNavigation.history)
+                    }
             }
             .listPlainItem()
             
             Section(header: Text("Post").listSectionHeader()) {
-                CustomNavigationLink("Upvoted", destination: UpvotedView())
+                Text("Upvoted")
+                    .primaryText()
+                    .onTapGesture {
+                        navigationManager.path.append(MoreViewNavigation.upvoted)
+                    }
                 
-                CustomNavigationLink("Downvoted", destination: DownvotedView())
+                Text("Downvoted")
+                    .primaryText()
+                    .onTapGesture {
+                        navigationManager.path.append(MoreViewNavigation.downvoted)
+                    }
                 
-                CustomNavigationLink("Hidden", destination: HiddenView())
+                Text("Hidden")
+                    .primaryText()
+                    .onTapGesture {
+                        navigationManager.path.append(MoreViewNavigation.hidden)
+                    }
                 
-                CustomNavigationLink("Saved", destination: SavedView())
+                Text("Saved")
+                    .primaryText()
+                    .onTapGesture {
+                        navigationManager.path.append(MoreViewNavigation.saved)
+                    }
             }
             .listPlainItem()
             
             Section(header: Text("Preferences").listSectionHeader()) {
-                CustomNavigationLink("Settings", destination: SettingsView())
+                Text("Settings")
+                    .primaryText()
+                    .onTapGesture {
+                        navigationManager.path.append(MoreViewNavigation.settings)
+                    }
                 
-                CustomNavigationLink("Test", destination: TestView())
+                Text("Test")
+                    .primaryText()
+                    .onTapGesture {
+                        navigationManager.path.append(MoreViewNavigation.test)
+                    }
             }
             .listPlainItem()
         }
