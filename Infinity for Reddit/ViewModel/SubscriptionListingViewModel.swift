@@ -19,6 +19,8 @@ public class SubscriptionListingViewModel: ObservableObject {
     @Published var isLoadingSubscriptions: Bool = false
     @Published var isLoadingMyCustomFeeds: Bool = false
     
+    @Published var error: Error?
+    
     private var after: String? = nil
     
     private var cancellables = Set<AnyCancellable>()
@@ -127,26 +129,20 @@ public class SubscriptionListingViewModel: ObservableObject {
         searchQueryPublisher.send(query)
     }
     
-    public func loadSubscriptionsOnline() {
+    public func loadSubscriptionsOnline() async {
         guard Int64(Date().timeIntervalSince1970) - AccountViewModel.shared.account.subscriptionSyncTime >= 60 * 60 * 24 else { return }
         
         guard !isLoadingSubscriptions || (isLoadingSubscriptions && after != nil && after?.isEmpty != true) else { return }
         
-        isLoadingSubscriptions = true
+        await MainActor.run {
+            isLoadingSubscriptions = true
+        }
         
-        subscriptionListingRepository.fetchSubscriptions(
-            queries: ["limit": "100", "after": after ?? ""]
-        )
-        .sink(receiveCompletion: { [weak self] completion in
-            if case .failure(let error) = completion {
-                DispatchQueue.main.async {
-                    print("Error fetching subscriptions: \(error)")
-                    self?.after = nil
-                    self?.isLoadingSubscriptions = false
-                }
-            }
-        }, receiveValue: { [weak self] subscriptionListing in
-            guard let self = self else { return }
+        do {
+            let subscriptionListing = try await subscriptionListingRepository.fetchSubscriptions(
+                queries: ["limit": "100", "after": after ?? ""]
+            )
+            
             if (subscriptionListing.subscriptions.isEmpty) {
                 // No more subscriptions
                 transformSubsriptions()
@@ -157,7 +153,9 @@ public class SubscriptionListingViewModel: ObservableObject {
                     print("Unable to update subscription sync time: \(error)")
                 }
             } else {
-                self.after = subscriptionListing.after
+                await MainActor.run {
+                    self.after = subscriptionListing.after
+                }
                 
                 subscriptionsPrivate.append(contentsOf: subscriptionListing.subscriptions)
                 
@@ -170,11 +168,18 @@ public class SubscriptionListingViewModel: ObservableObject {
                         print("Unable to update subscription sync time: \(error)")
                     }
                 } else {
-                    loadSubscriptionsOnline()
+                    await loadSubscriptionsOnline()
                 }
             }
-        })
-        .store(in: &cancellables)
+        } catch {
+            await MainActor.run {
+                self.error = error
+                
+                print("Error fetching subscriptions: \(error)")
+                self.after = nil
+                self.isLoadingSubscriptions = false
+            }
+        }
     }
     
     private func transformSubsriptions() {
@@ -234,65 +239,62 @@ public class SubscriptionListingViewModel: ObservableObject {
         }
     }
     
-    public func loadMyCustomFeedsOnline() {
+    public func loadMyCustomFeedsOnline() async {
         guard Int64(Date().timeIntervalSince1970) - AccountViewModel.shared.account.subscriptionSyncTime >= 60 * 60 * 24 else { return }
         
         guard !isLoadingMyCustomFeeds else { return }
         
-        isLoadingSubscriptions = true
+        await MainActor.run {
+            isLoadingSubscriptions = true
+        }
         
-        subscriptionListingRepository.fetchMyCustomFeeds()
-            .sink(receiveCompletion: { [weak self] completion in
-                if case .failure(let error) = completion {
-                    DispatchQueue.main.async {
-                        print("Error fetching custom feeds: \(error)")
-                        self?.isLoadingMyCustomFeeds = false
-                    }
-                }
-            }, receiveValue: { [weak self] myCustomFeedListing in
-                guard let self = self else { return }
-                myCustomFeedListing.customFeeds.sort { $0.displayName < $1.displayName }
-                
-                let myCustomFeedsTemp = myCustomFeedListing.customFeeds.map {
-                    MyCustomFeed(
-                        path: $0.path,
-                        displayName: $0.displayName,
-                        name: $0.name,
-                        description: $0.descriptionMd,
-                        copiedFrom: $0.copiedFrom,
-                        iconUrl: $0.iconUrl,
-                        visibility: $0.visibility,
-                        owner: $0.owner,
-                        nSubscribers: $0.numSubscribers,
-                        createdUTC: Int64($0.createdUtc),
-                        over18: $0.over18,
-                        isSubscriber: $0.isSubscriber,
-                        isFavorite: $0.isFavorited
-                    )
-                }
-                
-                insertMyCustomFeeds(myCustomFeeds: myCustomFeedsTemp)
-                
-                DispatchQueue.main.async {
-                    self.isLoadingMyCustomFeeds = false
-                    self.myCustomFeeds = myCustomFeedsTemp
-                }
-            })
-            .store(in: &cancellables)
+        do {
+            let myCustomFeedListing = try await subscriptionListingRepository.fetchMyCustomFeeds()
+            myCustomFeedListing.customFeeds.sort { $0.displayName < $1.displayName }
+            
+            let myCustomFeedsTemp = myCustomFeedListing.customFeeds.map {
+                MyCustomFeed(
+                    path: $0.path,
+                    displayName: $0.displayName,
+                    name: $0.name,
+                    description: $0.descriptionMd,
+                    copiedFrom: $0.copiedFrom,
+                    iconUrl: $0.iconUrl,
+                    visibility: $0.visibility,
+                    owner: $0.owner,
+                    nSubscribers: $0.numSubscribers,
+                    createdUTC: Int64($0.createdUtc),
+                    over18: $0.over18,
+                    isSubscriber: $0.isSubscriber,
+                    isFavorite: $0.isFavorited
+                )
+            }
+            
+            insertMyCustomFeeds(myCustomFeeds: myCustomFeedsTemp)
+            
+            await MainActor.run {
+                self.isLoadingMyCustomFeeds = false
+                self.myCustomFeeds = myCustomFeedsTemp
+            }
+        } catch {
+            await MainActor.run {
+                self.error = error
+                self.isLoadingMyCustomFeeds = false
+            }
+            
+            print("Error fetching custom feeds: \(error)")
+        }
     }
     
-    func refreshSubscriptions(account: Account) {
-        // This is for user switching accounts. We have to force clear all load
-        cancellables.forEach { $0.cancel() }
-        
+    func refreshSubscriptions(account: Account) async {
         isLoadingSubscriptions = false
         isLoadingMyCustomFeeds = false
         
         after = nil
         subscriptionsPrivate = []
         
-        loadSubscriptionsOnline()
-        loadMyCustomFeedsOnline()
+        await loadSubscriptionsOnline()
+        await loadMyCustomFeedsOnline()
     }
     
     private func insertSubscribedThings(subredditSubscriptions: [SubscribedSubredditData], userSubscriptions: [SubscribedUserData], subreddits: [SubredditData]) {

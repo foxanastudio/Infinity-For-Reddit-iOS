@@ -48,9 +48,9 @@ struct SubscriptionsView: View {
             Spacer()
         }
         .navigationTitle("Subscriptions")
-        .onAppear {
-            subscriptionListingViewModel.loadSubscriptionsOnline()
-            subscriptionListingViewModel.loadMyCustomFeedsOnline()
+        .task {
+            await subscriptionListingViewModel.loadSubscriptionsOnline()
+            await subscriptionListingViewModel.loadMyCustomFeedsOnline()
         }
     }
     

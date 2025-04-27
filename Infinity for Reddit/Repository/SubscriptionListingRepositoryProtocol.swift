@@ -9,6 +9,6 @@ import Combine
 import Alamofire
 
 public protocol SubscriptionListingRepositoryProtocol {
-    func fetchSubscriptions(queries: [String: String]) -> AnyPublisher<SubscriptionListing, Error>
-    func fetchMyCustomFeeds() -> AnyPublisher<MyCustomFeedListing, Error>
+    func fetchSubscriptions(queries: [String: String]) async throws -> SubscriptionListing
+    func fetchMyCustomFeeds() async throws -> MyCustomFeedListing
 }

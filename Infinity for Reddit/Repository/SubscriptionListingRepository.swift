@@ -26,60 +26,36 @@ public class SubscriptionListingRepository: SubscriptionListingRepositoryProtoco
     
     public func fetchSubscriptions(
         queries: [String: String] = [:]
-    ) -> AnyPublisher<SubscriptionListing, any Error> {
-        return Future<SubscriptionListing, any Error> { promise in
-            self.session.request(
-                RedditOAuthAPI.getSubscribedThings(queries: queries)
-            )
-                .validate()
-                .responseData { response in
-                    switch response.result {
-                    case .success(let data):
-                        do {
-                            let json = JSON(data)
-                            if let error = json.error {
-                                throw SubscriptionListingRepositoryError.JSONDecodingError(error.localizedDescription)
-                            } else {
-                                // TODO need to handle JSON error
-                                let subscriptionListingRootClass = SubscriptionListingRootClass(fromJson: json)
-                                promise(.success(subscriptionListingRootClass.subscriptionListing))
-                            }
-                        } catch {
-                            promise(.failure(error))
-                        }
-                    case .failure(let error):
-                        promise(.failure(error))
-                    }
-                }
+    ) async throws -> SubscriptionListing {
+        let data = try await self.session.request(
+            RedditOAuthAPI.getSubscribedThings(queries: queries)
+        )
+            .validate()
+            .serializingData()
+            .value
+        
+        let json = JSON(data)
+        if let error = json.error {
+            throw SubscriptionListingRepositoryError.JSONDecodingError(error.localizedDescription)
         }
-        .eraseToAnyPublisher()
+        
+        // TODO need to handle JSON error
+        return SubscriptionListingRootClass(fromJson: json).subscriptionListing
     }
     
-    public func fetchMyCustomFeeds() -> AnyPublisher<MyCustomFeedListing, any Error> {
-        return Future<MyCustomFeedListing, any Error> { promise in
-            self.session.request(
-                RedditOAuthAPI.getMyCustomFeeds
-            )
-                .validate()
-                .responseData { response in
-                    switch response.result {
-                    case .success(let data):
-                        do {
-                            let json = JSON(data)
-                            if let error = json.error {
-                                throw SubscriptionListingRepositoryError.JSONDecodingError(error.localizedDescription)
-                            } else {
-                                let myCustomFeedListing = MyCustomFeedListing(fromJson: json)
-                                promise(.success(myCustomFeedListing))
-                            }
-                        } catch {
-                            promise(.failure(error))
-                        }
-                    case .failure(let error):
-                        promise(.failure(error))
-                    }
-                }
+    public func fetchMyCustomFeeds() async throws -> MyCustomFeedListing {
+        let data = try await self.session.request(
+            RedditOAuthAPI.getMyCustomFeeds
+        )
+            .validate()
+            .serializingData()
+            .value
+        
+        let json = JSON(data)
+        if let error = json.error {
+            throw SubscriptionListingRepositoryError.JSONDecodingError(error.localizedDescription)
         }
-        .eraseToAnyPublisher()
+        
+        return MyCustomFeedListing(fromJson: json)
     }
 }
