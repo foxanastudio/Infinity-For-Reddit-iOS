@@ -9,5 +9,5 @@ import Combine
 import Alamofire
 
 public protocol PostDetailsRepositoryProtocol {
-    func fetchComments(postId: String, queries: [String: String]) -> AnyPublisher<PostDetailsRootClass, Error>
+    func fetchComments(postId: String, queries: [String: String]) async throws -> PostDetailsRootClass
 }

@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 
+@MainActor
 public class PostDetailsViewModel: ObservableObject {
     // MARK: - Properties
     @Published var post: Post
@@ -16,13 +17,13 @@ public class PostDetailsViewModel: ObservableObject {
     @Published var isInitialLoading: Bool = false
     @Published var isLoadingMore: Bool = false
     @Published var hasMoreComments: Bool = true
+    @Published var error: Error?
     private let account: Account
     private var postId: String?
     private var commentMore: CommentMore?
     private var isInitialLoad: Bool = true
     
     private var after: String? = nil
-    private var cancellables = Set<AnyCancellable>()
     
     public let postDetailsRepository: PostDetailsRepositoryProtocol
     
@@ -35,7 +36,7 @@ public class PostDetailsViewModel: ObservableObject {
     
     // MARK: - Methods
     
-    public func fetchComments() {
+    public func fetchComments() async {
         guard !isInitialLoading, !isLoadingMore, hasMoreComments else { return }
         
         if comments.isEmpty {
@@ -48,32 +49,28 @@ public class PostDetailsViewModel: ObservableObject {
             isInitialLoad = false
         }
         
-        postDetailsRepository.fetchComments(
-            postId: post.id,
-            queries: ["after": after ?? ""]
-        )
-        .receive(on: DispatchQueue.main)
-        .sink(receiveCompletion: { [weak self] completion in
-            self?.isInitialLoading = false
-            self?.isLoadingMore = false
+        defer {
+            self.isInitialLoading = false
+            self.isLoadingMore = false
+        }
+        
+        do {
+            let postDetails = try await postDetailsRepository.fetchComments(
+                postId: post.id,
+                queries: ["after": after ?? ""]
+            )
             
-            if case .failure(let error) = completion {
-                print("Error fetching comments: \(error)")
-            }
-        }, receiveValue: { [weak self] postDetails in
-            guard let self = self else { return }
             self.comments.append(contentsOf: postDetails.comments)
             
             hasMoreComments = postDetails.commentListing.commentMore?.children.isEmpty == false
-        })
-        .store(in: &cancellables)
+        } catch {
+            self.error = error
+            print("Error fetching comments: \(error)")
+        }
     }
     
     /// Reloads posts from the first page
-    func refreshPosts() {
-        // This is for user switching accounts. We have to force clear all load
-        cancellables.forEach { $0.cancel() }
-        
+    func refreshPosts() async {
         isInitialLoad = true
         isInitialLoading = false
         isLoadingMore = false
@@ -82,6 +79,6 @@ public class PostDetailsViewModel: ObservableObject {
         hasMoreComments = true
         comments = []
         
-        fetchComments()
+        await fetchComments()
     }
 }

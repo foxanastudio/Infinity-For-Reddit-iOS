@@ -52,8 +52,8 @@ struct PostDetailsView: View {
                     }
                     if postDetailsViewModel.hasMoreComments {
                         Text("Loading more comments")
-                            .onAppear {
-                                postDetailsViewModel.fetchComments()
+                            .task {
+                                await postDetailsViewModel.fetchComments()
                             }
                             .listPlainItem()
                     }
@@ -65,8 +65,8 @@ struct PostDetailsView: View {
         .onChange(of: colorScheme) {
             //print(colorScheme == .dark)
         }
-        .onAppear {
-            postDetailsViewModel.fetchComments()
+        .task {
+            await postDetailsViewModel.fetchComments()
         }
         .themedList()
         .themedNavigationBar()

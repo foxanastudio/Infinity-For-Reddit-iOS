@@ -13,6 +13,7 @@ struct PostDetailsViewCard: View {
     @EnvironmentObject var navigationManager: NavigationManager
     
     @StateObject var postViewModel: PostViewModel
+    @State var voteTask: Task<Void, Never>?
     
     let formatter = DateFormatter()
     
@@ -72,7 +73,10 @@ struct PostDetailsViewCard: View {
             
             HStack(alignment: .center) {
                 Button(action: {
-                    postViewModel.votePost(vote: 1)
+                    voteTask?.cancel()
+                    voteTask = Task {
+                        await postViewModel.votePost(vote: 1)
+                    }
                 }) {
                     SwiftUI.Image(postViewModel.post.likes == 1 ? "upvoted" : "upvote")
                         .postIconTemplateRendering()
@@ -85,7 +89,10 @@ struct PostDetailsViewCard: View {
                     .postInfo()
                 
                 Button(action: {
-                    postViewModel.votePost(vote: -1)
+                    voteTask?.cancel()
+                    voteTask = Task {
+                        await postViewModel.votePost(vote: -1)
+                    }
                 }) {
                     SwiftUI.Image(postViewModel.post.likes == -1 ? "downvoted" : "downvote")
                         .postIconTemplateRendering()
