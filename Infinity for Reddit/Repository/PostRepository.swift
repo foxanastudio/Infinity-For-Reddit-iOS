@@ -28,21 +28,16 @@ public class PostRepository: PostRepositoryProtocol {
     public func votePost(
         post: Post,
         point: String
-    ) -> AnyPublisher<Void, any Error> {
-        let params = ["dir": point, "id": post.name!, "rank": "10"]
-        
-        return Future<Void, any Error> { promise in
-            self.session.request(RedditOAuthAPI.vote(params: params))
+    ) async throws {
+        do {
+            let params = ["dir": point, "id": post.name!, "rank": "10"]
+            
+            try Task.checkCancellation()
+            
+            _ = try await self.session.request(RedditOAuthAPI.vote(params: params))
                 .validate()
-                .responseData { response in
-                    switch response.result {
-                    case .success(let data):
-                        promise(.success(Void()))
-                    case .failure(let error):
-                        promise(.failure(error))
-                    }
-                }
+                .serializingDecodable(Empty.self, automaticallyCancelling: true)
+                .value
         }
-        .eraseToAnyPublisher()
     }
 }

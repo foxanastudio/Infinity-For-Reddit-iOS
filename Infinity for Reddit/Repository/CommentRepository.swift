@@ -31,6 +31,9 @@ public class CommentRepository: CommentRepositoryProtocol {
     ) async throws {
         do {
             let params = ["dir": point, "id": comment.name!, "rank": "10"]
+            
+            try Task.checkCancellation()
+            
             _ = try await self.session.request(RedditOAuthAPI.vote(params: params))
                 .validate()
                 .serializingDecodable(Empty.self, automaticallyCancelling: true)

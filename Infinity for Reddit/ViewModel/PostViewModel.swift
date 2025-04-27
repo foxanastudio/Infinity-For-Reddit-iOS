@@ -12,6 +12,7 @@ import Combine
 public class PostViewModel: ObservableObject {
     let account: Account
     @Published var post: Post
+    @Published var error: Error?
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -23,7 +24,7 @@ public class PostViewModel: ObservableObject {
         self.postRepository = postRepository
     }
     
-    func votePost(vote: Int) {
+    func votePost(vote: Int) async {
         guard let _ = account.accessToken, let _ = post.name else { return }
         
         let previousVote = post.likes
@@ -41,16 +42,17 @@ public class PostViewModel: ObservableObject {
         }
         self.objectWillChange.send()
         
-        postRepository.votePost(post: post, point: point)
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { [weak self] completion in
-                if case .failure(_) = completion {
-                    self?.post.likes = previousVote
-                } else {
-                    self?.post.likes = finalVote
-                }
-                self?.objectWillChange.send()
-            }, receiveValue: {})
-            .store(in: &cancellables)
+        defer {
+            self.objectWillChange.send()
         }
+        
+        do {
+            try await postRepository.votePost(post: post, point: point)
+            self.post.likes = finalVote
+        } catch {
+            self.post.likes = previousVote
+            self.error = error
+            print("Error voting post: \(error)")
+        }
+    }
 }

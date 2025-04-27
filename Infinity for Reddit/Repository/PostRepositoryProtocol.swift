@@ -9,5 +9,5 @@ import Combine
 import Alamofire
 
 public protocol PostRepositoryProtocol {
-    func votePost(post: Post, point: String) -> AnyPublisher<Void, Error>
+    func votePost(post: Post, point: String) async throws
 }
