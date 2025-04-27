@@ -9,7 +9,6 @@ import Foundation
 import Combine
 import MarkdownUI
 
-@MainActor
 public class CommentListingViewModel: ObservableObject {
     // MARK: - Properties
     @Published var comments: [Comment] = []
@@ -36,44 +35,57 @@ public class CommentListingViewModel: ObservableObject {
     public func loadComments(account: Account) async {
         guard !isInitialLoading, !isLoadingMore, hasMorePages else { return }
         
-        if comments.isEmpty {
-            isInitialLoading = true
-        } else {
-            isLoadingMore = true
-        }
-        
-        if isInitialLoad {
-            isInitialLoad = false
-        }
-        
-        defer {
-            isInitialLoading = false
-            isLoadingMore = false
+        await MainActor.run {
+            if comments.isEmpty {
+                isInitialLoading = true
+            } else {
+                isLoadingMore = true
+            }
+            
+            if isInitialLoad {
+                isInitialLoad = false
+            }
         }
         
         do {
+            try Task.checkCancellation()
+            
             let commentListing = try await commentListingRepository.fetchComments(
                 commentListingType: commentListingMetadata.commentListingType,
                 pathComponents: commentListingMetadata.pathComponents,
                 queries: ["limit": "100", "after": after ?? ""].merging(commentListingMetadata.queries ?? [:], uniquingKeysWith: { _, new in new }),
                 params: commentListingMetadata.params)
             
-            let processedComments = await Task.detached {
-                await self.postProcessComments(commentListing.comments)
-            }.value
+            try Task.checkCancellation()
             
-            if (processedComments.isEmpty) {
-                // No more comments
-                hasMorePages = false
-                self.after = nil
-            } else {
-                self.after = commentListing.after
-                self.comments.append(contentsOf: processedComments)
-                self.hasMorePages = !(processedComments.isEmpty || after == nil || after?.isEmpty == true)
+            let processedComments = self.postProcessComments(commentListing.comments)
+            
+            try Task.checkCancellation()
+            
+            await MainActor.run {
+                if (processedComments.isEmpty) {
+                    // No more comments
+                    hasMorePages = false
+                    self.after = nil
+                } else {
+                    self.after = commentListing.after
+                    self.comments.append(contentsOf: processedComments)
+                    self.hasMorePages = !(processedComments.isEmpty || after == nil || after?.isEmpty == true)
+                }
+                
+                isInitialLoading = false
+                isLoadingMore = false
             }
+            
             print("comments")
         } catch {
-            self.error = error
+            await MainActor.run {
+                self.error = error
+                
+                isInitialLoading = false
+                isLoadingMore = false
+            }
+            
             print("Error fetching comments: \(error)")
         }
     }

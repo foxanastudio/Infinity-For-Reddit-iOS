@@ -31,28 +31,26 @@ public class CommentListingRepository: CommentListingRepositoryProtocol {
         queries: [String: String]? = [:],
         params: [String: String]? = [:]
     ) async throws -> CommentListing {
-        return try await Task.detached {
-            let apiRequest: URLRequestConvertible
-            switch commentListingType {
-            case .user:
-                apiRequest = RedditOAuthAPI.getUserComments(pathComponents: pathComponents!, queries: queries!)
-            }
-            
-            try Task.checkCancellation()
-            
-            let data = try await self.session.request(apiRequest)
-                .validate()
-                .serializingData(automaticallyCancelling: true)
-                .value
-            
-            try Task.checkCancellation()
-            
-            let json = JSON(data)
-            if let error = json.error {
-                throw CommentListingRepositoryError.JSONDecodingError(error.localizedDescription)
-            }
-            
-            return try CommentListingRootClass(fromJson: json).data
-        }.value
+        let apiRequest: URLRequestConvertible
+        switch commentListingType {
+        case .user:
+            apiRequest = RedditOAuthAPI.getUserComments(pathComponents: pathComponents!, queries: queries!)
+        }
+        
+        try Task.checkCancellation()
+        
+        let data = try await self.session.request(apiRequest)
+            .validate()
+            .serializingData(automaticallyCancelling: true)
+            .value
+        
+        try Task.checkCancellation()
+        
+        let json = JSON(data)
+        if let error = json.error {
+            throw CommentListingRepositoryError.JSONDecodingError(error.localizedDescription)
+        }
+        
+        return try CommentListingRootClass(fromJson: json).data
     }
 }
