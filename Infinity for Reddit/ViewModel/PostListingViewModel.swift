@@ -9,7 +9,6 @@ import Foundation
 import Combine
 import MarkdownUI
 
-@MainActor
 public class PostListingViewModel: ObservableObject {
     // MARK: - Properties
     @Published var posts: [Post] = []
@@ -48,19 +47,16 @@ public class PostListingViewModel: ObservableObject {
     public func loadPosts() async {
         guard !isInitialLoading, !isLoadingMore, hasMorePages else { return }
         
-        if posts.isEmpty {
-            isInitialLoading = true
-        } else {
-            isLoadingMore = true
-        }
-        
-        if isInitialLoad {
-            isInitialLoad = false
-        }
-        
-        defer {
-            isInitialLoading = false
-            isLoadingMore = false
+        await MainActor.run {
+            if posts.isEmpty {
+                isInitialLoading = true
+            } else {
+                isLoadingMore = true
+            }
+            
+            if isInitialLoad {
+                isInitialLoad = false
+            }
         }
         
         do {
@@ -71,22 +67,24 @@ public class PostListingViewModel: ObservableObject {
                 params: postListingMetadata.params
             )
             
-            let processedPosts = await Task.detached {
-                await self.postProcessPosts(postListing.posts)
-            }.value
+            try Task.checkCancellation()
+            
+            let processedPosts = self.postProcessPosts(postListing.posts)
+            
+            try Task.checkCancellation()
             
             if (processedPosts.isEmpty) {
                 // No more posts
-                hasMorePages = false
-                self.after = nil
+                await MainActor.run {
+                    hasMorePages = false
+                    self.after = nil
+                }
             } else {
                 let realNewPosts = processedPosts.filter {
                     !self.allPostIds.contains($0.id)
                 }
                 
                 self.after = postListing.after
-                
-                self.posts.append(contentsOf: realNewPosts)
                 
                 allPostIds.formUnion(
                     realNewPosts
@@ -95,10 +93,24 @@ public class PostListingViewModel: ObservableObject {
                         }
                 )
                 
-                hasMorePages = !(realNewPosts.isEmpty || after == nil || after?.isEmpty == true)
+                await MainActor.run {
+                    self.posts.append(contentsOf: realNewPosts)
+                    hasMorePages = !(realNewPosts.isEmpty || after == nil || after?.isEmpty == true)
+                }
+            }
+            
+            await MainActor.run {
+                isInitialLoading = false
+                isLoadingMore = false
             }
         } catch {
-            self.error = error
+            await MainActor.run {
+                self.error = error
+                
+                isInitialLoading = false
+                isLoadingMore = false
+            }
+            
             print("Error fetching posts: \(error)")
         }
     }
