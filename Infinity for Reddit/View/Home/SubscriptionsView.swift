@@ -52,6 +52,9 @@ struct SubscriptionsView: View {
             await subscriptionListingViewModel.loadSubscriptionsOnline()
             await subscriptionListingViewModel.loadMyCustomFeedsOnline()
         }
+        .onDisappear {
+            subscriptionListingViewModel.cancelAllCancellables()
+        }
     }
     
     struct SubredditsView: View {
