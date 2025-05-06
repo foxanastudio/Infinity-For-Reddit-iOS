@@ -65,9 +65,19 @@ class UserDetailsViewModel: ObservableObject {
     
     func fetchUserDetails() async {
         do {
-            self.userData = try await userDetailsRepository.fetchUserDetails(username: username)
+            try Task.checkCancellation()
+            
+            let fetchData = try await userDetailsRepository.fetchUserDetails(username: username)
+            
+            try Task.checkCancellation()
+            
+            await MainActor.run {
+                self.userData = fetchData
+            }
         } catch {
-            self.error = error
+            await MainActor.run {
+                self.error = error
+            }
             print("Error fetching user data: \(error)")
         }
     }

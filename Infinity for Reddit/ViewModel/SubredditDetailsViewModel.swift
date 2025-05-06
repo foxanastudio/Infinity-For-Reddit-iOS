@@ -69,7 +69,7 @@ class SubredditDetailsViewModel: ObservableObject {
             let fetchData = try await subredditDetailsRepository.fetchSubredditDetails(subredditName: subredditName)
             
             try Task.checkCancellation()
-            
+             
             await MainActor.run {
                 self.subredditData = fetchData
             }

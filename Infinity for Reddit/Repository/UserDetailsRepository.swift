@@ -26,12 +26,16 @@ public class UserDetailsRepository: UserDetailsRepositoryProtocol {
     }
     
     public func fetchUserDetails(username: String) async throws -> UserData {
+        try Task.checkCancellation()
+        
         let data = try await self.session.request(
             RedditAPI.getUserData(username: username)
         )
         .validate()
         .serializingData()
         .value
+        
+        try Task.checkCancellation()
         
         let json = JSON(data)
         if let error = json.error {
