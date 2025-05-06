@@ -8,14 +8,16 @@
 import SwiftUI
 
 struct GalleryCarousel: View {
+    @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
+    
     @State private var scrollID: Int?
     
     var items: [GalleryItem]
     var mediaMetadata: [String: MediaMetadata]
     
-    init(galleryData: GalleryData, mediaMetadata: [String: MediaMetadata]) {
-        self.items = galleryData.items
-        self.mediaMetadata = mediaMetadata
+    init(post: Post) {
+        self.items = post.galleryData!.items
+        self.mediaMetadata = post.mediaMetadata!
     }
     
     var body: some View {
@@ -23,7 +25,16 @@ struct GalleryCarousel: View {
             TabView(selection: $scrollID) {
                 ForEach(Array(items.enumerated()), id: \.offset) { index, item in
                     if let media = mediaMetadata[item.mediaId], let preview = media.p.last {
-                        CustomWebImage(preview.u)
+                        CustomWebImage(preview.u, handleImageTapGesture: false)
+                            .contentShape(Rectangle())
+                            .highPriorityGesture(
+                                TapGesture()
+                                    .onEnded {
+                                        withAnimation {
+                                            fullScreenMediaViewModel.show(.gallery(items: items, mediaMetadata: mediaMetadata))
+                                        }
+                                    }
+                            )
                             .containerRelativeFrame(.horizontal, count: 1, span: 1, spacing: 0, alignment: .center)
                             .tag(index)
                     }

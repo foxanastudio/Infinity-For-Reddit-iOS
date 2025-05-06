@@ -1,25 +1,22 @@
 //
-//  ImageFullScreenView.swift
+//  GalleryFullScreenView.swift
 //  Infinity for Reddit
 //
-//  Created by Docile Alligator on 2025-05-03.
+//  Created by Docile Alligator on 2025-05-05.
 //
 
 import SwiftUI
-import SDWebImageSwiftUI
 
-struct ImageFullScreenView: View {
-    @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
-    @EnvironmentObject var namespaceManager: NamespaceManager
-    
+struct GalleryFullScreenView: View {
+    @State private var scrollID: Int?
     @State private var scale: CGFloat = 1.0
     @GestureState private var dragOffset: CGSize = .zero
     @State private var currentDragOffset: CGSize = .zero
     @State private var hasStartedDragging: Bool = false
     @State private var isAnimatingBack: Bool = false
     
-    let url: URL?
-    let aspectRatio: CGSize?
+    var items: [GalleryItem]
+    var mediaMetadata: [String: MediaMetadata]
     let onDismiss: () -> Void
     
     var body: some View {
@@ -30,18 +27,16 @@ struct ImageFullScreenView: View {
                 .edgesIgnoringSafeArea(.all)
                 .ignoresSafeArea()
             
-            CustomWebImage(
-                url?.absoluteString ?? "",
-                aspectRatio: aspectRatio,
-                handleImageTapGesture: false,
-                placeholderView: {
-                    Spacer()
-                        .frame(width: UIScreen.main.bounds.width)
-                        .applyIf(aspectRatio != nil) {
-                            $0.aspectRatio(aspectRatio!, contentMode: .fit)
-                        }
+            TabView(selection: $scrollID) {
+                ForEach(Array(items.enumerated()), id: \.offset) { index, item in
+                    if let media = mediaMetadata[item.mediaId], let preview = media.p.last {
+                        CustomWebImage(preview.u, handleImageTapGesture: false)
+                            .containerRelativeFrame(.horizontal, count: 1, span: 1, spacing: 0, alignment: .center)
+                            .tag(index)
+                    }
                 }
-            )
+            }
+            .tabViewStyle(.page(indexDisplayMode: .never))
             .scaleEffect(scale)
             .offset(currentDragOffset)
         }

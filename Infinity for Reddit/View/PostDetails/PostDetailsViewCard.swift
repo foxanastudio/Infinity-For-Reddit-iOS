@@ -68,7 +68,7 @@ struct PostDetailsViewCard: View {
                       !galleryData.items.isEmpty,
                       let mediaMetadata = postViewModel.post.mediaMetadata,
                       let preview = mediaMetadata[galleryData.items[0].mediaId] {
-                GalleryCarousel(galleryData: galleryData, mediaMetadata: mediaMetadata)
+                GalleryCarousel(post: postViewModel.post)
                     .aspectRatio(preview.s.aspectRatio, contentMode: .fit)
                 
                 Spacer()
