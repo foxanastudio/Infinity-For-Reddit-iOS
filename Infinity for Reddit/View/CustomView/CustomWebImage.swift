@@ -21,19 +21,21 @@ struct CustomWebImage<Content: View>: View {
     var aspectRatio: CGSize?
     var circleClipped: Bool?
     var handleImageTapGesture: Bool
+    var post: Post?
     var placeholderView: (() -> Content)?
     var fallbackView: (() -> Content)?
     
-    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true) where Content == EmptyView {
+    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, post: Post? = nil) where Content == EmptyView {
         self.urlString = urlString
         self.width = width
         self.height = height
         self.aspectRatio = aspectRatio
         self.circleClipped = circleClipped
         self.handleImageTapGesture = handleImageTapGesture
+        self.post = post
     }
     
-    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true,
+    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, post: Post? = nil,
          @ViewBuilder placeholderView: @escaping () -> Content) {
         self.urlString = urlString
         self.width = width
@@ -41,10 +43,11 @@ struct CustomWebImage<Content: View>: View {
         self.aspectRatio = aspectRatio
         self.circleClipped = circleClipped
         self.handleImageTapGesture = handleImageTapGesture
+        self.post = post
         self.placeholderView = placeholderView
     }
     
-    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true,
+    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, post: Post? = nil,
          @ViewBuilder fallbackView: @escaping () -> Content) {
         self.urlString = urlString
         self.width = width
@@ -52,10 +55,11 @@ struct CustomWebImage<Content: View>: View {
         self.aspectRatio = aspectRatio
         self.circleClipped = circleClipped
         self.handleImageTapGesture = handleImageTapGesture
+        self.post = post
         self.fallbackView = fallbackView
     }
     
-    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true,
+    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, post: Post? = nil,
          @ViewBuilder placeholderView: @escaping () -> Content,
          @ViewBuilder fallbackView: @escaping () -> Content) {
         self.urlString = urlString
@@ -64,6 +68,7 @@ struct CustomWebImage<Content: View>: View {
         self.aspectRatio = aspectRatio
         self.circleClipped = circleClipped
         self.handleImageTapGesture = handleImageTapGesture
+        self.post = post
         self.placeholderView = placeholderView
         self.fallbackView = fallbackView
     }
@@ -137,7 +142,26 @@ struct CustomWebImage<Content: View>: View {
                     TapGesture()
                         .onEnded {
                             withAnimation {
-                                fullScreenMediaViewModel.show(.image(url: urlString ?? "", aspectRatio: aspectRatio, post: nil))
+                                switch post?.postType {
+                                case .image:
+                                    fullScreenMediaViewModel.show(.image(url: urlString ?? "", aspectRatio: aspectRatio, post: post))
+                                case .imageWithUrlPreview(let urlPreview):
+                                    fullScreenMediaViewModel.show(.image(url: urlString ?? "", aspectRatio: aspectRatio, post: post))
+                                case .gif:
+                                    print("gif")
+                                case .video(let videoUrl, let downloadUrl):
+                                    fullScreenMediaViewModel.show(.video(url: videoUrl, post: post))
+                                case .link:
+                                    print("link")
+                                case .imgurVideo(let url):
+                                    print("gif")
+                                case .redgifs(let redgifsId):
+                                    print("gif")
+                                case .streamable(let shortCode):
+                                    print("gif")
+                                default:
+                                    print("other types")
+                                }
                             }
                         }
                 )

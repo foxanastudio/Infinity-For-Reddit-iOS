@@ -55,6 +55,7 @@ struct PostViewCard: View {
                     CustomWebImage(
                         url,
                         aspectRatio: preview.images[0].source.aspectRatio,
+                        post: postViewModel.post,
                         placeholderView: {
                             Spacer()
                                 .frame(width: geo.size.width, height: CGFloat(geo.size.width) / (CGFloat(preview.images[0].source.width) / CGFloat(preview.images[0].source.height)))

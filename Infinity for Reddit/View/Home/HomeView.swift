@@ -159,6 +159,9 @@ struct HomeView: View {
                         fullScreenMediaViewModel.dismiss()
                     }
                     .id(UUID())
+                } else if case let .video(videoUrl, post) = media {
+                    VideoFullScreenView()
+                    .id(UUID())
                 }
             }
         }

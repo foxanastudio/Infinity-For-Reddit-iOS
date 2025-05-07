@@ -227,6 +227,11 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
     var url : String!
     var userReports : [[Any]]! = [[Any]]()
     
+    var postType: PostType!
+    
+    enum PostType {
+        case text, image, imageWithUrlPreview(urlPreview: String), gif, video(videoUrl: String, downloadUrl: String), gallery, link, noPreviewLink, poll, imgurVideo(url: String), redgifs(redgifsId: String), streamable(shortCode: String)
+    }
     
     /**
      * Instantiate the instance using the passed json values to set the properties values
@@ -351,6 +356,75 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
                 }
             }
             userReports.append(subArray)
+        }
+        
+        postType = Post.checkPostType(json: json, url: url, preview: preview, galleryData: galleryData, media: media, isVideo: isVideo, permalink: permalink)
+    }
+    
+    static func checkPostType(json: JSON,
+                       url: String,
+                       preview: Preview?,
+                       galleryData: GalleryData?,
+                       media: PostMedia?,
+                       isVideo: Bool,
+                       permalink: String) -> PostType {
+        if galleryData != nil {
+            return PostType.gallery
+        }
+        
+        let realUrl = URL(string: url)
+        let path = realUrl?.path ?? ""
+        let host = realUrl?.host ?? ""
+        if preview == nil || preview?.images?.isEmpty ?? true {
+            if url.contains(permalink) {
+                return PostType.text
+            } else {
+                if path.hasSuffix(".jpg") || path.hasSuffix(".png") || path.hasSuffix(".jpeg") {
+                    if host == "i.redgifs.com" {
+                        return PostType.noPreviewLink
+                    }
+                    return PostType.imageWithUrlPreview(urlPreview: url)
+                } else {
+                    if isVideo {
+                        return PostType.video(videoUrl: media?.redditVideo?.dashUrl ?? "", downloadUrl: media?.redditVideo?.fallbackUrl ?? "")
+                    } else {
+                        if host.contains("redgifs.com") {
+                            return PostType.redgifs(redgifsId: url.components(separatedBy: "/").last?.lowercased() ?? "")
+                        } else if host == "streamable.com" {
+                            return PostType.streamable(shortCode: url.components(separatedBy: "/").last ?? "")
+                        }
+                        return PostType.noPreviewLink
+                    }
+                }
+            }
+        } else {
+            if isVideo {
+                return PostType.video(videoUrl: media?.redditVideo?.dashUrl ?? "", downloadUrl: media?.redditVideo?.fallbackUrl ?? "")
+            } else {
+                if path.hasSuffix(".jpg") || path.hasSuffix(".png") || path.hasSuffix(".jpeg") {
+                    return PostType.image
+                } else if path.hasSuffix(".gif") {
+                    return PostType.gif
+                } else if host.contains("imgur.com") && (path.hasSuffix(".gifv") || path.hasSuffix(".mp4")) {
+                    if url.hasSuffix("gifv") {
+                        return PostType.imgurVideo(url: String(url.dropLast(5)) + ".mp4")
+                    }
+                    return PostType.imgurVideo(url: url)
+                } else if path.hasSuffix(".mp4") {
+                    return PostType.video(videoUrl: url, downloadUrl: url)
+                } else {
+                    if url.contains(permalink) {
+                        return PostType.text
+                    } else {
+                        if host.contains("redgifs.com") {
+                            return PostType.redgifs(redgifsId: url.components(separatedBy: "/").last?.lowercased() ?? "")
+                        } else if host == "streamable.com" {
+                            return PostType.streamable(shortCode: url.components(separatedBy: "/").last ?? "")
+                        }
+                        return PostType.link
+                    }
+                }
+            }
         }
     }
     
@@ -648,6 +722,8 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         upvoteRatio = aDecoder.decodeObject(forKey: "upvote_ratio") as? Float
         url = aDecoder.decodeObject(forKey: "url") as? String
         userReports = aDecoder.decodeObject(forKey: "user_reports") as? [[String]]
+        
+        postType = aDecoder.decodeObject(forKey: "post_type") as? PostType ?? .text
     }
     
     /**
@@ -865,6 +941,10 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         }
         if userReports != nil{
             aCoder.encode(userReports, forKey: "user_reports")
+        }
+        
+        if postType != nil {
+            aCoder.encode(postType, forKey: "post_type")
         }
     }
     
