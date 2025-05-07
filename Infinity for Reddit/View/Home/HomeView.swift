@@ -160,8 +160,12 @@ struct HomeView: View {
                     }
                     .id(UUID())
                 } else if case let .video(videoUrl, post) = media {
-                    VideoFullScreenView()
-                    .id(UUID())
+                    if let url = URL(string: videoUrl) {
+                        VideoFullScreenView(url: url) {
+                            fullScreenMediaViewModel.dismiss()
+                        }
+                        .id(UUID())
+                    }
                 }
             }
         }

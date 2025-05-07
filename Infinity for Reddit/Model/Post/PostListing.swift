@@ -386,7 +386,7 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
                     return PostType.imageWithUrlPreview(urlPreview: url)
                 } else {
                     if isVideo {
-                        return PostType.video(videoUrl: media?.redditVideo?.dashUrl ?? "", downloadUrl: media?.redditVideo?.fallbackUrl ?? "")
+                        return PostType.video(videoUrl: media?.redditVideo?.hlsUrl ?? "", downloadUrl: media?.redditVideo?.fallbackUrl ?? "")
                     } else {
                         if host.contains("redgifs.com") {
                             return PostType.redgifs(redgifsId: url.components(separatedBy: "/").last?.lowercased() ?? "")
@@ -399,7 +399,7 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
             }
         } else {
             if isVideo {
-                return PostType.video(videoUrl: media?.redditVideo?.dashUrl ?? "", downloadUrl: media?.redditVideo?.fallbackUrl ?? "")
+                return PostType.video(videoUrl: media?.redditVideo?.hlsUrl ?? "", downloadUrl: media?.redditVideo?.fallbackUrl ?? "")
             } else {
                 if path.hasSuffix(".jpg") || path.hasSuffix(".png") || path.hasSuffix(".jpeg") {
                     return PostType.image
