@@ -40,7 +40,7 @@ struct CommentListingView: View {
                             .id(comment.id)
                     }
                     if commentListingViewModel.hasMorePages {
-                        Text("Loading more pages")
+                        ProgressIndicator()
                             .task {
                                 await commentListingViewModel.loadComments(account: accountViewModel.account)
                             }

@@ -47,7 +47,7 @@ struct PostListingView: View {
 //                            }
                     }
                     if postListingViewModel.hasMorePages {
-                        Text("Loading more pages")
+                        ProgressIndicator()
                             .task {
                                 await postListingViewModel.loadPosts()
                             }
