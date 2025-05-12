@@ -10,6 +10,8 @@ import SDWebImageSwiftUI
 import MarkdownUI
 
 struct CommentViewCard: View {
+    @EnvironmentObject var navigationManager: NavigationManager
+    
     @StateObject var commentViewModel: CommentViewModel
     @State private var voteTask: Task<Void, Never>? = nil
     
@@ -29,10 +31,16 @@ struct CommentViewCard: View {
                     if !isInPostDetails {
                         Text(commentViewModel.comment.subredditNamePrefixed)
                             .subreddit()
+                            .onTapGesture {
+                                navigationManager.path.append(AppNavigation.subredditDetails(subredditName: commentViewModel.comment.subreddit))
+                            }
                     }
                     
                     Text("u/\(commentViewModel.comment.author)")
                         .username()
+                        .onTapGesture {
+                            navigationManager.path.append(AppNavigation.userDetails(username: commentViewModel.comment.author))
+                        }
                 }
                 
                 Spacer()
