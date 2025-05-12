@@ -55,8 +55,15 @@ class UserDetailsViewModel: ObservableObject {
     
     private func followUser(username: String, action: String) async {
         do {
+            try Task.checkCancellation()
+            
             try await userDetailsRepository.followUser(username: username, action: action)
-            self.isSubscribed = action == "sub"
+            
+            try Task.checkCancellation()
+            
+            await MainActor.run {
+                self.isSubscribed = action == "sub"
+            }
         } catch {
             self.error = error
             
@@ -73,6 +80,10 @@ class UserDetailsViewModel: ObservableObject {
             try Task.checkCancellation()
             
             self.userData = fetchData
+            if let isFollowed = self.userData?.isSubscribed {
+                isSubscribed = isFollowed
+            }
+                
         } catch {
             self.error = error
             

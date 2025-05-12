@@ -44,7 +44,7 @@ class SubredditDetailsViewModel: ObservableObject {
             self.isSubscribed = action == "sub"
         } catch {
             self.error = error
-            print("Error \(action == "sub" ? "following to" : "unfollowing from") \(subredditName): \(error)")
+            print("Error \(action == "sub" ? "subscribing to" : "unsubscribing from") \(subredditName): \(error)")
         }
     }
     

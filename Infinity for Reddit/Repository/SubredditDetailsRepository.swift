@@ -28,7 +28,7 @@ public class SubredditDetailsRepository: SubredditDetailsRepositoryProtocol {
         try Task.checkCancellation()
         
         let data = try await self.session.request(
-            RedditAPI.getSubredditData(subredditName: subredditName)
+            RedditOAuthAPI.getSubredditData(subredditName: subredditName)
         )
         .validate()
         .serializingData()
@@ -46,5 +46,10 @@ public class SubredditDetailsRepository: SubredditDetailsRepositoryProtocol {
     
     public func subsribeSubreddit(subredditName: String, action: String) async throws {
         let params = ["action": action, "sr_name": "r_\(subredditName)"]
+        
+        _ = try await self.session.request(RedditOAuthAPI.subsrcribeToSubreddit(params: params))
+            .validate()
+            .serializingDecodable(Empty.self)
+            .value
     }
 }

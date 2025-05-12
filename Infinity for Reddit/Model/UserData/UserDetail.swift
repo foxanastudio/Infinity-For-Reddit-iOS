@@ -72,6 +72,7 @@ class UserDetailRootClass : NSObject, NSCoding{
     
     public func toUserData() -> UserData {
         return UserData(
+            id: data.id,
             name: data.name,
             iconUrl: data.iconImg,
             banner: data.subreddit.bannerImg,
@@ -82,7 +83,7 @@ class UserDetailRootClass : NSObject, NSCoding{
             totalKarma : data.totalKarma,
             cakeday : data.createdUtc,
             isGold : data.isGold,
-            isFriend : data.isFriend,
+            isSubscribed : data.subreddit.userIsSubscriber,
             canBeFollowed : data.acceptFollowers,
             isNSFW : data.subreddit.over18,
             description : data.subreddit.publicDescription,

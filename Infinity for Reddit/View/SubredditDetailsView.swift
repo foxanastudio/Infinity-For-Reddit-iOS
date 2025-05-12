@@ -26,11 +26,9 @@ struct SubredditDetailsView: View {
     }
     
     var body: some View {
-        //        ScrollView {
         // Top Section (Subreddit Info)
         VStack(spacing: 0) {
             if let subredditData = subredditDetailsViewModel.subredditData {
-                
                 if let bannerUrl = subredditData.bannerUrl, !bannerUrl.isEmpty {
                     CustomWebImage(
                         subredditData.bannerUrl,
@@ -137,6 +135,7 @@ struct SubredditDetailsView: View {
                 Spacer()
             }
         }
+        
         .task {
             if subredditDetailsViewModel.subredditData == nil {
                 await subredditDetailsViewModel.fetchSubredditDetails()
