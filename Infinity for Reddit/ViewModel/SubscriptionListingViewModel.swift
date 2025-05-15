@@ -235,7 +235,8 @@ public class SubscriptionListingViewModel: ObservableObject {
                 nSubscribers: $0.subscribers,
                 createdUTC: $0.createdUtc,
                 suggestedCommentSort: $0.suggestedCommentSort,
-                isNSFW: $0.over18
+                isNSFW: $0.over18,
+                isSubscribed: $0.userIsSubscriber
             )
         })
         

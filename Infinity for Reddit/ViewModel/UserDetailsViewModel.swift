@@ -61,9 +61,8 @@ class UserDetailsViewModel: ObservableObject {
             
             try Task.checkCancellation()
             
-            await MainActor.run {
-                self.isSubscribed = action == "sub"
-            }
+            self.isSubscribed = action == "sub"
+
         } catch {
             self.error = error
             

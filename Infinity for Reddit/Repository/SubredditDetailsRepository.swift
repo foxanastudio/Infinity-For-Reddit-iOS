@@ -45,7 +45,7 @@ public class SubredditDetailsRepository: SubredditDetailsRepositoryProtocol {
     }
     
     public func subsribeSubreddit(subredditName: String, action: String) async throws {
-        let params = ["action": action, "sr_name": "r_\(subredditName)"]
+        let params = ["action": action, "sr_name": "\(subredditName)"]
         
         _ = try await self.session.request(RedditOAuthAPI.subsrcribeToSubreddit(params: params))
             .validate()
