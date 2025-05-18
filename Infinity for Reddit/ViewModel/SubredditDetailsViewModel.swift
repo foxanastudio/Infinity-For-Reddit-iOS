@@ -12,6 +12,7 @@ import Alamofire
 import SwiftUI
 import SwiftyJSON
 
+@MainActor
 class SubredditDetailsViewModel: ObservableObject {
     private let session: Session
     
@@ -40,11 +41,18 @@ class SubredditDetailsViewModel: ObservableObject {
     
     private func subscribeSubreddit(subredditName: String, action: String) async {
         do {
+            try Task.checkCancellation()
+            
             try await subredditDetailsRepository.subsribeSubreddit(subredditName: subredditName, action: action)
+            
+            try Task.checkCancellation()
+            
             self.isSubscribed = action == "sub"
+            
         } catch {
             self.error = error
-            print("Error \(action == "sub" ? "following to" : "unfollowing from") \(subredditName): \(error)")
+            
+            print("Error \(action == "sub" ? "subscribing to" : "unsubscribing from") \(subredditName): \(error)")
         }
     }
     
@@ -70,13 +78,14 @@ class SubredditDetailsViewModel: ObservableObject {
             
             try Task.checkCancellation()
              
-            await MainActor.run {
-                self.subredditData = fetchData
+            self.subredditData = fetchData
+            if let isJoined = self.subredditData?.isSubscribed {
+                isSubscribed = isJoined
             }
+            
         } catch {
-            await MainActor.run {
-                self.error = error
-            }
+            self.error = error
+            
             print("Error fetching user data: \(error)")
         }
     }

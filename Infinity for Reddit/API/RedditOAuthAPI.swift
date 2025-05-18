@@ -11,6 +11,8 @@ import Foundation
 enum RedditOAuthAPI: URLRequestConvertible {
     case getMyInfo(headers: HTTPHeaders)
     case getFrontPagePosts(pathComponents: [String: String], queries: [String: String])
+    case getUserData(username: String)
+    case getSubredditData(subredditName: String)
     case getSubredditPosts(pathComponents: [String: String], queries: [String: String])
     case getUserPosts(pathComponents: [String: String], queries: [String: String])
     case getSearchPosts(queries: [String: String])
@@ -29,7 +31,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
     
     var method: HTTPMethod {
         switch self {
-        case .getMyInfo, .getFrontPagePosts, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getPostAndCommentsById:
+        case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getPostAndCommentsById:
             return .get
         case .vote, .subsrcribeToSubreddit:
             return .post
@@ -40,6 +42,10 @@ enum RedditOAuthAPI: URLRequestConvertible {
         switch self {
         case .getMyInfo:
             return "/api/v1/me"
+        case .getUserData(let username):
+            return "/user/\(username)/about.json"
+        case .getSubredditData(let subredditName):
+            return "r/\(subredditName)/about.json"
         case .getFrontPagePosts(let pathComponents, _):
             return "/\(pathComponents["sortType"] ?? "best").json"
         case .vote:
@@ -69,7 +75,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
     
     var parameters: [String: String]? {
         switch self {
-        case .getMyInfo, .getFrontPagePosts, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getPostAndCommentsById:
+        case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getPostAndCommentsById:
             return nil
         case .vote(let params), .subsrcribeToSubreddit(let params):
             return params
@@ -82,6 +88,10 @@ enum RedditOAuthAPI: URLRequestConvertible {
             return ["raw_json": "1"]
         case .getFrontPagePosts(_, let queries):
             return ["raw_json": "1"].merging(queries, uniquingKeysWith: { _, new in new })
+        case .getUserData:
+            return ["raw_json": "1"]
+        case .getSubredditData:
+            return ["raw_json": "1"]
         case .vote, .getMyCustomFeeds:
             return nil
         case .getSubredditPosts(_, let queries):
@@ -109,14 +119,14 @@ enum RedditOAuthAPI: URLRequestConvertible {
         switch self {
         case .getMyInfo(let headers):
             return headers
-        case .getFrontPagePosts, .vote, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .subsrcribeToSubreddit, .getPostAndCommentsById:
+        case .getFrontPagePosts, .getUserData, .getSubredditData, .vote, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .subsrcribeToSubreddit, .getPostAndCommentsById:
             return nil
         }
     }
     
     var encoding: ParameterEncoding {
         switch self {
-        case .getMyInfo, .getFrontPagePosts, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .vote, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .subsrcribeToSubreddit, .getPostAndCommentsById:
+        case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .vote, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .subsrcribeToSubreddit, .getPostAndCommentsById:
             return URLEncoding.default
         }
     }

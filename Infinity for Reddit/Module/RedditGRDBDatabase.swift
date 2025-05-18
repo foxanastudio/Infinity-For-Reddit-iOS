@@ -97,6 +97,27 @@ struct RedditGRDBDatabase {
                 t.primaryKey(["name", "username"])
             }
             
+            try db.create(table: UserData.databaseTableName, ifNotExists: true) { t in
+                t.column("id", .text).notNull()
+                t.column("name", .text)
+                t.column("icon_url", .text)
+                t.column("banner_url", .text)
+                t.column("comment_karma", .text)
+                t.column("link_karma", .integer)
+                t.column("awarder_karma", .integer)
+                t.column("awardee_karma", .integer)
+                t.column("total_karma", .integer)
+                t.column("cakeday", .integer)
+                t.column("is_gold", .boolean).notNull().defaults(to: false)
+                t.column("is_subscribed", .boolean).notNull().defaults(to: false)
+                t.column("can_follow", .boolean).notNull().defaults(to: false)
+                t.column("is_nsfw", .boolean).notNull().defaults(to: false)
+                t.column("description", .text)
+                t.column("title", .text)
+                t.column("is_selected", .boolean).notNull().defaults(to: false)
+                t.primaryKey(["id"])
+            }
+            
             try db.create(table: SubredditData.databaseTableName, ifNotExists: true) { t in
                 t.column("id", .text).notNull()
                 t.column("name", .text)
