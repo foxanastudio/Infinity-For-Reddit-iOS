@@ -10,5 +10,5 @@ enum AppNavigation: Hashable {
     case postDetails(post: Post)
     case subredditDetails(subredditName: String)
     case userDetails(username: String)
-    case search(query: String, searchInSubredditOrUserName: String?, searchInMultiReddit: String?, searchInThingType: SearchInThingType?)
+    case search(query: String, searchInSubredditOrUserName: String?, searchInMultiReddit: String?, searchInThingType: Int)
 }
