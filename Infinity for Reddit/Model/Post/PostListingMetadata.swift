@@ -29,7 +29,7 @@ public struct PostListingMetadata {
 }
 
 public enum PostListingType: Codable {
-    case frontPage, subreddit, user(username: String, userWhere: UserWhere), search, multireddit, subredditConcat
+    case frontPage, subreddit, user(username: String, userWhere: UserWhere), search(query: String, searchInSubredditOrUserName: String?, searchInMultiReddit: String?, searchInThingType: SearchInThingType?), multireddit, subredditConcat
 }
 
 public enum UserWhere: String, Codable {

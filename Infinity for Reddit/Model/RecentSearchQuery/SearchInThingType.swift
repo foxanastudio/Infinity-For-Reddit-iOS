@@ -6,8 +6,8 @@
 //
 
 public enum SearchInThingType: Int, Codable, CaseIterable, Hashable {
-    case all = -1
-    case subreddit = 0
-    case user = 1
-    case multireddit = 2
+    case all = 0
+    case subreddit = 1
+    case user = 2
+    case multireddit = 3
 }

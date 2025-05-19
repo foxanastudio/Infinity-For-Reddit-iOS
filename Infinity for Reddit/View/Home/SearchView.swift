@@ -66,8 +66,23 @@ struct SearchView: View {
                         Text(search.searchQuery)
                             .primaryText()
                         
-                        Text(search.searchQuery)
-                            .secondaryText()
+                        switch search.searchInThingType {
+                        case SearchInThingType.all.rawValue:
+                            Text("All subreddits")
+                                .secondaryText()
+                        case SearchInThingType.subreddit.rawValue:
+                            Text("r/\(search.searchInSubredditOrUserName ?? "")")
+                                .subreddit()
+                        case SearchInThingType.user.rawValue:
+                            Text("u/\(search.searchInSubredditOrUserName ?? "")")
+                                .username()
+                        case SearchInThingType.multireddit.rawValue:
+                            Text(search.multiRedditDisplayName ?? "")
+                                .secondaryText()
+                        default:
+                            Text("All subreddits")
+                                .secondaryText()
+                        }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal)
