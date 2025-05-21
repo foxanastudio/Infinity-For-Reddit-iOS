@@ -96,7 +96,7 @@ public class PostListingViewModel: ObservableObject {
                 
                 await MainActor.run {
                     self.posts.append(contentsOf: realNewPosts)
-                    hasMorePages = !(realNewPosts.isEmpty || after == nil || after?.isEmpty == true)
+                    hasMorePages = !(after == nil || after?.isEmpty == true)
                 }
             }
             
