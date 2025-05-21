@@ -21,7 +21,6 @@ public class PostListingViewModel: ObservableObject {
     
     private var allPostIds = Set<String>()
     private var after: String? = nil
-    private var cancellables = Set<AnyCancellable>()
     
     public let postListingRepository: PostListingRepositoryProtocol
     

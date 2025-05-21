@@ -35,6 +35,9 @@ struct SearchResultsView: View {
                     params: nil
                 ))
                 .opacity(selectedOption == 0 ? 1 : 0)
+                
+                SubredditListingView(account: accountViewModel.account, query: searchResultsViewModel.query)
+                    .opacity(selectedOption == 1 ? 1 : 0)
             }
             
             Spacer()
