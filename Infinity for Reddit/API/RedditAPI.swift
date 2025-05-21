@@ -31,7 +31,7 @@ enum RedditAPI: URLRequestConvertible {
         switch self {
         case .getAccessToken:
             return .post
-        case .getFrontPagePosts, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getUserComments, .getPostAndCommentsById, .searchSubreddits, .searchUsers, .getUserData, .getSubredditData, :
+        case .getFrontPagePosts, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getUserComments, .getPostAndCommentsById, .searchSubreddits, .searchUsers, .getUserData, .getSubredditData:
             return .get
         }
     }
