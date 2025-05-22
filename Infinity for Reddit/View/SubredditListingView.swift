@@ -26,9 +26,54 @@ struct SubredditListingView: View {
     }
     
     var body: some View {
-        Text("Subreddit Listing View")
-            .task {
-                await subredditListingViewModel.initialLoadSubreddits()
+        Group {
+            if subredditListingViewModel.isInitialLoading || subredditListingViewModel.isInitialLoad {
+                ProgressIndicator()
+            } else if subredditListingViewModel.subreddits.isEmpty {
+                Text("No subreddits")
+            } else {
+                List {
+                    ForEach(subredditListingViewModel.subreddits, id: \.id) { subreddit in
+                        HStack {
+                            CustomWebImage(
+                                subreddit.iconImg,
+                                width: 30,
+                                height: 30,
+                                circleClipped: true,
+                                fallbackView: {
+                                    SwiftUI.Image(systemName: "person.crop.circle")
+                                        .resizable()
+                                        .frame(width: 30, height: 30)
+                                }
+                            )
+                            
+                            Spacer()
+                                .frame(width: 16)
+                            
+                            Text(subreddit.displayNamePrefixed)
+                            
+                            Spacer()
+                        }
+                        .contentShape(Rectangle())
+                        .listPlainItem()
+                    }
+                    if subredditListingViewModel.hasMorePages {
+                        ProgressIndicator()
+                            .task {
+                                await subredditListingViewModel.loadSubreddits()
+                            }
+                            .listPlainItem()
+                    }
+                }
+                .scrollBounceBehavior(.basedOnSize)
+                .themedList()
             }
+        }
+        .onChange(of: colorScheme) {
+            //print(colorScheme == .dark)
+        }
+        .task {
+            await subredditListingViewModel.initialLoadSubreddits()
+        }
     }
 }

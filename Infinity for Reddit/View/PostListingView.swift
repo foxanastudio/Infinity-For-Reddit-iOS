@@ -41,9 +41,6 @@ struct PostListingView: View {
                         PostViewCard(account: account, post: post)
                             .id(post.id)
                             .listPlainItem()
-//                            .onTapGesture {
-//                                navigationManager.path.append(AppNavigation.postDetails(post: post))
-//                            }
                     }
                     if postListingViewModel.hasMorePages {
                         ProgressIndicator()
