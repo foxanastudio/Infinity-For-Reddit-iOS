@@ -1,16 +1,16 @@
 //
-//  UserListing.swift
+//  Inbox.swift
 //  Infinity for Reddit
 //
-//  Created by Docile Alligator on 2025-05-22.
+//  Created by Docile Alligator on 2025-05-23.
 //
 
 import Foundation
 import SwiftyJSON
 
-class UserListingRootClass: NSObject, NSCoding{
+class InboxListingRootClass: NSObject, NSCoding{
     var kind: String!
-    var data: UserListing!
+    var data: InboxListing!
     
     /**
      * Instantiate the instance using the passed json values to set the properties values
@@ -21,7 +21,7 @@ class UserListingRootClass: NSObject, NSCoding{
         }
         let dataJson = json["data"]
         if !dataJson.isEmpty{
-            data = UserListing(fromJson: dataJson)
+            data = InboxListing(fromJson: dataJson)
         }
         kind = json["kind"].stringValue
     }
@@ -47,7 +47,7 @@ class UserListingRootClass: NSObject, NSCoding{
      */
     @objc required init(coder aDecoder: NSCoder)
     {
-        data = aDecoder.decodeObject(forKey: "data") as? UserListing
+        data = aDecoder.decodeObject(forKey: "data") as? InboxListing
         kind = aDecoder.decodeObject(forKey: "kind") as? String
     }
     
@@ -66,8 +66,8 @@ class UserListingRootClass: NSObject, NSCoding{
     }
 }
 
-public class UserListing : NSObject, NSCoding {
-    var users : [User]! = [User]()
+public class InboxListing : NSObject, NSCoding {
+    var inboxes : [Inbox]! = [Inbox]()
     var after : String!
     var before : String!
     var dist : Int!
@@ -76,14 +76,14 @@ public class UserListing : NSObject, NSCoding {
      * Instantiate the instance using the passed json values to set the properties values
      */
     init(fromJson json: JSON!) {
-        if json.isEmpty {
+        if json.isEmpty{
             return
         }
         let childrenArray = json["children"].arrayValue
         for childJSON in childrenArray {
             let dataJson = childJSON["data"]
             if !dataJson.isEmpty{
-                users.append(User(fromJson: dataJson))
+                inboxes.append(Inbox(fromJson: dataJson, kind: childJSON["kind"].stringValue))
             }
         }
         after = json["after"].stringValue
@@ -106,8 +106,8 @@ public class UserListing : NSObject, NSCoding {
         if dist != nil{
             dictionary["dist"] = dist
         }
-        if users != nil {
-            dictionary["children"] = users
+        if inboxes != nil {
+            dictionary["children"] = inboxes
         }
         return dictionary
     }
@@ -121,7 +121,7 @@ public class UserListing : NSObject, NSCoding {
         after = aDecoder.decodeObject(forKey: "after") as? String
         before = aDecoder.decodeObject(forKey: "before") as? String
         dist = aDecoder.decodeObject(forKey: "dist") as? Int
-        users = aDecoder.decodeObject(forKey: "children") as? [User]
+        inboxes = aDecoder.decodeObject(forKey: "children") as? [Inbox]
     }
     
     /**
@@ -139,8 +139,8 @@ public class UserListing : NSObject, NSCoding {
         if dist != nil{
             aCoder.encode(dist, forKey: "dist")
         }
-        if users != nil {
-            aCoder.encode(users, forKey: "children")
+        if inboxes != nil {
+            aCoder.encode(inboxes, forKey: "children")
         }
     }
 }
