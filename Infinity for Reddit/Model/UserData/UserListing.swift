@@ -63,11 +63,10 @@ class UserListingRootClass: NSObject, NSCoding{
         if kind != nil{
             aCoder.encode(kind, forKey: "kind")
         }
-        
     }
 }
 
-public class UserListing : NSObject, NSCoding{
+public class UserListing : NSObject, NSCoding {
     var users : [User]! = [User]()
     var after : String!
     var before : String!

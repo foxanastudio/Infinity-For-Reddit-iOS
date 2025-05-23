@@ -326,6 +326,9 @@
     "No subscribed users" : {
 
     },
+    "No users" : {
+
+    },
     "Notification" : {
 
     },
@@ -2258,9 +2261,6 @@
 
     },
     "Use Bottom Toolbar in Media Viewer" : {
-
-    },
-    "User Listing View" : {
 
     },
     "Video" : {
