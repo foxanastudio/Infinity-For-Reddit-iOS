@@ -12,7 +12,13 @@ import GRDB
 struct InboxView: View {
     @Environment(\.dependencyManager) private var dependencyManager: Container
     
+    private let account: Account
+    
+    init(account: Account) {
+        self.account = account
+    }
+    
     var body: some View {
-        Text("Inbox")
+        InboxListingView(account: account, messageWhere: MessageWhere.inbox)
     }
 }

@@ -51,14 +51,8 @@ struct HomeView: View {
                             }
                             .tag(Tab.subscriptions)
                         
-                        CommentListingView(
-                            commentListingMetadata: CommentListingMetadata(
-                                commentListingType: .user,
-                                pathComponents: ["username": accountViewModel.account.username, "sortType": "best"],
-                                headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
-                                queries: nil,
-                                params: nil
-                            )
+                        InboxView(
+                            account: accountViewModel.account
                         )
                         .id(accountViewModel.account.username)
                         .tabItem {
