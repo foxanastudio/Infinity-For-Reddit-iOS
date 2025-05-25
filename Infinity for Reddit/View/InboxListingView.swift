@@ -74,7 +74,7 @@ struct InboxMessageItemView: View {
         VStack {
             Text(account.username == inbox.author ? inbox.dest : inbox.author)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .primaryText()
+                .username()
             
             Text(inbox.subject)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -82,7 +82,7 @@ struct InboxMessageItemView: View {
             
             Text(inbox.body)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .primaryText()
+                .secondaryText()
             
             Divider()
         }
@@ -107,7 +107,7 @@ struct InboxNotificationItemView: View {
         VStack {
             Text(inbox.author)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .primaryText()
+                .username()
             
             Text(inbox.linkTitle)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -115,7 +115,7 @@ struct InboxNotificationItemView: View {
             
             Text(inbox.body)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .primaryText()
+                .secondaryText()
             
             Divider()
         }
