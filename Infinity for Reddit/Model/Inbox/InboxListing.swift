@@ -76,13 +76,13 @@ public class InboxListing : NSObject, NSCoding {
      * Instantiate the instance using the passed json values to set the properties values
      */
     init(fromJson json: JSON!, messageWhere: MessageWhere) {
-        if json.isEmpty{
+        if json.isEmpty {
             return
         }
         let childrenArray = json["children"].arrayValue
         for childJSON in childrenArray {
             let dataJson = childJSON["data"]
-            if !dataJson.isEmpty{
+            if !dataJson.isEmpty {
                 if !(messageWhere == .inbox && childJSON["kind"].stringValue == "t4") {
                     inboxes.append(Inbox(fromJson: dataJson, kind: childJSON["kind"].stringValue, messageWhere: messageWhere))
                 }

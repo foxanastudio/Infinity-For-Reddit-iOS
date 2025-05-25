@@ -34,20 +34,10 @@ struct InboxListingView: View {
             } else {
                 List {
                     ForEach(inboxListingViewModel.inboxes, id: \.id) { inbox in
-                        HStack {
-                            Spacer()
-                                .frame(width: 24)
-                            
-                            Text(inbox.subject)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .primaryText()
-                            
-                            Spacer()
-                        }
-                        .contentShape(Rectangle())
-                        .listPlainItem()
-                        .onTapGesture {
-                            //navigationManager.path.append(AppNavigation.inboxDetails(inboxname: inbox.name))
+                        if inboxListingViewModel.messageWhere == .messages {
+                            InboxMessageItemView(inbox: inbox, account: account)
+                        } else {
+                            InboxNotificationItemView(inbox: inbox, account: account)
                         }
                     }
                     if inboxListingViewModel.hasMorePages {
@@ -67,6 +57,72 @@ struct InboxListingView: View {
         }
         .task {
             await inboxListingViewModel.initialLoadInboxes()
+        }
+    }
+}
+
+struct InboxMessageItemView: View {
+    @State var inbox: Inbox
+    private let account: Account
+    
+    init(inbox: Inbox, account: Account) {
+        self.inbox = inbox
+        self.account = account
+    }
+    
+    var body: some View {
+        VStack {
+            Text(account.username == inbox.author ? inbox.dest : inbox.author)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .primaryText()
+            
+            Text(inbox.subject)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .primaryText()
+            
+            Text(inbox.body)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .primaryText()
+            
+            Divider()
+        }
+        .contentShape(Rectangle())
+        .listPlainItem()
+        .onTapGesture {
+            //navigationManager.path.append(AppNavigation.inboxDetails(inboxname: inbox.name))
+        }
+    }
+}
+
+struct InboxNotificationItemView: View {
+    @State var inbox: Inbox
+    private let account: Account
+    
+    init(inbox: Inbox, account: Account) {
+        self.inbox = inbox
+        self.account = account
+    }
+    
+    var body: some View {
+        VStack {
+            Text(inbox.author)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .primaryText()
+            
+            Text(inbox.linkTitle)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .primaryText()
+            
+            Text(inbox.body)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .primaryText()
+            
+            Divider()
+        }
+        .contentShape(Rectangle())
+        .listPlainItem()
+        .onTapGesture {
+            //navigationManager.path.append(AppNavigation.inboxDetails(inboxname: inbox.name))
         }
     }
 }
