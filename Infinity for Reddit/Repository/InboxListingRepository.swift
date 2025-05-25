@@ -7,6 +7,7 @@
 
 import Alamofire
 import SwiftyJSON
+import Foundation
 
 public class InboxListingRepository: InboxListingRepositoryProtocol {
     enum InboxRepositoryError: Error {
@@ -23,7 +24,7 @@ public class InboxListingRepository: InboxListingRepositoryProtocol {
         self.session = resolvedSession
     }
     
-    public func fetchInboxListing(pathComponents: [String : String], queries: [String : String]) async throws -> InboxListing {
+    public func fetchInboxListing(messageWhere: MessageWhere, pathComponents: [String : String], queries: [String : String]) async throws -> InboxListing {
         try Task.checkCancellation()
         
         let data = try await self.session.request(
@@ -40,6 +41,6 @@ public class InboxListingRepository: InboxListingRepositoryProtocol {
             throw InboxRepositoryError.JSONDecodingError(error.localizedDescription)
         }
         
-        return InboxListingRootClass(fromJson: json).data
+        return InboxListingRootClass(fromJson: json, messageWhere: messageWhere).data
     }
 }

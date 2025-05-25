@@ -38,7 +38,7 @@ struct InboxListingView: View {
                             Spacer()
                                 .frame(width: 24)
                             
-                            Text("u/" + inbox.subject)
+                            Text(inbox.subject)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .primaryText()
                             

@@ -17,7 +17,6 @@ struct SubscriptionsView: View {
     
     @StateObject var subscriptionListingViewModel: SubscriptionListingViewModel
 
-    // State to track the selected picker index
     @State private var selectedOption = 0
     
     init() {

@@ -31,7 +31,7 @@ class Inbox : NSObject, NSCoding{
     var newField : Bool!
     var numComments : Int!
     var parentId : String!
-    var replies : String!
+    var replies : InboxListingRootClass!
     var score : Int!
     var subject : String!
     var subreddit : String!
@@ -43,7 +43,7 @@ class Inbox : NSObject, NSCoding{
     /**
      * Instantiate the instance using the passed json values to set the properties values
      */
-    init(fromJson json: JSON!, kind: String!){
+    init(fromJson json: JSON!, kind: String!, messageWhere: MessageWhere){
         if json.isEmpty{
             return
         }
@@ -67,7 +67,9 @@ class Inbox : NSObject, NSCoding{
         newField = json["new"].boolValue
         numComments = json["num_comments"].intValue
         parentId = json["parent_id"].stringValue
-        replies = json["replies"].stringValue
+        if json["replies"].stringValue != ""{
+            replies = InboxListingRootClass(fromJson: json["replies"], messageWhere: messageWhere)
+        }
         score = json["score"].intValue
         subject = json["subject"].stringValue
         subreddit = json["subreddit"].stringValue
@@ -192,7 +194,7 @@ class Inbox : NSObject, NSCoding{
         newField = aDecoder.decodeObject(forKey: "new") as? Bool
         numComments = aDecoder.decodeObject(forKey: "num_comments") as? Int
         parentId = aDecoder.decodeObject(forKey: "parent_id") as? String
-        replies = aDecoder.decodeObject(forKey: "replies") as? String
+        replies = aDecoder.decodeObject(forKey: "replies") as? InboxListingRootClass
         score = aDecoder.decodeObject(forKey: "score") as? Int
         subject = aDecoder.decodeObject(forKey: "subject") as? String
         subreddit = aDecoder.decodeObject(forKey: "subreddit") as? String

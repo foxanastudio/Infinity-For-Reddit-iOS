@@ -6,5 +6,5 @@
 //
 
 public protocol InboxListingRepositoryProtocol {
-    func fetchInboxListing(pathComponents: [String : String], queries: [String : String]) async throws -> InboxListing
+    func fetchInboxListing(messageWhere: MessageWhere, pathComponents: [String : String], queries: [String : String]) async throws -> InboxListing
 }

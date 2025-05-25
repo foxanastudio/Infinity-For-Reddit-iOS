@@ -15,13 +15,13 @@ class InboxListingRootClass: NSObject, NSCoding{
     /**
      * Instantiate the instance using the passed json values to set the properties values
      */
-    init(fromJson json: JSON!) {
+    init(fromJson json: JSON!, messageWhere: MessageWhere) {
         if json.isEmpty{
             return
         }
         let dataJson = json["data"]
         if !dataJson.isEmpty{
-            data = InboxListing(fromJson: dataJson)
+            data = InboxListing(fromJson: dataJson, messageWhere: messageWhere)
         }
         kind = json["kind"].stringValue
     }
@@ -75,7 +75,7 @@ public class InboxListing : NSObject, NSCoding {
     /**
      * Instantiate the instance using the passed json values to set the properties values
      */
-    init(fromJson json: JSON!) {
+    init(fromJson json: JSON!, messageWhere: MessageWhere) {
         if json.isEmpty{
             return
         }
@@ -83,7 +83,9 @@ public class InboxListing : NSObject, NSCoding {
         for childJSON in childrenArray {
             let dataJson = childJSON["data"]
             if !dataJson.isEmpty{
-                inboxes.append(Inbox(fromJson: dataJson, kind: childJSON["kind"].stringValue))
+                if !(messageWhere == .inbox && childJSON["kind"].stringValue == "t4") {
+                    inboxes.append(Inbox(fromJson: dataJson, kind: childJSON["kind"].stringValue, messageWhere: messageWhere))
+                }
             }
         }
         after = json["after"].stringValue
