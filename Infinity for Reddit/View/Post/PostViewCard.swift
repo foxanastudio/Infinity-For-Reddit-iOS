@@ -51,10 +51,13 @@ struct PostViewCard: View {
                     Text(formatter.string(from: Date(timeIntervalSince1970: TimeInterval(postViewModel.post.createdUtc))))
                         .secondaryText()
                 }
-                .padding(.vertical, 8)
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
+                .padding(.bottom, 8)
                 
                 Text(postViewModel.post.title)
                     .font(.system(size: 24))
+                    .padding(.horizontal, 16)
                     .padding(.bottom, 8)
                     .postTitle()
                 
@@ -82,6 +85,8 @@ struct PostViewCard: View {
                 } else if let selftextTruncated = postViewModel.post.selftextTruncated {
                     Text(selftextTruncated)
                         .postContent()
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 8)
                 }
                 
                 HStack(alignment: .center) {
@@ -137,11 +142,10 @@ struct PostViewCard: View {
                     }
                     .buttonStyle(.borderless)
                 }
-                .padding(.vertical, 8)
-                
-                //Divider()
+                .padding(.horizontal, 16)
+                .padding(.bottom, 16)
             }
-            .padding(16)
+            .padding(.vertical, 8)
         }
         
         .onTapGesture {
