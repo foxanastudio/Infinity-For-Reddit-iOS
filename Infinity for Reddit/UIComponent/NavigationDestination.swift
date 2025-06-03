@@ -15,9 +15,7 @@ struct NavigationStackItemViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .toolbar {
-                ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    NavigationBarMenu()
-                    
+                ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
                         showProfile.toggle()
                     }) {
@@ -35,6 +33,10 @@ struct NavigationStackItemViewModifier: ViewModifier {
                             }
                         )
                     }
+                }
+                
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    NavigationBarMenu()
                 }
             }
             .themedNavigationBar()
