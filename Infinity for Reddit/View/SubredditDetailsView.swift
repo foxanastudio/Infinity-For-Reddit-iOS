@@ -8,6 +8,13 @@ import SwiftUI
 import MarkdownUI
 import SDWebImageSwiftUI
 
+enum ProfileSection: String, CaseIterable, Identifiable {
+    case posts = "Posts"
+    case about = "About"
+    
+    var id: String { self.rawValue }
+}
+
 struct SubredditDetailsView: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
@@ -16,6 +23,7 @@ struct SubredditDetailsView: View {
     @State private var isHeaderVisible = false
     @State private var isToolbarBackgroundVisible = true
     @State private var subscribeTask: Task<Void, Never>?
+    @State private var selectedSection: ProfileSection = .posts
     
     @StateObject var subredditDetailsViewModel : SubredditDetailsViewModel
     
@@ -112,18 +120,31 @@ struct SubredditDetailsView: View {
                 }
                 .listPlainItemNoInsets()
                 
-                PostListingView(
-                    account: accountViewModel.account,
-                    postListingMetadata:PostListingMetadata(
-                        postListingType:.subreddit,
-                        pathComponents: ["sortType": "hot", "subreddit": "\(subredditData.name)"],
-                        headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
-                        queries: nil,
-                        params: nil
-                    ),
-                    isRootView: false
-                )
-                .id(accountViewModel.account.username)
+                Picker("Select Section", selection: $selectedSection) {
+                    ForEach(ProfileSection.allCases) { section in
+                        Text(section.rawValue).tag(section)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .listRowInsets(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
+                
+                switch selectedSection {
+                case .posts:
+                    PostListingView(
+                        account: accountViewModel.account,
+                        postListingMetadata:PostListingMetadata(
+                            postListingType:.subreddit,
+                            pathComponents: ["sortType": "hot", "subreddit": "\(subredditData.name)"],
+                            headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
+                            queries: nil,
+                            params: nil
+                        ),
+                        isRootView: false
+                    )
+                    .id(accountViewModel.account.username)
+                case .about:
+                    SubredditAboutView(description: subredditData.description)
+                }
             }
         }
         .edgesIgnoringSafeArea(.top)
