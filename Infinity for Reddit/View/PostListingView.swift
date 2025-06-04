@@ -17,10 +17,24 @@ struct PostListingView: View {
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     
     @StateObject var postListingViewModel: PostListingViewModel
+    @State private var isRootView: Bool = true
+    
     private let account: Account
     
     init(account: Account, postListingMetadata: PostListingMetadata) {
         self.account = account
+        
+        _postListingViewModel = StateObject(
+            wrappedValue: PostListingViewModel(
+                postListingMetadata: postListingMetadata,
+                postListingRepository: PostListingRepository()
+            )
+        )
+    }
+    
+    init(account: Account, postListingMetadata: PostListingMetadata, isRootView: Bool) {
+        self.account = account
+        self.isRootView = isRootView
         
         _postListingViewModel = StateObject(
             wrappedValue: PostListingViewModel(
@@ -37,7 +51,24 @@ struct PostListingView: View {
             } else if postListingViewModel.posts.isEmpty {
                 Text("No posts")
             } else {
-                List {
+                if isRootView {
+                    List {
+                        ForEach(postListingViewModel.posts, id: \.id) { post in
+                            PostViewCard(account: account, post: post)
+                                .id(post.id)
+                                .listPlainItemNoInsets()
+                        }
+                        if postListingViewModel.hasMorePages {
+                            ProgressIndicator()
+                                .task {
+                                    await postListingViewModel.loadPosts()
+                                }
+                                .listPlainItem()
+                        }
+                    }
+                    .scrollBounceBehavior(.basedOnSize)
+                    .themedList()
+                } else {
                     ForEach(postListingViewModel.posts, id: \.id) { post in
                         PostViewCard(account: account, post: post)
                             .id(post.id)
@@ -51,8 +82,6 @@ struct PostListingView: View {
                             .listPlainItem()
                     }
                 }
-                .scrollBounceBehavior(.basedOnSize)
-                .themedList()
             }
         }
         .onChange(of: colorScheme) {

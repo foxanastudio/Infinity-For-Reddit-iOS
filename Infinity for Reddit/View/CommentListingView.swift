@@ -36,7 +36,7 @@ struct CommentListingView: View {
                 List {
                     ForEach(commentListingViewModel.comments, id: \.id) { comment in
                         CommentViewCard(account: accountViewModel.account, comment: comment, isInPostDetails: false)
-                            .listPlainItem()
+                            .listPlainItemNoInsets()
                             .id(comment.id)
                     }
                     if commentListingViewModel.hasMorePages {
