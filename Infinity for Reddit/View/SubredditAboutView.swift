@@ -19,7 +19,6 @@ struct SubredditAboutView: View {
                         .padding(0)
                 }
             }
-            .padding(.horizontal, 20)
         }
     }
 }

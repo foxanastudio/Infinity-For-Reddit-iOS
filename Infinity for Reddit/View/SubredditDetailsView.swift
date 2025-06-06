@@ -158,8 +158,11 @@ struct SubredditDetailsView: View {
                             isRootView: false
                         )
                         .id(accountViewModel.account.username)
+                        .listRowSeparator(.hidden)
+                        .padding(.horizontal, 16)
                     case .about:
                         SubredditAboutView(description: subredditData.description)
+                        .listRowSeparator(.hidden)
                     }
                 }
             }
