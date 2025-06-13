@@ -142,6 +142,6 @@ struct SettingsView: View {
         }
         .themedList()
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar("Settings")
+        .addTitleToInlineNavigationBar("Settings", 1.0)
     }
 }

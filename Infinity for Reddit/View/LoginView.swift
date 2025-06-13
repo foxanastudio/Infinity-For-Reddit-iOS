@@ -185,6 +185,6 @@ struct LoginView: View {
             }
         }
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar("Login")
+        .addTitleToInlineNavigationBar("Login", 1.0)
     }
 }

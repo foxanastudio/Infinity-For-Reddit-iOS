@@ -34,6 +34,6 @@ struct CustomFeedDetailsView: View {
         )
         .id(accountViewModel.account.username)
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar(customFeedDetailsViewModel.myCustomFeed.displayName)
+        .addTitleToInlineNavigationBar(customFeedDetailsViewModel.myCustomFeed.displayName, 1.0)
     }
 }

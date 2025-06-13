@@ -55,7 +55,7 @@ struct CustomizeCustomThemeView: View {
         }
         .themedList()
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar("Customize")
+        .addTitleToInlineNavigationBar("Customize", 1.0)
     }
     
     private func NameEntry() -> some View {

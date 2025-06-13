@@ -46,7 +46,7 @@ struct SearchResultsView: View {
             Spacer()
         }
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar(searchResultsViewModel.query)
+        .addTitleToInlineNavigationBar(searchResultsViewModel.query, 1.0)
         .id(accountViewModel.account.username)
     }
 }

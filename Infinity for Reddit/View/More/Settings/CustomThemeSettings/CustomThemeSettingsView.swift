@@ -77,7 +77,7 @@ struct CustomThemeSettingsView: View {
         }
         .themedList()
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar("Theme")
+        .addTitleToInlineNavigationBar("Theme", 1.0)
     }
     
     func themeListItem(themeType: String, themeName: String, icon: String) -> some View {

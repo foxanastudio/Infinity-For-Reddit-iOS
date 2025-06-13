@@ -49,6 +49,7 @@ struct SubredditDetailsView: View {
                         GeometryReader { headerProxy in
                             let currentHeaderMinY = headerProxy.frame(in: .named("SCROLL")).minY
                             let dynamicHeight = max(0, height + currentHeaderMinY * 0.4)
+                            let bannerOpacity = max(0, 1 + (currentHeaderMinY / 150))
                             
                             VStack(alignment: .center) {
                                 CustomWebImage(
@@ -59,8 +60,10 @@ struct SubredditDetailsView: View {
                                     fallbackView: {
                                         Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
                                             .frame(height: dynamicHeight)
+                                            .opacity(bannerOpacity)
                                     }
                                 )
+                                .opacity(bannerOpacity)
                                 
                                 HStack {
                                     ProgressIndicator()
@@ -201,7 +204,9 @@ struct SubredditDetailsView: View {
             }
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
-                NavigationBarMenu()
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    NavigationBarMenu()
+                }
             }
             .simultaneousGesture(
                 DragGesture(minimumDistance: 0)
@@ -230,20 +235,21 @@ struct SubredditDetailsView: View {
                     }
             )
             .overlay(alignment: .top) {
-                let scrollThreshold: CGFloat = 100.0
+                let scrollThreshold: CGFloat = 150.0
                 let opacity = min(1, max(0, (-headerMinY / scrollThreshold)))
                 
-                ZStack {
-                    Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
-                    
-                    Text("r/\(subredditDetailsViewModel.subredditData?.name ?? "")")
-                        .navigationBarPrimaryText()
-                        .padding(.top, proxy.safeAreaInsets.top)
-                }
-                .frame(height: (proxy.safeAreaInsets.top) + 30)
-                .opacity(opacity)
-                .ignoresSafeArea()
+                Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
+                    .frame(height: proxy.safeAreaInsets.top)
+                    .opacity(opacity)
+                    .ignoresSafeArea()
             }
+            .addTitleToInlineNavigationBar(
+                "r/\(subredditDetailsViewModel.subredditData?.name ?? "")",
+                {
+                    let scrollThreshold: CGFloat = 150.0
+                    return min(1, max(0, (-headerMinY / scrollThreshold)))
+                }()
+            )
         }
     }
 }

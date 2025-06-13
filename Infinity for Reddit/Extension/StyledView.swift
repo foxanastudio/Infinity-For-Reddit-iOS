@@ -36,8 +36,8 @@ extension View {
         self.modifier(NavigationBarViewModifier())
     }
     
-    func addTitleToInlineNavigationBar(_ title: String) -> some View {
-        self.modifier(InlineNavigationBarWithTitle(title: title))
+    func addTitleToInlineNavigationBar(_ title: String, _ opacity: Double) -> some View {
+        self.modifier(InlineNavigationBarWithTitle(title: title, opacity: opacity))
     }
     
     func navigationBarButton() -> some View {

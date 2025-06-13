@@ -30,7 +30,7 @@ struct CustomThemeListingView: View {
         }
         .themedList()
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar("Custom Themes")
+        .addTitleToInlineNavigationBar("Custom Themes", 1.0)
     }
     
     func ThemeListItem(themeName: String, primaryColor: Color) -> some View {

@@ -26,7 +26,7 @@ struct UpvotedView: View {
         )
         .id(accountViewModel.account.username)
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar("Upvoted")
+        .addTitleToInlineNavigationBar("Upvoted", 1.0)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {

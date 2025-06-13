@@ -44,7 +44,7 @@ struct HomeView: View {
                             )
                         )
                         .setUpHomeTabViewChildNavigationBar()
-                        .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
+                        .addTitleToInlineNavigationBar(selectedTab.navigationTitle, 1.0)
                     }
                     .id(accountViewModel.account.username)
                     .tabItem {
@@ -56,7 +56,7 @@ struct HomeView: View {
                     CustomNavigationStack {
                         SubscriptionsView()
                             .setUpHomeTabViewChildNavigationBar()
-                            .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
+                            .addTitleToInlineNavigationBar(selectedTab.navigationTitle, 1.0)
                     }
                     .id(accountViewModel.account.username)
                     .tabItem {
@@ -70,7 +70,7 @@ struct HomeView: View {
                             account: accountViewModel.account
                         )
                         .setUpHomeTabViewChildNavigationBar()
-                        .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
+                        .addTitleToInlineNavigationBar(selectedTab.navigationTitle, 1.0)
                     }
                     .id(accountViewModel.account.username)
                     .tabItem {
@@ -82,7 +82,7 @@ struct HomeView: View {
                     CustomNavigationStack {
                         SearchView(username: accountViewModel.account.username)
                             .setUpHomeTabViewChildNavigationBar()
-                            .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
+                            .addTitleToInlineNavigationBar(selectedTab.navigationTitle, 1.0)
                     }
                     .id(accountViewModel.account.username)
                     .tabItem {
@@ -94,7 +94,7 @@ struct HomeView: View {
                     CustomNavigationStack {
                         MoreView()
                             .setUpHomeTabViewChildNavigationBar()
-                            .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
+                            .addTitleToInlineNavigationBar(selectedTab.navigationTitle, 1.0)
                     }
                     .id(accountViewModel.account.username)
                     .tabItem {

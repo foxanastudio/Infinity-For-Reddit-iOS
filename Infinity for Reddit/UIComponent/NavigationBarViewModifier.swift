@@ -21,6 +21,7 @@ struct InlineNavigationBarWithTitle: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
     
     var title: String
+    var opacity: Double
 
     func body(content: Content) -> some View {
         content
@@ -28,6 +29,7 @@ struct InlineNavigationBarWithTitle: ViewModifier {
                 ToolbarItem(placement: .principal) {
                     Text(title)
                         .navigationBarPrimaryText()
+                        .opacity(opacity)
                 }
             }
             .navigationBarTitleDisplayMode(.inline)

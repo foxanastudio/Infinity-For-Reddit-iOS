@@ -26,7 +26,7 @@ struct DownvotedView: View {
         )
         .id(accountViewModel.account.username)
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar("Downvoted")
+        .addTitleToInlineNavigationBar("Downvoted", 1.0)
     }
 }
 
