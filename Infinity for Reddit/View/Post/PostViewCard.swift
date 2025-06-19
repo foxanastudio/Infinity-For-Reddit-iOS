@@ -66,6 +66,7 @@ struct PostViewCard: View {
                         CustomWebImage(
                             url,
                             aspectRatio: preview.images[0].source.aspectRatio,
+                            enableMatchedGeometryEffect: true,
                             post: postViewModel.post,
                             placeholderView: {
                                 Spacer()

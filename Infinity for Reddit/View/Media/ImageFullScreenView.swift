@@ -34,6 +34,7 @@ struct ImageFullScreenView: View {
                 url?.absoluteString ?? "",
                 aspectRatio: aspectRatio,
                 handleImageTapGesture: false,
+                enableMatchedGeometryEffect: true,
                 placeholderView: {
 //                    Spacer()
 //                        .frame(width: UIScreen.main.bounds.width)
@@ -42,7 +43,6 @@ struct ImageFullScreenView: View {
 //                        }
                 }
             )
-            .scaleEffect(scale)
             .offset(currentDragOffset)
         }
         .gesture(
