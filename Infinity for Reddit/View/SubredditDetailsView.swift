@@ -143,8 +143,7 @@ struct SubredditDetailsView: View {
                                 subredditData.sidebarDescription.map {
                                     Markdown($0)
                                         .themedMarkdown()
-                                        .padding(.leading, 4)
-                                        .padding(.bottom, 16)
+                                        .padding(.bottom, 8)
                                 }
                             }
                         }
@@ -154,17 +153,25 @@ struct SubredditDetailsView: View {
                     .listPlainItemNoInsets()
                     .zIndex(2)
                     
-                    Picker("Select Section", selection: $selectedSection) {
-                        ForEach(0..<2, id: \.self) { index in
-                            Text(index == 0 ? "Posts" : "About")
-                                .tag(index)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    .listRowInsets(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
-                    .offset(y: isManuallyRefreshing || isReadyToRefresh ? 30 : 0)
-                    .zIndex(0)
-                    .animation(.easeInOut, value: selectedSection)
+//                    Picker("Select Section", selection: $selectedSection) {
+//                        ForEach(0..<2, id: \.self) { index in
+//                            Text(index == 0 ? "Posts" : "About")
+//                                .tag(index)
+//                        }
+//                    }
+//                    .pickerStyle(.segmented)
+//                    .listRowInsets(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
+//                    .offset(y: isManuallyRefreshing || isReadyToRefresh ? 30 : 0)
+//                    .zIndex(0)
+//                    .animation(.easeInOut, value: selectedSection)
+                    
+                    SegmentedPicker(selectedValue: $selectedSection, values: ["Posts", "About"])
+                        .padding(4)
+                        .listRowInsets(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
+                        .offset(y: isManuallyRefreshing || isReadyToRefresh ? 30 : 0)
+                        .zIndex(0)
+                        .animation(.easeInOut, value: selectedSection)
+                        .frame(maxWidth: .infinity)
                     
                     Group {
                         if selectedSection == 0 {
