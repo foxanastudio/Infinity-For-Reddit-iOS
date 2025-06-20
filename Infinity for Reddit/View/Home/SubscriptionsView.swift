@@ -31,19 +31,18 @@ struct SubscriptionsView: View {
         VStack(spacing: 0) {
             SegmentedPicker(selectedValue: $selectedOption, values: ["Subreddits", "Users", "Custom Feed"])
                 .padding(4)
-
-            ZStack {
+            
+            TabView(selection: $selectedOption) {
                 SubredditsView(subscriptionListingViewModel: subscriptionListingViewModel)
-                    .opacity(selectedOption == 0 ? 1 : 0)
+                    .tag(0)
                 
                 UsersView(subscriptionListingViewModel: subscriptionListingViewModel)
-                    .opacity(selectedOption == 1 ? 1 : 0)
+                    .tag(1)
                 
                 CustomFeedView(subscriptionListingViewModel: subscriptionListingViewModel)
-                    .opacity(selectedOption == 2 ? 1 : 0)
+                    .tag(2)
             }
-
-            Spacer()
+            .tabViewStyle(.page(indexDisplayMode: .never))
         }
         .navigationTitle("Subscriptions")
         .task {

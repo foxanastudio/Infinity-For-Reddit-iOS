@@ -174,9 +174,9 @@ struct CustomWebImage<Content: View>: View {
                                 case .imgurVideo(let url):
                                     print("gif")
                                 case .redgifs(let redgifsId):
-                                    print("gif")
+                                    print("redgifs")
                                 case .streamable(let shortCode):
-                                    print("gif")
+                                    print("streamable")
                                 default:
                                     print("other types")
                                 }
