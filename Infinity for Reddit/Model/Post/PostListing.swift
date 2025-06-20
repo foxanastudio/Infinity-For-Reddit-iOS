@@ -154,6 +154,7 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
     var canModPost : Bool!
     var created : Int64!
     var createdUtc : Int64!
+    var crosspostParent: Post!
     var domain : String!
     var downs : Int!
     var edited : Bool!
@@ -237,7 +238,7 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
      * Instantiate the instance using the passed json values to set the properties values
      */
     init(fromJson json: JSON!){
-        if json.isEmpty{
+        if json.isEmpty {
             return
         }
         approvedAtUtc = json["approved_at_utc"].stringValue
@@ -255,6 +256,9 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         canModPost = json["can_mod_post"].boolValue
         created = json["created"].int64Value
         createdUtc = json["created_utc"].int64Value
+        if let crosspostParentListArray = json["crosspost_parent_list"].array, !crosspostParentListArray.isEmpty {
+            crosspostParent = Post(fromJson: crosspostParentListArray[0])
+        }
         domain = json["domain"].stringValue
         downs = json["downs"].intValue
         edited = json["edited"].boolValue
@@ -358,16 +362,18 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
             userReports.append(subArray)
         }
         
-        postType = Post.checkPostType(json: json, url: url, preview: preview, galleryData: galleryData, media: media, isVideo: isVideo, permalink: permalink)
+        postType = crosspostParent == nil ? Post.checkPostType(url: url, preview: preview, galleryData: galleryData, media: media, isVideo: isVideo, permalink: permalink) :
+        Post.checkPostType(url: crosspostParent.url, preview: crosspostParent.preview, galleryData: crosspostParent.galleryData, media: crosspostParent.media, isVideo: crosspostParent.isVideo, permalink: crosspostParent.permalink)
     }
     
-    static func checkPostType(json: JSON,
-                       url: String,
-                       preview: Preview?,
-                       galleryData: GalleryData?,
-                       media: PostMedia?,
-                       isVideo: Bool,
-                       permalink: String) -> PostType {
+    static func checkPostType(url: String,
+                              preview: Preview?,
+                              galleryData: GalleryData?,
+                              media: PostMedia?,
+                              isVideo: Bool,
+                              permalink: String,
+                              isCrosspost: Bool = false
+    ) -> PostType {
         if galleryData != nil {
             return PostType.gallery
         }
@@ -469,6 +475,9 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         }
         if createdUtc != nil{
             dictionary["created_utc"] = createdUtc
+        }
+        if crosspostParent != nil {
+            dictionary["crosspost_parent_list"] = crosspostParent
         }
         if domain != nil{
             dictionary["domain"] = domain
@@ -665,6 +674,7 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         canModPost = aDecoder.decodeObject(forKey: "can_mod_post") as? Bool
         created = aDecoder.decodeObject(forKey: "created") as? Int64
         createdUtc = aDecoder.decodeObject(forKey: "created_utc") as? Int64
+        crosspostParent = aDecoder.decodeObject(forKey: "crosspost_parent_list") as? Post
         domain = aDecoder.decodeObject(forKey: "domain") as? String
         downs = aDecoder.decodeObject(forKey: "downs") as? Int
         edited = aDecoder.decodeObject(forKey: "edited") as? Bool
@@ -767,6 +777,9 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         }
         if createdUtc != nil{
             aCoder.encode(createdUtc, forKey: "created_utc")
+        }
+        if crosspostParent != nil {
+            aCoder.encode(crosspostParent, forKey: "crosspost_parent_list")
         }
         if domain != nil{
             aCoder.encode(domain, forKey: "domain")
@@ -1026,12 +1039,14 @@ class Image : NSObject, NSCoding{
     
     var resolutions : [Resolution]! = [Resolution]()
     var source : Resolution!
+    var gifVariant: Image!
+    var mp4Variant: Image!
     
     /**
      * Instantiate the instance using the passed json values to set the properties values
      */
-    init(fromJson json: JSON!){
-        if json.isEmpty{
+    init(fromJson json: JSON!) {
+        if json.isEmpty {
             return
         }
         resolutions = [Resolution]()
@@ -1041,8 +1056,17 @@ class Image : NSObject, NSCoding{
             resolutions.append(value)
         }
         let sourceJson = json["source"]
-        if !sourceJson.isEmpty{
+        if !sourceJson.isEmpty {
             source = Resolution(fromJson: sourceJson)
+        }
+        let variantsJson = json["variants"]
+        if !variantsJson.isEmpty {
+            if variantsJson["gif"].exists() {
+                gifVariant = Image(fromJson: variantsJson["gif"])
+            }
+            if variantsJson["mp4"].exists() {
+                mp4Variant = Image(fromJson: variantsJson["mp4"])
+            }
         }
     }
     
