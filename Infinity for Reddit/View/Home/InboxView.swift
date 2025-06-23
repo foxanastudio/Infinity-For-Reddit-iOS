@@ -25,13 +25,14 @@ struct InboxView: View {
             SegmentedPicker(selectedValue: $selectedOption, values: ["Notifications", "Messages"])
                 .padding(4)
             
-            ZStack {
+            TabView(selection: $selectedOption) {
                 InboxListingView(account: account, messageWhere: MessageWhere.inbox)
-                    .opacity(selectedOption == 0 ? 1 : 0)
+                    .tag(0)
                 
                 InboxListingView(account: account, messageWhere: MessageWhere.messages)
-                    .opacity(selectedOption == 1 ? 1 : 0)
+                    .tag(1)
             }
+            .tabViewStyle(.page(indexDisplayMode: .never))
             
             Spacer()
         }
