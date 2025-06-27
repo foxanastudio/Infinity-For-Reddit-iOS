@@ -140,6 +140,10 @@ public class PostDetailsViewModel: ObservableObject {
     }
     
     public func collapseComments(comment: Comment) {
+        guard comment.replies?.comments?.count ?? -1 > 0 else {
+            return
+        }
+        
         guard let index = visibleComments.index(id: comment.id) else { return }
 
         let parentDepth = comment.depth
@@ -156,6 +160,10 @@ public class PostDetailsViewModel: ObservableObject {
     }
     
     public func expandComments(comment: Comment) {
+        guard comment.replies?.comments?.count ?? -1 > 0 else {
+            return
+        }
+        
         guard let index = visibleComments.index(id: comment.id),
               let parentIndexInAll = allComments.index(id: comment.id),
               let parentDepth = comment.depth else {
