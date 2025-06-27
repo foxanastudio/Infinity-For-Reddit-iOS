@@ -47,7 +47,15 @@ struct PostDetailsView: View {
                         .listPlainItem()
                 } else {
                     ForEach(postDetailsViewModel.visibleComments, id: \.id) { comment in
-                        CommentViewCard(account: account, comment: comment, isInPostDetails: true)
+                        CommentViewCard(account: account, comment: comment, isInPostDetails: true, onToggleExpand: {
+                            withAnimation {
+                                if comment.isCollasped {
+                                    postDetailsViewModel.expandComments(comment: comment)
+                                } else {
+                                    postDetailsViewModel.collapseComments(comment: comment)
+                                }
+                            }
+                        })
                             .listPlainItemNoInsets()
                             .id(comment.id)
                             .onLongPressGesture {

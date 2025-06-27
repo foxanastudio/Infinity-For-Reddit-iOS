@@ -128,7 +128,7 @@ struct PostViewCard: View {
                             await postViewModel.votePost(vote: 1)
                         }
                     }) {
-                        SwiftUI.Image(postViewModel.post.likes == 1 ? "upvoted" : "upvote")
+                        SwiftUI.Image(systemName: postViewModel.post.likes == 1 ? "arrowshape.up.fill" : "arrowshape.up")
                             .postIconTemplateRendering()
                             .postUpvoteIcon(isUpvoted: postViewModel.post.likes == 1)
                     }
@@ -144,7 +144,7 @@ struct PostViewCard: View {
                             await postViewModel.votePost(vote: -1)
                         }
                     }) {
-                        SwiftUI.Image(postViewModel.post.likes == -1 ? "downvoted" : "downvote")
+                        SwiftUI.Image(systemName: postViewModel.post.likes == -1 ? "arrowshape.down.fill" : "arrowshape.down")
                             .postIconTemplateRendering()
                             .postDownvoteIcon(isDownvoted: postViewModel.post.likes == -1)
                     }
@@ -154,7 +154,7 @@ struct PostViewCard: View {
                     Button {
                         
                     } label: {
-                        SwiftUI.Image("comment")
+                        SwiftUI.Image(systemName: "text.bubble")
                             .postIconTemplateRendering()
                             .postIcon()
                     }

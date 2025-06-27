@@ -88,7 +88,7 @@ struct UserDetailsView: View {
                 }
                 .padding(.horizontal, 20)
                 
-                TabView {
+                TabView(selection: $selectedTab) {
                     PostListingView(
                         account: accountViewModel.account,
                         postListingMetadata:PostListingMetadata(

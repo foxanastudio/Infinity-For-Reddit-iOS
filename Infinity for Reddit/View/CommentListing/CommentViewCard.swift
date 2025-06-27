@@ -18,10 +18,12 @@ struct CommentViewCard: View {
     
     let formatter = DateFormatter()
     private let isInPostDetails: Bool
+    let onToggleExpand: (() -> Void)?
     
-    init(account: Account, comment: Comment, isInPostDetails: Bool) {
+    init(account: Account, comment: Comment, isInPostDetails: Bool, onToggleExpand: (() -> Void)? = nil) {
         formatter.dateFormat = "y-MM-dd H:mm"
         self.isInPostDetails = isInPostDetails
+        self.onToggleExpand = onToggleExpand
         _commentViewModel = StateObject(wrappedValue: CommentViewModel(account: account, comment: comment, commentRepository: CommentRepository()))
     }
     
@@ -44,6 +46,13 @@ struct CommentViewCard: View {
                         }
                     )
                     .frame(width: 24, height: 24)
+                    .onTapGesture {
+                        if !isInPostDetails {
+                            navigationManager.path.append(AppNavigation.subredditDetails(subredditName: commentViewModel.comment.subreddit))
+                        } else {
+                            navigationManager.path.append(AppNavigation.userDetails(username: commentViewModel.comment.author))
+                        }
+                    }
                     
                     VStack(alignment: .leading) {
                         if !isInPostDetails {
@@ -52,13 +61,13 @@ struct CommentViewCard: View {
                                 .onTapGesture {
                                     navigationManager.path.append(AppNavigation.subredditDetails(subredditName: commentViewModel.comment.subreddit))
                                 }
+                        } else {
+                            Text("u/\(commentViewModel.comment.author)")
+                                .username()
+                                .onTapGesture {
+                                    navigationManager.path.append(AppNavigation.userDetails(username: commentViewModel.comment.author))
+                                }
                         }
-                        
-                        Text("u/\(commentViewModel.comment.author)")
-                            .username()
-                            .onTapGesture {
-                                navigationManager.path.append(AppNavigation.userDetails(username: commentViewModel.comment.author))
-                            }
                     }
                     
                     Spacer()
@@ -97,7 +106,7 @@ struct CommentViewCard: View {
                             await commentViewModel.voteComment(vote: 1)
                         }
                     }) {
-                        SwiftUI.Image(commentViewModel.comment.likes == 1 ? "upvoted" : "upvote")
+                        SwiftUI.Image(systemName: commentViewModel.comment.likes == 1 ? "arrowshape.up.fill" : "arrowshape.up")
                             .commentIconTemplateRendering()
                             .commentUpvoteIcon(isUpvoted: commentViewModel.comment.likes == 1)
                     }
@@ -113,7 +122,7 @@ struct CommentViewCard: View {
                             await commentViewModel.voteComment(vote: -1)
                         }
                     }) {
-                        SwiftUI.Image(commentViewModel.comment.likes == -1 ? "downvoted" : "downvote")
+                        SwiftUI.Image(systemName: commentViewModel.comment.likes == -1 ? "arrowshape.down.fill" : "arrowshape.down")
                             .commentIconTemplateRendering()
                             .commentDownvoteIcon(isDownvoted: commentViewModel.comment.likes == -1)
                     }
@@ -121,6 +130,20 @@ struct CommentViewCard: View {
                     .buttonStyle(.borderless)
                     
                     Spacer()
+                    
+                    if let onToggleExpand {
+                        Button(action: {
+                            onToggleExpand()
+                        }) {
+                            SwiftUI.Image(systemName: "chevron.up")
+                                .commentIconTemplateRendering()
+                                .commentIcon()
+                                .rotationEffect(.degrees(commentViewModel.comment.isCollasped ? 0 : 180))
+                                .animation(.easeInOut(duration: 0.25), value: commentViewModel.comment.isCollasped)
+                        }
+                        .padding(.trailing, 16)
+                        .buttonStyle(.borderless)
+                    }
                     
                     Button(action: {
                         saveTask?.cancel()
