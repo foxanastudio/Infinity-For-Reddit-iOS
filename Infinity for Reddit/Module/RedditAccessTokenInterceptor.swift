@@ -26,18 +26,14 @@ final class RedditAccessTokenInterceptor: RequestInterceptor {
                 if let newURL = components?.url {
                     urlRequest.url = newURL
                 }
-            } else if urlRequest.headers["Authorization"] != nil {
-                return completion(.success(urlRequest))
+            } else if urlRequest.headers["Authorization"] == nil {
+                urlRequest.setValue("bearer \(AccountViewModel.shared.account.accessToken ?? "")", forHTTPHeaderField: "Authorization")
+                urlRequest.setValue(APIUtils.USER_AGENT, forHTTPHeaderField: APIUtils.USER_AGENT_KEY)
             }
-        } else {
-            print(urlRequest.url?.absoluteString ?? "Empty URL?")
-            return completion(.success(urlRequest))
         }
         
         print(urlRequest.url?.absoluteString ?? "Empty URL?")
-        
-        urlRequest.setValue("bearer \(AccountViewModel.shared.account.accessToken ?? "")", forHTTPHeaderField: "Authorization")
-        urlRequest.setValue(APIUtils.USER_AGENT, forHTTPHeaderField: APIUtils.USER_AGENT_KEY)
+        print("damn " + (AccountViewModel.shared.account.accessToken ?? ""))
         
         completion(.success(urlRequest))
     }

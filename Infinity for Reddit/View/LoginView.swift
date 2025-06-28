@@ -22,16 +22,13 @@ struct LoginView: View {
     
     init() {
         // Resolve the session ASAP and store it in a property
-        guard let resolvedSession = DependencyManager.shared.container.resolve(Session.self) else {
-            fatalError("Failed to resolve Session")
-        }
         guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
             fatalError("Failed to resolve DatabasePool")
         }
         guard let resolvedOperationQueue = DependencyManager.shared.container.resolve(OperationQueue.self) else {
             fatalError("Failed to resolve OperationQueue")
         }
-        self.session = resolvedSession
+        self.session = Session(configuration: URLSessionConfiguration.af.default)
         self.dbPool = resolvedDBPool
         self.operationQueue = resolvedOperationQueue
     }
