@@ -77,8 +77,12 @@ struct PostDetailsView: View {
                                 .listPlainItemNoInsets()
                                 .id(commentMore.id)
                                 .onTapGesture {
-                                    Task {
-                                        await postDetailsViewModel.fetchMoreCommentsInCommentMore(commentMore: commentMore)
+                                    if commentMore.children.count > 0 {
+                                        Task {
+                                            await postDetailsViewModel.fetchMoreCommentsInCommentMore(commentMore: commentMore)
+                                        }
+                                    } else {
+                                        
                                     }
                                 }
                         }

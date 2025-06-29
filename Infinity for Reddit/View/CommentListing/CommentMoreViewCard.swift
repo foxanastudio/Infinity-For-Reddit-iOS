@@ -16,7 +16,7 @@ struct CommentMoreViewCard: View {
             
             Spacer()
             
-            Text("Load more comments")
+            Text(commentMore.children.count > 0 ? "Load more comments" : "Continue Thread")
                 .commentText()
                 .padding(.horizontal, 16)
             
