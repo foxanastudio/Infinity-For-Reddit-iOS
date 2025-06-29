@@ -18,7 +18,7 @@ public class PostListingRepository: PostListingRepositoryProtocol {
     }
     private let session: Session
     private let subredditDao: SubredditDao
-    private let dbPool: DatabasePool
+    private var subredditOrUserIcons: [String: String] = [:]
     
     public init() {
         guard let resolvedSession = DependencyManager.shared.container.resolve(Session.self) else {
@@ -28,7 +28,6 @@ public class PostListingRepository: PostListingRepositoryProtocol {
             fatalError( "Failed to resolve DatabasePool")
         }
         self.session = resolvedSession
-        self.dbPool = resolvedDBPool
         self.subredditDao = SubredditDao(dbPool: resolvedDBPool)
     }
     
@@ -79,13 +78,25 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         if displaySubredditIcon {
             if "u/\(post.author)" == post.subredditNamePrefixed {
                 // User's own subreddit
-                try await loadUserIcon(post: post)
+                if subredditOrUserIcons[post.author] != nil {
+                    post.subredditOrUserIcon = subredditOrUserIcons[post.author]
+                } else {
+                    try await loadUserIcon(post: post)
+                }
             } else {
-                try await loadSubredditIcon(post: post)
+                if subredditOrUserIcons[post.subreddit] != nil {
+                    post.subredditOrUserIcon = subredditOrUserIcons[post.subreddit]
+                } else {
+                    try await loadSubredditIcon(post: post)
+                }
             }
         } else {
             if !post.isAuthorDeleted() {
-                try await loadUserIcon(post: post)
+                if subredditOrUserIcons[post.author] != nil {
+                    post.subredditOrUserIcon = subredditOrUserIcons[post.author]
+                } else {
+                    try await loadUserIcon(post: post)
+                }
             }
         }
     }
@@ -99,8 +110,8 @@ public class PostListingRepository: PostListingRepositoryProtocol {
             let subredditDataList = try subredditDao.getSubredditDataByName(name: post.subreddit)
             if !subredditDataList.isEmpty {
                 await MainActor.run {
-                    print("database icon!!!!!!!!")
                     post.subredditOrUserIcon = subredditDataList[0].iconUrl ?? ""
+                    subredditOrUserIcons[post.subreddit] = post.subredditOrUserIcon
                 }
                 return
             }
@@ -124,6 +135,7 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         
         await MainActor.run {
             post.subredditOrUserIcon = SubredditDetailRootClass(fromJson: json).toSubredditData().iconUrl ?? ""
+            subredditOrUserIcons[post.subreddit] = post.subredditOrUserIcon
         }
     }
     
@@ -148,6 +160,7 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         
         await MainActor.run {
             post.subredditOrUserIcon = UserDetailRootClass(fromJson: json).toUserData().iconUrl ?? ""
+            subredditOrUserIcons[post.author] = post.subredditOrUserIcon
         }
     }
 }
