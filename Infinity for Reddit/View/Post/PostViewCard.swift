@@ -15,9 +15,12 @@ struct PostViewCard: View {
     @State var voteTask: Task<Void, Never>?
     @State var saveTask: Task<Void, Never>?
     
+    let isSubredditPostListing: Bool
+    
     let formatter = DateFormatter()
     
-    init(account: Account, post: Post) {
+    init(account: Account, post: Post, isSubredditPostListing: Bool) {
+        self.isSubredditPostListing = isSubredditPostListing
         formatter.dateFormat = "y-MM-dd H:mm"
         _postViewModel = StateObject(wrappedValue: PostViewModel(account: account, post: post, postRepository: PostRepository()))
     }
@@ -47,7 +50,11 @@ struct PostViewCard: View {
                     )
                     .frame(width: 24, height: 24)
                     .onTapGesture {
-                        //navigationManager.path.append(AppNavigation.userDetails(username: commentViewModel.comment.author))
+                        if (!isSubredditPostListing) {
+                            navigationManager.path.append(AppNavigation.subredditDetails(subredditName: postViewModel.post.subreddit))
+                        } else if !postViewModel.post.isAuthorDeleted() {
+                            navigationManager.path.append(AppNavigation.userDetails(username: postViewModel.post.author))
+                        }
                     }
                     
                     VStack(alignment: .leading) {

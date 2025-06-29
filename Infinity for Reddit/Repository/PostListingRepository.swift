@@ -69,85 +69,56 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         if displaySubredditIcon {
             if "u/\(post.author)" == post.subredditNamePrefixed {
                 // User's own subreddit
-                try Task.checkCancellation()
-                
-                let data = try await self.session.request(
-                    RedditAPI.getUserData(username: post.author)
-                )
-                .validate()
-                .serializingData()
-                .value
-                
-                try Task.checkCancellation()
-                
-                let json = JSON(data)
-                if let error = json.error {
-                    throw PostListingRepositoryError.JSONDecodingError(error.localizedDescription)
-                }
-                
-                await MainActor.run {
-                    post.subredditOrUserIcon = UserDetailRootClass(fromJson: json).toUserData().iconUrl
-                }
+                try await loadUserIcon(post: post)
             } else {
-                let data = try await self.session.request(
-                    RedditOAuthAPI.getSubredditData(subredditName: post.subreddit)
-                )
-                    .validate()
-                    .serializingData(automaticallyCancelling: true)
-                    .value
-                
-                try Task.checkCancellation()
-                
-                let json = JSON(data)
-                if let error = json.error {
-                    throw PostListingRepositoryError.JSONDecodingError(error.localizedDescription)
-                }
-                
-                await MainActor.run {
-                    post.subredditOrUserIcon = SubredditDetailRootClass(fromJson: json).toSubredditData().iconUrl
-                }
+                try await loadSubredditIcon(post: post)
             }
         } else {
-            if post.isAuthorDeleted() {
-                // Load subreddit icon
-                let data = try await self.session.request(
-                    RedditOAuthAPI.getSubredditData(subredditName: post.subreddit)
-                )
-                    .validate()
-                    .serializingData(automaticallyCancelling: true)
-                    .value
-                
-                try Task.checkCancellation()
-                
-                let json = JSON(data)
-                if let error = json.error {
-                    throw PostListingRepositoryError.JSONDecodingError(error.localizedDescription)
-                }
-                
-                await MainActor.run {
-                    post.subredditOrUserIcon = SubredditDetailRootClass(fromJson: json).toSubredditData().iconUrl
-                }
-            } else {
-                try Task.checkCancellation()
-                
-                let data = try await self.session.request(
-                    RedditAPI.getUserData(username: post.author)
-                )
-                .validate()
-                .serializingData()
-                .value
-                
-                try Task.checkCancellation()
-                
-                let json = JSON(data)
-                if let error = json.error {
-                    throw PostListingRepositoryError.JSONDecodingError(error.localizedDescription)
-                }
-                
-                await MainActor.run {
-                    post.subredditOrUserIcon = UserDetailRootClass(fromJson: json).toUserData().iconUrl
-                }
+            if !post.isAuthorDeleted() {
+                try await loadUserIcon(post: post)
             }
+        }
+    }
+    
+    private func loadSubredditIcon(post: Post) async throws {
+        let data = try await self.session.request(
+            RedditOAuthAPI.getSubredditData(subredditName: post.subreddit)
+        )
+            .validate()
+            .serializingData(automaticallyCancelling: true)
+            .value
+        
+        try Task.checkCancellation()
+        
+        let json = JSON(data)
+        if let error = json.error {
+            throw PostListingRepositoryError.JSONDecodingError(error.localizedDescription)
+        }
+        
+        await MainActor.run {
+            post.subredditOrUserIcon = SubredditDetailRootClass(fromJson: json).toSubredditData().iconUrl
+        }
+    }
+    
+    private func loadUserIcon(post: Post) async throws {
+        try Task.checkCancellation()
+        
+        let data = try await self.session.request(
+            RedditAPI.getUserData(username: post.author)
+        )
+        .validate()
+        .serializingData()
+        .value
+        
+        try Task.checkCancellation()
+        
+        let json = JSON(data)
+        if let error = json.error {
+            throw PostListingRepositoryError.JSONDecodingError(error.localizedDescription)
+        }
+        
+        await MainActor.run {
+            post.subredditOrUserIcon = UserDetailRootClass(fromJson: json).toUserData().iconUrl
         }
     }
 }

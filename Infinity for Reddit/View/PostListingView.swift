@@ -22,12 +22,12 @@ struct PostListingView: View {
     @State private var showNewPostMenu: Bool = false
     
     private let account: Account
-    private var isUserPostListing: Bool = false
+    private var isSubredditPostListing: Bool = false
     
     init(account: Account, postListingMetadata: PostListingMetadata) {
         self.account = account
-        if case .user = postListingMetadata.postListingType {
-            isUserPostListing = true
+        if case .subreddit = postListingMetadata.postListingType {
+            isSubredditPostListing = true
         }
         
         _postListingViewModel = StateObject(
@@ -41,6 +41,9 @@ struct PostListingView: View {
     init(account: Account, postListingMetadata: PostListingMetadata, isRootView: Bool) {
         self.account = account
         self.isRootView = isRootView
+        if case .subreddit = postListingMetadata.postListingType {
+            isSubredditPostListing = true
+        }
         
         _postListingViewModel = StateObject(
             wrappedValue: PostListingViewModel(
@@ -60,12 +63,12 @@ struct PostListingView: View {
                 if isRootView {
                     List {
                         ForEach(postListingViewModel.posts, id: \.id) { post in
-                            PostViewCard(account: account, post: post)
+                            PostViewCard(account: account, post: post, isSubredditPostListing: isSubredditPostListing)
                                 .id(post.id)
                                 .listPlainItemNoInsets()
                                 .onAppear {
                                     Task {
-                                        await postListingViewModel.loadIcon(post: post, displaySubredditIcon: !isUserPostListing)
+                                        await postListingViewModel.loadIcon(post: post, displaySubredditIcon: !isSubredditPostListing)
                                     }
                                 }
                         }
@@ -81,12 +84,12 @@ struct PostListingView: View {
                     .themedList()
                 } else {
                     ForEach(postListingViewModel.posts, id: \.id) { post in
-                        PostViewCard(account: account, post: post)
+                        PostViewCard(account: account, post: post, isSubredditPostListing: isSubredditPostListing)
                             .id(post.id)
                             .listPlainItemNoInsets()
                             .onAppear {
                                 Task {
-                                    await postListingViewModel.loadIcon(post: post, displaySubredditIcon: !isUserPostListing)
+                                    await postListingViewModel.loadIcon(post: post, displaySubredditIcon: !isSubredditPostListing)
                                 }
                             }
                     }
