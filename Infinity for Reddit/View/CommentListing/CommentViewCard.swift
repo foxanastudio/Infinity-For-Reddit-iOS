@@ -23,6 +23,7 @@ struct CommentViewCard: View {
     init(account: Account, comment: Comment, isInPostDetails: Bool, onToggleExpand: (() -> Void)? = nil) {
         formatter.dateFormat = "y-MM-dd H:mm"
         self.isInPostDetails = isInPostDetails
+        print(isInPostDetails)
         self.onToggleExpand = onToggleExpand
         _commentViewModel = StateObject(wrappedValue: CommentViewModel(account: account, comment: comment, commentRepository: CommentRepository()))
     }
@@ -33,24 +34,22 @@ struct CommentViewCard: View {
             
             VStack(alignment: .leading) {
                 HStack(alignment: .center) {
-                    CustomWebImage(
-                        commentViewModel.comment.authorIconUrl?.absoluteString,
-                        width: 24,
-                        height: 24,
-                        circleClipped: true,
-                        handleImageTapGesture: false,
-                        fallbackView: {
-                            SwiftUI.Image(systemName: "person.crop.circle")
-                                .resizable()
-                                .frame(width: 24, height: 24)
-                        }
-                    )
-                    .frame(width: 24, height: 24)
-                    .onTapGesture {
-                        if !isInPostDetails {
+                    if isInPostDetails {
+                        CustomWebImage(
+                            commentViewModel.comment.authorIconUrl?.absoluteString,
+                            width: 24,
+                            height: 24,
+                            circleClipped: true,
+                            handleImageTapGesture: false,
+                            fallbackView: {
+                                SwiftUI.Image(systemName: "person.crop.circle")
+                                    .resizable()
+                                    .frame(width: 24, height: 24)
+                            }
+                        )
+                        .frame(width: 24, height: 24)
+                        .onTapGesture {
                             navigationManager.path.append(AppNavigation.subredditDetails(subredditName: commentViewModel.comment.subreddit))
-                        } else {
-                            navigationManager.path.append(AppNavigation.userDetails(username: commentViewModel.comment.author))
                         }
                     }
                     
