@@ -22,9 +22,13 @@ struct PostListingView: View {
     @State private var showNewPostMenu: Bool = false
     
     private let account: Account
+    private var isUserPostListing: Bool = false
     
     init(account: Account, postListingMetadata: PostListingMetadata) {
         self.account = account
+        if case .user = postListingMetadata.postListingType {
+            isUserPostListing = true
+        }
         
         _postListingViewModel = StateObject(
             wrappedValue: PostListingViewModel(
@@ -59,6 +63,11 @@ struct PostListingView: View {
                             PostViewCard(account: account, post: post)
                                 .id(post.id)
                                 .listPlainItemNoInsets()
+                                .onAppear {
+                                    Task {
+                                        await postListingViewModel.loadIcon(post: post, displaySubredditIcon: !isUserPostListing)
+                                    }
+                                }
                         }
                         if postListingViewModel.hasMorePages {
                             ProgressIndicator()
@@ -75,6 +84,11 @@ struct PostListingView: View {
                         PostViewCard(account: account, post: post)
                             .id(post.id)
                             .listPlainItemNoInsets()
+                            .onAppear {
+                                Task {
+                                    await postListingViewModel.loadIcon(post: post, displaySubredditIcon: !isUserPostListing)
+                                }
+                            }
                     }
                     if postListingViewModel.hasMorePages {
                         ProgressIndicator()

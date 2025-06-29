@@ -229,6 +229,7 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
     var userReports : [[Any]]! = [[Any]]()
     
     var postType: PostType!
+    @Published var subredditOrUserIcon: String?
     
     enum PostType: Equatable {
         case text, image, imageWithUrlPreview(urlPreview: String), gif, video(videoUrl: String, downloadUrl: String), gallery, link, noPreviewLink, poll, imgurVideo(url: String), redgifs(redgifsId: String), streamable(shortCode: String)
@@ -431,6 +432,10 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
                 }
             }
         }
+    }
+    
+    public func isAuthorDeleted() -> Bool {
+        return author != nil && author! == "[deleted]"
     }
     
     /**

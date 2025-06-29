@@ -143,4 +143,12 @@ public class PostListingViewModel: ObservableObject {
     func modifyPostBody(_ post: Post) {
         MarkdownUtils.parseRedditImagesBlock(post)
     }
+    
+    func loadIcon(post: Post, displaySubredditIcon: Bool) async {
+        do {
+            try await postListingRepository.loadIcon(post: post, displaySubredditIcon: displaySubredditIcon)
+        } catch {
+            print("Load icon failed")
+        }
+    }
 }

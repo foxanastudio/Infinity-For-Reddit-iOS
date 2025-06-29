@@ -23,6 +23,12 @@ public class PostViewModel: ObservableObject {
         self.account = account
         self.post = post
         self.postRepository = postRepository
+        
+        post.objectWillChange
+            .sink { [weak self] _ in
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
     }
     
     func votePost(vote: Int) async {

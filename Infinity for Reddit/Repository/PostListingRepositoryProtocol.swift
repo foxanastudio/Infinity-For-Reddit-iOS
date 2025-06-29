@@ -10,4 +10,5 @@ import Alamofire
 
 public protocol PostListingRepositoryProtocol {
     func fetchPosts(postListingType: PostListingType, pathComponents: [String: String]?, queries: [String: String]?, params: [String: String]?) async throws -> PostListing
+    func loadIcon(post: Post, displaySubredditIcon: Bool) async throws
 }

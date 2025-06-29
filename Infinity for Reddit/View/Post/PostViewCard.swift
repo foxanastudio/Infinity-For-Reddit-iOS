@@ -33,6 +33,23 @@ struct PostViewCard: View {
             
             VStack(alignment: .leading) {
                 HStack(alignment: .center) {
+                    CustomWebImage(
+                        postViewModel.post.subredditOrUserIcon,
+                        width: 24,
+                        height: 24,
+                        circleClipped: true,
+                        handleImageTapGesture: false,
+                        fallbackView: {
+                            SwiftUI.Image(systemName: "person.crop.circle")
+                                .resizable()
+                                .frame(width: 24, height: 24)
+                        }
+                    )
+                    .frame(width: 24, height: 24)
+                    .onTapGesture {
+                        //navigationManager.path.append(AppNavigation.userDetails(username: commentViewModel.comment.author))
+                    }
+                    
                     VStack(alignment: .leading) {
                         Text(postViewModel.post.subredditNamePrefixed)
                             .subreddit()
@@ -46,6 +63,7 @@ struct PostViewCard: View {
                                 navigationManager.path.append(AppNavigation.userDetails(username: postViewModel.post.author))
                             }
                     }
+                    .padding(.leading, 4)
                     
                     Spacer()
                     
@@ -193,6 +211,9 @@ struct PostViewCard: View {
         }
         .onTapGesture {
             navigationManager.path.append(AppNavigation.postDetails(post: postViewModel.post))
+        }
+        .onAppear {
+            
         }
     }
 }
