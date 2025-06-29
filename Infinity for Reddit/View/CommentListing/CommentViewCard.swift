@@ -49,7 +49,7 @@ struct CommentViewCard: View {
                         )
                         .frame(width: 24, height: 24)
                         .onTapGesture {
-                            navigationManager.path.append(AppNavigation.subredditDetails(subredditName: commentViewModel.comment.subreddit))
+                            navigationManager.path.append(AppNavigation.userDetails(username: commentViewModel.comment.author))
                         }
                     }
                     
