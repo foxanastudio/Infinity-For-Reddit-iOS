@@ -20,12 +20,15 @@ struct PostListingView: View {
     @StateObject var postListingViewModel: PostListingViewModel
     @State private var isRootView: Bool = true
     @State private var showNewPostMenu: Bool = false
+    @State private var showSortTypeSheet: Bool = false
     
     private let account: Account
+    private let postListingMetadata: PostListingMetadata
     private var isSubredditPostListing: Bool = false
     
     init(account: Account, postListingMetadata: PostListingMetadata) {
         self.account = account
+        self.postListingMetadata = postListingMetadata
         if case .subreddit = postListingMetadata.postListingType {
             isSubredditPostListing = true
         }
@@ -41,6 +44,7 @@ struct PostListingView: View {
     init(account: Account, postListingMetadata: PostListingMetadata, isRootView: Bool) {
         self.account = account
         self.isRootView = isRootView
+        self.postListingMetadata = postListingMetadata
         if case .subreddit = postListingMetadata.postListingType {
             isSubredditPostListing = true
         }
@@ -120,7 +124,7 @@ struct PostListingView: View {
                 },
                 
                 NavigationBarMenuItem(title: "Sort") {
-                    print("sort")
+                    showSortTypeSheet = true
                 }
             ])
         }
@@ -130,8 +134,12 @@ struct PostListingView: View {
         .sheet(isPresented: $showNewPostMenu) {
             NewPostSheet()
                 .themedList()
-                .presentationDetents([.fraction(0.33)])
+                .presentationDetents([.medium, .large])
                 .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor))
+        }
+        .sheet(isPresented: $showSortTypeSheet) {
+            SortTypeSheet(postListingType: postListingMetadata.postListingType, currentSortType: .best)
+                .presentationDetents([.medium, .large])
         }
     }
 }

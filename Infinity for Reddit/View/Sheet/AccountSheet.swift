@@ -65,14 +65,14 @@ struct AccountSheet: View {
                     }
                     
                     if accountViewModel.account.isAnonymous() != true {
-                        IconTextButton(iconUrl: "person.crop.circle", text: "Profile") {
+                        IconTextButton(startIconUrl: "person.crop.circle", text: "Profile") {
                             dismiss()
                             navigationManager.path.append(AppNavigation.userDetails(username: accountViewModel.account.username))
                         }
                     }
                     
                     ForEach(accountListingViewModel.otherAccounts, id: \.username) { account in
-                        IconTextButton(iconUrl: account.profileImageUrl ?? "", isWebImage: true, text: account.username) {
+                        IconTextButton(startIconUrl: account.profileImageUrl ?? "", startIsWebImage: true, text: account.username) {
                             do {
                                 AccountViewModel.shared.switchAccount(newAccount: account)
                                 try AccountViewModel.shared.updateTokens(accessToken: account.accessToken ?? "", refreshToken: account.refreshToken ?? "")
@@ -85,13 +85,13 @@ struct AccountSheet: View {
                         }
                     }
                     
-                    IconTextButton(iconUrl: "person.crop.circle.badge.plus", text: "Add account") {
+                    IconTextButton(startIconUrl: "person.crop.circle.badge.plus", text: "Add account") {
                         dismiss()
                         navigationManager.path.append(AppNavigation.login)
                     }
                     
                     if accountViewModel.account.isAnonymous() == false {
-                        IconTextButton(iconUrl: "person.fill.questionmark", text: "Anonymous") {
+                        IconTextButton(startIconUrl: "person.fill.questionmark", text: "Anonymous") {
                             do {
                                 try accountViewModel.switchToAnonymous()
                             } catch {
@@ -100,7 +100,7 @@ struct AccountSheet: View {
                             dismiss()
                         }
                         
-                        IconTextButton(iconUrl: "rectangle.portrait.and.arrow.right", text: "Log out") {
+                        IconTextButton(startIconUrl: "rectangle.portrait.and.arrow.right", text: "Log out") {
                             do {
                                 try accountViewModel.logout()
                             } catch {

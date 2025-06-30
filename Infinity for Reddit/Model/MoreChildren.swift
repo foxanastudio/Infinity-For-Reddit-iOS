@@ -66,11 +66,7 @@ public class MoreChildren : NSObject {
         }
         
         if let commentMore = commentListing.commentMore {
-            if commentMore.children.count == 0 {
-                commentItems.append(CommentItem.continueThread(commentMore))
-            } else {
-                commentItems.append(CommentItem.more(commentMore))
-            }
+            commentItems.append(CommentItem.more(commentMore))
         }
     }
 }

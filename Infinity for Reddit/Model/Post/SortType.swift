@@ -8,19 +8,16 @@
 import Foundation
 
 struct SortType {
-    enum `Type`: String {
+    enum Kind: String {
         case best = "best"
         case hot = "hot"
         case new = "new"
-        case random = "random"
         case rising = "rising"
         case top = "top"
         case controversial = "controversial"
         case relevance = "relevance"
         case comments = "comments"
         case activity = "activity"
-        case confidence = "confidence"
-        case old = "old"
         case qa = "qa"
         case live = "live"
 
@@ -29,17 +26,30 @@ struct SortType {
             case .best: return "Best"
             case .hot: return "Hot"
             case .new: return "New"
-            case .random: return "Random"
             case .rising: return "Rising"
             case .top: return "Top"
             case .controversial: return "Controversial"
             case .relevance: return "Relevance"
             case .comments: return "Comments"
             case .activity: return "Activity"
-            case .confidence: return "Best"
-            case .old: return "Old"
             case .qa: return "QA"
             case .live: return "Live"
+            }
+        }
+        
+        var icon: String {
+            switch self {
+            case .best: return "sort_best"
+            case .hot: return "sort_hot"
+            case .new: return "sort_new"
+            case .rising: return "sort_rising"
+            case .top: return "sort_top"
+            case .controversial: return "sort_controversial"
+            case .relevance: return "sort_relevance"
+            case .comments: return "sort_comments"
+            case .activity: return "sort_activity"
+            case .qa: return "sort_qa"
+            case .live: return "sort_live"
             }
         }
     }
@@ -64,10 +74,10 @@ struct SortType {
         }
     }
 
-    let type: Type
+    let type: Kind
     let time: Time?
 
-    init(type: Type, time: Time? = nil) {
+    init(type: Kind, time: Time? = nil) {
         self.type = type
         self.time = time
     }
