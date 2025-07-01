@@ -138,8 +138,10 @@ struct PostListingView: View {
                 .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor))
         }
         .sheet(isPresented: $showSortTypeSheet) {
-            SortTypeSheet(postListingType: postListingMetadata.postListingType, currentSortType: .best)
-                .presentationDetents([.medium, .large])
+            SortTypeSheet(postListingType: postListingMetadata.postListingType, currentSortType: postListingViewModel.sortType) { sortType in
+                postListingViewModel.sortType = sortType
+            }
+            .presentationDetents([.medium, .large])
         }
     }
 }

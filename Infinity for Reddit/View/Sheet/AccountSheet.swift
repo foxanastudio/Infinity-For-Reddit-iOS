@@ -72,7 +72,7 @@ struct AccountSheet: View {
                     }
                     
                     ForEach(accountListingViewModel.otherAccounts, id: \.username) { account in
-                        IconTextButton(startIconUrl: account.profileImageUrl ?? "", startIsWebImage: true, text: account.username) {
+                        IconTextButton(startIconUrl: account.profileImageUrl ?? "", startIconType: .webImage, text: account.username) {
                             do {
                                 AccountViewModel.shared.switchAccount(newAccount: account)
                                 try AccountViewModel.shared.updateTokens(accessToken: account.accessToken ?? "", refreshToken: account.refreshToken ?? "")
@@ -113,6 +113,5 @@ struct AccountSheet: View {
                 .padding(.horizontal, 24)
             }
         }
-        //.padding(.horizontal, 24)
     }
 }

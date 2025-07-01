@@ -9,16 +9,17 @@ import SwiftUI
 
 struct IconTextButton: View {
     var startIconUrl: String
-    var startIsWebImage: Bool = false
+    var startIconType: IconType = .systemIcon
     var endIconUrl: String? = nil
-    var endIsWebImage: Bool = false
+    var endIconType: IconType = .systemIcon
     var text: String
     var action: () -> Void
     
     var body: some View {
         Button(action: action) {
             HStack {
-                if startIsWebImage {
+                switch startIconType {
+                case .webImage:
                     CustomWebImage(
                         startIconUrl,
                         width: 24,
@@ -32,8 +33,14 @@ struct IconTextButton: View {
                                 .primaryIcon()
                         }
                     )
-                } else {
+                case .systemIcon:
                     SwiftUI.Image(systemName: startIconUrl)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 24, height: 24)
+                        .primaryIcon()
+                case .icon:
+                    SwiftUI.Image(startIconUrl)
                         .resizable()
                         .scaledToFit()
                         .frame(width: 24, height: 24)
@@ -49,7 +56,8 @@ struct IconTextButton: View {
                 Spacer()
                 
                 if let endIconUrl = endIconUrl {
-                    if endIsWebImage {
+                    switch endIconType {
+                    case .webImage:
                         CustomWebImage(
                             endIconUrl,
                             width: 24,
@@ -63,8 +71,14 @@ struct IconTextButton: View {
                                     .primaryIcon()
                             }
                         )
-                    } else {
+                    case .systemIcon:
                         SwiftUI.Image(systemName: endIconUrl)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 24, height: 24)
+                            .primaryIcon()
+                    case .icon:
+                        SwiftUI.Image(endIconUrl)
                             .resizable()
                             .scaledToFit()
                             .frame(width: 24, height: 24)
@@ -74,5 +88,11 @@ struct IconTextButton: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+    
+    enum IconType {
+        case webImage
+        case systemIcon
+        case icon
     }
 }

@@ -18,6 +18,7 @@ public class PostListingViewModel: ObservableObject {
     @Published var isLoadingMore: Bool = false
     @Published var hasMorePages: Bool = true
     @Published var error: Error?
+    @Published var sortType: SortType.Kind
     private let postListingMetadata: PostListingMetadata
     
     private var allPostIds = Set<String>()
@@ -27,6 +28,7 @@ public class PostListingViewModel: ObservableObject {
     
     // MARK: - Initializer
     init(postListingMetadata: PostListingMetadata, postListingRepository: PostListingRepositoryProtocol) {
+        self.sortType = postListingMetadata.postListingType.availableSortTypes[0]
         self.postListingMetadata = postListingMetadata
         self.postListingRepository = postListingRepository
     }
