@@ -187,11 +187,7 @@ public class PostDetailsViewModel: ObservableObject {
         while endIndex < visibleComments.count {
             let item = visibleComments[endIndex]
 
-            guard case let .comment(childComment) = item else {
-                break
-            }
-
-            guard childComment.depth > (parentDepth ?? 0) else {
+            guard item.depth > (parentDepth ?? 0) else {
                 break
             }
 
@@ -220,8 +216,7 @@ public class PostDetailsViewModel: ObservableObject {
             let child = allComments[childIndex]
 
             // Stop when we reach a sibling or ancestor
-            guard case let .comment(childComment) = child,
-                  childComment.depth > parentDepth else {
+            guard child.depth > parentDepth else {
                 break
             }
 

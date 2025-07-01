@@ -944,6 +944,15 @@ enum CommentItem: Identifiable {
         }
     }
     
+    var depth: Int {
+        switch self {
+        case .comment(let comment):
+            return comment.depth
+        case .more(let more):
+            return more.depth
+        }
+    }
+    
     case comment(Comment)
     case more(CommentMore)
 }
