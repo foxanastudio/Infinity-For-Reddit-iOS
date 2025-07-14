@@ -40,6 +40,7 @@ struct SubredditListingView: View {
                                 width: 40,
                                 height: 40,
                                 circleClipped: true,
+                                handleImageTapGesture: false,
                                 fallbackView: {
                                     SwiftUI.Image(systemName: "person.crop.circle")
                                         .resizable()

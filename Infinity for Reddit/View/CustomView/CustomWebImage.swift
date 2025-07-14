@@ -22,12 +22,12 @@ struct CustomWebImage<Content: View>: View {
     var circleClipped: Bool?
     var handleImageTapGesture: Bool
     var centerCrop: Bool
-    var enableMatchedGeometryEffect: Bool
+    var matchedGeometryEffectId: String?
     var post: Post?
     var placeholderView: (() -> Content)?
     var fallbackView: (() -> Content)?
     
-    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, enableMatchedGeometryEffect: Bool = false, post: Post? = nil) where Content == EmptyView {
+    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, matchedGeometryEffectId: String? = nil, post: Post? = nil) where Content == EmptyView {
         self.urlString = urlString
         self.width = width
         self.height = height
@@ -35,12 +35,12 @@ struct CustomWebImage<Content: View>: View {
         self.circleClipped = circleClipped
         self.centerCrop = centerCrop
         self.handleImageTapGesture = handleImageTapGesture
-        self.enableMatchedGeometryEffect = enableMatchedGeometryEffect
+        self.matchedGeometryEffectId = matchedGeometryEffectId
         self.post = post
     }
     
 
-    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, enableMatchedGeometryEffect: Bool = false, post: Post? = nil,
+    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, matchedGeometryEffectId: String? = nil, post: Post? = nil,
          @ViewBuilder placeholderView: @escaping () -> Content) {
         self.urlString = urlString
         self.width = width
@@ -49,12 +49,12 @@ struct CustomWebImage<Content: View>: View {
         self.circleClipped = circleClipped
         self.centerCrop = centerCrop
         self.handleImageTapGesture = handleImageTapGesture
-        self.enableMatchedGeometryEffect = enableMatchedGeometryEffect
+        self.matchedGeometryEffectId = matchedGeometryEffectId
         self.post = post
         self.placeholderView = placeholderView
     }
     
-    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, enableMatchedGeometryEffect: Bool = false, post: Post? = nil,
+    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, matchedGeometryEffectId: String? = nil, post: Post? = nil,
          @ViewBuilder fallbackView: @escaping () -> Content) {
         self.urlString = urlString
         self.width = width
@@ -63,12 +63,12 @@ struct CustomWebImage<Content: View>: View {
         self.circleClipped = circleClipped
         self.centerCrop = centerCrop
         self.handleImageTapGesture = handleImageTapGesture
-        self.enableMatchedGeometryEffect = enableMatchedGeometryEffect
+        self.matchedGeometryEffectId = matchedGeometryEffectId
         self.post = post
         self.fallbackView = fallbackView
     }
     
-    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, enableMatchedGeometryEffect: Bool = false, post: Post? = nil,
+    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, matchedGeometryEffectId: String? = nil, post: Post? = nil,
          @ViewBuilder placeholderView: @escaping () -> Content,
          @ViewBuilder fallbackView: @escaping () -> Content) {
         self.urlString = urlString
@@ -77,7 +77,7 @@ struct CustomWebImage<Content: View>: View {
         self.aspectRatio = aspectRatio
         self.circleClipped = circleClipped
         self.handleImageTapGesture = handleImageTapGesture
-        self.enableMatchedGeometryEffect = enableMatchedGeometryEffect
+        self.matchedGeometryEffectId = matchedGeometryEffectId
         self.post = post
         self.centerCrop = centerCrop
         self.placeholderView = placeholderView
@@ -91,7 +91,7 @@ struct CustomWebImage<Content: View>: View {
                     fallbackView()
                 }
             } else {
-                if handleImageTapGesture == true && fullScreenMediaViewModel.currentId == (urlString ?? "") {
+                if handleImageTapGesture == true && matchedGeometryEffectId != nil && fullScreenMediaViewModel.matchedGeometryEffectId == matchedGeometryEffectId {
                     // Image is now in full screen mode
                     Color.clear
                         .frame(width: width)
@@ -132,9 +132,10 @@ struct CustomWebImage<Content: View>: View {
                     .applyIf(centerCrop == false) {
                         $0.scaledToFit()
                     }
-                    .applyIf(enableMatchedGeometryEffect) {
-                        $0.matchedGeometryEffect(id: urlString ?? "", in: namespaceManager.animation)
+                    .applyIf(matchedGeometryEffectId != nil) {
+                        $0.matchedGeometryEffect(id: matchedGeometryEffectId!, in: namespaceManager.animation)
                     }
+                    .id(matchedGeometryEffectId)
                 }
             }
         }
@@ -146,9 +147,9 @@ struct CustomWebImage<Content: View>: View {
                             withAnimation {
                                 switch post?.postType {
                                 case .image:
-                                    fullScreenMediaViewModel.show(.image(url: urlString ?? "", aspectRatio: aspectRatio, post: post))
+                                    fullScreenMediaViewModel.show(.image(url: urlString ?? "", aspectRatio: aspectRatio, post: post, matchedGeometryEffectId: matchedGeometryEffectId))
                                 case .imageWithUrlPreview(let urlPreview):
-                                    fullScreenMediaViewModel.show(.image(url: urlString ?? "", aspectRatio: aspectRatio, post: post))
+                                    fullScreenMediaViewModel.show(.image(url: urlString ?? "", aspectRatio: aspectRatio, post: post, matchedGeometryEffectId: matchedGeometryEffectId))
                                 case .gif:
                                     print("gif")
                                     if post?.preview.images.isEmpty == false {

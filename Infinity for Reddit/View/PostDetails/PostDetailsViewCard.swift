@@ -97,7 +97,7 @@ struct PostDetailsViewCard: View {
                         CustomWebImage(
                             url,
                             aspectRatio: preview.images[0].source.aspectRatio,
-                            enableMatchedGeometryEffect: true,
+                            matchedGeometryEffectId: UUID().uuidString,
                             post: postViewModel.post,
                             placeholderView: {
                                 Spacer()

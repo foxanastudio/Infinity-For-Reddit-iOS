@@ -49,6 +49,7 @@ struct SubredditDetailsView: View {
                                     subredditData.bannerUrl,
                                     width: UIScreen.main.bounds.width,
                                     height: dynamicHeight,
+                                    handleImageTapGesture: false,
                                     centerCrop: true,
                                     fallbackView: {
                                         Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
@@ -92,7 +93,8 @@ struct SubredditDetailsView: View {
                                     subredditData.iconUrl,
                                     width: 80,
                                     height: 80,
-                                    circleClipped: true
+                                    circleClipped: true,
+                                    handleImageTapGesture: false
                                 )
                                 
                                 VStack(alignment: .leading, spacing: 8) {

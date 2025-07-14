@@ -36,7 +36,8 @@ struct UserDetailsView: View {
                             userData.iconUrl,
                             width: 80,
                             height: 80,
-                            circleClipped: true
+                            circleClipped: true,
+                            handleImageTapGesture: false
                         )
                         .padding(.vertical, 20)
                         

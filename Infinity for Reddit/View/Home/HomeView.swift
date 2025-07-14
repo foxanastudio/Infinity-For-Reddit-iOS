@@ -114,8 +114,8 @@ struct HomeView: View {
             .id(accountViewModel.account.username)
             
             if let media = fullScreenMediaViewModel.media {
-                if case let .image(urlString, aspectRatio, post) = media {
-                    ImageFullScreenView(url: URL(string: urlString), aspectRatio: aspectRatio) {
+                if case let .image(urlString, aspectRatio, post, matchedGeometryEffectId) = media {
+                    ImageFullScreenView(url: URL(string: urlString), aspectRatio: aspectRatio, matchedGeometryEffectId: matchedGeometryEffectId) {
                         fullScreenMediaViewModel.dismiss()
                     }
                     .id(UUID())

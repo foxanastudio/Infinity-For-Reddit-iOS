@@ -8,7 +8,7 @@
 import Foundation
 
 enum FullScreenMediaType {
-    case image(url: String, aspectRatio: CGSize?, post: Post?)
+    case image(url: String, aspectRatio: CGSize?, post: Post?, matchedGeometryEffectId: String?)
     case gif(url: String, post: Post?)
     case video(url: String, post: Post?)
     case gallery(currentUrl: String, items: [GalleryItem], mediaMetadata: [String: MediaMetadata], galleryScrollState: GalleryScrollState)
@@ -24,21 +24,21 @@ class GalleryScrollState: ObservableObject {
 
 class FullScreenMediaViewModel: ObservableObject {
     @Published var media: FullScreenMediaType?
-    @Published var currentId: String?
+    @Published var matchedGeometryEffectId: String?
     @Published var isTransitioning: Bool = false
     
     func show(_ media: FullScreenMediaType) {
         isTransitioning = true
         self.media = media
         switch media {
-        case .image(let url, _, _):
-            self.currentId = url
-        case .gif(let url, _):
-            self.currentId = url
-        case .video(let url, _):
-            self.currentId = url
-        case .gallery(let currentUrl, _, _, _):
-            self.currentId = currentUrl
+        case .image(_, _, _, let matchedGeometryEffectId):
+            self.matchedGeometryEffectId = matchedGeometryEffectId
+        case .gif(_, _):
+            break
+        case .video(_, _):
+            break
+        case .gallery(_, _, _, _):
+            break
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
@@ -50,7 +50,7 @@ class FullScreenMediaViewModel: ObservableObject {
         isTransitioning = true
         
         self.media = nil
-        self.currentId = nil
+        self.matchedGeometryEffectId = nil
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
             self.isTransitioning = false

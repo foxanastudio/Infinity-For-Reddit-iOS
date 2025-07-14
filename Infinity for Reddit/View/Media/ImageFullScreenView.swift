@@ -20,6 +20,7 @@ struct ImageFullScreenView: View {
     
     let url: URL?
     let aspectRatio: CGSize?
+    let matchedGeometryEffectId: String?
     let onDismiss: () -> Void
     
     var body: some View {
@@ -34,7 +35,7 @@ struct ImageFullScreenView: View {
                 url?.absoluteString ?? "",
                 aspectRatio: aspectRatio,
                 handleImageTapGesture: false,
-                enableMatchedGeometryEffect: true,
+                matchedGeometryEffectId: matchedGeometryEffectId,
                 placeholderView: {
                     Spacer()
                         .frame(width: UIScreen.main.bounds.width)

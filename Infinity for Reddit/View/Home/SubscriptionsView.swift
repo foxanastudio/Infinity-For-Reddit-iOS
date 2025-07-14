@@ -73,6 +73,7 @@ struct SubscriptionsView: View {
                                     width: 30,
                                     height: 30,
                                     circleClipped: true,
+                                    handleImageTapGesture: false,
                                     fallbackView: {
                                         SwiftUI.Image(systemName: "person.crop.circle")
                                             .resizable()
@@ -120,6 +121,7 @@ struct SubscriptionsView: View {
                                     width: 30,
                                     height: 30,
                                     circleClipped: true,
+                                    handleImageTapGesture: false,
                                     fallbackView: {
                                         SwiftUI.Image(systemName: "person.crop.circle")
                                             .resizable()
@@ -167,6 +169,7 @@ struct SubscriptionsView: View {
                                     width: 30,
                                     height: 30,
                                     circleClipped: true,
+                                    handleImageTapGesture: false,
                                     fallbackView: {
                                         SwiftUI.Image(systemName: "person.crop.circle")
                                             .resizable()
