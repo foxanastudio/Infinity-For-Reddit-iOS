@@ -88,7 +88,7 @@ public class PostListingViewModel: ObservableObject {
                 postListing = try await postListingRepository.fetchPosts(
                     postListingType: postListingMetadata.postListingType,
                     pathComponents: postListingMetadata.pathComponents,
-                    queries: ["sort": sortType.type.rawValue, key: sortType.time?.rawValue ?? "", "limit": "100", "after": after ?? ""].merging(postListingMetadata.queries ?? [:], uniquingKeysWith: { _, new in new }),
+                    queries: [key: sortType.type.rawValue, "t": sortType.time?.rawValue ?? "", "limit": "100", "after": after ?? ""].merging(postListingMetadata.queries ?? [:], uniquingKeysWith: { _, new in new }),
                     params: postListingMetadata.params
                 )
             }
