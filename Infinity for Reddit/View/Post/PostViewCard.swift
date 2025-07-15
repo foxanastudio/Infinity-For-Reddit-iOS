@@ -160,8 +160,19 @@ struct PostViewCard: View {
                 } else if postViewModel.post.postType.isMedia {
                     // No preview media
                     ZStack {
-                        SwiftUI.Image(systemName: "photo")
-                            .noPreviewPostTypeIndicator()
+                        switch postViewModel.post.postType {
+                        case .video, .imgurVideo, .redgifs, .streamable:
+                            SwiftUI.Image(systemName: "video")
+                                .noPreviewPostTypeIndicator()
+                        case .gallery:
+                            SwiftUI.Image(systemName: "square.stack")
+                                .noPreviewPostTypeIndicator()
+                        default:
+                            // Image and some weird post types
+                            SwiftUI.Image(systemName: "photo")
+                                .noPreviewPostTypeIndicator()
+                        }
+                        
                     }
                     .noPreviewPostTypeIndicatorBackground()
                     .mediaTapGesture(post: postViewModel.post, aspectRatio: nil, matchedGeometryEffectId: nil)
