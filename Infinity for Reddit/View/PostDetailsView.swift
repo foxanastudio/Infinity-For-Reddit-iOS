@@ -55,6 +55,7 @@ struct PostDetailsView: View {
                 if postDetailsViewModel.visibleComments.isEmpty {
                     if postDetailsViewModel.isInitialLoading || postDetailsViewModel.isInitialLoad {
                         ProgressIndicator()
+                            .frame(maxWidth: .infinity)
                             .listPlainItem()
                     } else {
                         Text("No comments")
@@ -110,16 +111,17 @@ struct PostDetailsView: View {
                             .listPlainItem()
                     }
                 }
-            }.scrollBounceBehavior(.basedOnSize)
+            }
+            .scrollBounceBehavior(.basedOnSize)
+            .refreshable {
+                await postDetailsViewModel.refreshPostAndCommentsWithContinuation()
+            }
         }
         .onChange(of: colorScheme) {
             //print(colorScheme == .dark)
         }
         .task(id: postDetailsViewModel.loadPostAndCommentsTaskId) {
             await postDetailsViewModel.initialLoadPostAndComments()
-        }
-        .refreshable {
-            await postDetailsViewModel.refreshPostAndCommentsWithContinuation()
         }
         .themedList()
         .themedNavigationBar()

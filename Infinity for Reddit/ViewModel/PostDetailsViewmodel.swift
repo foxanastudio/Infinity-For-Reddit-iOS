@@ -67,18 +67,6 @@ public class PostDetailsViewModel: ObservableObject {
         }
     }
     
-//    public func initialLoadComments() async {
-//        if sortTypeKind != lastLoadedSortTypeKind {
-//            await resetPostAndCommentsLoadingState()
-//        }
-//        
-//        guard isInitialLoad else {
-//            return
-//        }
-//        
-//        await fetchPostAndComments(isRefreshWithContinuation: refreshPostsContinuation != nil)
-//    }
-    
     public func fetchPostAndComments(isRefreshWithContinuation: Bool = false, shouldLoadPost: Bool = false) async {
         guard !isInitialLoading, !isLoadingMore, hasMoreComments else { return }
         
