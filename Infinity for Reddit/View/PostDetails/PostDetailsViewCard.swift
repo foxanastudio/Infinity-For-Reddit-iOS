@@ -283,5 +283,6 @@ struct PostDetailsViewCard: View {
             .padding(.top, 8)
             .padding(.bottom, 16)
         }
+        .padding(.vertical, 0)
     }
 }

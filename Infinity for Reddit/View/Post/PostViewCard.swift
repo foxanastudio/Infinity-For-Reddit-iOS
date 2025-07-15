@@ -33,8 +33,7 @@ struct PostViewCard: View {
                 .fill(.white)
                 .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: -1)
                 .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 4)
-                .padding(.top, 8)
-                .padding(.bottom, 8)
+                .padding(.vertical, 8)
             
             VStack(alignment: .leading) {
                 Spacer()
