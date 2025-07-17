@@ -22,32 +22,37 @@ struct TogglePreference: View {
     }
     
     var body: some View {
-        HStack(spacing: 0) {
-            if let icon = icon {
-                SwiftUI.Image(systemName: icon)
-                    .primaryIcon()
-                    .frame(width: 24, height: 24, alignment: .leading)
-                    .padding(0)
-            } else {
+        TouchRipple(backgroundShape: Rectangle(), action: {
+            isEnabled.toggle()
+        }) {
+            HStack(spacing: 0) {
+                if let icon = icon {
+                    SwiftUI.Image(systemName: icon)
+                        .primaryIcon()
+                        .frame(width: 24, height: 24, alignment: .leading)
+                        .padding(0)
+                } else {
+                    Spacer()
+                        .frame(width: 24)
+                }
+                
                 Spacer()
                     .frame(width: 24)
-            }
-            
-            Spacer()
-                .frame(width: 24)
-            
-            Toggle(isOn: $isEnabled) {
-                Text(title)
-                    .primaryText()
                 
-                if let subtitle = subtitle {
-                    Text(subtitle)
-                        .secondaryText()
+                Toggle(isOn: $isEnabled) {
+                    Text(title)
+                        .primaryText()
+                    
+                    if let subtitle = subtitle {
+                        Text(subtitle)
+                            .secondaryText()
+                    }
                 }
+                .themedToggle()
             }
-            .themedToggle()
+            .contentShape(Rectangle())
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
     }
 }
