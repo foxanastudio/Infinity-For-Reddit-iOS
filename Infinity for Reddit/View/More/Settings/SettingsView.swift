@@ -16,132 +16,129 @@ struct SettingsView: View {
     
     var body: some View {
         List {
-            RowText("Notification")
-                .primaryText()
-                .listPlainItem()
+            PreferenceEntryWithBackground(title: "Notification", icon: "bell", top: true)
+                .listPlainItemNoInsets()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.notification)
-                    //navigationManager.path.append(AppNavigation.userDetails(username: "Hostilenemy"))
                 }
             
-            RowText("Interface")
-                .primaryText()
-                .listPlainItem()
+            PreferenceEntryWithBackground(title: "Interface", icon: "display")
+                .listPlainItemNoInsets()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.interface)
                 }
             
-            RowText("Theme")
-                .primaryText()
-                .listPlainItem()
+            PreferenceEntryWithBackground(title: "Theme", icon: "paintpalette")
+                .listPlainItemNoInsets()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.theme)
                 }
             
-            RowText("Gesture & Buttons")
-                .primaryText()
-                .listPlainItem()
-                .onTapGesture {
-                    navigationManager.path.append(SettingsViewNavigation.gestureAndButtons)
-                }
-            
-            RowText("Video")
-                .primaryText()
-                .listPlainItem()
+            PreferenceEntryWithBackground(title: "Video", icon: "video")
+                .listPlainItemNoInsets()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.video)
                 }
             
-            RowText("Lazy Mode Interval")
-                .primaryText()
-                .listPlainItem()
-            
-            RowText("Download Location")
-                .primaryText()
-                .listPlainItem()
+            PreferenceEntryWithBackground(title: "Gestures & Buttons", icon: "hand.point.up.left", bottom: true)
+                .listPlainItemNoInsets()
                 .onTapGesture {
-                    navigationManager.path.append(SettingsViewNavigation.downloadLocation)
+                    navigationManager.path.append(SettingsViewNavigation.gesturesAndButtons)
                 }
             
-            RowText("Security")
-                .primaryText()
-                .listPlainItem()
+            PreferenceEntryWithBackground(title: "Security", icon: "lock.shield", top: true)
+                .listPlainItemNoInsets()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.security)
                 }
             
-            RowText("Content Sensitivity Filter")
-                .primaryText()
-                .listPlainItem()
+            PreferenceEntryWithBackground(title: "Data Saving Mode", icon: "dollarsign.bank.building")
+                .listPlainItemNoInsets()
                 .onTapGesture {
-                    navigationManager.path.append(SettingsViewNavigation.contentSensitivityFilter)
+                    navigationManager.path.append(SettingsViewNavigation.dataSavingMode)
                 }
             
-            RowText("Post History")
-                .primaryText()
-                .listPlainItem()
+            PreferenceEntryWithBackground(title: "Proxy", icon: "arrow.trianglehead.branch", bottom: true)
+                .listPlainItemNoInsets()
+                .onTapGesture {
+                    navigationManager.path.append(SettingsViewNavigation.proxy)
+                }
+            
+            PreferenceEntryWithBackground(title: "Post History", icon: "clock", top: true)
+                .listPlainItemNoInsets()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.postHistory)
                 }
             
-            RowText("Post Filter")
-                .primaryText()
-                .listPlainItem()
+            PreferenceEntryWithBackground(title: "Content Sensitivity Filter", icon: "figure.child.and.lock")
+                .listPlainItemNoInsets()
+                .onTapGesture {
+                    navigationManager.path.append(SettingsViewNavigation.contentSensitivityFilter)
+                }
+            
+            PreferenceEntryWithBackground(title: "Post Filter", icon: "line.3.horizontal.decrease.circle")
+                .listPlainItemNoInsets()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.postFilter)
                 }
             
-            RowText("Comment Filter")
-                .primaryText()
-                .listPlainItem()
+            PreferenceEntryWithBackground(title: "Comment Filter", icon: "line.3.horizontal.decrease.circle", bottom: true)
+                .listPlainItemNoInsets()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.commentFilter)
                 }
             
-            RowText("Miscellaneous")
-                .primaryText()
-                .listPlainItem()
+            PreferenceEntryWithBackground(title: "Sort Type", icon: "arrow.up.arrow.down.circle", top: true)
+                .listPlainItemNoInsets()
+                .onTapGesture {
+                    navigationManager.path.append(SettingsViewNavigation.sortType)
+                }
+            
+            PreferenceEntryWithBackground(title: "Download Location", icon: "square.and.arrow.down")
+                .listPlainItemNoInsets()
+                .onTapGesture {
+                    navigationManager.path.append(SettingsViewNavigation.downloadLocation)
+                }
+            
+            PreferenceEntryWithBackground(title: "Miscellaneous", icon: "gearshape.2")
+                .listPlainItemNoInsets()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.miscellaneous)
                 }
             
-            RowText("Advanced")
-                .primaryText()
-                .listPlainItem()
+            PreferenceEntryWithBackground(title: "Advanced", icon: "wrench.and.screwdriver", bottom: true)
+                .listPlainItemNoInsets()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.advanced)
                 }
             
-            RowText("Manage Subscription")
-                .primaryText()
-                .listPlainItem()
+            PreferenceEntryWithBackground(title: "Manage Subscription", icon: "crown", top: true)
+                .listPlainItemNoInsets()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.manageSubscription)
                 }
             
-            RowText("About")
-                .primaryText()
-                .listPlainItem()
+            PreferenceEntryWithBackground(title: "About", icon: "questionmark.circle")
+                .listPlainItemNoInsets()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.about)
                 }
             
-            RowText("Privacy Policy")
-                .primaryText()
-                .listPlainItem()
+            PreferenceEntryWithBackground(title: "Privacy Policy", icon: "hand.raised.circle")
+                .listPlainItemNoInsets()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.privacyPolicy)
                 }
             
-            RowText("Reddit User Agreement")
-                .primaryText()
-                .listPlainItem()
+            PreferenceEntryWithBackground(title: "Reddit User Agreement", icon: "text.document", bottom: true)
+                .listPlainItemNoInsets()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.redditUserAgreement)
                 }
+                .padding(.bottom, 16)
         }
         .themedList()
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar("Settings", 1.0)
+        .addTitleToInlineNavigationBar("Settings")
     }
 }

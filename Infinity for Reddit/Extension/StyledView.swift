@@ -36,7 +36,7 @@ extension View {
         self.modifier(NavigationBarViewModifier(opacity: opacity))
     }
     
-    func addTitleToInlineNavigationBar(_ title: String, _ opacity: Double) -> some View {
+    func addTitleToInlineNavigationBar(_ title: String, _ opacity: Double = 1.0) -> some View {
         self.modifier(InlineNavigationBarWithTitle(title: title, opacity: opacity))
     }
     
@@ -200,5 +200,9 @@ extension View {
     
     func crosspostTag() -> some View {
         self.modifier(CrosspostTagViewModifier())
+    }
+    
+    func filledCardBackground() -> some View {
+        self.modifier(FilledCardBackgroundViewModifier())
     }
 }

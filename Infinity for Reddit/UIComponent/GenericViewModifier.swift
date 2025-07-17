@@ -193,3 +193,12 @@ struct CrosspostTagViewModifier: ViewModifier {
             .colorMultiply(Color(hex: themeViewModel.currentCustomTheme.crosspostIconTint))
     }
 }
+
+struct FilledCardBackgroundViewModifier: ViewModifier {
+    @EnvironmentObject var themeViewModel: CustomThemeViewModel
+    
+    func body(content: Content) -> some View {
+        content
+            .background(Color(hex: themeViewModel.currentCustomTheme.filledCardViewBackgroundColor))
+    }
+}

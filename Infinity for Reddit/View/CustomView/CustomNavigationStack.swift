@@ -89,29 +89,35 @@ struct CustomNavigationStack<Content: View>: View {
                     case .theme:
                         CustomThemeSettingsView()
                             .environmentObject(navigationManager)
-                    case .gestureAndButtons:
-                        GestureButtonsSettingsView()
-                            .environmentObject(navigationManager)
                     case .video:
                         VideoSettingsView()
                             .environmentObject(navigationManager)
-                    case .downloadLocation:
-                        DownloadLocationSettingsView()
+                    case .gesturesAndButtons:
+                        GestureButtonsSettingsView()
                             .environmentObject(navigationManager)
                     case .security:
                         SecuritySettingsView()
                             .environmentObject(navigationManager)
-                    case .contentSensitivityFilter:
-                        ContentSensitivityFilterSettingsView()
-                            .environmentObject(navigationManager)
+                    case .dataSavingMode:
+                        EmptyView()
+                    case .proxy:
+                        EmptyView()
                     case .postHistory:
                         PostHistorySettingsView()
+                            .environmentObject(navigationManager)
+                    case .contentSensitivityFilter:
+                        ContentSensitivityFilterSettingsView()
                             .environmentObject(navigationManager)
                     case .postFilter:
                         PostFilterSettingsView()
                             .environmentObject(navigationManager)
                     case .commentFilter:
                         CommentFilterSettingsView()
+                            .environmentObject(navigationManager)
+                    case .sortType:
+                        EmptyView()
+                    case .downloadLocation:
+                        DownloadLocationSettingsView()
                             .environmentObject(navigationManager)
                     case .miscellaneous:
                         MiscellaneousSettingsView()

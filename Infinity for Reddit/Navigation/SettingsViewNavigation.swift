@@ -9,14 +9,17 @@ enum SettingsViewNavigation: Hashable {
     case notification
     case interface
     case theme
-    case gestureAndButtons
     case video
-    case downloadLocation
+    case gesturesAndButtons
     case security
-    case contentSensitivityFilter
+    case dataSavingMode
+    case proxy
     case postHistory
+    case contentSensitivityFilter
     case postFilter
     case commentFilter
+    case sortType
+    case downloadLocation
     case miscellaneous
     case advanced
     case manageSubscription

@@ -12,6 +12,10 @@ import GRDB
 struct ContentSensitivityFilterSettingsView: View {
     @Environment(\.dependencyManager) private var dependencyManager: Container
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.sensitiveContentKey, store: .contentSensitivityFilter) private var sensitiveContent: Bool = false
+    @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSensitiveImagesKey, store: .contentSensitivityFilter) private var blurSensitiveImages: Bool = false
+    @AppStorage(ContentSensitivityFilterUserDetailsUtils.doNotBlurSensitiveImagesInSensitiveSubredditsKey, store: .contentSensitivityFilter) private var doNotBlurSensitiveImagesInSensitiveSubreddits: Bool = false
+    @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSpoilerImagesKey, store: .contentSensitivityFilter) private var blurSpoilerImages: Bool = false
+    @AppStorage(ContentSensitivityFilterUserDetailsUtils.disableSensitiveContentForeverKey, store: .contentSensitivityFilter) private var disableSensitiveContentForever: Bool = false
     
     @State var test: Bool = false
     
@@ -20,16 +24,16 @@ struct ContentSensitivityFilterSettingsView: View {
             TogglePreference(isEnabled: $sensitiveContent, title: "Sensitive Content", icon: "figure.child.and.lock")
                 .listPlainItemNoInsets()
             
-            TogglePreference(isEnabled: $test, title: "Blur Sensitive Images")
+            TogglePreference(isEnabled: $blurSensitiveImages, title: "Blur Sensitive Images")
                 .listPlainItemNoInsets()
             
-            TogglePreference(isEnabled: $test, title: "Don't Blur Senstive Images in Sensitive Subreddits")
+            TogglePreference(isEnabled: $doNotBlurSensitiveImagesInSensitiveSubreddits, title: "Don't Blur Senstive Images in Sensitive Subreddits")
                 .listPlainItemNoInsets()
             
-            TogglePreference(isEnabled: $test, title: "Blur Spoiler Images")
+            TogglePreference(isEnabled: $blurSpoilerImages, title: "Blur Spoiler Images")
                 .listPlainItemNoInsets()
             
-            TogglePreference(isEnabled: $test, title: "Disable Sensitive Content Forever")
+            TogglePreference(isEnabled: $disableSensitiveContentForever, title: "Disable Sensitive Content Forever")
                 .listPlainItemNoInsets()
         }
         .themedList()

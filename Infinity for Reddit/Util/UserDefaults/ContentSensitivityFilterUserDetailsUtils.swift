@@ -12,4 +12,21 @@ enum ContentSensitivityFilterUserDetailsUtils {
     static var sensitiveContent: Bool {
         return UserDefaults.contentSensitivityFilter.bool(forKey: sensitiveContentKey)
     }
+    static let blurSensitiveImagesKey = "blur_sensitive_images"
+    static var blurSensitiveImages: Bool {
+        return UserDefaults.contentSensitivityFilter.bool(forKey: blurSensitiveImagesKey)
+    }
+    static let doNotBlurSensitiveImagesInSensitiveSubredditsKey = "do_not_blur_sensitive_images_in_sensitive_subreddits"
+    static var doNotBlurSensitiveImagesInSensitiveSubreddits: Bool {
+        return UserDefaults.contentSensitivityFilter.bool(forKey: doNotBlurSensitiveImagesInSensitiveSubredditsKey)
+    }
+    static let blurSpoilerImagesKey = "blur_spoiler_images"
+    static var blurSpoilerImages: Bool {
+        return UserDefaults.contentSensitivityFilter.bool(forKey: blurSpoilerImagesKey)
+    }
+    static let disableSensitiveContentForeverKey = "disable_sensitive_content_forever"
+    static var disableSensitiveContentForever: Bool {
+        return UserDefaults.contentSensitivityFilter.bool(forKey: disableSensitiveContentForeverKey)
+    }
+    
 }
