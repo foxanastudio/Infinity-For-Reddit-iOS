@@ -130,10 +130,12 @@ struct PostViewCard: View {
             switch postViewModel.post.postType {
             case .noPreviewLink:
                 if let url = URL(string: postViewModel.post.url), let domain = url.host {
+                    Spacer()
+                        .frame(height: 10)
+                    
                     Text(domain)
                         .noPreviewPostTypeIndicatorBackground()
                         .noPreviewPostTypeIndicator()
-                        .padding(.bottom, 8)
                         .onTapGesture {
                             LinkHandler.shared.handle(url: url)
                         }
@@ -152,7 +154,7 @@ struct PostViewCard: View {
                 // May not have a preview!!!!!!
                 GalleryCarousel(post: postViewModel.post)
                     .aspectRatio(preview.s.aspectRatio, contentMode: .fit)
-            } else if case .text = postViewModel.post.postType, let selftextTruncated = postViewModel.post.selftextTruncated {
+            } else if case .text = postViewModel.post.postType, let selftextTruncated = postViewModel.post.selftextTruncated, !selftextTruncated.isEmpty {
                 Spacer()
                     .frame(height: 6)
                 

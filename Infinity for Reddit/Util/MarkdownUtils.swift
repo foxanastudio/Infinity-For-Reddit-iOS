@@ -59,11 +59,11 @@ class MarkdownUtils {
     }
     
     static func parseRedditImagesBlock(_ post: Post) {
-        guard let mediaMetadataMap = post.mediaMetadata else {
+        guard var markdownString = post.selftext, !markdownString.isEmpty else {
             return
         }
         
-        guard var markdownString = post.selftext else {
+        guard let mediaMetadataMap = post.mediaMetadata else {
             return
         }
         
@@ -110,8 +110,6 @@ class MarkdownUtils {
             } else {
                 break
             }
-            
-            
             
             post.selftext = markdownString
         }

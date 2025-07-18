@@ -38,6 +38,7 @@ struct Infinity: App {
                 .environmentObject(accountViewModel)
                 .environmentObject(customThemeViewModel)
                 .environmentObject(fullScreenMediaViewModel)
+                .environment(\.defaultMinListRowHeight, 0)
         }
     }
 }

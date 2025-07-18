@@ -16,4 +16,24 @@ extension View {
             self
         }
     }
+    
+    func getHeightOfView( completion: @escaping (_ height: Double) -> Void) -> some View {
+        self.background {
+            GeometryReader {
+                Color.clear.preference(
+                    key: ViewHeightKeyTestScreen.self,
+                    value: $0.frame(in: .local).size.height
+                )
+            }
+        }.onPreferenceChange(ViewHeightKeyTestScreen.self) {
+            completion($0)
+        }
+    }
+}
+
+struct ViewHeightKeyTestScreen: PreferenceKey {
+    static var defaultValue: CGFloat { 0 }
+    static func reduce(value: inout Value, nextValue: () -> Value) {
+        value += nextValue()
+    }
 }

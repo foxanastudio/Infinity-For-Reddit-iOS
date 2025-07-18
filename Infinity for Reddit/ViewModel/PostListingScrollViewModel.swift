@@ -140,8 +140,10 @@ public class PostListingScrollViewModel: ObservableObject {
     
     func postProcessPosts(_ posts: [Post]) -> [Post] {
         return posts.map {
-            modifyPostBody($0)
-            $0.selftextProcessedMarkdown = MarkdownContent($0.selftext)
+            if !$0.selftext.isEmpty {
+                modifyPostBody($0)
+                $0.selftextProcessedMarkdown = MarkdownContent($0.selftext)
+            }
             return $0
         }
     }

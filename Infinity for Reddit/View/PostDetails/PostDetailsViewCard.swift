@@ -123,10 +123,12 @@ struct PostDetailsViewCard: View {
             switch postViewModel.post.postType {
             case .noPreviewLink:
                 if let url = URL(string: postViewModel.post.url), let domain = url.host {
+                    Spacer()
+                        .frame(height: 10)
+                    
                     Text(domain)
                         .noPreviewPostTypeIndicatorBackground()
                         .noPreviewPostTypeIndicator()
-                        .padding(.bottom, 8)
                         .onTapGesture {
                             LinkHandler.shared.handle(url: url)
                         }
@@ -185,7 +187,7 @@ struct PostDetailsViewCard: View {
                 .aspectRatio(preview.images[0].source.aspectRatio, contentMode: .fit)
             } else if postViewModel.post.postType.isMedia {
                 Spacer()
-                    .frame(height: 8)
+                    .frame(height: 10)
                 
                 // No preview media
                 ZStack {
@@ -201,7 +203,6 @@ struct PostDetailsViewCard: View {
                         SwiftUI.Image(systemName: "photo")
                             .noPreviewPostTypeIndicator()
                     }
-                    
                 }
                 .noPreviewPostTypeIndicatorBackground()
                 .mediaTapGesture(post: postViewModel.post, aspectRatio: nil, matchedGeometryEffectId: nil)
