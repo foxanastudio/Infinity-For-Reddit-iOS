@@ -67,32 +67,36 @@ struct SubscriptionsView: View {
                 } else {
                     List {
                         ForEach(subscriptionListingViewModel.subredditSubscriptions, id: \.fullName) { subscription in
-                            HStack {
-                                CustomWebImage(
-                                    subscription.iconUrl,
-                                    width: 30,
-                                    height: 30,
-                                    circleClipped: true,
-                                    handleImageTapGesture: false,
-                                    fallbackView: {
-                                        SwiftUI.Image(systemName: "person.crop.circle")
-                                            .resizable()
-                                            .frame(width: 30, height: 30)
-                                    }
-                                )
-                                
-                                Spacer()
-                                    .frame(width: 16)
-                                
-                                Text(subscription.name)
-                                
-                                Spacer()
-                            }
-                            .contentShape(Rectangle())
-                            .listPlainItem()
-                            .onTapGesture {
+                            TouchRipple(backgroundShape: Rectangle(), action: {
                                 navigationManager.path.append(AppNavigation.subredditDetails(subredditName: subscription.name))
+                            }) {
+                                HStack(spacing: 0) {
+                                    CustomWebImage(
+                                        subscription.iconUrl,
+                                        width: 30,
+                                        height: 30,
+                                        circleClipped: true,
+                                        handleImageTapGesture: false,
+                                        fallbackView: {
+                                            SwiftUI.Image(systemName: "person.crop.circle")
+                                                .resizable()
+                                                .frame(width: 30, height: 30)
+                                        }
+                                    )
+                                    
+                                    Spacer()
+                                        .frame(width: 24)
+                                    
+                                    Text(subscription.name)
+                                        .primaryText()
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 16)
+                                .contentShape(Rectangle())
                             }
+                            .listPlainItemNoInsets()
                         }
                     }
                     .scrollBounceBehavior(.basedOnSize)
@@ -115,32 +119,36 @@ struct SubscriptionsView: View {
                 } else {
                     List {
                         ForEach(subscriptionListingViewModel.userSubscriptions, id: \.name) { subscription in
-                            HStack {
-                                CustomWebImage(
-                                    subscription.iconUrl,
-                                    width: 30,
-                                    height: 30,
-                                    circleClipped: true,
-                                    handleImageTapGesture: false,
-                                    fallbackView: {
-                                        SwiftUI.Image(systemName: "person.crop.circle")
-                                            .resizable()
-                                            .frame(width: 30, height: 30)
-                                    }
-                                )
-                                
-                                Spacer()
-                                    .frame(width: 16)
-                                
-                                Text(subscription.name)
-                                
-                                Spacer()
-                            }
-                            .contentShape(Rectangle())
-                            .listPlainItem()
-                            .onTapGesture {
+                            TouchRipple(backgroundShape: Rectangle(), action: {
                                 navigationManager.path.append(AppNavigation.userDetails(username: subscription.name))
+                            }) {
+                                HStack(spacing: 0) {
+                                    CustomWebImage(
+                                        subscription.iconUrl,
+                                        width: 30,
+                                        height: 30,
+                                        circleClipped: true,
+                                        handleImageTapGesture: false,
+                                        fallbackView: {
+                                            SwiftUI.Image(systemName: "person.crop.circle")
+                                                .resizable()
+                                                .frame(width: 30, height: 30)
+                                        }
+                                    )
+                                    
+                                    Spacer()
+                                        .frame(width: 24)
+                                    
+                                    Text(subscription.name)
+                                        .primaryText()
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 16)
+                                .contentShape(Rectangle())
                             }
+                            .listPlainItemNoInsets()
                         }
                     }
                     .scrollBounceBehavior(.basedOnSize)
@@ -163,32 +171,36 @@ struct SubscriptionsView: View {
                 } else {
                     List {
                         ForEach(subscriptionListingViewModel.myCustomFeeds, id: \.path) { customFeed in
-                            HStack {
-                                CustomWebImage(
-                                    customFeed.iconUrl,
-                                    width: 30,
-                                    height: 30,
-                                    circleClipped: true,
-                                    handleImageTapGesture: false,
-                                    fallbackView: {
-                                        SwiftUI.Image(systemName: "person.crop.circle")
-                                            .resizable()
-                                            .frame(width: 30, height: 30)
-                                    }
-                                )
-                                
-                                Spacer()
-                                    .frame(width: 16)
-                                
-                                Text(customFeed.displayName)
-                                
-                                Spacer()
-                            }
-                            .contentShape(Rectangle())
-                            .listPlainItem()
-                            .onTapGesture {
+                            TouchRipple(backgroundShape: Rectangle(), action: {
                                 navigationManager.path.append(AppNavigation.customFeed(myCustomFeed: customFeed))
+                            }) {
+                                HStack(spacing: 0) {
+                                    CustomWebImage(
+                                        customFeed.iconUrl,
+                                        width: 30,
+                                        height: 30,
+                                        circleClipped: true,
+                                        handleImageTapGesture: false,
+                                        fallbackView: {
+                                            SwiftUI.Image(systemName: "person.crop.circle")
+                                                .resizable()
+                                                .frame(width: 30, height: 30)
+                                        }
+                                    )
+                                    
+                                    Spacer()
+                                        .frame(width: 24)
+                                    
+                                    Text(customFeed.displayName)
+                                        .primaryText()
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 16)
+                                .contentShape(Rectangle())
                             }
+                            .listPlainItemNoInsets()
                         }
                     }
                     .scrollBounceBehavior(.basedOnSize)
