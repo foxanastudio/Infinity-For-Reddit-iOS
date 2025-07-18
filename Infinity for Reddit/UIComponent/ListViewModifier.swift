@@ -33,6 +33,5 @@ struct ListPlainItemNoInsetsThemeViewModifier: ViewModifier {
             .listRowBackground(Color.clear)
             .listRowSeparator(.hidden)
             .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-            .background(Color.clear)
     }
 }
