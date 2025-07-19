@@ -11,6 +11,11 @@ import MarkdownUI
 import GRDB
 import SwiftUI
 
+enum PostListItem {
+    case post(Post)
+    case loading
+}
+
 public class PostListingViewModel: ObservableObject {
     // MARK: - Properties
     @Published var posts: [Post] = []
@@ -21,6 +26,14 @@ public class PostListingViewModel: ObservableObject {
     @Published var error: Error?
     @Published var sortType: SortType
     @Published var loadPostsTaskId = UUID()
+    
+    var itemsWithLoadingIndicator: [PostListItem] {
+        if hasMorePages {
+            return posts.map { .post($0) } + [.loading]
+        } else {
+            return posts.map { .post($0) }
+        }
+    }
     
     private let postListingMetadata: PostListingMetadata
     private var lastLoadedSortType: SortType? = nil
@@ -64,12 +77,14 @@ public class PostListingViewModel: ObservableObject {
     public func loadPosts(isRefreshWithContinuation: Bool = false) async {
         guard !isInitialLoading, !isLoadingMore, hasMorePages else { return }
         
+        print("what the fuck")
         let isInitailLoadCopy = isInitialLoad
         
         await MainActor.run {
             if posts.isEmpty {
                 isInitialLoading = true
             } else {
+                print("isloadingmore is true")
                 isLoadingMore = true
             }
             
