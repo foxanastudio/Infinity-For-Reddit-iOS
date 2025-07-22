@@ -27,10 +27,12 @@ struct InboxListingView: View {
     
     var body: some View {
         Group {
-            if inboxListingViewModel.isInitialLoading || inboxListingViewModel.isInitialLoad {
-                ProgressIndicator()
-            } else if inboxListingViewModel.inboxes.isEmpty {
-                Text("No inboxes")
+            if inboxListingViewModel.inboxes.isEmpty {
+                if inboxListingViewModel.isInitialLoading || inboxListingViewModel.isInitialLoad {
+                    ProgressIndicator()
+                } else {
+                    Text("No inboxes")
+                }
             } else {
                 List {
                     ForEach(inboxListingViewModel.inboxes, id: \.id) { inbox in
@@ -71,27 +73,31 @@ struct InboxMessageItemView: View {
     }
     
     var body: some View {
-        VStack {
-            Text(account.username == inbox.author ? inbox.dest : inbox.author)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .username()
-            
-            Text(inbox.subject)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .primaryText()
-            
-            Text(inbox.body)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .lineLimit(1)
-                .secondaryText()
+        VStack(spacing: 0) {
+            TouchRipple(action: {
+                //navigationManager.path.append(AppNavigation.inboxDetails(inboxname: inbox.name))
+            }) {
+                VStack {
+                    Text(account.username == inbox.author ? inbox.dest : inbox.author)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .username()
+                    
+                    Text(inbox.subject)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .primaryText()
+                    
+                    Text(inbox.body)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .lineLimit(1)
+                        .secondaryText()
+                }
+                .contentShape(Rectangle())
+                .padding(16)
+            }
             
             Divider()
         }
-        .contentShape(Rectangle())
-        .listPlainItem()
-        .onTapGesture {
-            //navigationManager.path.append(AppNavigation.inboxDetails(inboxname: inbox.name))
-        }
+        .listPlainItemNoInsets()
     }
 }
 
@@ -105,26 +111,30 @@ struct InboxNotificationItemView: View {
     }
     
     var body: some View {
-        VStack {
-            Text(inbox.author)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .username()
-            
-            Text(inbox.linkTitle)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .primaryText()
-            
-            Text(inbox.body)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .lineLimit(1)
-                .secondaryText()
+        VStack(spacing: 0) {
+            TouchRipple(action: {
+                //navigationManager.path.append(AppNavigation.inboxDetails(inboxname: inbox.name))
+            }) {
+                VStack {
+                    Text(inbox.author)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .username()
+                    
+                    Text(inbox.linkTitle)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .primaryText()
+                    
+                    Text(inbox.body)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .lineLimit(1)
+                        .secondaryText()
+                }
+                .contentShape(Rectangle())
+                .padding(16)
+            }
             
             Divider()
         }
-        .contentShape(Rectangle())
-        .listPlainItem()
-        .onTapGesture {
-            //navigationManager.path.append(AppNavigation.inboxDetails(inboxname: inbox.name))
-        }
+        .listPlainItemNoInsets()
     }
 }
