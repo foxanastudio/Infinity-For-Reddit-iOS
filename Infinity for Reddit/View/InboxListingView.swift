@@ -64,6 +64,8 @@ struct InboxListingView: View {
 }
 
 struct InboxMessageItemView: View {
+    @EnvironmentObject var navigationManager: NavigationManager
+    
     @State var inbox: Inbox
     private let account: Account
     
@@ -75,7 +77,7 @@ struct InboxMessageItemView: View {
     var body: some View {
         VStack(spacing: 0) {
             TouchRipple(action: {
-                //navigationManager.path.append(AppNavigation.inboxDetails(inboxname: inbox.name))
+                navigationManager.path.append(AppNavigation.inboxConversation(inbox: inbox))
             }) {
                 VStack {
                     Text(account.username == inbox.author ? inbox.dest : inbox.author)
@@ -113,7 +115,7 @@ struct InboxNotificationItemView: View {
     var body: some View {
         VStack(spacing: 0) {
             TouchRipple(action: {
-                //navigationManager.path.append(AppNavigation.inboxDetails(inboxname: inbox.name))
+                LinkHandler.shared.handle(link: inbox.context)
             }) {
                 VStack {
                     Text(inbox.author)

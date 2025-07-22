@@ -42,6 +42,9 @@ struct CustomNavigationStack<Content: View>: View {
                     } else if case .customFeed(let myCustomFeed) = destination {
                         CustomFeedDetailsView(myCustomFeed: myCustomFeed)
                             .environmentObject(navigationManager)
+                    } else if case .inboxConversation(let inbox) = destination {
+                        InboxConversationView(inbox: inbox)
+                            .environmentObject(navigationManager)
                     }
                 }
                 .navigationDestination(for: MoreViewNavigation.self) { destination in

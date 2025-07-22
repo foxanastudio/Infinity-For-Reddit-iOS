@@ -17,6 +17,14 @@ class LinkHandler {
         return URL(string: full)!
     }
     
+    func handle(link: String) {
+        guard let url = URL(string: link) else {
+            return
+        }
+        
+        handle(url: url)
+    }
+    
     func handle(url: URL) {
         let finalURL: URL
         
