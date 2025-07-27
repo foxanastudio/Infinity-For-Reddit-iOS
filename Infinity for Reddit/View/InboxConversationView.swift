@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct InboxConversationView: View {
+    @EnvironmentObject var accountViewModel: AccountViewModel
+    
     @StateObject var inboxConversationViewModel: InboxConversationViewModel
     
     @State private var scrollToBottomTrigger: Bool = false
@@ -79,13 +81,20 @@ struct InboxConversationView: View {
 //        .themedNavigationBar()
         
         VStack(spacing: 0) {
-            List(inboxConversationViewModel.conversations, id: \.id) { inbox in
-                ChatBubble(isSentMessage: true, shouldShowTail: false) {
-                    Text(inbox.body)
+            List {
+                let conversations = inboxConversationViewModel.conversations
+                
+                ForEach(Array(conversations.enumerated()), id: \.element.id) { index, inbox in
+                    // Remember the conversations is reversed.
+                    let isLastFromSender = index == 0 || conversations[index - 1].author != inbox.author
+                    
+                    ChatBubble(isSentMessage: inbox.author == accountViewModel.account.username, shouldShowTail: isLastFromSender) {
+                        Text(inbox.body)
+                    }
+                    .listPlainItemNoInsets()
+                    .rotationEffect(.degrees(180))
+                    .id(inbox.id)
                 }
-                .listPlainItemNoInsets()
-                .rotationEffect(.degrees(180))
-                .id(inbox.id)
             }
             .rotationEffect(.degrees(180))
             .themedList()
