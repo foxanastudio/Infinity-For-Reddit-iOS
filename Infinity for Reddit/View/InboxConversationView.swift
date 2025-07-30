@@ -13,6 +13,9 @@ struct InboxConversationView: View {
     @StateObject var inboxConversationViewModel: InboxConversationViewModel
     
     @State private var scrollToBottomTrigger: Bool = false
+    @State private var messageText: String = ""
+    @State private var sendMessageTask: Task<Void, Never>?
+    @FocusState private var isInputActive: Bool
     
     init(inbox: Inbox) {
         _inboxConversationViewModel = StateObject(
@@ -98,6 +101,59 @@ struct InboxConversationView: View {
             }
             .rotationEffect(.degrees(180))
             .themedList()
+            .scrollIndicators(.hidden)
+            .onTapGesture {
+                isInputActive = false
+            }
+            
+            if inboxConversationViewModel.fullNameToReplyTo != nil {
+                // It shouldn't happen but still
+                HStack(spacing: 8) {
+                    TextField("Type a message...", text: $messageText)
+                        .focused($isInputActive)
+                        .padding(12)
+                        .background(Color.gray.opacity(0.1))
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                        .submitLabel(.send)
+                        .onSubmit {
+                            guard sendMessageTask == nil else {
+                                print("A message is being sent")
+                                return
+                            }
+                            
+                            sendMessageTask = Task {
+                                defer {
+                                    sendMessageTask = nil
+                                }
+                                
+                                await inboxConversationViewModel.sendMessage(message: messageText)
+                            }
+                        }
+
+                    Button(action: {
+                        guard sendMessageTask == nil else {
+                            print("A message is being sent")
+                            return
+                        }
+                        
+                        sendMessageTask = Task {
+                            defer {
+                                sendMessageTask = nil
+                            }
+                            
+                            await inboxConversationViewModel.sendMessage(message: messageText)
+                        }
+                    }) {
+                        SwiftUI.Image(systemName: "paperplane.fill")
+                            .foregroundColor(messageText.isEmpty ? .gray : .blue)
+                            .padding(10)
+                    }
+                    .disabled(messageText.isEmpty || sendMessageTask != nil)
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+                .background(Color(UIColor.systemBackground))
+            }
         }
         .themedNavigationBar()
     }

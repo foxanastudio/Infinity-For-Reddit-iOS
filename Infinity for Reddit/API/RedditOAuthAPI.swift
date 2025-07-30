@@ -31,6 +31,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
     case saveThing(params: [String: String])
     case unsaveThing(params: [String: String])
     case getMoreCommentsForCommentMore(params: [String: String])
+    case sendCommentOrReplyToMessage(params: [String: String])
     
     private var baseURL: String {
         return "https://oauth.reddit.com"
@@ -40,7 +41,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
         switch self {
         case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox:
             return .get
-        case .vote, .subsrcribeToSubreddit, .saveThing, .unsaveThing, .getMoreCommentsForCommentMore:
+        case .vote, .subsrcribeToSubreddit, .saveThing, .unsaveThing, .getMoreCommentsForCommentMore, .sendCommentOrReplyToMessage:
             return .post
         }
     }
@@ -91,6 +92,8 @@ enum RedditOAuthAPI: URLRequestConvertible {
             return "/api/unsave"
         case .getMoreCommentsForCommentMore:
             return "/api/morechildren.json"
+        case .sendCommentOrReplyToMessage:
+            return "/api/comment"
         }
     }
     
@@ -98,7 +101,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
         switch self {
         case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox:
             return nil
-        case .vote(let params), .subsrcribeToSubreddit(let params), .saveThing(let params), .unsaveThing(let params), .getMoreCommentsForCommentMore(let params):
+        case .vote(let params), .subsrcribeToSubreddit(let params), .saveThing(let params), .unsaveThing(let params), .getMoreCommentsForCommentMore(let params), .sendCommentOrReplyToMessage(let params):
             return params
         }
     }
@@ -143,6 +146,8 @@ enum RedditOAuthAPI: URLRequestConvertible {
             return ["raw_json": "1", "limit": "100"].merging(queries, uniquingKeysWith: { _, new in new })
         case .getMoreCommentsForCommentMore:
             return ["raw_json": "1", "api_type": "json"]
+        case .sendCommentOrReplyToMessage:
+            return nil
         }
     }
     
@@ -150,14 +155,14 @@ enum RedditOAuthAPI: URLRequestConvertible {
         switch self {
         case .getMyInfo(let headers):
             return headers
-        case .getFrontPagePosts, .getUserData, .getSubredditData, .vote, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .subsrcribeToSubreddit, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox, .saveThing, .unsaveThing, .getMoreCommentsForCommentMore:
+        case .getFrontPagePosts, .getUserData, .getSubredditData, .vote, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .subsrcribeToSubreddit, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox, .saveThing, .unsaveThing, .getMoreCommentsForCommentMore, .sendCommentOrReplyToMessage:
             return nil
         }
     }
     
     var encoding: ParameterEncoding {
         switch self {
-        case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .vote, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .subsrcribeToSubreddit, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox, .saveThing, .unsaveThing, .getMoreCommentsForCommentMore:
+        case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .vote, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .subsrcribeToSubreddit, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox, .saveThing, .unsaveThing, .getMoreCommentsForCommentMore, .sendCommentOrReplyToMessage:
             return URLEncoding.default
         }
     }
