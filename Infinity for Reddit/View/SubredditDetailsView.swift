@@ -213,9 +213,7 @@ struct SubredditDetailsView: View {
             }
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationBarMenu()
-                }
+                NavigationBarMenu()
             }
             .simultaneousGesture(
                 DragGesture(minimumDistance: 5)

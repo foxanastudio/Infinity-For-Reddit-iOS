@@ -126,9 +126,7 @@ struct PostListingView: View {
         }
         .applyIf(handleToolbarMenu) {
             $0.toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationBarMenu()
-                }
+                NavigationBarMenu()
             }
         }
         .onChange(of: colorScheme) {
