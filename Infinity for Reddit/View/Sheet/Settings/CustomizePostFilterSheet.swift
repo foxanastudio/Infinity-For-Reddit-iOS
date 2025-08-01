@@ -97,10 +97,45 @@ struct CustomizePostFilterView: View {
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
                 
-                Section(header: Text("To only see sensitive or spoiler posts, please turn on the corresponding switch.")) {
-                    Toggle("Only Sensitive Content", isOn: $onlySensitive)
-                    Toggle("Only Spoiler", isOn: $onlySpoiler)
+                FilledCardView {
+                    VStack(spacing: 0) {
+                        Text("To only see sensitive or spoiler posts, please turn on the corresponding switch.")
+                            .primaryText()
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        TogglePreference(isEnabled: $onlySensitive, title: "Only Sensitive Content", icon: "figure.child.and.lock")
+                        
+                        TogglePreference(isEnabled: $onlySpoiler, title: "Only Spoiler", icon: "exclamationmark.triangle.fill")
+                    }
                 }
+                .listPlainItemNoInsets()
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                
+                FilledCardView {
+                    VStack(spacing: 0) {
+                        Text("Posts will be filtered out if they contain the following keywords in their title")
+                            .primaryText()
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        TextField("Title: excludes keywords (key1,key2)", text: $excludesKeywords)
+                        
+                        Text("Posts will be filtered out if they do not contain the following keywords in their title.")
+                            .primaryText()
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        TextField("Title: contains keywords (key1,key2)", text: $containsKeywords)
+                    }
+                }
+                .listPlainItemNoInsets()
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
                 
                 Section(header: Text("Posts will be filtered out if they contain the following")) {
                     Text("This is where you will add UI for filtering out content.")

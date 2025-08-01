@@ -335,12 +335,6 @@
     "Online: %lld" : {
 
     },
-    "Only Sensitive Content" : {
-
-    },
-    "Only Spoiler" : {
-
-    },
     "Poll" : {
 
     },
@@ -390,6 +384,9 @@
 
     },
     "Posts will be filtered out if they contain the following" : {
+
+    },
+    "Posts will be filtered out if they contain the following keywords in their title" : {
 
     },
     "Posts will be filtered out if they contain the following keywords in their title." : {
