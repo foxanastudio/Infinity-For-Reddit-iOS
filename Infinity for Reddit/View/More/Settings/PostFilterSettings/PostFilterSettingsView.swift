@@ -84,9 +84,6 @@ struct PostFilterSettingsView: View {
         .sheet(isPresented: $isCustomizePostFilter) {
             CustomizePostFilterView($postFilterName)
         }
-        .onAppear {
-            postFilterViewModel.loadPostFilters()
-        }
         .environmentObject(postFilterViewModel)
     }
 }

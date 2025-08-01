@@ -89,12 +89,6 @@
     "Compact Layout" : {
 
     },
-    "Contain domains" : {
-
-    },
-    "Contain flairs (e.g., flair1,flair2)" : {
-
-    },
     "Content" : {
 
     },
@@ -138,18 +132,6 @@
 
     },
     "Enable Notifications" : {
-
-    },
-    "Exclude domains" : {
-
-    },
-    "Exclude flairs (e.g., flair1,flair2)" : {
-
-    },
-    "Exclude subreddits (e.g., funny,AskReddit)" : {
-
-    },
-    "Exclude users (e.g., Hostilenemy,random)" : {
 
     },
     "Fixed Height in Card" : {
@@ -278,18 +260,6 @@
     "Manage Themes" : {
 
     },
-    "Max comments (-1: no restriction)" : {
-
-    },
-    "Max vote (-1: no restriction)" : {
-
-    },
-    "Min comments (-1: no restriction)" : {
-
-    },
-    "Min vote (-1: no restriction)" : {
-
-    },
     "Miscellaneous" : {
 
     },
@@ -347,9 +317,6 @@
     "Post Details" : {
 
     },
-    "Post Filter Name" : {
-
-    },
     "Post History" : {
 
     },
@@ -383,13 +350,7 @@
     "Posts will be filtered out if their title matches the following regular expression." : {
 
     },
-    "Posts will be filtered out if they contain the following" : {
-
-    },
     "Posts will be filtered out if they contain the following keywords in their title" : {
-
-    },
-    "Posts will be filtered out if they contain the following keywords in their title." : {
 
     },
     "Posts will be filtered out if they do not contain the following keywords in their title." : {
@@ -500,10 +461,10 @@
     "Text" : {
 
     },
-    "The Number of Columns in Post Feed" : {
+    "The name should be unique." : {
 
     },
-    "The post filter name should be unique." : {
+    "The Number of Columns in Post Feed" : {
 
     },
     "Theme" : {
@@ -2239,9 +2200,6 @@
         }
       }
     },
-    "This is where you will add UI for filtering out content." : {
-
-    },
     "Time Format" : {
 
     },
@@ -2252,18 +2210,6 @@
 
     },
     "Title Font Size" : {
-
-    },
-    "Title: contains keywords (key1,key2)" : {
-
-    },
-    "Title: contains regex" : {
-
-    },
-    "Title: excludes keywords (key1,key2)" : {
-
-    },
-    "Title: excludes regex" : {
 
     },
     "To only see sensitive or spoiler posts, please turn on the corresponding switch." : {

@@ -23,6 +23,7 @@ class PostFilterViewModel: ObservableObject {
     init(dbPool: DatabasePool) {
         self.postFilterDao = PostFilterDao(dbPool: dbPool)
         self.dbPool = dbPool
+        loadPostFilters()
     }
     
     // MARK: - Methods

@@ -68,16 +68,28 @@ struct CustomizePostFilterView: View {
             .padding(.vertical, 16)
             
             List {
-                Section(header: Text("The post filter name should be unique.")) {
-                    TextField("Post Filter Name", text: $profileName)
+                FilledCardView {
+                    VStack(spacing: 16) {
+                        Text("The name should be unique.")
+                            .primaryText()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        CustomTextField("Post Filter Name", text: $profileName)
+                    }
+                    .padding(16)
                 }
+                .listPlainItemNoInsets()
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
+                .padding(.bottom, 8)
                 
                 FilledCardView {
                     VStack(spacing: 0) {
                         Text("To see certain types of posts, please turn on the switch corresponding to the types.")
                             .primaryText()
                             .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
+                            .padding(.top, 16)
+                            .padding(.bottom, 8)
                             .frame(maxWidth: .infinity, alignment: .leading)
                         
                         TogglePreference(isEnabled: $showText, title: "Text", icon: "text.page")
@@ -102,7 +114,8 @@ struct CustomizePostFilterView: View {
                         Text("To only see sensitive or spoiler posts, please turn on the corresponding switch.")
                             .primaryText()
                             .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
+                            .padding(.top, 16)
+                            .padding(.bottom, 8)
                             .frame(maxWidth: .infinity, alignment: .leading)
                         
                         TogglePreference(isEnabled: $onlySensitive, title: "Only Sensitive Content", icon: "figure.child.and.lock")
@@ -115,110 +128,177 @@ struct CustomizePostFilterView: View {
                 .padding(.vertical, 8)
                 
                 FilledCardView {
-                    VStack(spacing: 0) {
+                    VStack(spacing: 16) {
                         Text("Posts will be filtered out if they contain the following keywords in their title")
                             .primaryText()
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
                             .frame(maxWidth: .infinity, alignment: .leading)
                         
-                        TextField("Title: excludes keywords (key1,key2)", text: $excludesKeywords)
+                        CustomTextField("Title: excludes keywords (key1,key2)", text: $excludesKeywords)
                         
                         Text("Posts will be filtered out if they do not contain the following keywords in their title.")
                             .primaryText()
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
                             .frame(maxWidth: .infinity, alignment: .leading)
                         
-                        TextField("Title: contains keywords (key1,key2)", text: $containsKeywords)
+                        CustomTextField("Title: contains keywords (key1,key2)", text: $containsKeywords)
                     }
+                    .padding(16)
                 }
                 .listPlainItemNoInsets()
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
                 
-                Section(header: Text("Posts will be filtered out if they contain the following")) {
-                    Text("This is where you will add UI for filtering out content.")
+                FilledCardView {
+                    VStack(spacing: 16) {
+                        Text("Posts will be filtered out if their title matches the following regular expression.")
+                            .primaryText()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        CustomTextField("Title: excludes regex", text: $excludesRegex)
+                        
+                        Text("Posts will be filtered out if their title does not match the following regular expression.")
+                            .primaryText()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        CustomTextField("Title: contains regex", text: $containsRegex)
+                    }
+                    .padding(16)
                 }
-                Section(header: Text("Posts will be filtered out if they contain the following keywords in their title.")) {
-                    TextField("Title: excludes keywords (key1,key2)", text: $excludesKeywords)
-                }
+                .listPlainItemNoInsets()
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
                 
-                Section(header: Text("Posts will be filtered out if they do not contain the following keywords in their title.")) {
-                    TextField("Title: contains keywords (key1,key2)", text: $containsKeywords)
-                }
-                
-                Section(header: Text("Posts will be filtered out if their title matches the following regular expression.")) {
-                    TextField("Title: excludes regex", text: $excludesRegex)
-                }
-                
-                Section(header: Text("Posts will be filtered out if their title does not match the following regular expression.")) {
-                    TextField("Title: contains regex", text: $containsRegex)
-                }
-                
-                Section(header: Text("Posts from the following subreddits will be filtered out.")) {
-                    HStack {
-                        TextField("Exclude subreddits (e.g., funny,AskReddit)", text: $excludeSubreddits)
-                        Button("",  systemImage: "plus"){
-                            PostFilterSettingsView()
+                FilledCardView {
+                    VStack(spacing: 16) {
+                        Text("Posts from the following subreddits will be filtered out.")
+                            .primaryText()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        HStack(spacing: 0) {
+                            CustomTextField("E.g. funny,AskReddit", text: $excludeSubreddits)
+                            
+                            Button(action: {}) {
+                                SwiftUI.Image(systemName: "plus")
+                                    .primaryIcon()
+                            }
+                            .padding(.leading, 16)
+                        }
+                        
+                        Text("Posts submitted by the following users will be filtered out.")
+                            .primaryText()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        HStack {
+                            CustomTextField("E.g. Hostilenemy,random", text: $excludeUsers)
+                            
+                            Button(action: {}) {
+                                SwiftUI.Image(systemName: "plus")
+                                    .primaryIcon()
+                            }
+                            .padding(.leading, 16)
                         }
                     }
+                    .padding(16)
                 }
+                .listPlainItemNoInsets()
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
                 
-                Section(header: Text("Posts submitted by the following users will be filtered out.")) {
-                    HStack {
-                        TextField("Exclude users (e.g., Hostilenemy,random)", text: $excludeUsers)
-                        Button("",  systemImage: "plus"){
-                            PostFilterSettingsView()
-                        }
+                FilledCardView {
+                    VStack(spacing: 16) {
+                        Text("Posts that have the following flairs will be filtered out.")
+                            .primaryText()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        CustomTextField("Exclude flairs (e.g., flair1,flair2)", text: $excludeFlairs)
+                        
+                        Text("Posts that do not have the following flairs will be filtered out.")
+                            .primaryText()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        CustomTextField("Contain flairs (e.g., flair1,flair2)", text: $containFlairs)
                     }
+                    .padding(16)
                 }
-                Section(header: Text("Posts that have the following flairs will be filtered out.")) {
-                    TextField("Exclude flairs (e.g., flair1,flair2)", text: $excludeFlairs)
-                }
+                .listPlainItemNoInsets()
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
                 
-                Section(header: Text("Posts that do not have the following flairs will be filtered out.")) {
-                    TextField("Contain flairs (e.g., flair1,flair2)", text: $containFlairs)
+                FilledCardView {
+                    VStack(spacing: 16) {
+                        Text("Link posts that have the following urls will be filtered out.")
+                            .primaryText()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        CustomTextField("Exclude domains", text: $excludeDomains)
+                        
+                        Text("Link posts that do not have the following urls will be filtered out.")
+                            .primaryText()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        CustomTextField("Contain domains", text: $containDomains)
+                    }
+                    .padding(16)
                 }
+                .listPlainItemNoInsets()
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
                 
-                Section(header: Text("Link posts that have the following urls will be filtered out.")) {
-                    TextField("Exclude domains", text: $excludeDomains)
+                FilledCardView {
+                    VStack(spacing: 16) {
+                        Text("Posts that have a score lower than the following value will be filtered out (-1 means no restriction).")
+                            .primaryText()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        CustomTextField("Min vote (-1: no restriction)", text: Binding(
+                            get: { String(minVote) },
+                            set: { minVote = Int($0) ?? -1 }
+                        ))
+                        .keyboardType(.numberPad)
+                        
+                        Text("Posts that have a score higher than the following value will be filtered out (-1 means no restriction).")
+                            .primaryText()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        CustomTextField("Max vote (-1: no restriction)", text: Binding(
+                            get: { String(maxVote) },
+                            set: { maxVote = Int($0) ?? -1 }
+                        ))
+                        .keyboardType(.numberPad)
+                    }
+                    .padding(16)
                 }
+                .listPlainItemNoInsets()
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
                 
-                Section(header: Text("Link posts that do not have the following urls will be filtered out.")) {
-                    TextField("Contain domains", text: $containDomains)
+                FilledCardView {
+                    VStack(spacing: 16) {
+                        Text("Posts will be filtered out if the number of their comments is less than the following value. (-1 means no restriction).")
+                            .primaryText()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        CustomTextField("Min comments (-1: no restriction)", text: Binding(
+                            get: { String(minComments) },
+                            set: { minComments = Int($0) ?? -1 }
+                        ))
+                        .keyboardType(.numberPad)
+                        
+                        Text("Posts will be filtered out if the number of their comments is larger than the following value. (-1 means no restriction).")
+                            .primaryText()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        CustomTextField("Max comments (-1: no restriction)", text: Binding(
+                            get: { String(maxComments) },
+                            set: { maxComments = Int($0) ?? -1 }
+                        ))
+                        .keyboardType(.numberPad)
+                    }
+                    .padding(16)
                 }
-                
-                Section(header: Text("Posts that have a score lower than the following value will be filtered out (-1 means no restriction).")) {
-                    TextField("Min vote (-1: no restriction)", text: Binding(
-                        get: { String(minVote) },
-                        set: { minVote = Int($0) ?? -1 }
-                    ))
-                    .keyboardType(.numberPad)
-                }
-                
-                Section(header: Text("Posts that have a score higher than the following value will be filtered out (-1 means no restriction).")) {
-                    TextField("Max vote (-1: no restriction)", text: Binding(
-                        get: { String(maxVote) },
-                        set: { maxVote = Int($0) ?? -1 }
-                    ))
-                    .keyboardType(.numberPad)
-                }
-                Section(header: Text("Posts will be filtered out if the number of their comments is less than the following value. (-1 means no restriction).")) {
-                    TextField("Min comments (-1: no restriction)", text: Binding(
-                        get: { String(minComments) },
-                        set: { minComments = Int($0) ?? -1 }
-                    ))
-                    .keyboardType(.numberPad)
-                }
-                
-                Section(header: Text("Posts will be filtered out if the number of their comments is larger than the following value. (-1 means no restriction).")) {
-                    TextField("Max comments (-1: no restriction)", text: Binding(
-                        get: { String(maxComments) },
-                        set: { maxComments = Int($0) ?? -1 }
-                    ))
-                    .keyboardType(.numberPad)
-                }
+                .listPlainItemNoInsets()
+                .padding(.horizontal, 16)
+                .padding(.top, 8)
+                .padding(.bottom, 16)
             }
             .themedList()
         }
