@@ -34,10 +34,11 @@ struct PostFilterSettingsView: View {
     
     var body: some View {
         List {
-            Text("Restart the app to see the changes")
-                .secondaryText()
+            InfoPreference(title: "Restart the app to see the changes", iconUrl: "info.circle")
+                .listPlainItemNoInsets()
             
             Divider()
+                .listPlainItemNoInsets()
             
             if postFilterViewModel.postFilters.isEmpty {
                 Text("No post filters found. Create a new one!")
@@ -45,20 +46,17 @@ struct PostFilterSettingsView: View {
                     .listPlainItemNoInsets()
             } else {
                 ForEach(postFilterViewModel.postFilters, id: \.name) { filter in
-                    HStack{
-                        Text(filter.name)
-                            .primaryText()
-                        
-                        Spacer()
-                        
-                        Button(action: {}) {
-                            SwiftUI.Image(systemName: "info.circle")
+                    TouchRipple(action: {
+                        postFilterName = filter.name
+                        isCustomizePostFilter = true
+                    }) {
+                        VStack {
+                            Text(filter.name)
+                                .primaryText()
+                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        .onTapGesture {
-                            postFilterName = filter.name
-                            isCustomizePostFilter = true
-                        }
-                        
+                        .contentShape(Rectangle())
+                        .padding(16)
                     }
                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                         Button(role: .destructive) {

@@ -124,6 +124,10 @@ extension View {
         self.modifier(PrimaryIconImageViewModifier())
     }
     
+    func secondaryIcon() -> some View {
+        self.modifier(SecondaryIconImageViewModifier())
+    }
+    
     func themedPicker() -> some View {
         self.modifier(PickerCustomThemeViewModifier())
     }

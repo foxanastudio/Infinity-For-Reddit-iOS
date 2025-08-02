@@ -114,6 +114,16 @@ struct PrimaryIconImageViewModifier: ViewModifier {
     }
 }
 
+struct SecondaryIconImageViewModifier: ViewModifier {
+    @EnvironmentObject var themeViewModel: CustomThemeViewModel
+    
+    func body(content: Content) -> some View {
+        content
+            .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.secondaryTextColor))
+            .colorMultiply(Color(hex: themeViewModel.currentCustomTheme.secondaryTextColor))
+    }
+}
+
 struct MediaIndicatorViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
     
