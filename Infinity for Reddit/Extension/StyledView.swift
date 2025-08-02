@@ -217,4 +217,12 @@ extension View {
     func colorAccentText() -> some View {
         self.modifier(ColorAccentTextViewModifier())
     }
+    
+    func positiveTextButton() -> some View {
+        self.modifier(PositiveTextButtonViewModifier())
+    }
+    
+    func neutralTextButton() -> some View {
+        self.modifier(NeutralTextButtonViewModifier())
+    }
 }

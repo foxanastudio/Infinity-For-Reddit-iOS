@@ -158,3 +158,23 @@ struct ColorAccentTextViewModifier: ViewModifier {
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.colorAccent))
     }
 }
+
+struct PositiveTextButtonViewModifier: ViewModifier {
+    @EnvironmentObject var themeViewModel: CustomThemeViewModel
+    
+    func body(content: Content) -> some View {
+        content
+            //.font()
+            .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.colorPrimaryLightTheme))
+    }
+}
+
+struct NeutralTextButtonViewModifier: ViewModifier {
+    @EnvironmentObject var themeViewModel: CustomThemeViewModel
+    
+    func body(content: Content) -> some View {
+        content
+            //.font()
+            .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor))
+    }
+}

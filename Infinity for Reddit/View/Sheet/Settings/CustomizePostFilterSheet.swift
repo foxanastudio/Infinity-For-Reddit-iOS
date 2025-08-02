@@ -56,7 +56,7 @@ struct CustomizePostFilterView: View {
                     dismiss()
                 }) {
                     Text("Cancel")
-                        .primaryText()
+                        .neutralTextButton()
                 }
                 
                 Spacer()
@@ -66,7 +66,7 @@ struct CustomizePostFilterView: View {
                     dismiss()
                 }) {
                     Text("Save")
-                        .primaryText()
+                        .positiveTextButton()
                 }
             }
             .padding(.horizontal, 16)
