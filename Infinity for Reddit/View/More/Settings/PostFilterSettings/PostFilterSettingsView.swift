@@ -10,12 +10,11 @@ import Swinject
 import GRDB
 
 struct PostFilterSettingsView: View {
+    @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     @Environment(\.dependencyManager) private var dependencyManager: Container
     
     @StateObject var postFilterViewModel: PostFilterViewModel
-    @State private var isCustomizePostFilter = false
-    @State private var postFilterName: String? = nil
     @State private var navigationBarMenuKey: UUID?
     
     private let postFilterDao: PostFilterDao
@@ -27,7 +26,7 @@ struct PostFilterSettingsView: View {
         postFilterDao = PostFilterDao(dbPool: resolvedDBPool)
         _postFilterViewModel = StateObject(
             wrappedValue: PostFilterViewModel(
-                dbPool: resolvedDBPool
+                postFilterRepository: PostFilterRepository()
             )
         )
     }
@@ -45,10 +44,9 @@ struct PostFilterSettingsView: View {
                     .secondaryText()
                     .listPlainItemNoInsets()
             } else {
-                ForEach(postFilterViewModel.postFilters, id: \.name) { filter in
+                ForEach(postFilterViewModel.postFilters, id: \.id) { filter in
                     TouchRipple(action: {
-                        postFilterName = filter.name
-                        isCustomizePostFilter = true
+                        navigationManager.path.append(SettingsViewNavigation.createOrEditPostFilter(postFilter: filter))
                     }) {
                         VStack {
                             Text(filter.name)
@@ -60,7 +58,7 @@ struct PostFilterSettingsView: View {
                     }
                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                         Button(role: .destructive) {
-                            postFilterViewModel.deletePostFilter(filter.name)
+                            postFilterViewModel.deletePostFilter(id: filter.id ?? -1)
                         } label: {
                             Label("Delete", systemImage: "trash")
                         }
@@ -75,14 +73,9 @@ struct PostFilterSettingsView: View {
         .addTitleToInlineNavigationBar("Post Filter")
         .toolbar {
             Button("", systemImage: "plus") {
-                postFilterName = nil
-                isCustomizePostFilter = true
+                navigationManager.path.append(SettingsViewNavigation.createOrEditPostFilter())
             }
         }
-        .sheet(isPresented: $isCustomizePostFilter) {
-            CustomizePostFilterView($postFilterName)
-        }
-        .environmentObject(postFilterViewModel)
     }
 }
 

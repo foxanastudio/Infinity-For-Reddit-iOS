@@ -53,9 +53,9 @@ struct PostFilterDao {
         }
     }
     
-    func deletePostFilter(name: String) throws {
+    func deletePostFilter(id: Int) throws {
         try dbPool.write { db in
-            try db.execute(sql: "DELETE FROM post_filter WHERE name = ?", arguments: [name])
+            try db.execute(sql: "DELETE FROM post_filter WHERE id = ?", arguments: [id])
         }
     }
     

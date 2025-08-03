@@ -114,6 +114,9 @@ struct CustomNavigationStack<Content: View>: View {
                     case .postFilter:
                         PostFilterSettingsView()
                             .environmentObject(navigationManager)
+                    case .createOrEditPostFilter(let postFilter):
+                        CustomizePostFilterView(postFilter)
+                            .environmentObject(navigationManager)
                     case .commentFilter:
                         CommentFilterSettingsView()
                             .environmentObject(navigationManager)
