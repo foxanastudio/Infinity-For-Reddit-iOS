@@ -29,18 +29,18 @@ struct PostFilterUsageDao {
         }
     }
     
-    func getAllPostFilterUsageLiveData(name: String) -> AnyPublisher<[PostFilterUsage], Error> {
+    func getAllPostFilterUsageLiveData(postFilterId: Int) -> AnyPublisher<[PostFilterUsage], Error> {
         ValueObservation
             .tracking { db in
-                try PostFilterUsage.fetchAll(db, sql: "SELECT * FROM post_filter_usage WHERE name = ?", arguments: [name])
+                try PostFilterUsage.fetchAll(db, sql: "SELECT * FROM post_filter_usage WHERE post_filter_id = ?", arguments: [postFilterId])
             }
             .publisher(in: dbPool)
             .eraseToAnyPublisher()
     }
     
-    func getAllPostFilterUsage(name: String) throws -> [PostFilterUsage] {
+    func getAllPostFilterUsage(postFilterId: Int) throws -> [PostFilterUsage] {
         try dbPool.read { db in
-            try PostFilterUsage.fetchAll(db, sql: "SELECT * FROM post_filter_usage WHERE name = ?", arguments: [name])
+            try PostFilterUsage.fetchAll(db, sql: "SELECT * FROM post_filter_usage WHERE postFilterId = ?", arguments: [postFilterId])
         }
     }
 
@@ -52,7 +52,7 @@ struct PostFilterUsageDao {
 
     func deletePostFilterUsage(postFilterUsage: PostFilterUsage) throws {
         try dbPool.write { db in
-            try db.execute(sql: "DELETE FROM post_filter_usage WHERE name = ? AND usage = ? AND name_of_usage = ?", arguments: [postFilterUsage.name, postFilterUsage.usageType.rawValue, postFilterUsage.nameOfUsage])
+            try db.execute(sql: "DELETE FROM post_filter_usage WHERE post_filter_id = ? AND usage = ? AND name_of_usage = ?", arguments: [postFilterUsage.postFilterId, postFilterUsage.usageType.rawValue, postFilterUsage.nameOfUsage])
         }
     }
 }

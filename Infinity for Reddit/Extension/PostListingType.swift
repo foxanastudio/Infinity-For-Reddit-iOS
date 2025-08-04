@@ -67,7 +67,7 @@ extension PostListingType {
         case .search:
             return .search
         case .multireddit:
-            return .multireddit
+            return .customFeed
         case .anonymousFrontPage:
             return .home
         }

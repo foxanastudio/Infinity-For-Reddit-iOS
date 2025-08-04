@@ -15,7 +15,10 @@ struct PostFilterSettingsView: View {
     @Environment(\.dependencyManager) private var dependencyManager: Container
     
     @StateObject var postFilterViewModel: PostFilterViewModel
+    @State private var selectedPostFilter: PostFilter?
     @State private var navigationBarMenuKey: UUID?
+    
+    @State private var showPostFilterOptionSheet: Bool = false
     
     init() {
         guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
@@ -64,7 +67,8 @@ struct PostFilterSettingsView: View {
                     
                     ForEach(postFilterViewModel.postFilters, id: \.id) { filter in
                         TouchRipple(action: {
-                            navigationManager.path.append(SettingsViewNavigation.createOrEditPostFilter(postFilter: filter))
+                            selectedPostFilter = filter
+                            showPostFilterOptionSheet = true
                         }) {
                             VStack {
                                 Text(filter.name)
@@ -94,6 +98,23 @@ struct PostFilterSettingsView: View {
             Button("", systemImage: "plus") {
                 navigationManager.path.append(SettingsViewNavigation.createOrEditPostFilter())
             }
+        }
+        .sheet(isPresented: $showPostFilterOptionSheet) {
+            PostFilterOptionSheet(onEditSelected: {
+                if let postFilter = selectedPostFilter {
+                    navigationManager.path.append(SettingsViewNavigation.createOrEditPostFilter(postFilter: postFilter))
+                }
+            }, onApplyToSelected: {
+                if let postFilter = selectedPostFilter, let id = postFilter.id {
+                    navigationManager.path.append(SettingsViewNavigation.postFilterUsageListing(postFilterId: id))
+                }
+            }, onDeleteSelected: {
+                if let postFilter = selectedPostFilter, let id = postFilter.id {
+                    postFilterViewModel.deletePostFilter(id: id)
+                }
+            }
+            )
+            .presentationDetents([.medium, .large])
         }
     }
 }

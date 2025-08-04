@@ -12,7 +12,6 @@ import GRDB
 class PostFilterViewModel: ObservableObject {
     // MARK: - Properties
     @Published var postFilters: [PostFilter] = []
-    private var cancellables = Set<AnyCancellable>()
     
     private let postFilterRepository: PostFilterRepositoryProtocol
     private let postFilterDao: PostFilterDao
@@ -28,6 +27,7 @@ class PostFilterViewModel: ObservableObject {
         self.postFilterRepository = postFilterRepository
         self.postFilterDao = PostFilterDao(dbPool: resolvedDBPool)
         self.dbPool = resolvedDBPool
+        
         loadPostFilters()
     }
     

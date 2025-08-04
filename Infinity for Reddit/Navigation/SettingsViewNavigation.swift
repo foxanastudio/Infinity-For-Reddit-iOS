@@ -18,6 +18,7 @@ enum SettingsViewNavigation: Hashable {
     case contentSensitivityFilter
     case postFilter
     case createOrEditPostFilter(postFilter: PostFilter? = nil)
+    case postFilterUsageListing(postFilterId: Int)
     case commentFilter
     case sortType
     case downloadLocation

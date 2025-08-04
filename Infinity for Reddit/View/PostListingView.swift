@@ -157,8 +157,8 @@ struct PostListingView: View {
             guard let navigationBarMenuKey else { return }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
-        .onChange(of: sensitiveContent) {
-            postListingViewModel.setSensitiveContent($0)
+        .onChange(of: sensitiveContent) { newValue, oldValue in
+            postListingViewModel.setSensitiveContent(newValue)
         }
         .sheet(isPresented: $showNewPostMenu) {
             NewPostSheet()

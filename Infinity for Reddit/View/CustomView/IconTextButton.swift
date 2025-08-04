@@ -16,7 +16,7 @@ struct IconTextButton: View {
     var action: () -> Void
     
     var body: some View {
-        Button(action: action) {
+        TouchRipple(action: action) {
             HStack {
                 if let startIconUrl = startIconUrl {
                     switch startIconType {
@@ -88,6 +88,8 @@ struct IconTextButton: View {
                     }
                 }
             }
+            .contentShape(Rectangle())
+            .padding(16)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }

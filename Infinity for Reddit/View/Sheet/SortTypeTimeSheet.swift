@@ -16,17 +16,20 @@ struct SortTypeTimeSheet: View {
     
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: 0) {
                 Text("Select Sort Time")
+                
+                Spacer()
+                    .frame(height: 16)
                 
                 ForEach(sortTypeTimeSource.availableSortTypeTimes, id: \.self) { sortTime in
                     IconTextButton(endIconUrl: sortTime == currentSortTypeTime ? "checkmark.seal" : nil, text: sortTime.fullName) {
                         onSelectSortType(sortTime)
                         dismiss()
                     }
+                    .listPlainItemNoInsets()
                 }
             }
-            .padding(.horizontal, 24)
             .padding(.top, 24)
         }
     }

@@ -16,17 +16,20 @@ struct SortTypeKindSheet: View {
     
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: 0) {
                 Text("Select Sort Type")
+                
+                Spacer()
+                    .frame(height: 16)
                 
                 ForEach(sortTypeKindSource.availableSortTypeKinds, id: \.self) { sortType in
                     IconTextButton(startIconUrl: sortType.icon, startIconType: .icon, endIconUrl: sortType == currentSortTypeKind ? "checkmark.seal" : nil, text: sortType.fullName) {
                         onSelectSortTypeKind(sortType)
                         dismiss()
                     }
+                    .listPlainItemNoInsets()
                 }
             }
-            .padding(.horizontal, 24)
             .padding(.top, 24)
         }
     }

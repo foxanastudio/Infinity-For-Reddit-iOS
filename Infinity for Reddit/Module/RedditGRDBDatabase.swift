@@ -77,13 +77,13 @@ struct RedditGRDBDatabase {
             }
             
             try db.create(table: PostFilterUsage.databaseTableName, ifNotExists: true) { t in
-                t.column("name", .text)
+                t.column("post_filter_id", .integer)
                     .notNull()
                     .indexed()
-                    .references(PostFilter.databaseTableName, onDelete: .cascade, onUpdate: .cascade)
+                    .references(PostFilter.databaseTableName, column: "id", onDelete: .cascade, onUpdate: .cascade)
                 t.column("usage_type", .integer)
                 t.column("name_of_usage", .text)
-                t.primaryKey(["name", "usage_type", "name_of_usage"])
+                t.primaryKey(["post_filter_id", "usage_type", "name_of_usage"])
             }
             
             try db.create(table: SubscribedSubredditData.databaseTableName, ifNotExists: true) { t in
