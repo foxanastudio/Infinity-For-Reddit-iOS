@@ -34,7 +34,8 @@ struct PostFilterUsageSheet: View {
                     Text("Save")
                         .positiveTextButton()
                         .onTapGesture {
-                            onPostFilterUsageSelected(selectedType, nil)
+                            let trimmed = nameOfUsage.trimmingCharacters(in: .whitespacesAndNewlines)
+                            onPostFilterUsageSelected(selectedType, trimmed.isEmpty ? nil : trimmed)
                             dismiss()
                         }
                 }

@@ -18,7 +18,7 @@ public class CustomizePostFilterRepository: CustomizePostFilterRepositoryProtoco
     }
     
     public func savePostFilter(_ postFilter: PostFilter) -> Bool {
-        if let id = postFilter.id {
+        if postFilter.id != nil {
             // Updating a post filter
             do {
                 try postFilterDao.updatePostFilter(updatedPostFilter: postFilter)

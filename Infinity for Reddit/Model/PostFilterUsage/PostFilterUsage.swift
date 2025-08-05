@@ -62,19 +62,19 @@ public struct PostFilterUsage: Codable, FetchableRecord, PersistableRecord, Hash
             return "Home"
         case .subreddit:
             if nameOfUsage == PostFilterUsage.NO_USAGE {
-                return "Subreddit"
+                return "All subreddits"
             }
             return "r/" + nameOfUsage
         case .user:
             if nameOfUsage == PostFilterUsage.NO_USAGE {
-                return "User"
+                return "All users"
             }
             return "u/" + nameOfUsage
         case .customFeed:
             if nameOfUsage == PostFilterUsage.NO_USAGE {
-                return "Custom Feed"
+                return "All custom feeds"
             }
-            return "Custom Feed:" + nameOfUsage
+            return "Custom Feed: " + nameOfUsage
         case .search:
             return "Search"
         case .history:
