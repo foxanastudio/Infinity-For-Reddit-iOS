@@ -21,9 +21,6 @@ struct PostFilterSettingsView: View {
     @State private var showPostFilterOptionSheet: Bool = false
     
     init() {
-        guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
-            fatalError("Failed to resolve DatabasePool")
-        }
         _postFilterViewModel = StateObject(
             wrappedValue: PostFilterViewModel(
                 postFilterRepository: PostFilterRepository()

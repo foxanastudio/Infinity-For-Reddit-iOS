@@ -9,6 +9,7 @@ import SwiftUI
 
 struct PostFilterUsageListingView: View {
     @StateObject private var postFilterUsageViewModel: PostFilterUsageViewModel
+    @State private var showPostFilterUsageSheet: Bool = false
     
     init(postFilterId: Int) {
         _postFilterUsageViewModel = StateObject(
@@ -37,7 +38,7 @@ struct PostFilterUsageListingView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        
+                        showPostFilterUsageSheet = true
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -73,8 +74,14 @@ struct PostFilterUsageListingView: View {
         .addTitleToInlineNavigationBar("Post Filter Usage")
         .toolbar {
             Button("", systemImage: "plus") {
+                showPostFilterUsageSheet = true
+            }
+        }
+        .sheet(isPresented: $showPostFilterUsageSheet) {
+            PostFilterUsageSheet { usageType, nameOfUsage in
                 
             }
+            .presentationDetents([.medium, .large])
         }
     }
 }
