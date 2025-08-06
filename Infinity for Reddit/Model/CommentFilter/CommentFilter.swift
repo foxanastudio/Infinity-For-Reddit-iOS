@@ -20,7 +20,15 @@ struct CommentFilter: Codable, FetchableRecord, PersistableRecord, Hashable {
     var excludeStrings: String?
     var excludeUsers: String?
 
-    init() { }
+    init(
+        id: Int? = nil,
+        name: String = "New Filter",
+        displayMode: Int = 0,
+        maxVote: Int = -1,
+        minVote: Int = -1,
+        excludeStrings: String? = nil,
+        excludeUsers: String? = nil
+    ) { }
 
     private enum CodingKeys: String, CodingKey, ColumnExpression {
         case id, name, displayMode = "display_mode", maxVote = "max_vote",
