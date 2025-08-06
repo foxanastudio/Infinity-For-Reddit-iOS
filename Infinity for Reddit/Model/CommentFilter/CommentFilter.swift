@@ -9,11 +9,16 @@ import GRDB
 
 struct CommentFilter: Codable, FetchableRecord, PersistableRecord, Hashable {
     static let databaseTableName = "comment_filter"
+    
+    enum DisplayMode: Int, Codable {
+        case removeComment = 0
+        case collapseComment = 10
+    }
 
     var id: Int?
     var name: String = "New Filter"
 
-    var displayMode: Int = 0
+    var displayMode: DisplayMode = .removeComment
 
     var maxVote: Int = -1
     var minVote: Int = -1
@@ -23,12 +28,20 @@ struct CommentFilter: Codable, FetchableRecord, PersistableRecord, Hashable {
     init(
         id: Int? = nil,
         name: String = "New Filter",
-        displayMode: Int = 0,
+        displayMode: DisplayMode = .removeComment,
         maxVote: Int = -1,
         minVote: Int = -1,
         excludeStrings: String? = nil,
         excludeUsers: String? = nil
-    ) { }
+    ) {
+        self.id = id
+        self.name = name
+        self.displayMode = displayMode
+        self.maxVote = maxVote
+        self.minVote = minVote
+        self.excludeStrings = excludeStrings
+        self.excludeUsers = excludeUsers
+    }
 
     private enum CodingKeys: String, CodingKey, ColumnExpression {
         case id, name, displayMode = "display_mode", maxVote = "max_vote",
