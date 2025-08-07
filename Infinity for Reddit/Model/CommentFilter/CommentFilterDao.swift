@@ -7,6 +7,7 @@
 
 import GRDB
 import Combine
+import Foundation
 
 struct CommentFilterDao {
     let dbPool: DatabasePool
@@ -25,6 +26,17 @@ struct CommentFilterDao {
         try dbPool.write { db in
             for filter in commentFilters {
                 try filter.insert(db, onConflict: .replace)
+            }
+        }
+    }
+    
+    func updateCommentFilter(updatedCommentFilter: CommentFilter) throws {
+        try dbPool.write { db in
+            if var existingCommentFilter = try CommentFilter.filter(Column("id") == updatedCommentFilter.id).fetchOne(db) {
+                existingCommentFilter = updatedCommentFilter
+                try existingCommentFilter.update(db)
+            } else {
+                throw NSError(domain: "CommentFilter", code: 404, userInfo: [NSLocalizedDescriptionKey: "CommentFilter with name \(updatedCommentFilter.name) not found."])
             }
         }
     }

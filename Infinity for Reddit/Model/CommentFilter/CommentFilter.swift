@@ -7,8 +7,8 @@
 
 import GRDB
 
-struct CommentFilter: Codable, FetchableRecord, PersistableRecord, Hashable {
-    static let databaseTableName = "comment_filter"
+public struct CommentFilter: Codable, FetchableRecord, PersistableRecord, Hashable {
+    public static let databaseTableName = "comment_filter"
     
     enum DisplayMode: Int, Codable {
         case removeComment = 0
