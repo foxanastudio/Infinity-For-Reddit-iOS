@@ -62,7 +62,7 @@ struct CommentFilterSettingsView: View {
                     Divider()
                         .listPlainItemNoInsets()
                     
-                    ForEach(commentFilterViewModel.commentFilters, id: \.id) { commentFilter in
+                    ForEach(commentFilterViewModel.commentFilters, id: \.identityForView) { commentFilter in
                         CommentFilterItemView(commentFilter: commentFilter) {
                             selectedCommentFilter = commentFilter
                             showCommentFilterOptionSheet = true

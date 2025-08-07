@@ -24,6 +24,10 @@ public struct CommentFilter: Codable, FetchableRecord, PersistableRecord, Hashab
     var minVote: Int = -1
     var excludeStrings: String?
     var excludeUsers: String?
+    
+    var identityForView: String {
+        "\(String(id ?? -1))-\(name)"
+    }
 
     init(
         id: Int? = nil,

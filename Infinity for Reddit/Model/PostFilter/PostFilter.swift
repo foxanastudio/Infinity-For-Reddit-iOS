@@ -60,6 +60,10 @@ public struct PostFilter: Codable, FetchableRecord, PersistableRecord, Equatable
     var allowSensitive: Bool = false
     var allowSpoiler: Bool = true
     
+    var identityForView: String {
+        "\(String(id ?? -1))-\(name)"
+    }
+    
     init(
         id: Int? = nil,
         name: String = "New Filter",

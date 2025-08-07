@@ -62,7 +62,7 @@ struct PostFilterSettingsView: View {
                     Divider()
                         .listPlainItemNoInsets()
                     
-                    ForEach(postFilterViewModel.postFilters, id: \.id) { postFilter in
+                    ForEach(postFilterViewModel.postFilters, id: \.identityForView) { postFilter in
                         PostFilterItemView(postFilter: postFilter) {
                             selectedPostFilter = postFilter
                             showPostFilterOptionSheet = true
