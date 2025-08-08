@@ -34,17 +34,21 @@ struct GalleryCarousel: View {
                         CustomWebImage(
                             preview.u,
                             handleImageTapGesture: false,
-                            blur: (post.over18 && blurSensitiveImages) || (post.spoiler && blurSpoilerImages)
-                        )
-                        .contentShape(Rectangle())
-                        .highPriorityGesture(
-                            TapGesture()
-                                .onEnded {
-                                    withAnimation {
-                                        fullScreenMediaViewModel.show(.gallery(currentUrl: preview.u, items: items, mediaMetadata: mediaMetadata, galleryScrollState: galleryScrollState))
-                                    }
+                            blur: (post.over18 && blurSensitiveImages) || (post.spoiler && blurSpoilerImages),
+                            customOnTapGesture: {
+                                withAnimation {
+                                    fullScreenMediaViewModel.show(.gallery(currentUrl: preview.u, items: items, mediaMetadata: mediaMetadata, galleryScrollState: galleryScrollState))
                                 }
+                            }
                         )
+//                        .highPriorityGesture(
+//                            TapGesture()
+//                                .onEnded {
+//                                    withAnimation {
+//                                        fullScreenMediaViewModel.show(.gallery(currentUrl: preview.u, items: items, mediaMetadata: mediaMetadata, galleryScrollState: galleryScrollState))
+//                                    }
+//                                }
+//                        )
                         .containerRelativeFrame(.horizontal, count: 1, span: 1, spacing: 0, alignment: .center)
                         .tag(index)
                     } else {
