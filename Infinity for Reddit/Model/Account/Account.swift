@@ -8,7 +8,7 @@
 import GRDB
 import Foundation
 
-public struct Account: Codable, FetchableRecord, PersistableRecord, Sendable {
+public struct Account: Codable, FetchableRecord, PersistableRecord, Sendable, Equatable {
     static let ANONYMOUS_ACCOUNT = Account(username: "-", isCurrentUser: false, profileImageUrl: nil, bannerImageUrl: nil, karma: 0, isMod: false, accessToken: nil, refreshToken: nil, code: nil, createdUTC: 0.0)
     
     public static let databaseTableName = "accounts"

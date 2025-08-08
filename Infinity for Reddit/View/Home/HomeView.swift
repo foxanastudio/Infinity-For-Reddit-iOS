@@ -44,7 +44,7 @@ struct HomeView: View {
                             handleToolbarMenu: false
                         )
                         .setUpHomeTabViewChildNavigationBar()
-                        .addTitleToInlineNavigationBar(selectedTab.navigationTitle, 1.0)
+                        .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
                     }
                     .id(accountViewModel.account.username)
                     .tabItem {
@@ -56,7 +56,7 @@ struct HomeView: View {
                     CustomNavigationStack {
                         SubscriptionsView()
                             .setUpHomeTabViewChildNavigationBar()
-                            .addTitleToInlineNavigationBar(selectedTab.navigationTitle, 1.0)
+                            .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
                     }
                     .id(accountViewModel.account.username)
                     .tabItem {
@@ -65,24 +65,26 @@ struct HomeView: View {
                     .tag(Tab.subscriptions)
                     .environmentObject(tab2NavigationBarMenuManager)
                     
-                    CustomNavigationStack {
-                        InboxView(
-                            account: accountViewModel.account
-                        )
-                        .setUpHomeTabViewChildNavigationBar()
-                        .addTitleToInlineNavigationBar(selectedTab.navigationTitle, 1.0)
+                    if !accountViewModel.account.isAnonymous() {
+                        CustomNavigationStack {
+                            InboxView(
+                                account: accountViewModel.account
+                            )
+                            .setUpHomeTabViewChildNavigationBar()
+                            .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
+                        }
+                        .id(accountViewModel.account.username)
+                        .tabItem {
+                            Label("Inbox", systemImage: "envelope")
+                        }
+                        .tag(Tab.inbox)
+                        .environmentObject(tab3NavigationBarMenuManager)
                     }
-                    .id(accountViewModel.account.username)
-                    .tabItem {
-                        Label("Inbox", systemImage: "envelope")
-                    }
-                    .tag(Tab.inbox)
-                    .environmentObject(tab3NavigationBarMenuManager)
                     
                     CustomNavigationStack {
                         SearchView(username: accountViewModel.account.username)
                             .setUpHomeTabViewChildNavigationBar()
-                            .addTitleToInlineNavigationBar(selectedTab.navigationTitle, 1.0)
+                            .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
                     }
                     .id(accountViewModel.account.username)
                     .tabItem {
@@ -94,7 +96,7 @@ struct HomeView: View {
                     CustomNavigationStack {
                         MoreView()
                             .setUpHomeTabViewChildNavigationBar()
-                            .addTitleToInlineNavigationBar(selectedTab.navigationTitle, 1.0)
+                            .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
                     }
                     .id(accountViewModel.account.username)
                     .tabItem {
@@ -137,6 +139,11 @@ struct HomeView: View {
         }
         .onChange(of: colorScheme) {
             customThemeViewModel.isDarkTheme = colorScheme == .dark
+        }
+        .onChange(of: accountViewModel.account) { oldValue, newValue in
+            if newValue.isAnonymous(), case .inbox = selectedTab {
+                selectedTab = .home
+            }
         }
         .environmentObject(NamespaceManager(animation))
     }
