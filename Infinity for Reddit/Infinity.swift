@@ -22,6 +22,8 @@ struct Infinity: App {
     
     @Environment(\.scenePhase) private var scenePhase
     
+    private let notificationDelegate = NotificationDelegate()
+    
     init() {
         guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
             fatalError("Failed to resolve DatabasePool")
@@ -31,6 +33,8 @@ struct Infinity: App {
         _accountViewModel = StateObject(wrappedValue: AccountViewModel.shared)
         _customThemeViewModel = StateObject(wrappedValue: CustomThemeViewModel())
         _fullScreenMediaViewModel = StateObject(wrappedValue: FullScreenMediaViewModel())
+        
+        UNUserNotificationCenter.current().delegate = notificationDelegate
         
         BackgroundTasksManager.shared.registerBackgroundTask()
     }

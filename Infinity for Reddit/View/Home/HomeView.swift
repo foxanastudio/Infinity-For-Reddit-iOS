@@ -13,6 +13,7 @@ import SDWebImageSwiftUI
 struct HomeView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dependencyManager) private var dependencyManager: Container
+    @Environment(\.scenePhase) var scenePhase
     @EnvironmentObject var accountViewModel: AccountViewModel
     @EnvironmentObject var customThemeViewModel: CustomThemeViewModel
     @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
@@ -23,8 +24,13 @@ struct HomeView: View {
     @StateObject private var tab4NavigationBarMenuManager: NavigationBarMenuManager = NavigationBarMenuManager()
     @StateObject private var tab5NavigationBarMenuManager: NavigationBarMenuManager = NavigationBarMenuManager()
     
+    @StateObject private var homeViewModel = HomeViewModel()
+    
     @State private var selectedTab: Tab = .home
     @State private var showProfile: Bool = false
+    @State private var timerIsActive = true
+    
+    let timer = Timer.publish(every: 5 * 60, on: .main, in: .common).autoconnect()
     
     @Namespace private var animation
     
@@ -115,6 +121,13 @@ struct HomeView: View {
                 print(docsDir)
             }
             .id(accountViewModel.account.username)
+            .onChange(of: selectedTab) { _, newTab in
+                print("Tab selection changed to: \(newTab)")
+                
+                if newTab == .inbox {
+                    homeViewModel.userViewedInbox()
+                }
+            }
             
             if let media = fullScreenMediaViewModel.media {
                 if case let .image(urlString, aspectRatio, post, matchedGeometryEffectId) = media {
@@ -146,6 +159,22 @@ struct HomeView: View {
             }
         }
         .environmentObject(NamespaceManager(animation))
+        .task {
+            await homeViewModel.refreshInbox()
+        }
+        .onReceive(timer) { _ in
+            guard timerIsActive else { return }
+            Task {
+                await homeViewModel.refreshInbox()
+            }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                timerIsActive = true
+            } else {
+                timerIsActive = false
+            }
+        }
     }
     
     enum Tab {
