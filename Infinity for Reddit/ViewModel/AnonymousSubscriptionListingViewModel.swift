@@ -15,6 +15,8 @@ public class AnonymousSubscriptionListingViewModel: ObservableObject {
     @Published var userSubscriptions: [SubscribedUserData] = []
     @Published var myCustomFeeds: [MyCustomFeed] = []
     
+    private let anonymousSubscriptionListingRepository: AnonymousSubscriptionListingRepositoryProtocol
+    
     private var cancellables = Set<AnyCancellable>()
     private let operationqueue: OperationQueue
     private let dbPool: DatabasePool
@@ -25,7 +27,7 @@ public class AnonymousSubscriptionListingViewModel: ObservableObject {
     private let myCustomFeedSubscriptionsPublisher: AnyPublisher<[MyCustomFeed], Error>
     
     // MARK: - Initializer
-    init() {
+    init(anonymousSubscriptionListingRepository: AnonymousSubscriptionListingRepositoryProtocol) {
         guard let resolvedOperationQueue = DependencyManager.shared.container.resolve(OperationQueue.self) else {
             fatalError("Could not resolve OperationQueue")
         }
@@ -34,6 +36,7 @@ public class AnonymousSubscriptionListingViewModel: ObservableObject {
             fatalError("Could not resolve DatabasePool")
         }
         
+        self.anonymousSubscriptionListingRepository = anonymousSubscriptionListingRepository
         self.operationqueue = resolvedOperationQueue
         self.dbPool = resolvedDatabasePool
         
@@ -116,5 +119,23 @@ public class AnonymousSubscriptionListingViewModel: ObservableObject {
     
     public func setSearchQuery(_ query: String) {
         searchQueryPublisher.send(query)
+    }
+    
+    func toggleFavoriteSubreddit(_ subscribedSubreddit: SubscribedSubredditData) {
+        if !anonymousSubscriptionListingRepository.toggleFavoriteSubreddit(subscribedSubreddit) {
+            // TODO handle error
+        }
+    }
+    
+    func toggleFavoriteUser(_ subscribedUser: SubscribedUserData) {
+        if !anonymousSubscriptionListingRepository.toggleFavoriteUser(subscribedUser) {
+            // TODO handle error
+        }
+    }
+    
+    func toggleFavoriteCustomFeed(_ myCustomFeed: MyCustomFeed) {
+        if !anonymousSubscriptionListingRepository.toggleFavoriteCustomFeed(myCustomFeed) {
+            // TODO handle error
+        }
     }
 }

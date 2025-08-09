@@ -20,7 +20,7 @@ struct AnonymousSubscriptionsView: View {
     
     init() {
         _anonymousSubscriptionListingViewModel = StateObject(
-            wrappedValue: AnonymousSubscriptionListingViewModel()
+            wrappedValue: AnonymousSubscriptionListingViewModel(anonymousSubscriptionListingRepository: AnonymousSubscriptionListingRepository())
         )
     }
 
@@ -56,8 +56,11 @@ struct AnonymousSubscriptionsView: View {
                 } else {
                     List {
                         ForEach(anonymousSubscriptionListingViewModel.subredditSubscriptions, id: \.fullName) { subscription in
-                            SimpleWebImageTouchItemRow(text: subscription.name, iconUrl: subscription.iconUrl) {
+                            SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.favorite, action: {
                                 navigationManager.path.append(AppNavigation.subredditDetails(subredditName: subscription.name))
+                            }) {
+                                subscription.favorite.toggle()
+                                anonymousSubscriptionListingViewModel.toggleFavoriteSubreddit(subscription)
                             }
                             .listPlainItemNoInsets()
                         }
@@ -81,8 +84,11 @@ struct AnonymousSubscriptionsView: View {
                 } else {
                     List {
                         ForEach(anonymousSubscriptionListingViewModel.userSubscriptions, id: \.name) { subscription in
-                            SimpleWebImageTouchItemRow(text: subscription.name, iconUrl: subscription.iconUrl) {
+                            SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.favorite, action: {
                                 navigationManager.path.append(AppNavigation.userDetails(username: subscription.name))
+                            }) {
+                                subscription.favorite.toggle()
+                                anonymousSubscriptionListingViewModel.toggleFavoriteUser(subscription)
                             }
                             .listPlainItemNoInsets()
                         }
@@ -106,8 +112,11 @@ struct AnonymousSubscriptionsView: View {
                 } else {
                     List {
                         ForEach(anonymousSubscriptionListingViewModel.myCustomFeeds, id: \.path) { customFeed in
-                            SimpleWebImageTouchItemRow(text: customFeed.displayName, iconUrl: customFeed.iconUrl) {
+                            SubscriptionItemView(text: customFeed.displayName, iconUrl: customFeed.iconUrl, isFavorite: customFeed.isFavorite, action: {
                                 navigationManager.path.append(AppNavigation.customFeed(myCustomFeed: customFeed))
+                            }) {
+                                customFeed.isFavorite.toggle()
+                                anonymousSubscriptionListingViewModel.toggleFavoriteCustomFeed(customFeed)
                             }
                             .listPlainItemNoInsets()
                         }

@@ -7,7 +7,7 @@
 
 import GRDB
 
-struct MyCustomFeed: Codable, FetchableRecord, PersistableRecord, Equatable, Hashable {
+class MyCustomFeed: Codable, FetchableRecord, PersistableRecord, Equatable, Hashable {
     static let databaseTableName = "custom_feeds"
     
     var path: String
@@ -62,4 +62,15 @@ struct MyCustomFeed: Codable, FetchableRecord, PersistableRecord, Equatable, Has
     }
 
     public static let databaseSelection: [SQLSelectable] = CodingKeys.allCases.map { $0 }
+    
+    // Equatable conformance
+    static func == (lhs: MyCustomFeed, rhs: MyCustomFeed) -> Bool {
+        return lhs.path == rhs.path && lhs.owner == rhs.owner
+    }
+    
+    // Hashable conformance
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(path)
+        hasher.combine(owner)
+    }
 }
