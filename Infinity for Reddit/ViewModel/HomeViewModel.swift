@@ -52,13 +52,30 @@ class HomeViewModel: ObservableObject {
         Task {
             do {
                 let inboxListingRepository = InboxListingRepository()
-                let listing = try await inboxListingRepository.fetchInboxListing(messageWhere: .inbox, pathComponents: [:], queries: ["limit": "1"])
-                if let latestMessageID = listing.inboxes?.first?.id {
-                    self.userDefaults.set(latestMessageID, forKey: "lastSeenMessageID")
-                    print("Updated last seen message ID to: \(latestMessageID)")
+                let messageWhere = MessageWhere.unread
+                let pathComponents: [String: String] = ["where": "\(messageWhere)"]
+                let queries: [String: String] = ["limit": "50"]
+                let inboxListing = try await inboxListingRepository.fetchInboxListing(
+                    messageWhere: messageWhere,
+                    pathComponents: pathComponents,
+                    queries: queries
+                )
+                
+                let inboxes = inboxListing.inboxes ?? []
+                let createdUTCs: [TimeInterval] = inboxes.compactMap { inbox in
+                    let raw = (inbox.createdUtc as Float?) 
+                    guard let raw else { return nil }
+                    let timeInterval = TimeInterval(raw)
+                    return timeInterval > 0 ? timeInterval : nil
+                }
+                if let maxCreatedUTC = createdUTCs.max() {
+                    self.userDefaults.set(maxCreatedUTC, forKey: "lastNotifiedUTC")
+                    print("Updated lastNotifiedUTC to: \(maxCreatedUTC)")
+                } else {
+                    print("No unread messages; lastNotifiedUTC unchanged.")
                 }
             } catch {
-                print("Failed to update last seen message ID: \(error)")
+                print("Failed to advance lastNotifiedUTC: \(error)")
             }
         }
     }

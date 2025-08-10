@@ -4,7 +4,7 @@
 <dict>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
-		<string>com.docilealligator.infinityforreddit</string>
+		<string>com.docilealligator.infinityforreddit.bg.refresh.inbox</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>

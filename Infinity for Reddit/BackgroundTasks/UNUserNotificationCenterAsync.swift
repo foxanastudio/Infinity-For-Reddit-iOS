@@ -7,15 +7,22 @@
 import UserNotifications
 
 extension UNUserNotificationCenter {
+    enum NotificationAuthError: Error { case authorizationDenied }
+
     func addRequest(_ request: UNNotificationRequest) async throws {
-        let settings = await notificationSettings()
-        guard settings.authorizationStatus == .authorized || settings.authorizationStatus == .provisional else {
-            guard try await requestAuthorization(options: [.alert, .sound, .badge]) else {
-                throw URLError(.userAuthenticationRequired)
-            }
-            return
+        var settings = await notificationSettings()
+
+        if settings.authorizationStatus == .notDetermined {
+            let granted = try await requestAuthorization(options: [.alert, .sound, .badge])
+            guard granted else { throw NotificationAuthError.authorizationDenied }
+            settings = await notificationSettings()
         }
-        
-        try await self.add(request)
+
+        let ok: Set<UNAuthorizationStatus> = [.authorized, .provisional, .ephemeral]
+        guard ok.contains(settings.authorizationStatus) else {
+            throw NotificationAuthError.authorizationDenied
+        }
+
+        try await add(request)
     }
 }

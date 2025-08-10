@@ -8,11 +8,10 @@ import Foundation
 import BackgroundTasks
 import UserNotifications
 
-@MainActor
 class BackgroundTasksManager {
     
     // MARK: - Properties
-    let taskIdentifier = "com.docilealligator.infinityforreddit"
+    let taskIdentifier = "com.docilealligator.infinityforreddit.bg.refresh.inbox"
     private let userDefaults: UserDefaults
     
     // MARK: - Singleton
@@ -28,33 +27,65 @@ class BackgroundTasksManager {
     // MARK: - Public Methods
     public func checkForNewData() async throws -> Bool {
         if AccountViewModel.shared.account.isAnonymous() {
-            return true
-        }
-        let inboxListingRepository = InboxListingRepository()
-        
-        let messageWhere = MessageWhere.inbox
-        let pathComponents: [String: String] = [:]
-        let queries: [String: String] = ["limit": "1"]
-        
-        let inboxListing = try await inboxListingRepository.fetchInboxListing(
-                    messageWhere: messageWhere,
-                    pathComponents: pathComponents,
-                    queries: queries
-                )
-                
-        try Task.checkCancellation()
-        
-        guard let latestMessageID = inboxListing.inboxes.first?.id else {
             return false
         }
         
-        let lastSeenMessageID = self.userDefaults.string(forKey: "lastSeenMessageID")
-        print("Background Check: Latest ID from API is \(latestMessageID), last seen ID was \(lastSeenMessageID ?? "none").")
-        
-//        return latestMessageID != lastSeenMessageID
-        
-        // debug
+#if DEBUG
+        print("DEBUG: force hasNewMessages = true (skip fetch & writes)")
         return true
+#endif
+        
+        let inboxListingRepository = InboxListingRepository()
+        
+        let messageWhere = MessageWhere.unread
+        let pathComponents: [String: String] = ["where": "\(messageWhere)"]
+        let queries: [String: String] = ["limit": "50"]
+        
+        let inboxListing = try await inboxListingRepository.fetchInboxListing(
+            messageWhere: messageWhere,
+            pathComponents: pathComponents,
+            queries: queries
+        )
+        try Task.checkCancellation()
+        
+        let inboxes = inboxListing.inboxes ?? []
+        let createdUTCs: [TimeInterval] = inboxes.compactMap { inbox in
+            let raw = (inbox.createdUtc as Float?)
+            guard let raw else {
+                return nil
+            }
+            let timeInterval = TimeInterval(raw)
+            return timeInterval > 0 ? timeInterval : nil
+        }
+        
+        guard !createdUTCs.isEmpty else {
+            return false
+        }
+        
+        let maxCreatedUTC = createdUTCs.max()!
+        
+        let key = "lastNotifiedUTC"
+        let lastNotifiedUTC = self.userDefaults.object(forKey: key) as? TimeInterval
+        
+        if lastNotifiedUTC == nil {
+            self.userDefaults.set(maxCreatedUTC, forKey: key)
+            print("Background Check: seeded lastNotifiedUTC = \(maxCreatedUTC)")
+            return false
+        }
+        
+        let hasNewMessages = createdUTCs.contains {
+            $0 > (lastNotifiedUTC ?? 0)
+        }
+        print("Background Check: maxCreatedUTC=\(maxCreatedUTC), lastNotifiedUTC=\(lastNotifiedUTC ?? 0), hasNewMessages=\(hasNewMessages)")
+
+
+        
+        if hasNewMessages {
+            self.userDefaults.set(maxCreatedUTC, forKey: key)
+            self.userDefaults.set(true, forKey: "hasNewMessages")
+        }
+        
+        return hasNewMessages
     }
     
     func registerBackgroundTask() {
@@ -69,6 +100,8 @@ class BackgroundTasksManager {
                 backgroundTask.cancel()
             }
         }
+        
+        scheduleAppRefresh()
     }
     
     func scheduleAppRefresh() {
@@ -80,7 +113,12 @@ class BackgroundTasksManager {
             try BGTaskScheduler.shared.submit(request)
             print("Background Task Manager: Successfully scheduled app refresh task.")
         } catch {
-            print("Background Task Manager: Could not schedule app refresh task: \(error)")
+            let nsError = error as NSError
+            if nsError.domain == "BGTaskSchedulerErrorDomain" {
+                print("Background Task Manager: App refresh task is already scheduled.")
+            } else {
+                print("Background Task Manager: Could not schedule app refresh task: \(error)")
+            }
         }
     }
     
@@ -98,6 +136,9 @@ class BackgroundTasksManager {
     
     // MARK: - Task Handling
     private func handleAppRefresh(task: BGAppRefreshTask) async {
+        
+        scheduleAppRefresh()
+        
         do {
             print("Background Task (async): Starting task.")
             if try await checkForNewData() {
