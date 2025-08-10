@@ -19,11 +19,13 @@ struct GalleryCarousel: View {
     let post: Post
     let items: [GalleryItem]
     let mediaMetadata: [String: MediaMetadata]
+    let onImageTap: (() -> Void)?
     
-    init(post: Post) {
+    init(post: Post, onImageTap: (() -> Void)? = nil) {
         self.post = post
         self.items = post.galleryData!.items
         self.mediaMetadata = post.mediaMetadata!
+        self.onImageTap = onImageTap
     }
     
     var body: some View {
@@ -39,16 +41,9 @@ struct GalleryCarousel: View {
                                 withAnimation {
                                     fullScreenMediaViewModel.show(.gallery(currentUrl: preview.u, items: items, mediaMetadata: mediaMetadata, galleryScrollState: galleryScrollState))
                                 }
+                                onImageTap?()
                             }
                         )
-//                        .highPriorityGesture(
-//                            TapGesture()
-//                                .onEnded {
-//                                    withAnimation {
-//                                        fullScreenMediaViewModel.show(.gallery(currentUrl: preview.u, items: items, mediaMetadata: mediaMetadata, galleryScrollState: galleryScrollState))
-//                                    }
-//                                }
-//                        )
                         .containerRelativeFrame(.horizontal, count: 1, span: 1, spacing: 0, alignment: .center)
                         .tag(index)
                     } else {

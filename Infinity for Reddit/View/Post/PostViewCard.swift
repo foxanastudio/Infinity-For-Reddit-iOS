@@ -155,8 +155,10 @@ struct PostViewCard: View {
                     .frame(height: 10)
                 
                 // May not have a preview!!!!!!
-                GalleryCarousel(post: postViewModel.post)
-                    .aspectRatio(preview.s.aspectRatio, contentMode: .fit)
+                GalleryCarousel(post: postViewModel.post) {
+                    postViewModel.readPost()
+                }
+                .aspectRatio(preview.s.aspectRatio, contentMode: .fit)
             } else if case .text = postViewModel.post.postType, let selftextTruncated = postViewModel.post.selftextTruncated, !selftextTruncated.isEmpty {
                 Spacer()
                     .frame(height: 6)
