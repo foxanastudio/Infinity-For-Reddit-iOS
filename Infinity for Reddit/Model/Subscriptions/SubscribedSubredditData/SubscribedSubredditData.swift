@@ -6,6 +6,7 @@
 //
 
 import GRDB
+import Foundation
 
 class SubscribedSubredditData: Codable, FetchableRecord, PersistableRecord {
     static let databaseTableName = "subscribed_subreddits"
@@ -16,9 +17,7 @@ class SubscribedSubredditData: Codable, FetchableRecord, PersistableRecord {
     var username: String
     var isFavorite: Bool
     
-    var identityInView: String {
-        return fullName + String(isFavorite)
-    }
+    let identityInView = UUID().uuidString
 
     init(fullName: String, name: String, iconUrl: String? = nil, username: String, isFavorite: Bool) {
         self.fullName = fullName

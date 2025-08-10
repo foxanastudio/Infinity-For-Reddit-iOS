@@ -16,9 +16,7 @@ class SubscribedUserData: Codable, FetchableRecord, PersistableRecord {
     var username: String
     var isFavorite: Bool
     
-    var identityInView: String {
-        return name + String(isFavorite)
-    }
+    let identityInView = UUID().uuidString
     
     init(name: String, iconUrl: String?, username: String, isFavorite: Bool) {
         self.name = name

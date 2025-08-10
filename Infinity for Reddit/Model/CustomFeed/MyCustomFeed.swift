@@ -6,6 +6,7 @@
 //
 
 import GRDB
+import Foundation
 
 class MyCustomFeed: Codable, FetchableRecord, PersistableRecord, Equatable, Hashable {
     static let databaseTableName = "custom_feeds"
@@ -25,9 +26,7 @@ class MyCustomFeed: Codable, FetchableRecord, PersistableRecord, Equatable, Hash
     var isFavorite: Bool
     var subreddits: [String]?
     
-    var identityInView: String {
-        return path + String(isFavorite)
-    }
+    let identityInView = UUID().uuidString
     
     init(path: String, displayName: String, name: String, description: String? = nil,
          copiedFrom: String? = nil, iconUrl: String? = nil, visibility: String? = nil,

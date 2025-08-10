@@ -103,7 +103,7 @@ struct AnonymousSubscriptionsView: View {
                     List {
                         if !anonymousSubscriptionListingViewModel.favoriteUserSubscriptions.isEmpty {
                             Section(header: Text("Favorite").listSectionHeader()) {
-                                ForEach(anonymousSubscriptionListingViewModel.favoriteUserSubscriptions, id: \.name) { subscription in
+                                ForEach(anonymousSubscriptionListingViewModel.favoriteUserSubscriptions, id: \.identityInView) { subscription in
                                     SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
                                         navigationManager.path.append(AppNavigation.userDetails(username: subscription.name))
                                     }) {
@@ -117,7 +117,7 @@ struct AnonymousSubscriptionsView: View {
                         }
                         
                         Section(header: Text("All").listSectionHeader()) {
-                            ForEach(anonymousSubscriptionListingViewModel.userSubscriptions, id: \.name) { subscription in
+                            ForEach(anonymousSubscriptionListingViewModel.userSubscriptions, id: \.identityInView) { subscription in
                                 SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
                                     navigationManager.path.append(AppNavigation.userDetails(username: subscription.name))
                                 }) {
@@ -149,7 +149,7 @@ struct AnonymousSubscriptionsView: View {
                     List {
                         if !anonymousSubscriptionListingViewModel.favoriteMyCustomFeeds.isEmpty {
                             Section(header: Text("Favorite").listSectionHeader()) {
-                                ForEach(anonymousSubscriptionListingViewModel.favoriteMyCustomFeeds, id: \.path) { customFeed in
+                                ForEach(anonymousSubscriptionListingViewModel.favoriteMyCustomFeeds, id: \.identityInView) { customFeed in
                                     SubscriptionItemView(text: customFeed.displayName, iconUrl: customFeed.iconUrl, isFavorite: customFeed.isFavorite, action: {
                                         navigationManager.path.append(AppNavigation.customFeed(myCustomFeed: customFeed))
                                     }) {
@@ -163,7 +163,7 @@ struct AnonymousSubscriptionsView: View {
                         }
                         
                         Section(header: Text("All").listSectionHeader()) {
-                            ForEach(anonymousSubscriptionListingViewModel.myCustomFeeds, id: \.path) { customFeed in
+                            ForEach(anonymousSubscriptionListingViewModel.myCustomFeeds, id: \.identityInView) { customFeed in
                                 SubscriptionItemView(text: customFeed.displayName, iconUrl: customFeed.iconUrl, isFavorite: customFeed.isFavorite, action: {
                                     navigationManager.path.append(AppNavigation.customFeed(myCustomFeed: customFeed))
                                 }) {
