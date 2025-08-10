@@ -45,6 +45,7 @@ struct SubscriptionItemView: View {
                 
                 Button(action: {}) {
                     SwiftUI.Image(systemName: isFavorite ? "heart.fill" : "heart")
+                        .foregroundColor(Color(hex: "#EE0264"))
                 }
                 .highPriorityGesture(
                     TapGesture()
