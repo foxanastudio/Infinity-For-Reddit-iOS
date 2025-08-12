@@ -82,8 +82,7 @@ struct CommentViewCard: View {
                     .secondaryText()
                 }
                 .padding(.horizontal, 16)
-                .padding(.top, 8)
-                .padding(.bottom, 8)
+                .padding(.vertical, 12)
                 
                 if !((commentViewModel.comment.isCollasped && fullyCollapseComment) || (commentViewModel.comment.isFilteredOut && !commentViewModel.comment.hasExpandedBefore)) {
                     Group {
@@ -177,8 +176,7 @@ struct CommentViewCard: View {
                         .buttonStyle(.borderless)
                     }
                     .padding(.horizontal, 16)
-                    .padding(.top, 8)
-                    .padding(.bottom, 8)
+                    .padding(.vertical, 12)
                 }
                 
                 if showCommentDivider {

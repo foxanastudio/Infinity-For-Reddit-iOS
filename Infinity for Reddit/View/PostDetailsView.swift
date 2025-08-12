@@ -21,6 +21,9 @@ struct PostDetailsView: View {
     @State private var showSortTypeSheet: Bool = false
     @State private var navigationBarMenuKey: UUID?
     
+    @AppStorage(InterfaceCommentUserDefaultsUtils.fullyCollapseCommentKey, store: .interfaceCommentFilter)
+    private var fullyCollapseComment: Bool = false
+    
     private let account: Account
     private let isFromSubredditPostListing: Bool
     
@@ -80,22 +83,38 @@ struct PostDetailsView: View {
                     ForEach(postDetailsViewModel.visibleComments, id: \.id) { commentItem in
                         if case let .comment(comment) = commentItem {
                             CommentViewCard(account: account, comment: comment, isInPostDetails: true, onToggleExpand: {
-                                withAnimation {
+                                if fullyCollapseComment {
                                     if comment.isCollasped {
                                         postDetailsViewModel.expandComments(comment: comment)
                                     } else {
                                         postDetailsViewModel.collapseComments(comment: comment)
+                                    }
+                                } else {
+                                    withAnimation {
+                                        if comment.isCollasped {
+                                            postDetailsViewModel.expandComments(comment: comment)
+                                        } else {
+                                            postDetailsViewModel.collapseComments(comment: comment)
+                                        }
                                     }
                                 }
                             })
                             .listPlainItemNoInsets()
                             .id(comment.id)
                             .onLongPressGesture {
-                                withAnimation {
+                                if fullyCollapseComment {
                                     if comment.isCollasped {
                                         postDetailsViewModel.expandComments(comment: comment)
                                     } else {
                                         postDetailsViewModel.collapseComments(comment: comment)
+                                    }
+                                } else {
+                                    withAnimation {
+                                        if comment.isCollasped {
+                                            postDetailsViewModel.expandComments(comment: comment)
+                                        } else {
+                                            postDetailsViewModel.collapseComments(comment: comment)
+                                        }
                                     }
                                 }
                             }

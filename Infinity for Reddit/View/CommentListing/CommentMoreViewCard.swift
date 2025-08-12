@@ -21,12 +21,13 @@ struct CommentMoreViewCard: View {
                 Text(commentMore.children.count > 0 ? "Load more comments" : "Continue Thread")
                     .commentText()
                     .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
+                    .padding(.vertical, 12)
                 
                 if showCommentDivider {
                     Divider()
                 }
             }
         }
+        .contentShape(Rectangle())
     }
 }
