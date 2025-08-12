@@ -22,8 +22,6 @@ struct Infinity: App {
     
     @Environment(\.scenePhase) private var scenePhase
     
-    private let notificationDelegate = NotificationDelegate()
-    
     init() {
         guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
             fatalError("Failed to resolve DatabasePool")
@@ -34,7 +32,15 @@ struct Infinity: App {
         _customThemeViewModel = StateObject(wrappedValue: CustomThemeViewModel())
         _fullScreenMediaViewModel = StateObject(wrappedValue: FullScreenMediaViewModel())
         
-        UNUserNotificationCenter.current().delegate = notificationDelegate
+        UNUserNotificationCenter.current().delegate = NotificationDelegate.shared
+        
+        Task {
+            let center = UNUserNotificationCenter.current()
+            let settings = await center.notificationSettings()
+            if settings.authorizationStatus == .notDetermined {
+                _ = try? await center.requestAuthorization(options: [.alert, .badge, .sound])
+            }
+        }
         
         BackgroundTasksManager.shared.registerBackgroundTask()
     }

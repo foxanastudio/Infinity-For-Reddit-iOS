@@ -108,13 +108,19 @@ class BackgroundTasksManager {
         }
     }
     
+    @discardableResult
+    public func refreshAndNotifyAllAccounts() async -> Bool {
+        let anySent = await pullUnreadAndNotifyAllAccounts()
+        if anySent {
+            self.userDefaults.set(true, forKey: "hasNewMessages")
+        }
+        return anySent
+    }
+    
     private func handleAppRefresh(task: BGAppRefreshTask) async {
-        
+        let success = await refreshAndNotifyAllAccounts()
+        task.setTaskCompleted(success: success)
         scheduleAppRefresh()
-        
-        _ = await pullUnreadAndNotifyAllAccounts()
-        
-        task.setTaskCompleted(success: true)
     }
     
     private func loadAllAccounts() async -> [Account] {
