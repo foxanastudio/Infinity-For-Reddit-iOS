@@ -63,19 +63,23 @@ class PostRepository: PostRepositoryProtocol {
         }
     }
     
-    func readPost(post: Post, account: Account) throws {
+    func readPost(post: Post, account: Account, limitReadPosts: Bool, readPostsLimit: Int) async throws {
         guard !account.isAnonymous() else {
             return
         }
         
-        try readPostDao.insert(
+        if limitReadPosts {
+            if try await readPostDao.getReadPostsCount(username: account.username) >= readPostsLimit {
+                try await readPostDao.deleteOldestReadPosts(username: account.username)
+            }
+        }
+        
+        try await readPostDao.insert(
             readPost: ReadPost(
                 username: account.username,
                 postId: post.id,
                 time: Int64(Date().timeIntervalSince1970)
             )
         )
-        
-        post.isRead = true
     }
 }

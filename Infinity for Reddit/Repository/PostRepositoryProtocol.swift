@@ -11,5 +11,5 @@ import Alamofire
 protocol PostRepositoryProtocol {
     func votePost(post: Post, point: String) async throws
     func savePost(post: Post, save: Bool) async throws
-    func readPost(post: Post, account: Account) throws
+    func readPost(post: Post, account: Account, limitReadPosts: Bool, readPostsLimit: Int) async throws
 }

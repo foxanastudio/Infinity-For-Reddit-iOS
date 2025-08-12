@@ -15,8 +15,8 @@ struct ReadPostDao {
         self.dbPool = dbPool
     }
     
-    func insert(readPost: ReadPost) throws {
-        try dbPool.write { db in
+    func insert(readPost: ReadPost) async throws {
+        try await dbPool.write { db in
             try readPost.insert(db, onConflict: .replace)
         }
     }
@@ -66,18 +66,18 @@ struct ReadPostDao {
         }
     }
     
-    func getReadPostsCount(username: String) throws -> Int {
-        try dbPool.read { db in
+    func getReadPostsCount(username: String) async throws -> Int {
+        try await dbPool.read { db in
             try Int.fetchOne(db, sql: """
-            SELECT COUNT(id)
+            SELECT COUNT(*)
             FROM read_posts
             WHERE username = ?
             """, arguments: [username])!
         }
     }
     
-    func deleteOldestReadPosts(username: String) throws {
-        try dbPool.write { db in
+    func deleteOldestReadPosts(username: String) async throws {
+        try await dbPool.write { db in
             try db.execute(sql: """
             DELETE FROM read_posts 
             WHERE rowid IN (SELECT rowid FROM read_posts ORDER BY time ASC LIMIT 100) 

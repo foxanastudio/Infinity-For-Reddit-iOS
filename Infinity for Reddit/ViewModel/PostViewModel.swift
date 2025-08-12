@@ -16,6 +16,11 @@ class PostViewModel: ObservableObject {
     @Published var error: Error?
     @Published var shouldBlurMedia: Bool = false
     
+    // User defaults
+    private var markPostsAsRead: Bool
+    private var limitReadPosts: Bool
+    private var readPostsLimit: Int
+    
     private var cancellables = Set<AnyCancellable>()
     
     let postRepository: PostRepositoryProtocol
@@ -24,10 +29,21 @@ class PostViewModel: ObservableObject {
         self.account = account
         self.post = post
         self.postRepository = postRepository
+        self.markPostsAsRead = PostHistoryUserDefaultsUtils.markPostsAsRead
+        self.limitReadPosts = PostHistoryUserDefaultsUtils.limitReadPosts
+        self.readPostsLimit = PostHistoryUserDefaultsUtils.readPostsLimit
         
         post.objectWillChange
             .sink { [weak self] _ in
                 self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
+        
+        NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
+            .sink { [weak self] _ in
+                self?.markPostsAsRead = UserDefaults.postHistory.bool(forKey: PostHistoryUserDefaultsUtils.markPostsAsReadKey)
+                self?.limitReadPosts = UserDefaults.postHistory.bool(forKey: PostHistoryUserDefaultsUtils.limitReadPostsKey)
+                self?.readPostsLimit = UserDefaults.postHistory.integer(forKey: PostHistoryUserDefaultsUtils.readPostsLimitKey)
             }
             .store(in: &cancellables)
     }
@@ -86,13 +102,22 @@ class PostViewModel: ObservableObject {
         }
     }
     
-    func readPost() {
-        guard !post.isRead else {
+    func readPost() async {
+        guard !post.isRead, markPostsAsRead else {
             return
         }
         
         do {
-            try postRepository.readPost(post: post, account: AccountViewModel.shared.account)
+            try await postRepository.readPost(
+                post: post,
+                account: AccountViewModel.shared.account,
+                limitReadPosts: limitReadPosts,
+                readPostsLimit: readPostsLimit
+            )
+            
+            await MainActor.run {
+                post.isRead = true
+            }
         } catch {
             print("Mark post as read failed with error: \(error)")
         }

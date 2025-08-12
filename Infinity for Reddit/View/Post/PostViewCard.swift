@@ -140,7 +140,9 @@ struct PostViewCard: View {
                         .noPreviewPostTypeIndicator()
                         .onTapGesture {
                             LinkHandler.shared.handle(url: url)
-                            postViewModel.readPost()
+                            Task {
+                                await postViewModel.readPost()
+                            }
                         }
                 }
             default:
@@ -156,7 +158,9 @@ struct PostViewCard: View {
                 
                 // May not have a preview!!!!!!
                 GalleryCarousel(post: postViewModel.post) {
-                    postViewModel.readPost()
+                    Task {
+                        await postViewModel.readPost()
+                    }
                 }
                 .aspectRatio(preview.s.aspectRatio, contentMode: .fit)
             } else if case .text = postViewModel.post.postType, let selftextTruncated = postViewModel.post.selftextTruncated, !selftextTruncated.isEmpty {
@@ -182,7 +186,9 @@ struct PostViewCard: View {
                         .simultaneousGesture(
                             TapGesture()
                                 .onEnded {
-                                    postViewModel.readPost()
+                                    Task {
+                                        await postViewModel.readPost()
+                                    }
                                 }
                         )
                         
@@ -308,7 +314,9 @@ struct PostViewCard: View {
         }
         .padding(.vertical, 8)
         .onTapGesture {
-            postViewModel.readPost()
+            Task {
+                await postViewModel.readPost()
+            }
             navigationManager.path.append(AppNavigation.postDetails(postDetailsInput: .post(postViewModel.post), isFromSubredditPostListing: isSubredditPostListing))
         }
     }
