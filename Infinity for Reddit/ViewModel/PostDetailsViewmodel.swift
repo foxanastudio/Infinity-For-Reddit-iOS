@@ -26,14 +26,18 @@ public class PostDetailsViewModel: ObservableObject {
     @Published var postDetailsInput: PostDetailsInput
     @Published var singleThreadContext: Int = 8
     private let account: Account
-    private var commentMore: CommentMore?
-    private var after: String? = nil
+    var commentMore: CommentMore?
     private var lastLoadedSortTypeKind: SortType.Kind? = nil
     private var commentFilter: CommentFilter?
+    
+    //User defaults
+    private var showTopLevelCommentsFirst: Bool
     
     public let postDetailsRepository: PostDetailsRepositoryProtocol
     
     private var refreshPostsContinuation: CheckedContinuation<Void, Never>?
+    
+    private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Initializer
     init(account: Account, postDetailsInput: PostDetailsInput, postDetailsRepository: PostDetailsRepositoryProtocol) {
@@ -41,6 +45,13 @@ public class PostDetailsViewModel: ObservableObject {
         self.postDetailsInput = postDetailsInput
         self.sortTypeKind = .best
         self.postDetailsRepository = postDetailsRepository
+        self.showTopLevelCommentsFirst = InterfaceCommentUserDefaultsUtils.showTopLevelCommentsFirst
+        
+        NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
+            .sink { [weak self] _ in
+                self?.showTopLevelCommentsFirst = UserDefaults.interfaceComment.bool(forKey: InterfaceCommentUserDefaultsUtils.showTopLevelCommentsFirstKey)
+            }
+            .store(in: &cancellables)
     }
     
     // MARK: - Methods
@@ -70,7 +81,7 @@ public class PostDetailsViewModel: ObservableObject {
     }
     
     public func fetchPostAndComments(isRefreshWithContinuation: Bool = false, shouldLoadPost: Bool = false) async {
-        guard !isInitialLoading, !isLoadingMore, hasMoreComments else { return }
+        guard !isInitialLoading, !isLoadingMore else { return }
         
         let isInitailLoadCopy = isInitialLoad
         
@@ -94,19 +105,19 @@ public class PostDetailsViewModel: ObservableObject {
             case .post(let post):
                 postDetails = try await postDetailsRepository.fetchComments(
                     postId: post.id,
-                    queries: ["sort": sortTypeKind.rawValue, "after": after ?? ""]
+                    queries: ["sort": sortTypeKind.rawValue]
                 )
             case .postAndCommentId(let postId, let commentId):
                 if let commentId = commentId {
                     postDetails = try await postDetailsRepository.fetchCommentsSingleThread(
                         postId: postId,
                         commentId: commentId,
-                        queries: ["sort": sortTypeKind.rawValue, "after": after ?? "", "context": String(singleThreadContext)]
+                        queries: ["sort": sortTypeKind.rawValue, "context": String(singleThreadContext)]
                     )
                 } else {
                     postDetails = try await postDetailsRepository.fetchComments(
                         postId: postId,
-                        queries: ["sort": sortTypeKind.rawValue, "after": after ?? ""]
+                        queries: ["sort": sortTypeKind.rawValue]
                     )
                 }
             }
@@ -135,6 +146,7 @@ public class PostDetailsViewModel: ObservableObject {
                 self.allComments.append(contentsOf: processedComments)
                 
                 hasMoreComments = postDetails.commentListing.commentMore?.children.isEmpty == false
+                commentMore = postDetails.commentListing.commentMore
                 
                 self.isInitialLoading = false
                 self.isLoadingMore = false
@@ -156,9 +168,10 @@ public class PostDetailsViewModel: ObservableObject {
         }
     }
     
-    public func fetchMoreCommentsInCommentMore(commentMore: CommentMore) async {
+    public func fetchMoreCommentsInCommentMore(commentMore: CommentMore?) async {
         guard refreshPostsContinuation == nil else { return }
         guard let post else { return }
+        guard let commentMore else { return }
         
         do {
             try Task.checkCancellation()
@@ -203,31 +216,38 @@ public class PostDetailsViewModel: ObservableObject {
         allCommentItems.forEach { commentItem in
             switch commentItem {
             case .comment(let comment):
-                if comment.isCollasped {
-                    lastCollapsedDepth = comment.depth
-                    result.append(commentItem)
-                } else {
-                    if let depth = lastCollapsedDepth {
-                        if depth < comment.depth {
-                            // Child comment
-                            comment.isCollasped = true
+                if !(showTopLevelCommentsFirst && comment.depth != 0) {
+                    if comment.isCollasped {
+                        lastCollapsedDepth = comment.depth
+                        result.append(commentItem)
+                    } else {
+                        if let depth = lastCollapsedDepth {
+                            if depth < comment.depth {
+                                // Child comment
+                                comment.isCollasped = true
+                            } else {
+                                lastCollapsedDepth = nil
+                                result.append(commentItem)
+                            }
                         } else {
+                            if showTopLevelCommentsFirst && comment.depth == 0 {
+                                comment.isCollasped = true
+                            }
+                            result.append(commentItem)
+                        }
+                    }
+                }
+            case .more:
+                if !(showTopLevelCommentsFirst && commentItem.depth != 0) {
+                    if let depth = lastCollapsedDepth {
+                        if depth >= commentItem.depth {
+                            // Not a child CommentMore of a collapsed parent
                             lastCollapsedDepth = nil
                             result.append(commentItem)
                         }
                     } else {
                         result.append(commentItem)
                     }
-                }
-            case .more:
-                if let depth = lastCollapsedDepth {
-                    if depth >= commentItem.depth {
-                        // Not a child CommentMore of a collapsed parent
-                        lastCollapsedDepth = nil
-                        result.append(commentItem)
-                    }
-                } else {
-                    result.append(commentItem)
                 }
             }
         }
@@ -255,7 +275,6 @@ public class PostDetailsViewModel: ObservableObject {
             isInitialLoading = false
             isLoadingMore = false
             
-            after = nil
             hasMoreComments = true
             if refreshPostsContinuation == nil {
                 visibleComments.removeAll()
