@@ -11,7 +11,6 @@ import GRDB
 import Alamofire
 
 class BackgroundTasksManager {
-
     
     // MARK: - Properties
     let taskIdentifier = "com.docilealligator.infinityforreddit.bg.refresh.inbox"
@@ -32,49 +31,6 @@ class BackgroundTasksManager {
             fatalError("Failed to resolve DatabasePool")
         }
         self.dbPool = resolvedDatabasePool
-    }
-    
-    public func checkForNewData() async throws -> Bool {
-        if AccountViewModel.shared.account.isAnonymous() {
-            return false
-        }
-        
-        let inboxListingRepository = InboxListingRepository()
-        
-        let inboxListing = try await inboxListingRepository.fetchInboxListing(
-            messageWhere: .unread,
-            pathComponents: [:],
-            queries: ["limit": "50"]
-        )
-        try Task.checkCancellation()
-        
-        let createdUTCs: [TimeInterval] = (inboxListing.inboxes ?? [])
-            .compactMap { $0.createdDate?.timeIntervalSince1970 }
-        
-        guard !createdUTCs.isEmpty else {
-            return false
-        }
-        
-        let maxCreatedUTC = createdUTCs.max()!
-        let lastNotifiedUTC = self.userDefaults.object(forKey: "lastNotifiedUTC") as? TimeInterval
-        
-        if lastNotifiedUTC == nil {
-            self.userDefaults.set(maxCreatedUTC, forKey: "lastNotifiedUTC")
-            print("Background Check: seeded lastNotifiedUTC = \(maxCreatedUTC)")
-            return false
-        }
-        
-        let hasNewMessages = createdUTCs.contains {
-            $0 > (lastNotifiedUTC ?? 0)
-        }
-        print("Background Check: maxCreatedUTC=\(maxCreatedUTC), lastNotifiedUTC=\(lastNotifiedUTC ?? 0), hasNewMessages=\(hasNewMessages)")
-        
-        if hasNewMessages {
-            self.userDefaults.set(maxCreatedUTC, forKey: "lastNotifiedUTC")
-            self.userDefaults.set(true, forKey: "hasNewMessages")
-        }
-        
-        return hasNewMessages
     }
     
     func registerBackgroundTask() {
@@ -110,11 +66,7 @@ class BackgroundTasksManager {
     
     @discardableResult
     public func refreshAndNotifyAllAccounts() async -> Bool {
-        let anySent = await pullUnreadAndNotifyAllAccounts()
-        if anySent {
-            self.userDefaults.set(true, forKey: "hasNewMessages")
-        }
-        return anySent
+        return await pullUnreadAndNotifyAllAccounts()
     }
     
     private func handleAppRefresh(task: BGAppRefreshTask) async {

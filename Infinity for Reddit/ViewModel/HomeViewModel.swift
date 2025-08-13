@@ -17,24 +17,18 @@ class HomeViewModel: ObservableObject {
             fatalError("Failed to resolve UserDefaults")
         }
         self.userDefaults = resolvedUserDefaults
-        self.hasNewMessages = self.userDefaults.bool(forKey: "hasNewMessages")
     }
     
     func refreshInbox() async {
         print("Foreground Refresh: Pull & notify via unified pipeline.")
         let anySent = await BackgroundTasksManager.shared.refreshAndNotifyAllAccounts()
-        let flag = anySent || userDefaults.bool(forKey: "hasNewMessages")
-        if hasNewMessages != flag {
-            hasNewMessages = flag
-        }
-        print(hasNewMessages ? "Foreground Refresh: New message found! UI will be updated."
+        if hasNewMessages != anySent { hasNewMessages = anySent}
+        print(anySent ? "Foreground Refresh: New message found! UI will be updated."
               : "Foreground Refresh: No new message.")
     }
     
     func userViewedInbox() {
         print("User viewed inbox, clearing badge and advancing last seen.")
         hasNewMessages = false
-        userDefaults.set(false, forKey: "hasNewMessages")
-        userDefaults.set(Date().timeIntervalSince1970, forKey: "PULL_NOTIFICATION_TIME")
     }
 }
