@@ -96,8 +96,7 @@ class BackgroundTasksManager {
         let userNotificationCenter = UNUserNotificationCenter.current()
         
         let lastTime = self.userDefaults.double(forKey: pullNotificationTimeKey)
-        self.userDefaults.set(Date().timeIntervalSince1970, forKey: pullNotificationTimeKey)
-        
+        var maxDelivered = lastTime
         var anySent = false
         
         for (accIndex, account) in accounts.enumerated() {
@@ -108,16 +107,13 @@ class BackgroundTasksManager {
             let messages = (unreadListing.inboxes ?? [])
                 .sorted { ($0.createdDate ?? .distantPast) < ($1.createdDate ?? .distantPast)}
                 .suffix(20)
-                
-            
-            var countForAccount = 0
             
             for (msgIndex, inbox) in messages.enumerated().reversed() {
                 let created = inbox.createdDate?.timeIntervalSince1970 ?? 0
                 guard created > lastTime else { continue }
                 
                 anySent = true
-                countForAccount += 1
+                maxDelivered = max(maxDelivered, created)
                 
                 let (title, subtitle) = NotificationFormatter.titleSubtitle(for: inbox)
                 
@@ -136,29 +132,16 @@ class BackgroundTasksManager {
                 if let ctx = inbox.context { info["context"] = ctx }
                 content.userInfo = info
                 
-                let identifier = "msg.\(accIndex).\(msgIndex).\(UUID().uuidString)"
-                try? await userNotificationCenter.addRequest(UNNotificationRequest(identifier: identifier, content: content, trigger: nil))
-            }
-            
-            let showAccountSummary = false
-            if showAccountSummary && countForAccount > 0 {
-                let summary = UNMutableNotificationContent()
-                summary.title = "New messages"
-                summary.subtitle = account.username
-                summary.body = "\(countForAccount) new message(s)"
-                summary.sound = .default
-                summary.threadIdentifier = "inbox.\(account.username.lowercased())"
-                
-                try? await userNotificationCenter.addRequest(
-                    UNNotificationRequest(
-                        identifier: "summary.\(account.username).\(UUID().uuidString)",
-                        content: summary,
-                        trigger: nil
-                    )
+                let stableId = "msg.\(account.username.lowercased()).\(inbox.id ?? "\(accIndex).\(msgIndex)")"
+                try? await userNotificationCenter.add(
+                    UNNotificationRequest(identifier: stableId, content: content, trigger: nil)
                 )
             }
         }
         
+        if maxDelivered > lastTime {
+            userDefaults.set(maxDelivered, forKey: pullNotificationTimeKey)
+        }
         return anySent
     }
     
