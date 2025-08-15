@@ -92,7 +92,7 @@ struct CommentViewCard: View {
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
                 
-                if !((commentViewModel.comment.isCollasped && fullyCollapseComment) || (commentViewModel.comment.isFilteredOut && !commentViewModel.comment.hasExpandedBefore)) {
+                if !((commentViewModel.comment.isCollasped && fullyCollapseComment && commentViewModel.comment.hasExpandedBefore) || (commentViewModel.comment.isFilteredOut && !commentViewModel.comment.hasExpandedBefore)) {
                     Group {
                         if commentViewModel.comment.bodyProcessedMarkdown != nil {
                             Markdown(commentViewModel.comment.bodyProcessedMarkdown!)
@@ -197,7 +197,7 @@ struct CommentViewCard: View {
             }
         }
         .contentShape(Rectangle())
-        .background((commentViewModel.comment.isCollasped && fullyCollapseComment) || (commentViewModel.comment.isFilteredOut && !commentViewModel.comment.hasExpandedBefore) ? Color(hex: customThemeViewModel.currentCustomTheme.fullyCollapsedCommentBackgroundColor) : Color.clear)
+        .background((commentViewModel.comment.isCollasped && fullyCollapseComment && commentViewModel.comment.hasExpandedBefore) || (commentViewModel.comment.isFilteredOut && !commentViewModel.comment.hasExpandedBefore) ? Color(hex: customThemeViewModel.currentCustomTheme.fullyCollapsedCommentBackgroundColor) : Color.clear)
         .onTapGesture {
             isToolbarHidden.toggle()
         }

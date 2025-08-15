@@ -106,7 +106,6 @@ public class PostDetailsRepository: PostDetailsRepositoryProtocol {
         }
         
         let moreChildren = MoreChildren(fromJson: json)
-        //moreChildren.makeCommentList()
         print(moreChildren.commentItems.count)
         
         return moreChildren
