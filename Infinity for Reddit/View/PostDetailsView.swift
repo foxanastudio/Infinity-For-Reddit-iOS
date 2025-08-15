@@ -143,8 +143,9 @@ struct PostDetailsView: View {
                     }
                     if postDetailsViewModel.hasMoreComments {
                         Text("Loading more comments")
+                            .primaryText()
                             .task {
-                                await postDetailsViewModel.fetchMoreCommentsInCommentMore(commentMore: postDetailsViewModel.commentMore)
+                                await postDetailsViewModel.fetchCommentsPagination()
                             }
                             .listPlainItem()
                     }

@@ -26,7 +26,7 @@ public class PostDetailsViewModel: ObservableObject {
     @Published var postDetailsInput: PostDetailsInput
     @Published var singleThreadContext: Int = 8
     private let account: Account
-    var commentMore: CommentMore?
+    private var commentMore: CommentMore?
     private var lastLoadedSortTypeKind: SortType.Kind? = nil
     private var commentFilter: CommentFilter?
     
@@ -168,10 +168,20 @@ public class PostDetailsViewModel: ObservableObject {
         }
     }
     
-    public func fetchMoreCommentsInCommentMore(commentMore: CommentMore?) async {
-        guard refreshPostsContinuation == nil else { return }
-        guard let post else { return }
-        guard let commentMore else { return }
+    public func fetchCommentsPagination() async {
+        if await fetchMoreCommentsInCommentMore(commentMore: commentMore) {
+            await MainActor.run {
+                commentMore = nil
+                hasMoreComments = false
+            }
+        }
+    }
+    
+    // Pagination or "Load more comments"
+    public func fetchMoreCommentsInCommentMore(commentMore: CommentMore?) async -> Bool {
+        guard refreshPostsContinuation == nil else { return false }
+        guard let post else { return false }
+        guard let commentMore else { return false }
         
         do {
             try Task.checkCancellation()
@@ -202,11 +212,15 @@ public class PostDetailsViewModel: ObservableObject {
                 self.visibleComments.insert(contentsOf: commentsToBeAppendedToVisibleComments, at: visibleIndex)
                 self.allComments.insert(contentsOf: processedComments, at: allIndex)
             }
+            
+            return true
         } catch {
             await MainActor.run {
                 self.error = error
             }
             print("Error fetching more comments for CommentMore: \(error)")
+            
+            return false
         }
     }
     

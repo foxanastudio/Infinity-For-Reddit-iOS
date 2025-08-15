@@ -9,7 +9,6 @@ import Foundation
 import SwiftyJSON
 
 public class MoreChildren : NSObject {
-    var comments : [Comment]! = [Comment]()
     var errors : [String]!
     
     var commentItems : [CommentItem] = []
@@ -32,7 +31,34 @@ public class MoreChildren : NSObject {
                     let dataJson = childThing["data"]
                     if !dataJson.isEmpty {
                         do {
-                            try comments.append(Comment(fromJson: dataJson))
+                            if childThing["kind"] == "t1" {
+                                // Comment
+                                let comment = try Comment(fromJson: dataJson)
+                                if let parent = MoreChildren.findParentComment(commentItems: commentItems, comment.parentId) {
+                                    // Has a parent
+                                    if let repliesListing = parent.replies {
+                                        repliesListing.comments.append(comment)
+                                    } else {
+                                        parent.replies = CommentListing(reply: comment)
+                                    }
+                                }
+                                commentItems.append(CommentItem.comment(comment))
+                            } else if dataJson["kind"] == "more" {
+                                let commentMore = try CommentMore(fromJson: dataJson)
+                                if commentMore.children.isEmpty {
+                                    // Continue thread
+                                    commentMore.commentMoreType = .continueThread
+                                }
+                                if let parent = MoreChildren.findParentComment(commentItems: commentItems, commentMore.parentFullname) {
+                                    // Has a parent
+                                    if let repliesListing = parent.replies {
+                                        repliesListing.commentMore = commentMore
+                                    } else {
+                                        parent.replies = CommentListing(commentMore: commentMore)
+                                    }
+                                    commentItems.append(CommentItem.more(commentMore))
+                                }
+                            }
                         } catch {
                             // Ignore
                         }
@@ -42,31 +68,15 @@ public class MoreChildren : NSObject {
         }
     }
     
-    func makeCommentList() {
-        commentItems = []
-        for comment in comments {
-            commentItems.append(CommentItem.comment(comment))
-            makeCommentList(commentListing: comment.replies)
-        }
-    }
-    
-    private func makeCommentList(commentListing: CommentListing?) {
-        guard let commentListing = commentListing else {
-            return
-        }
-        
-        for comment in commentListing.comments {
-            guard let childrenCommentListing = comment.replies else {
-                commentItems.append(CommentItem.comment(comment))
-                continue
+    private static func findParentComment(commentItems: [CommentItem], _ commentParentFullname: String) -> Comment? {
+        for comment in commentItems.reversed() {
+            if case .comment(let c) = comment {
+                if c.name == commentParentFullname {
+                    return c
+                }
             }
-            
-            commentItems.append(CommentItem.comment(comment))
-            makeCommentList(commentListing: childrenCommentListing)
         }
         
-        if let commentMore = commentListing.commentMore {
-            commentItems.append(CommentItem.more(commentMore))
-        }
+        return nil
     }
 }

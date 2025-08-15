@@ -106,6 +106,20 @@ public class CommentListing : NSObject, NSCoding, Validatable {
         dist = json["dist"].intValue
     }
     
+    init(reply comment: Comment) {
+        comments.append(comment)
+        after = ""
+        before = ""
+        dist = 0
+    }
+    
+    init(commentMore: CommentMore) {
+        self.commentMore = commentMore
+        after = ""
+        before = ""
+        dist = 0
+    }
+    
     /**
      * Returns all the available property values in the form of [String:Any] object where the key is the approperiate json key and the value is the value of the corresponding property
      */
@@ -373,6 +387,12 @@ public class CommentMore: NSObject, Validatable, Identifiable {
     public var id : String
     var name : String!
     var parentFullname : String!
+    var commentMoreType: CommentMoreType = .normal
+    
+    enum CommentMoreType {
+        case normal
+        case continueThread
+    }
 
     /**
      * Instantiate the instance using the passed json values to set the properties values
