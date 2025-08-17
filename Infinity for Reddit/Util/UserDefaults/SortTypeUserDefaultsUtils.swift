@@ -69,8 +69,8 @@ enum SortTypeUserDetailsUtils {
     }
     
     static let postCommentSortTypeKey = "post_comment_sort_type"
-    static var postComment: SortType {
+    static var postComment: SortType.Kind {
         let sortTypeKind = SortType.Kind(rawValue: UserDefaults.sortType?.string(forKey: postCommentSortTypeKey) ?? SortType.Kind.best.rawValue) ?? SortType.Kind.best
-        return .init(type: sortTypeKind)
+        return sortTypeKind
     }
 }

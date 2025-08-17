@@ -43,7 +43,7 @@ public class PostDetailsViewModel: ObservableObject {
     init(account: Account, postDetailsInput: PostDetailsInput, postDetailsRepository: PostDetailsRepositoryProtocol) {
         self.account = account
         self.postDetailsInput = postDetailsInput
-        self.sortTypeKind = .best
+        self.sortTypeKind = SortTypeUserDetailsUtils.postComment
         self.postDetailsRepository = postDetailsRepository
         self.showTopLevelCommentsFirst = InterfaceCommentUserDefaultsUtils.showTopLevelCommentsFirst
         
@@ -471,6 +471,7 @@ public class PostDetailsViewModel: ObservableObject {
         if sortTypeKind != self.sortTypeKind {
             self.sortTypeKind = sortTypeKind
             loadPostAndCommentsTaskId = UUID()
+            UserDefaults.sortType?.set(sortTypeKind.rawValue, forKey: SortTypeUserDetailsUtils.postCommentSortTypeKey)
         }
     }
 }

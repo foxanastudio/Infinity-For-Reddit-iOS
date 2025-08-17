@@ -28,6 +28,6 @@ public struct CommentListingMetadata {
     }
 }
 
-public enum CommentListingType: String, Codable {
-    case user
+public enum CommentListingType: Codable {
+    case user(username: String)
 }

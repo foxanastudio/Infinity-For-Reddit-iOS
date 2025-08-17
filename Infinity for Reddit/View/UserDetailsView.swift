@@ -111,7 +111,7 @@ struct UserDetailsView: View {
                     ZStack {
                         CommentListingView(
                             commentListingMetadata: CommentListingMetadata(
-                                commentListingType:.user,
+                                commentListingType:.user(username: userData.name),
                                 pathComponents: ["username": "\(userData.name)"],
                                 headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
                                 queries: nil,

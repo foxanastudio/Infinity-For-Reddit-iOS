@@ -30,10 +30,7 @@ public class CommentListingViewModel: ObservableObject {
     
     // MARK: - Initializer
     init(commentListingMetadata: CommentListingMetadata, commentListingRepository: CommentListingRepositoryProtocol) {
-        self.sortType = SortType(
-            type: .new,
-            time: .all
-        )
+        self.sortType = commentListingMetadata.commentListingType.savedSortType
         self.commentListingMetadata = commentListingMetadata
         self.commentListingRepository = commentListingRepository
     }
@@ -170,6 +167,7 @@ public class CommentListingViewModel: ObservableObject {
         if sortTypeKind != self.sortType.type {
             self.sortType = self.sortType.with(type: sortTypeKind)
             loadCommentsTaskId = UUID()
+            commentListingMetadata.commentListingType.saveSortType(sortType: SortType(type: sortTypeKind))
         }
     }
     
@@ -177,6 +175,7 @@ public class CommentListingViewModel: ObservableObject {
         if sortType != self.sortType {
             self.sortType = sortType
             loadCommentsTaskId = UUID()
+            commentListingMetadata.commentListingType.saveSortType(sortType: sortType)
         }
     }
 }

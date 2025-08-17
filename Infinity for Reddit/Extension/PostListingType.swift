@@ -112,9 +112,7 @@ extension PostListingType {
             return SortTypeUserDetailsUtils.getSubredditPost(subredditName: Account.ANONYMOUS_ACCOUNT.username)
         }
     }
-}
-
-extension PostListingType {
+    
     func saveSortType(sortType: SortType) {
         switch self {
         case .frontPage:
