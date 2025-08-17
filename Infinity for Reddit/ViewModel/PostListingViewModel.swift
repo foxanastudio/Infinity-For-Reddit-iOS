@@ -70,10 +70,7 @@ public class PostListingViewModel: ObservableObject {
         postListingRepository: PostListingRepositoryProtocol,
         readPostsRepository: ReadPostsRepositoryProtocol
     ) {
-        self.sortType = SortType(
-            type: postListingMetadata.postListingType.availableSortTypeKinds[0],
-            time: postListingMetadata.postListingType.defaultSortTime
-        )
+        self.sortType = postListingMetadata.postListingType.savedSortType
         self.postListingMetadata = postListingMetadata
         self.postListingRepository = postListingRepository
         self.readPostsRepository = readPostsRepository
@@ -326,6 +323,7 @@ public class PostListingViewModel: ObservableObject {
         if sortTypeKind != self.sortType.type {
             self.sortType = self.sortType.with(type: sortTypeKind)
             loadPostsTaskId = UUID()
+            postListingMetadata.postListingType.saveSortType(sortType: SortType(type: sortTypeKind))
         }
     }
     
@@ -333,6 +331,7 @@ public class PostListingViewModel: ObservableObject {
         if sortType != self.sortType {
             self.sortType = sortType
             loadPostsTaskId = UUID()
+            postListingMetadata.postListingType.saveSortType(sortType: sortType)
         }
     }
     

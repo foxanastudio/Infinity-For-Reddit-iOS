@@ -5,6 +5,8 @@
 //  Created by Docile Alligator on 2025-06-29.
 //
 
+import Foundation
+
 extension PostListingType: SortTypeKindSource {
     var availableSortTypeKinds: [SortType.Kind] {
         switch self {
@@ -12,9 +14,9 @@ extension PostListingType: SortTypeKindSource {
             return [.best, .hot, .new, .rising, .top, .controversial]
         case .subreddit:
             return [.hot, .new, .rising, .top, .controversial]
-        case .user(username: let username, userWhere: let userWhere):
+        case .user:
             return [.new, .hot, .top, .controversial]
-        case .search(query: let query, searchInSubredditOrUserName: let searchInSubredditOrUserName, searchInMultiReddit: let searchInMultiReddit, searchInThingType: let searchInThingType):
+        case .search:
             return [.relevance, .hot, .top, .new, .comments]
         case .multireddit:
             return [.hot, .new, .rising, .top, .controversial]
@@ -89,6 +91,62 @@ extension PostListingType {
             return path
         case .anonymousFrontPage:
             return PostFilterUsage.NO_USAGE
+        }
+    }
+}
+
+extension PostListingType {
+    var savedSortType: SortType {
+        switch self {
+        case .frontPage:
+            return SortTypeUserDetailsUtils.frontPagePost
+        case .subreddit(let subredditName):
+            return SortTypeUserDetailsUtils.getSubredditPost(subredditName: subredditName)
+        case .user(let username, _):
+            return SortTypeUserDetailsUtils.getUserPost(username: username)
+        case .search:
+            return SortTypeUserDetailsUtils.searchPost
+        case .multireddit(let path):
+            return SortTypeUserDetailsUtils.getCustomFeedPost(path: path)
+        case .anonymousFrontPage:
+            return SortTypeUserDetailsUtils.getSubredditPost(subredditName: Account.ANONYMOUS_ACCOUNT.username)
+        }
+    }
+}
+
+extension PostListingType {
+    func saveSortType(sortType: SortType) {
+        switch self {
+        case .frontPage:
+            UserDefaults.sortType?.set(sortType.type.rawValue, forKey: SortTypeUserDetailsUtils.frontPagePostSortTypeKey)
+            if let time = sortType.time {
+                UserDefaults.sortType?.set(time.rawValue, forKey: SortTypeUserDetailsUtils.frontPagePostSortTimeKey)
+            }
+        case .subreddit(let subredditName):
+            UserDefaults.sortType?.set(sortType.type.rawValue, forKey: SortTypeUserDetailsUtils.subredditPostSortTypeBaseKey + subredditName)
+            if let time = sortType.time {
+                UserDefaults.sortType?.set(time.rawValue, forKey: SortTypeUserDetailsUtils.subredditPostSortTimeBaseKey + subredditName)
+            }
+        case .user(let username, _):
+            UserDefaults.sortType?.set(sortType.type.rawValue, forKey: SortTypeUserDetailsUtils.userPostSortTypeBaseKey + username)
+            if let time = sortType.time {
+                UserDefaults.sortType?.set(time.rawValue, forKey: SortTypeUserDetailsUtils.userPostSortTimeBaseKey + username)
+            }
+        case .search:
+            UserDefaults.sortType?.set(sortType.type.rawValue, forKey: SortTypeUserDetailsUtils.searchPostSortTypeKey)
+            if let time = sortType.time {
+                UserDefaults.sortType?.set(time.rawValue, forKey: SortTypeUserDetailsUtils.searchPostSortTimeKey)
+            }
+        case .multireddit(let path):
+            UserDefaults.sortType?.set(sortType.type.rawValue, forKey: SortTypeUserDetailsUtils.customFeedPostSortTypeBaseKey + path)
+            if let time = sortType.time {
+                UserDefaults.sortType?.set(time.rawValue, forKey: SortTypeUserDetailsUtils.customFeedPostSortTimeBaseKey + path)
+            }
+        case .anonymousFrontPage:
+            UserDefaults.sortType?.set(sortType.type.rawValue, forKey: SortTypeUserDetailsUtils.subredditPostSortTypeBaseKey + Account.ANONYMOUS_ACCOUNT.username)
+            if let time = sortType.time {
+                UserDefaults.sortType?.set(time.rawValue, forKey: SortTypeUserDetailsUtils.subredditPostSortTimeBaseKey + Account.ANONYMOUS_ACCOUNT.username)
+            }
         }
     }
 }
