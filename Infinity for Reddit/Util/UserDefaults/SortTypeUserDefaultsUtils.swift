@@ -56,16 +56,16 @@ enum SortTypeUserDetailsUtils {
         return .init(type: sortTypeKind, time: sortTypeTime)
     }
 
-    static let searchSubredditSortTypeKey = "search_subreddit_sort_type"
-    static var searchSubreddit: SortType {
-        let sortTypeKind = SortType.Kind(rawValue: UserDefaults.sortType?.string(forKey: searchSubredditSortTypeKey) ?? SortType.Kind.relevance.rawValue) ?? SortType.Kind.relevance
-        return .init(type: sortTypeKind)
+    static let subredditListingSortTypeKey = "subreddit_listing_sort_type"
+    static var subredditListing: SortType.Kind {
+        let sortTypeKind = SortType.Kind(rawValue: UserDefaults.sortType?.string(forKey: subredditListingSortTypeKey) ?? SortType.Kind.relevance.rawValue) ?? SortType.Kind.relevance
+        return sortTypeKind
     }
     
-    static let searchUserSortTypeKey = "search_user_sort_type"
-    static var searchUser: SortType {
-        let sortTypeKind = SortType.Kind(rawValue: UserDefaults.sortType?.string(forKey: searchUserSortTypeKey) ?? SortType.Kind.relevance.rawValue) ?? SortType.Kind.relevance
-        return .init(type: sortTypeKind)
+    static let userListingSortTypeKey = "user_listing_sort_type"
+    static var userListing: SortType.Kind {
+        let sortTypeKind = SortType.Kind(rawValue: UserDefaults.sortType?.string(forKey: userListingSortTypeKey) ?? SortType.Kind.relevance.rawValue) ?? SortType.Kind.relevance
+        return sortTypeKind
     }
     
     static let postCommentSortTypeKey = "post_comment_sort_type"

@@ -10,8 +10,11 @@ import SwiftUI
 struct SubredditListingView: View {
     @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     
     @StateObject var subredditListingViewModel: SubredditListingViewModel
+    @State private var showSortTypeKindSheet: Bool = false
+    @State private var navigationBarMenuKey: UUID?
     private let account: Account
     
     init(account: Account, query: String) {
@@ -84,8 +87,38 @@ struct SubredditListingView: View {
         .onChange(of: colorScheme) {
             //print(colorScheme == .dark)
         }
-        .task {
+        .task(id: subredditListingViewModel.loadSubredditsTaskId) {
             await subredditListingViewModel.initialLoadSubreddits()
+        }
+        .refreshable {
+            await subredditListingViewModel.refreshSubredditsWithContinuation()
+        }
+        .onAppear {
+            if let key = navigationBarMenuKey {
+                navigationBarMenuManager.pop(key: key)
+            }
+            navigationBarMenuKey = navigationBarMenuManager.push([
+                NavigationBarMenuItem(title: "Refresh") {
+                    subredditListingViewModel.refreshSubreddits()
+                },
+                
+                NavigationBarMenuItem(title: "Sort") {
+                    showSortTypeKindSheet = true
+                }
+            ])
+        }
+        .onDisappear {
+            guard let navigationBarMenuKey else { return }
+            navigationBarMenuManager.pop(key: navigationBarMenuKey)
+        }
+        .sheet(isPresented: $showSortTypeKindSheet) {
+            SortTypeKindSheet(
+                sortTypeKindSource: OtherSortTypeKindSource.subredditListing,
+                currentSortTypeKind: subredditListingViewModel.sortType
+            ) { sortTypeKind in
+                subredditListingViewModel.changeSortTypeKind(sortTypeKind)
+            }
+            .presentationDetents([.medium, .large])
         }
     }
 }
