@@ -38,7 +38,7 @@ public class SubredditListingViewModel: ObservableObject {
     
     public func initialLoadSubreddits() async {
         if sortType != lastLoadedSortType {
-            await resetSubredditLoadingState()
+            resetSubredditLoadingState()
         }
         
         guard isInitialLoad else {
@@ -92,13 +92,11 @@ public class SubredditListingViewModel: ObservableObject {
             
             self.lastLoadedSortType = self.sortType
         } catch {
-            await MainActor.run {
-                self.error = error
-                
-                isInitialLoad = isInitailLoadCopy
-                isInitialLoading = false
-                isLoadingMore = false
-            }
+            self.error = error
+            
+            isInitialLoad = isInitailLoadCopy
+            isInitialLoading = false
+            isLoadingMore = false
             
             print("Error fetching subreddits: \(error)")
         }
@@ -117,17 +115,15 @@ public class SubredditListingViewModel: ObservableObject {
         loadSubredditsTaskId = UUID()
     }
     
-    private func resetSubredditLoadingState() async {
-        await MainActor.run {
-            isInitialLoad = true
-            isInitialLoading = false
-            isLoadingMore = false
-            
-            after = nil
-            hasMorePages = true
-            if refreshSubredditsContinuation == nil {
-                subreddits = []
-            }
+    private func resetSubredditLoadingState() {
+        isInitialLoad = true
+        isInitialLoading = false
+        isLoadingMore = false
+        
+        after = nil
+        hasMorePages = true
+        if refreshSubredditsContinuation == nil {
+            subreddits = []
         }
     }
     

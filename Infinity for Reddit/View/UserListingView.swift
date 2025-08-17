@@ -10,8 +10,11 @@ import SwiftUI
 struct UserListingView: View {
     @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     
     @StateObject var userListingViewModel: UserListingViewModel
+    @State private var showSortTypeKindSheet: Bool = false
+    @State private var navigationBarMenuKey: UUID?
     private let account: Account
     
     init(account: Account, query: String) {
@@ -78,8 +81,38 @@ struct UserListingView: View {
         .onChange(of: colorScheme) {
             //print(colorScheme == .dark)
         }
-        .task {
+        .task(id: userListingViewModel.loadUsersTaskId) {
             await userListingViewModel.initialLoadUsers()
+        }
+        .refreshable {
+            await userListingViewModel.refreshUsersWithContinuation()
+        }
+        .onAppear {
+            if let key = navigationBarMenuKey {
+                navigationBarMenuManager.pop(key: key)
+            }
+            navigationBarMenuKey = navigationBarMenuManager.push([
+                NavigationBarMenuItem(title: "Refresh") {
+                    userListingViewModel.refreshUsers()
+                },
+                
+                NavigationBarMenuItem(title: "Sort") {
+                    showSortTypeKindSheet = true
+                }
+            ])
+        }
+        .onDisappear {
+            guard let navigationBarMenuKey else { return }
+            navigationBarMenuManager.pop(key: navigationBarMenuKey)
+        }
+        .sheet(isPresented: $showSortTypeKindSheet) {
+            SortTypeKindSheet(
+                sortTypeKindSource: OtherSortTypeKindSource.userListing,
+                currentSortTypeKind: userListingViewModel.sortType
+            ) { sortTypeKind in
+                userListingViewModel.changeSortTypeKind(sortTypeKind)
+            }
+            .presentationDetents([.medium, .large])
         }
     }
 }
