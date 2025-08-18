@@ -18,32 +18,36 @@ struct CustomNavigationStack<Content: View>: View {
         NavigationStack(path: $navigationManager.path) {
             content()
                 .navigationDestination(for: AppNavigation.self) { destination in
-                    if case .login = destination {
+                    switch destination {
+                    case .login:
                         LoginView()
                             .environmentObject(navigationManager)
-                    } else if case .postDetails(let postDetailsInput, let isFromSubredditPostListing) = destination {
+                    case .postDetails(let postDetailsInput, let isFromSubredditPostListing):
                         PostDetailsView(account: self.accountViewModel.account, postDetailsInput: postDetailsInput, isFromSubredditPostListing: isFromSubredditPostListing)
                             .environmentObject(navigationManager)
-                    } else if case .postDetailsWithId(let postId, let commentId) = destination {
+                    case .postDetailsWithId(let postId, let commentId):
                         PostDetailsView(account: self.accountViewModel.account,
                                         postDetailsInput: PostDetailsInput.postAndCommentId(postId: postId, commentId: commentId),
                                         isFromSubredditPostListing: false
                         )
                         .environmentObject(navigationManager)
-                    } else if case .userDetails(let username) = destination {
-                        UserDetailsView(username: username)
-                            .environmentObject(navigationManager)
-                    } else if case .subredditDetails(let subredditName) = destination {
+                    case .subredditDetails(let subredditName):
                         SubredditDetailsView(subredditName: subredditName)
                             .environmentObject(navigationManager)
-                    } else if case .search(let query, let searchInSubredditOrUserName, let searchInMultiReddit, let searchInThingType) = destination {
+                    case .userDetails(let username):
+                        UserDetailsView(username: username)
+                            .environmentObject(navigationManager)
+                    case .search(let query, let searchInSubredditOrUserName, searchInMultiReddit: let searchInMultiReddit, searchInThingType: let searchInThingType):
                         SearchResultsView(query: query, searchInSubredditOrUserName: searchInSubredditOrUserName, searchInMultiReddit: searchInMultiReddit, searchInThingType: searchInThingType)
                             .environmentObject(navigationManager)
-                    } else if case .customFeed(let myCustomFeed) = destination {
+                    case .customFeed(let myCustomFeed):
                         CustomFeedDetailsView(myCustomFeed: myCustomFeed)
                             .environmentObject(navigationManager)
-                    } else if case .inboxConversation(let inbox) = destination {
+                    case .inboxConversation(let inbox):
                         InboxConversationView(inbox: inbox)
+                            .environmentObject(navigationManager)
+                    case .submitComment(let commentParent):
+                        SubmitCommentView(parent: commentParent)
                             .environmentObject(navigationManager)
                     }
                 }

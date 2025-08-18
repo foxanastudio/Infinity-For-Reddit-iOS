@@ -6,9 +6,97 @@
 //
 
 import SwiftUI
+import MarkdownUI
 
 struct SubmitCommentView: View {
+    @StateObject private var submitCommentViewModel: SubmitCommentViewModel
+    
+    init(parent: CommentParent) {
+        _submitCommentViewModel = StateObject(
+            wrappedValue: SubmitCommentViewModel(
+                commentParent: parent
+            )
+        )
+    }
+    
     var body: some View {
-        Text("Submit Comment")
+        ScrollView {
+            VStack(spacing: 0) {
+                if let title = submitCommentViewModel.commentParent.title {
+                    RowText(title)
+                        .primaryText()
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 16)
+                }
+                
+                if let bodyProcessedMarkdown = submitCommentViewModel.commentParent.bodyProcessedMarkdown {
+                    Markdown(bodyProcessedMarkdown)
+                        .markdownImageProvider(WebImageProvider(mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata))
+                        .font(.system(size: 24))
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 16)
+                        .themedCommentMarkdown()
+                        .markdownLinkHandler { url in
+                            LinkHandler.shared.handle(url: url)
+                        }
+                } else if let body = submitCommentViewModel.commentParent.body {
+                    Markdown(body)
+                        .markdownImageProvider(WebImageProvider(mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata))
+                        .font(.system(size: 24))
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 16)
+                        .themedCommentMarkdown()
+                        .markdownLinkHandler { url in
+                            LinkHandler.shared.handle(url: url)
+                        }
+                }
+            }
+        }
+        .themedNavigationBar()
+        .addTitleToInlineNavigationBar("Send Comment")
+        .toolbar {
+            NavigationBarMenu()
+        }
+    }
+}
+
+enum CommentParent: Hashable {
+    case post(parentPost: Post)
+    case comment(parentComment: Comment)
+    
+    var title: String? {
+        switch self {
+        case .post(let parentPost):
+            return parentPost.title
+        case .comment:
+            return nil
+        }
+    }
+    
+    var bodyProcessedMarkdown: MarkdownContent? {
+        switch self {
+        case .post(let parentPost):
+            return parentPost.selftextProcessedMarkdown
+        case .comment(let parentComment):
+            return parentComment.bodyProcessedMarkdown
+        }
+    }
+    
+    var body: String? {
+        switch self {
+        case .post(let parentPost):
+            return parentPost.selftext
+        case .comment(let parentComment):
+            return parentComment.body
+        }
+    }
+    
+    var mediaMetadata: [String: MediaMetadata]? {
+        switch self {
+        case .post(let parentPost):
+            return parentPost.mediaMetadata
+        case .comment(let parentComment):
+            return parentComment.mediaMetadata
+        }
     }
 }

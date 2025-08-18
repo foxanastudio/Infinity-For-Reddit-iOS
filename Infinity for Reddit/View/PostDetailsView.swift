@@ -178,6 +178,12 @@ struct PostDetailsView: View {
                 
                 NavigationBarMenuItem(title: "Sort") {
                     showSortTypeSheet = true
+                },
+                
+                NavigationBarMenuItem(title: "Send comment") {
+                    if let post = postDetailsViewModel.post {
+                        navigationManager.path.append(AppNavigation.submitComment(commentParent: CommentParent.post(parentPost: post)))
+                    }
                 }
             ])
         }
