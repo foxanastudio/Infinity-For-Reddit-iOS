@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 @MainActor
 public class SubredditListingViewModel: ObservableObject {
@@ -23,15 +24,28 @@ public class SubredditListingViewModel: ObservableObject {
     private var after: String? = nil
     private var lastLoadedSortType: SortType.Kind? = nil
     
+    // UserDefaults
+    private var sensitiveContent: Bool
+    
     public let subredditListingRepository: SubredditListingRepositoryProtocol
     
     private var refreshSubredditsContinuation: CheckedContinuation<Void, Never>?
+    
+    private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Initializer
     init(query: String, subredditListingRepository: SubredditListingRepositoryProtocol) {
         self.query = query
         self.sortType = SortTypeUserDetailsUtils.subredditListing
         self.subredditListingRepository = subredditListingRepository
+        
+        self.sensitiveContent = ContentSensitivityFilterUserDetailsUtils.sensitiveContent
+        NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
+            .sink { [weak self] _ in
+                let sensitiveContent = UserDefaults.contentSensitivityFilter.bool(forKey: ContentSensitivityFilterUserDetailsUtils.sensitiveContentKey)
+                self?.setSensitiveContent(sensitiveContent)
+            }
+            .store(in: &cancellables)
     }
     
     // MARK: - Methods
@@ -66,11 +80,17 @@ public class SubredditListingViewModel: ObservableObject {
         do {
             try Task.checkCancellation()
             
-            let subredditListing = try await subredditListingRepository.fetchSubredditListing(queries: ["q": query, "sort": sortType.rawValue, "limit": "100", "after": after ?? ""])
+            let subredditListing = try await subredditListingRepository.fetchSubredditListing(
+                queries: ["q": query, "sort": sortType.rawValue, "limit": "100", "after": after ?? "", "include_over_18": sensitiveContent ? "1" : "0"]
+            )
             
             try Task.checkCancellation()
             
-            if (subredditListing.subreddits.isEmpty) {
+            let allowedSubreddits = subredditListing.subreddits.filter {
+                !($0.over18 && !sensitiveContent)
+            }
+            
+            if (allowedSubreddits.isEmpty) {
                 // No more subreddits
                 self.hasMorePages = false
                 self.after = nil
@@ -79,7 +99,7 @@ public class SubredditListingViewModel: ObservableObject {
                 if isRefreshWithContinuation {
                     self.subreddits.removeAll()
                 }
-                self.subreddits.append(contentsOf: subredditListing.subreddits)
+                self.subreddits.append(contentsOf: allowedSubreddits)
                 self.hasMorePages = !(after == nil || after?.isEmpty == true)
             }
             
@@ -137,6 +157,13 @@ public class SubredditListingViewModel: ObservableObject {
             self.sortType = sortTypeKind
             loadSubredditsTaskId = UUID()
             UserDefaults.sortType?.set(sortTypeKind.rawValue, forKey: SortTypeUserDetailsUtils.subredditListingSortTypeKey)
+        }
+    }
+    
+    func setSensitiveContent(_ sensitiveContent: Bool) {
+        if sensitiveContent != self.sensitiveContent {
+            self.sensitiveContent = sensitiveContent
+            refreshSubreddits()
         }
     }
 }
