@@ -150,4 +150,13 @@ struct AccountDao {
             )
         }
     }
+    
+    func getAllAccountsLiveData() -> AnyPublisher<[Account], Error> {
+        ValueObservation
+            .tracking {
+                db in try Account.fetchAll(db, sql: "SELECT * FROM accounts WHERE username != '-'")
+            }
+            .publisher(in: dbPool)
+            .eraseToAnyPublisher()
+    }
 }

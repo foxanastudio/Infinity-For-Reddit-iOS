@@ -53,6 +53,12 @@ struct SubmitCommentView: View {
                             LinkHandler.shared.handle(url: url)
                         }
                 }
+                
+                Divider()
+                
+                UserPicker {
+                    submitCommentViewModel.selectedAccount = $0
+                }
             }
         }
         .themedNavigationBar()

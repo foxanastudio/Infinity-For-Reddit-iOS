@@ -9,9 +9,12 @@ import Foundation
 import MarkdownUI
 
 class SubmitCommentViewModel: ObservableObject {
+    @Published var selectedAccount: Account
+    
     let commentParent: CommentParent
     
     init(commentParent: CommentParent) {
+        self.selectedAccount = AccountViewModel.shared.account
         self.commentParent = commentParent
     }
 }
