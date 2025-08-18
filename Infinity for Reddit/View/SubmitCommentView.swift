@@ -26,7 +26,8 @@ struct SubmitCommentView: View {
                     RowText(title)
                         .primaryText()
                         .padding(.horizontal, 16)
-                        .padding(.vertical, 16)
+                        .padding(.top, 16)
+                        .padding(.bottom, 8)
                 }
                 
                 if let bodyProcessedMarkdown = submitCommentViewModel.commentParent.bodyProcessedMarkdown {
@@ -34,8 +35,9 @@ struct SubmitCommentView: View {
                         .markdownImageProvider(WebImageProvider(mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata))
                         .font(.system(size: 24))
                         .padding(.horizontal, 16)
-                        .padding(.vertical, 16)
-                        .themedCommentMarkdown()
+                        .padding(.top, 8)
+                        .padding(.bottom, 16)
+                        .themedPostCommentMarkdown()
                         .markdownLinkHandler { url in
                             LinkHandler.shared.handle(url: url)
                         }
@@ -44,8 +46,9 @@ struct SubmitCommentView: View {
                         .markdownImageProvider(WebImageProvider(mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata))
                         .font(.system(size: 24))
                         .padding(.horizontal, 16)
-                        .padding(.vertical, 16)
-                        .themedCommentMarkdown()
+                        .padding(.top, 8)
+                        .padding(.bottom, 16)
+                        .themedPostCommentMarkdown()
                         .markdownLinkHandler { url in
                             LinkHandler.shared.handle(url: url)
                         }
