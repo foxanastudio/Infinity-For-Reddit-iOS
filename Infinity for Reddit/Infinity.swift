@@ -19,6 +19,7 @@ struct Infinity: App {
     @StateObject var accountViewModel: AccountViewModel
     @StateObject var customThemeViewModel: CustomThemeViewModel
     @StateObject var fullScreenMediaViewModel: FullScreenMediaViewModel
+    @StateObject var notificationRouter = NotificationRouter.shared
     
     @Environment(\.scenePhase) private var scenePhase
     
@@ -32,7 +33,7 @@ struct Infinity: App {
         _customThemeViewModel = StateObject(wrappedValue: CustomThemeViewModel())
         _fullScreenMediaViewModel = StateObject(wrappedValue: FullScreenMediaViewModel())
         
-        UNUserNotificationCenter.current().delegate = NotificationDelegate.shared
+//        UNUserNotificationCenter.current().delegate = NotificationDelegate.shared
         
         Task {
             let center = UNUserNotificationCenter.current()
@@ -42,6 +43,7 @@ struct Infinity: App {
             }
         }
         
+        NotificationDelegate.shared.configure()
         BackgroundTasksManager.shared.registerBackgroundTask()
     }
 
@@ -52,12 +54,13 @@ struct Infinity: App {
                 .environmentObject(accountViewModel)
                 .environmentObject(customThemeViewModel)
                 .environmentObject(fullScreenMediaViewModel)
+                .environmentObject(notificationRouter)
                 .environment(\.defaultMinListRowHeight, 0)
         }
-//        .onChange(of: scenePhase) { _, newPhase in
-//            if newPhase == .background  {
-//                BackgroundTasksManager.shared.scheduleAppRefresh()
-//            }
-//        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .background  {
+                BackgroundTasksManager.shared.scheduleAppRefresh()
+            }
+        }
     }
 }

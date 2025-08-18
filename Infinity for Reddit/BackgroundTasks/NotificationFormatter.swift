@@ -10,6 +10,7 @@ struct NotificationFormatter {
     static func titleSubtitle(for inbox: Inbox) -> (title: String, subtitle: String) {
         let subject = (inbox.subject ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         let fallback = subject.isEmpty ? "New message" : subject
+        
         switch inbox.messageKind {
         case .t1, .t3:
             let title = (inbox.author?.isEmpty == false) ? inbox.author! : "New comment"

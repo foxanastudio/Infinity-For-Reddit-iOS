@@ -126,12 +126,28 @@ class BackgroundTasksManager {
                 
                 let (title, subtitle) = NotificationFormatter.titleSubtitle(for: inbox)
                 
-                let content  = UNMutableNotificationContent()
-                content.title = title
-                content.subtitle = subtitle
-                content.body = inbox.body ?? "You've got a new message"
-                content.sound = .default
-                content.threadIdentifier = "inbox.\(account.username.lowercased())"
+//                let content  = UNMutableNotificationContent()
+//                content.title = title
+//                content.subtitle = subtitle
+//                content.body = inbox.body ?? "You've got a new message"
+//                content.sound = .default
+//                content.threadIdentifier = "inbox.\(account.username.lowercased())"
+//                
+//                var info: [String: Any] = [
+//                    "accountName": account.username,
+//                    "kind": inbox.messageKind.rawValue
+//                ]
+//                if let fullname = inbox.name { info["messageFullname"] = fullname }
+//                if let ctx = inbox.context { info["context"] = ctx }
+//                content.userInfo = info
+//                
+//                let stableId = "msg.\(account.username.lowercased()).\(inbox.id ?? "\(accIndex).\(msgIndex)")"
+//                try? await userNotificationCenter.add(
+//                    UNNotificationRequest(identifier: stableId, content: content, trigger: nil)
+//                )
+                
+                let stableId = "msg.\(account.username.lowercased()).\(inbox.id ?? "\(accIndex).\(msgIndex)")"
+                let threadId = "inbox.\(account.username.lowercased())"
                 
                 var info: [String: Any] = [
                     "accountName": account.username,
@@ -139,11 +155,14 @@ class BackgroundTasksManager {
                 ]
                 if let fullname = inbox.name { info["messageFullname"] = fullname }
                 if let ctx = inbox.context { info["context"] = ctx }
-                content.userInfo = info
                 
-                let stableId = "msg.\(account.username.lowercased()).\(inbox.id ?? "\(accIndex).\(msgIndex)")"
-                try? await userNotificationCenter.add(
-                    UNNotificationRequest(identifier: stableId, content: content, trigger: nil)
+                try? await NotificationDelegate.shared.postInboxNotification(
+                    stableId: stableId,
+                    threadId: threadId,
+                    title: title,
+                    subtitle: subtitle,
+                    body: inbox.body ?? "You've got a new message",
+                    userInfo: info
                 )
             }
         }

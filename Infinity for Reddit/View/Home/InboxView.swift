@@ -36,5 +36,9 @@ struct InboxView: View {
             
             Spacer()
         }
+        .onReceive(NotificationCenter.default.publisher(for: .inboxDeepLink)) { note in
+            let viewMessage = (note.userInfo?["viewMessage"] as? Bool) ?? false
+            selectedOption = viewMessage ? 1 : 0
+        }
     }
 }
