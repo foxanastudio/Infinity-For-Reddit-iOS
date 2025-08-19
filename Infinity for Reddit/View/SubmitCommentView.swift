@@ -11,6 +11,7 @@ import MarkdownUI
 struct SubmitCommentView: View {
     @StateObject private var submitCommentViewModel: SubmitCommentViewModel
     @State private var selectedRange: NSRange = NSRange(location: 0, length: 0)
+    @State private var toolbarHeight: CGFloat = 0
     
     init(parent: CommentParent) {
         _submitCommentViewModel = StateObject(
@@ -22,68 +23,71 @@ struct SubmitCommentView: View {
     
     var body: some View {
         ZStack {
-            ScrollView {
-                VStack(spacing: 0) {
-                    if let title = submitCommentViewModel.commentParent.title {
-                        RowText(title)
-                            .primaryText()
-                            .padding(.horizontal, 16)
-                            .padding(.top, 16)
-                            .padding(.bottom, 8)
-                    }
-                    
-                    if let bodyProcessedMarkdown = submitCommentViewModel.commentParent.bodyProcessedMarkdown {
-                        Markdown(bodyProcessedMarkdown)
-                            .markdownImageProvider(WebImageProvider(mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata))
-                            .font(.system(size: 24))
-                            .padding(.horizontal, 16)
-                            .padding(.top, 8)
-                            .padding(.bottom, 16)
-                            .themedPostCommentMarkdown()
-                            .markdownLinkHandler { url in
-                                LinkHandler.shared.handle(url: url)
-                            }
-                    } else if let body = submitCommentViewModel.commentParent.body, !body.isEmpty {
-                        Markdown(body)
-                            .markdownImageProvider(WebImageProvider(mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata))
-                            .font(.system(size: 24))
-                            .padding(.horizontal, 16)
-                            .padding(.top, 8)
-                            .padding(.bottom, 16)
-                            .themedPostCommentMarkdown()
-                            .markdownLinkHandler { url in
-                                LinkHandler.shared.handle(url: url)
-                            }
-                    } else {
-                        Spacer()
-                            .frame(height: 8)
-                    }
-                    
-                    Divider()
-                    
-                    UserPicker {
-                        submitCommentViewModel.selectedAccount = $0
-                    }
-                    
-                    ZStack(alignment: .topLeading) {
-                        MarkdownTextField(text: $submitCommentViewModel.text, selectedRange: $selectedRange)
-                            .frame(minHeight: 120)
-                        
-                        if submitCommentViewModel.text.isEmpty {
-                            Text("Your interesting thoughts here")
-                                .secondaryText()
+            VStack(spacing: 0) {
+                ScrollView {
+                    VStack(spacing: 0) {
+                        if let title = submitCommentViewModel.commentParent.title {
+                            RowText(title)
+                                .primaryText()
+                                .padding(.horizontal, 16)
+                                .padding(.top, 16)
+                                .padding(.bottom, 8)
                         }
+                        
+                        if let bodyProcessedMarkdown = submitCommentViewModel.commentParent.bodyProcessedMarkdown {
+                            Markdown(bodyProcessedMarkdown)
+                                .markdownImageProvider(WebImageProvider(mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata))
+                                .font(.system(size: 24))
+                                .padding(.horizontal, 16)
+                                .padding(.top, 8)
+                                .padding(.bottom, 16)
+                                .themedPostCommentMarkdown()
+                                .markdownLinkHandler { url in
+                                    LinkHandler.shared.handle(url: url)
+                                }
+                        } else if let body = submitCommentViewModel.commentParent.body, !body.isEmpty {
+                            Markdown(body)
+                                .markdownImageProvider(WebImageProvider(mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata))
+                                .font(.system(size: 24))
+                                .padding(.horizontal, 16)
+                                .padding(.top, 8)
+                                .padding(.bottom, 16)
+                                .themedPostCommentMarkdown()
+                                .markdownLinkHandler { url in
+                                    LinkHandler.shared.handle(url: url)
+                                }
+                        } else {
+                            Spacer()
+                                .frame(height: 8)
+                        }
+                        
+                        Divider()
+                        
+                        UserPicker {
+                            submitCommentViewModel.selectedAccount = $0
+                        }
+                        
+                        ZStack(alignment: .topLeading) {
+                            MarkdownTextField(text: $submitCommentViewModel.text, selectedRange: $selectedRange)
+                                .frame(minHeight: 120)
+                            
+                            if submitCommentViewModel.text.isEmpty {
+                                Text("Your interesting thoughts here")
+                                    .secondaryText()
+                            }
+                        }
+                        .padding(16)
                     }
-                    .padding(16)
-                    
-                    Spacer()
-                        .frame(height: 32)
                 }
+                
+                Spacer()
+                    .frame(height: toolbarHeight)
             }
             
             MarkdownToolbar(
                 text: $submitCommentViewModel.text,
-                selectedRange: $selectedRange
+                selectedRange: $selectedRange,
+                toolbarHeight: $toolbarHeight
             )
         }
         .frame(maxHeight: .infinity)

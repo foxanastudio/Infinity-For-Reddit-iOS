@@ -10,6 +10,7 @@ import SwiftUI
 struct MarkdownToolbar: View {
     @Binding var text: String
     @Binding var selectedRange: NSRange
+    @Binding var toolbarHeight: CGFloat
     
     @State var isInsertingLink: Bool = false
     @State var linkText: String = ""
@@ -106,6 +107,15 @@ struct MarkdownToolbar: View {
                     }
                 }
             }
+            .background(
+                GeometryReader { geo in
+                    Color.clear
+                        .onAppear { toolbarHeight = geo.size.height }
+                        .onChange(of: geo.size.height) { newValue in
+                            toolbarHeight = newValue
+                        }
+                }
+            )
         }
         .frame(maxHeight: .infinity)
         .overlay(
