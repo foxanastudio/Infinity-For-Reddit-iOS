@@ -44,9 +44,7 @@ struct SliderPreference: View {
                 CustomUISlider(
                     value: $value,
                     in: minValue...maxValue,
-                    step: step,
-                    minTrackColor: UIColor(Color(hex: customThemeViewModel.currentCustomTheme.colorAccent)),
-                    maxTrackColor: UIColor(Color.deriveContrastingColor(hex: customThemeViewModel.currentCustomTheme.colorAccent))
+                    step: step
                 )
             }
         }

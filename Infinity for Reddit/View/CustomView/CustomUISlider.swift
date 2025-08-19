@@ -8,27 +8,24 @@
 import SwiftUI
 
 struct CustomUISlider: UIViewRepresentable {
+    @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
+    
     @Binding var value: Float
+    
     let range: ClosedRange<Float>
     let step: Float
     let thumbColor: UIColor
-    let minTrackColor: UIColor
-    let maxTrackColor: UIColor
 
     init(
         value: Binding<Float>,
         in range: ClosedRange<Float>,
         step: Float = 1,
-        thumbColor: UIColor = .white,
-        minTrackColor: UIColor = .systemBlue,
-        maxTrackColor: UIColor = .gray
+        thumbColor: UIColor = .white
     ) {
         self._value = value
         self.range = range
         self.step = step
         self.thumbColor = thumbColor
-        self.minTrackColor = minTrackColor
-        self.maxTrackColor = maxTrackColor
     }
 
     func makeUIView(context: Context) -> UISlider {
@@ -36,8 +33,8 @@ struct CustomUISlider: UIViewRepresentable {
         slider.minimumValue = range.lowerBound
         slider.maximumValue = range.upperBound
         slider.value = value
-        slider.minimumTrackTintColor = minTrackColor
-        slider.maximumTrackTintColor = maxTrackColor
+        slider.minimumTrackTintColor = UIColor(Color(hex: customThemeViewModel.currentCustomTheme.colorAccent))
+        slider.maximumTrackTintColor = UIColor(Color.deriveContrastingColor(hex: customThemeViewModel.currentCustomTheme.colorAccent))
         slider.thumbTintColor = thumbColor
         slider.addTarget(context.coordinator, action: #selector(Coordinator.valueChanged(_:)), for: .valueChanged)
         return slider
@@ -47,8 +44,8 @@ struct CustomUISlider: UIViewRepresentable {
         if uiView.value != value {
             uiView.value = value
         }
-        uiView.minimumTrackTintColor = minTrackColor
-        uiView.maximumTrackTintColor = maxTrackColor
+        uiView.minimumTrackTintColor = UIColor(Color(hex: customThemeViewModel.currentCustomTheme.colorAccent))
+        uiView.maximumTrackTintColor = UIColor(Color.deriveContrastingColor(hex: customThemeViewModel.currentCustomTheme.colorAccent))
         uiView.thumbTintColor = thumbColor
     }
 

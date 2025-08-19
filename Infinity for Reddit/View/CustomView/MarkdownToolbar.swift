@@ -15,6 +15,7 @@ struct MarkdownToolbar: View {
     @State private var activeAlert: ActiveAlert? = nil
     @State private var linkText: String = ""
     @State private var linkURL: String = ""
+    @State private var headerSize: Float = 1
 
     var body: some View {
         VStack {
@@ -64,7 +65,12 @@ struct MarkdownToolbar: View {
                             .padding(16)
                     }
                     
-                    TouchRipple(backgroundShape: Circle(), action: {}) {
+                    TouchRipple(backgroundShape: Circle(), action: {
+                        headerSize = 1
+                        withAnimation(.linear(duration: 0.2)) {
+                            activeAlert = .header
+                        }
+                    }) {
                         SwiftUI.Image(systemName: "h.circle")
                             .primaryIcon()
                             .padding(16)
@@ -141,18 +147,21 @@ struct MarkdownToolbar: View {
                         CustomTextField("URL", text: $linkURL, singleLine: true)
                     }
                 case .header:
-                    EmptyView()
+                    CustomUISlider(
+                        value: $headerSize,
+                        in: 1...6
+                    )
                 case nil:
                     EmptyView()
                 }
             } onConfirm: {
-                switch activeAlert {
-                case .link:
-                    insertLink()
-                case .header:
-                    break
-                case nil:
-                    break
+                if let alert = activeAlert {
+                    switch alert {
+                    case .link:
+                        insertLink()
+                    case .header:
+                        applyMarkdown(left: String(repeating: "#", count: Int(headerSize)) + " ")
+                    }
                 }
             }
         )

@@ -31,6 +31,8 @@ struct CustomAlert<Content: View>: View {
         self.subtitle = subtitle
         self._isPresented = isPresented
         self.content = content()
+        self.onDismiss = onDismiss
+        self.onConfirm = onConfirm
     }
     
     var body: some View {
