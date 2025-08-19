@@ -10,6 +10,7 @@ import MarkdownUI
 
 class SubmitCommentViewModel: ObservableObject {
     @Published var selectedAccount: Account
+    @Published var text: String = ""
     
     let commentParent: CommentParent
     

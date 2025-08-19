@@ -41,6 +41,9 @@
     "AMOLED Dark" : {
 
     },
+    "B" : {
+
+    },
     "Back" : {
 
     },
@@ -231,6 +234,9 @@
 
     },
     "Home" : {
+
+    },
+    "I" : {
 
     },
     "Ignore Navigation Bar in Immersive Interface" : {
@@ -2243,6 +2249,9 @@
 
     },
     "Vote Buttons on the Right" : {
+
+    },
+    "Your interesting thoughts here" : {
 
     }
   },
