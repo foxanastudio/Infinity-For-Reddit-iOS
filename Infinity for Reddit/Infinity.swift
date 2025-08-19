@@ -19,7 +19,6 @@ struct Infinity: App {
     @StateObject var accountViewModel: AccountViewModel
     @StateObject var customThemeViewModel: CustomThemeViewModel
     @StateObject var fullScreenMediaViewModel: FullScreenMediaViewModel
-    @StateObject var notificationRouter = NotificationRouter.shared
     
     @Environment(\.scenePhase) private var scenePhase
     
@@ -32,8 +31,6 @@ struct Infinity: App {
         _accountViewModel = StateObject(wrappedValue: AccountViewModel.shared)
         _customThemeViewModel = StateObject(wrappedValue: CustomThemeViewModel())
         _fullScreenMediaViewModel = StateObject(wrappedValue: FullScreenMediaViewModel())
-        
-//        UNUserNotificationCenter.current().delegate = NotificationDelegate.shared
         
         Task {
             let center = UNUserNotificationCenter.current()
@@ -54,8 +51,22 @@ struct Infinity: App {
                 .environmentObject(accountViewModel)
                 .environmentObject(customThemeViewModel)
                 .environmentObject(fullScreenMediaViewModel)
-                .environmentObject(notificationRouter)
                 .environment(\.defaultMinListRowHeight, 0)
+                .onOpenURL { url in
+                    guard let parsed = AppDeepLink.parse(url) else { return }
+                    switch parsed {
+                    case .external(let external):
+                        LinkHandler.shared.handle(url: external)
+
+                    case .inbox(let account, let viewMessage, let fullname):
+                        var info: [String: Any] = [
+                            "accountName": account,
+                            "viewMessage": viewMessage
+                        ]
+                        if let fullname { info["messageFullname"] = fullname }
+                        NotificationCenter.default.post(name: .inboxDeepLink, object: nil, userInfo: info)
+                    }
+                }
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .background  {

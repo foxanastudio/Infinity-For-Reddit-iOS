@@ -6,6 +6,19 @@
 	<array>
 		<string>com.docilealligator.infinityforreddit.bg.refresh.inbox</string>
 	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.docilealligator.infinity</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>infinity</string>
+			</array>
+		</dict>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

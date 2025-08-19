@@ -17,7 +17,6 @@ struct HomeView: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
     @EnvironmentObject var customThemeViewModel: CustomThemeViewModel
     @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
-    @EnvironmentObject var notificationRouter: NotificationRouter
     
     @StateObject private var tab1NavigationBarMenuManager: NavigationBarMenuManager = NavigationBarMenuManager()
     @StateObject private var tab2NavigationBarMenuManager: NavigationBarMenuManager = NavigationBarMenuManager()
@@ -187,32 +186,17 @@ struct HomeView: View {
                 timerIsActive = false
             }
         }
-        .onChange(of: notificationRouter.route) { _, newRoute in
-            guard let route = newRoute else { return }
-            switch route.kind {
-            case let .openInbox(account, viewMessage, fullname):
-                selectedTab = .inbox
-                NotificationCenter.default.post(name: .inboxDeepLink, object: nil, userInfo: [
-                    "accountName": account,
-                    "viewMessage": viewMessage,
-                    "messageFullname": fullname as Any
-                ])
-            }
-            
-            notificationRouter.route = nil
-        }
-        .task {
-            if let route = notificationRouter.route {
-                switch route.kind {
-                case let .openInbox(account, viewMessage, fullname):
-                    selectedTab = .inbox
-                    NotificationCenter.default.post(name: .inboxDeepLink, object: nil, userInfo: [
-                        "accountName": account,
-                        "viewMessage": viewMessage,
-                        "messageFullname": fullname as Any
-                    ])
-                }
-                notificationRouter.route = nil
+        .onReceive(NotificationCenter.default.publisher(for: .inboxDeepLink)) { note in
+            selectedTab = .inbox
+
+            let rebroadcasted = (note.userInfo?["rebroadcast"] as? Bool) ?? false
+            guard !rebroadcasted else { return }
+
+            var info = note.userInfo ?? [:]
+            info["rebroadcast"] = true
+
+            Task { @MainActor in
+                NotificationCenter.default.post(name: .inboxDeepLink, object: nil, userInfo: info)
             }
         }
     }

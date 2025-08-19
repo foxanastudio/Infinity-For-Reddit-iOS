@@ -67,11 +67,22 @@ class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
         let kindRaw  = (userInfo["kind"] as? String) ?? ""
         let fullname = userInfo["messageFullname"] as? String
         
-        switch MsgKind.parse(kindRaw) {
-        case .message:
-            NotificationRouter.shared.postOpenInbox(account: account, viewMessage: true, fullname: fullname)
-        case .comment, .link, .account, .subreddit, .other:
-            NotificationRouter.shared.postOpenInbox(account: account, viewMessage: false, fullname: fullname)
+        if let s = userInfo["context"] as? String,
+           let external = URL(string: s),
+           let deep = AppDeepLink.wrap(external) {
+            Task { @MainActor in
+                UIApplication.shared.open(deep)
+            }
+            completion()
+            return
+        }
+        
+        let viewMessage = (MsgKind.parse(kindRaw) == .message)
+        if let deep = AppDeepLink.toInbox(account: account, viewMessage: viewMessage, fullname: fullname) {
+            Task { @MainActor in
+                UIApplication.shared.open(deep)
+            }
+            completion(); return
         }
         
         completion()
