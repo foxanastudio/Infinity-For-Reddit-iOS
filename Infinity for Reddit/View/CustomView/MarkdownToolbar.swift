@@ -13,19 +13,24 @@ struct MarkdownToolbar: View {
     var onLink: () -> Void
 
     var body: some View {
-        HStack(spacing: 16) {
-            Button(action: onBold) {
-                Text("B").bold()
+        ScrollView(.horizontal) {
+            HStack(spacing: 16) {
+                Button(action: onBold) {
+                    SwiftUI.Image(systemName: "bold")
+                        .primaryIcon()
+                }
+                
+                Button(action: onItalic) {
+                    SwiftUI.Image(systemName: "italic")
+                        .primaryIcon()
+                }
+                
+                Button(action: onLink) {
+                    SwiftUI.Image(systemName: "link")
+                        .primaryIcon()
+                }
             }
-            Button(action: onItalic) {
-                Text("I").italic()
-            }
-            Button(action: onLink) {
-                SwiftUI.Image(systemName: "link")
-            }
+            .padding(16)
         }
-        .padding()
-        .background(Color.gray.opacity(0.2))
-        .cornerRadius(10)
     }
 }
