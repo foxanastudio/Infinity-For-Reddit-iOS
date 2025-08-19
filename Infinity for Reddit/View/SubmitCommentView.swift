@@ -80,13 +80,13 @@ struct SubmitCommentView: View {
                 onItalic: { applyMarkdown("_") },
                 onLink: { insertLink() },
                 onStrikeThrough: { applyMarkdown("~~") },
-                onSuperscript: { applyMarkdown("^") },
+                onSuperscript: { applyMarkdown("^(", ")") },
                 onHeader: {},
-                onOrderedList: {},
-                onUnorderedList: {},
-                onSpoiler: {},
-                onQuote: {},
-                onCodeBlock: {},
+                onOrderedList: { applyMarkdown(left: "1. ") },
+                onUnorderedList: { applyMarkdown(left: "* ") },
+                onSpoiler: { applyMarkdown(">!", "!<")},
+                onQuote: { applyMarkdown("> ", "\n\n")},
+                onCodeBlock: { applyMarkdown("```\n", "\n```\n")},
                 onUploadImage: {},
                 onGiphyGif: {}
             )
@@ -110,6 +110,40 @@ struct SubmitCommentView: View {
         } else {
             newText = submitCommentViewModel.text.inserting("\(wrapper)\(wrapper)", at: selectedRange.location)
             selectedRange = NSRange(location: selectedRange.location + wrapper.count,
+                                    length: 0)
+        }
+        submitCommentViewModel.text = newText
+    }
+    
+    private func applyMarkdown(_ left: String, _ right: String) {
+        guard let range = Range(selectedRange, in: submitCommentViewModel.text) else { return }
+        
+        let selectedText = String(submitCommentViewModel.text[range])
+        let newText: String
+        if selectedRange.length > 0 {
+            newText = submitCommentViewModel.text.replacingCharacters(in: range, with: "\(left)\(selectedText)\(right)")
+            selectedRange = NSRange(location: selectedRange.location,
+                                    length: selectedText.count + left.count + right.count)
+        } else {
+            newText = submitCommentViewModel.text.inserting("\(left)\(right)", at: selectedRange.location)
+            selectedRange = NSRange(location: selectedRange.location + left.count,
+                                    length: 0)
+        }
+        submitCommentViewModel.text = newText
+    }
+    
+    private func applyMarkdown(left: String) {
+        guard let range = Range(selectedRange, in: submitCommentViewModel.text) else { return }
+        
+        let selectedText = String(submitCommentViewModel.text[range])
+        let newText: String
+        if selectedRange.length > 0 {
+            newText = submitCommentViewModel.text.replacingCharacters(in: range, with: "\(left)\(selectedText)")
+            selectedRange = NSRange(location: selectedRange.location,
+                                    length: selectedText.count + left.count)
+        } else {
+            newText = submitCommentViewModel.text.inserting("\(left)", at: selectedRange.location)
+            selectedRange = NSRange(location: selectedRange.location + left.count,
                                     length: 0)
         }
         submitCommentViewModel.text = newText
