@@ -40,7 +40,7 @@ struct CustomAlert<Content: View>: View {
                     .ignoresSafeArea()
                     .onTapGesture {
                         onDismiss?()
-                        withAnimation {
+                        withAnimation(.linear(duration: 0.2)) {
                             isPresented = false
                         }
                     }
@@ -52,11 +52,9 @@ struct CustomAlert<Content: View>: View {
                         .padding(.horizontal, 16)
                     
                     if let subtitle {
-                        Spacer()
-                            .frame(height: 16)
-                        
                         Text(subtitle)
                             .secondaryText()
+                            .padding(.top, 16)
                             .padding(.horizontal, 16)
                     }
                     
@@ -66,9 +64,7 @@ struct CustomAlert<Content: View>: View {
                     if let content {
                         content
                             .padding(.horizontal, 16)
-                        
-                        Spacer()
-                            .frame(height: 16)
+                            .padding(.bottom, 20)
                     }
                     
                     Divider()
@@ -76,7 +72,7 @@ struct CustomAlert<Content: View>: View {
                     HStack(spacing: 0) {
                         TouchRipple(action: {
                             onDismiss?()
-                            withAnimation {
+                            withAnimation(.linear(duration: 0.2)) {
                                 isPresented = false
                             }
                         }) {
@@ -94,7 +90,7 @@ struct CustomAlert<Content: View>: View {
                         
                         TouchRipple(action: {
                             onConfirm?()
-                            withAnimation {
+                            withAnimation(.linear(duration: 0.2)) {
                                 isPresented = false
                             }
                         }) {

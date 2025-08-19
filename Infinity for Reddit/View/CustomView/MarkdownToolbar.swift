@@ -37,9 +37,13 @@ struct MarkdownToolbar: View {
                     TouchRipple(backgroundShape: Circle(), action: {
                         if let range = Range(selectedRange, in: text) {
                             linkText = String(text[range])
+                        } else {
+                            linkText = ""
                         }
                         
-                        withAnimation {
+                        linkURL = ""
+                        
+                        withAnimation(.linear(duration: 0.2)) {
                             isInsertingLink = true
                         }
                     }) {
@@ -122,7 +126,7 @@ struct MarkdownToolbar: View {
         .frame(maxHeight: .infinity)
         .overlay(
             CustomAlert(title: "Insert Link", isPresented: $isInsertingLink) {
-                VStack(spacing: 16) {
+                VStack(spacing: 20) {
                     CustomTextField("Text", text: $linkText, singleLine: true)
                     
                     CustomTextField("URL", text: $linkURL, singleLine: true)
