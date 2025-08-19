@@ -251,6 +251,9 @@
     "Karma: %lld" : {
 
     },
+    "Large" : {
+
+    },
     "Lazy Mode Interval" : {
 
     },
@@ -438,6 +441,9 @@
 
     },
     "Since:" : {
+
+    },
+    "Small" : {
 
     },
     "Sort Type" : {

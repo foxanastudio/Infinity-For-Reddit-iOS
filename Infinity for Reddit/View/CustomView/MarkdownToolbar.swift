@@ -147,10 +147,22 @@ struct MarkdownToolbar: View {
                         CustomTextField("URL", text: $linkURL, singleLine: true)
                     }
                 case .header:
-                    CustomUISlider(
-                        value: $headerSize,
-                        in: 1...6
-                    )
+                    VStack(spacing: 4) {
+                        CustomUISlider(
+                            value: $headerSize,
+                            in: 1...6
+                        )
+                        
+                        HStack(spacing: 0) {
+                            Text("Large")
+                                .primaryText()
+                            
+                            Spacer()
+                            
+                            Text("Small")
+                                .primaryText()
+                        }
+                    }
                 case nil:
                     EmptyView()
                 }
