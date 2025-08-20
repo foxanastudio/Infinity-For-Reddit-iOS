@@ -102,8 +102,6 @@ class BackgroundTasksManager {
         for (accIndex, account) in accounts.enumerated() {
             let username = account.username
             let provider = TokenCenter.shared
-//            let accessToken = account.accessToken ?? ""
-//            let refreshToken = account.refreshToken ?? ""
             let perAccountAccessTokenInterceptor = RedditPerAccountAccessTokenInterceptor(
                 getToken: { await provider.currentAccessToken(for: username) },
                 refreshToken: { try await provider.forceRefresh(for: username) }
@@ -125,26 +123,6 @@ class BackgroundTasksManager {
                 maxDelivered = max(maxDelivered, created)
                 
                 let (title, subtitle) = NotificationFormatter.titleSubtitle(for: inbox)
-                
-//                let content  = UNMutableNotificationContent()
-//                content.title = title
-//                content.subtitle = subtitle
-//                content.body = inbox.body ?? "You've got a new message"
-//                content.sound = .default
-//                content.threadIdentifier = "inbox.\(account.username.lowercased())"
-//                
-//                var info: [String: Any] = [
-//                    "accountName": account.username,
-//                    "kind": inbox.messageKind.rawValue
-//                ]
-//                if let fullname = inbox.name { info["messageFullname"] = fullname }
-//                if let ctx = inbox.context { info["context"] = ctx }
-//                content.userInfo = info
-//                
-//                let stableId = "msg.\(account.username.lowercased()).\(inbox.id ?? "\(accIndex).\(msgIndex)")"
-//                try? await userNotificationCenter.add(
-//                    UNNotificationRequest(identifier: stableId, content: content, trigger: nil)
-//                )
                 
                 let stableId = "msg.\(account.username.lowercased()).\(inbox.id ?? "\(accIndex).\(msgIndex)")"
                 let threadId = "inbox.\(account.username.lowercased())"

@@ -1,5 +1,5 @@
 //
-// InboxDeepLink.swift
+// AppDeepLink.swift
 // Infinity for Reddit
 //
 // Created by joeylr2042 on 2025-08-18
@@ -39,14 +39,32 @@ struct AppDeepLink {
         return nil
     }
     
+    static func toExternalLink(url: URL, account: String, fullname: String?) -> URL? {
+        var components = URLComponents()
+        components.scheme = scheme
+        components.host = "link"
+        var items: [URLQueryItem] = [
+            URLQueryItem(name: "account", value: account),
+            URLQueryItem(name: "url", value: url.absoluteString)
+        ]
+        if let fullname { items.append(URLQueryItem(name: "fullname", value: fullname)) }
+        components.queryItems = items
+        return components.url
+    }
+    
     enum Parsed {
         case external(URL)
         case inbox(account: String, viewMessage: Bool, fullname: String?)
+        case link(url: URL, account: String, fullname: String?)
     }
     
     static func parse(_ url: URL) -> Parsed? {
         guard url.scheme == scheme else { return nil }
         guard let comps = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
+        
+        func query(_ name: String) -> String? {
+            comps.queryItems?.first(where: { $0.name == name })?.value
+        }
         
         switch url.host {
         case "open":
@@ -55,13 +73,19 @@ struct AppDeepLink {
                 return .external(u)
             }
         case "inbox":
-            func query(_ name: String) -> String? {
-                comps.queryItems?.first(where: { $0.name == name })?.value
-            }
             let account = query("account") ?? ""
             let viewMsg = (query("viewMessage") == "1")
             let fullname = query("fullname")
             return .inbox(account: account, viewMessage: viewMsg, fullname: fullname)
+        case "link":
+            guard let account = query("account"),
+                  let urlString = query("url"),
+                  let externalUrl = URL(string: urlString) else {
+                break
+            }
+            let fullname = query("fullname")
+            return .link(url: externalUrl, account: account, fullname: fullname)
+            
         default:
             break
         }

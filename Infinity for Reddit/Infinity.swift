@@ -65,6 +65,11 @@ struct Infinity: App {
                         ]
                         if let fullname { info["messageFullname"] = fullname }
                         NotificationCenter.default.post(name: .inboxDeepLink, object: nil, userInfo: info)
+                    case .link(let externalUrl, let account, _):
+                        Task {
+                            await accountViewModel.switchToAccountIfNeeded(account)
+                            LinkHandler.shared.handle(url: externalUrl)
+                        }
                     }
                 }
         }
