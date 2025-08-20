@@ -10,6 +10,12 @@ import SwiftUI
 @MainActor
 class HomeViewModel: ObservableObject {
     @Published var hasNewMessages: Bool = false
+    @Published var pendingInboxRoute: InboxRoute?
+    
+    struct InboxRoute: Equatable {
+        let viewMessage: Bool
+    }
+    
     private let userDefaults: UserDefaults
     
     init() {

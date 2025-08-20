@@ -8,5 +8,4 @@ import Foundation
 
 extension Notification.Name {
     static let inboxDeepLink = Notification.Name("inboxDeepLink")
-    static let inboxDeepLinkForwarded = Notification.Name("inboxDeepLinkForwarded")
 }

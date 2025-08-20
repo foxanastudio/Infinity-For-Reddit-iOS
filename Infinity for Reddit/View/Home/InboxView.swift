@@ -11,6 +11,7 @@ import GRDB
 
 struct InboxView: View {
     @Environment(\.dependencyManager) private var dependencyManager: Container
+    @EnvironmentObject var homeViewModel: HomeViewModel
     
     @State private var selectedOption = 0
     
@@ -36,9 +37,14 @@ struct InboxView: View {
             
             Spacer()
         }
-        .onReceive(NotificationCenter.default.publisher(for: .inboxDeepLinkForwarded)) { note in
-            let viewMessage = (note.userInfo?["viewMessage"] as? Bool) ?? false
-            selectedOption = viewMessage ? 1 : 0
+        .onAppear { applyPendingRouteIfAny() }
+        .onChange(of: homeViewModel.pendingInboxRoute, initial: true) { _, _  in applyPendingRouteIfAny() }
+    }
+    
+    private func applyPendingRouteIfAny() {
+        if let route = homeViewModel.pendingInboxRoute {
+            selectedOption = route.viewMessage ? 1 : 0
+            homeViewModel.pendingInboxRoute = nil 
         }
     }
 }

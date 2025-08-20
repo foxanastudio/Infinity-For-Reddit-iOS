@@ -95,6 +95,7 @@ struct HomeView: View {
                         .tag(Tab.inbox)
                         .badge(homeViewModel.hasNewMessages ? "!" : nil)
                         .environmentObject(tab3NavigationBarMenuManager)
+                        .environmentObject(homeViewModel)
                     }
                     
                     CustomNavigationStack {
@@ -188,16 +189,16 @@ struct HomeView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .inboxDeepLink)) { note in
             let accountName = (note.userInfo?["accountName"] as? String) ?? ""
+            let viewMessage = (note.userInfo?["viewMessage"] as? Bool) ?? false
+            
             Task { @MainActor in
                 if !accountName.isEmpty {
                     await accountViewModel.switchToAccountIfNeeded(accountName)
                 }
                 selectedTab = .inbox
-                NotificationCenter.default.post(
-                    name: .inboxDeepLinkForwarded,
-                    object: nil,
-                    userInfo: note.userInfo
-                )
+                Task { @MainActor in
+                    homeViewModel.pendingInboxRoute = .init(viewMessage: viewMessage)
+                }
             }
         }
     }
