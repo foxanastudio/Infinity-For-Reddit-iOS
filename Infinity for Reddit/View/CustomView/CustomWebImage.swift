@@ -143,5 +143,6 @@ struct CustomWebImage<Placeholder: View, Fallback: View>: View {
                     }
             }
         }
+        .id(urlString)
     }
 }

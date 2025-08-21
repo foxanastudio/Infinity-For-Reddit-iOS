@@ -30,7 +30,6 @@ struct UserPicker: View {
             }
         } label: {
             SimpleWebImageTouchItemRow(text: userPickerViewModel.selectedAccount.username, iconUrl: userPickerViewModel.selectedAccount.profileImageUrl)
-                .id(userPickerViewModel.selectedAccount)
         }
     }
 }
