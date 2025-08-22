@@ -7,6 +7,7 @@
 
 import Foundation
 import MarkdownUI
+import SwiftUI
 
 class SubmitCommentViewModel: ObservableObject {
     @Published var selectedAccount: Account
@@ -24,21 +25,21 @@ class SubmitCommentViewModel: ObservableObject {
         self.submitCommentRepository = submitCommentRepository
     }
     
-    func submitComment() async {
-        guard isSubmitting == false else { return }
+    func submitComment() async -> Comment? {
+        guard isSubmitting == false else { return nil }
         
         await MainActor.run {
             isSubmitting = true
         }
         
+        var sentComment: Comment? = nil
         do {
-            let comment = try await submitCommentRepository.submitComment(
+            sentComment = try await submitCommentRepository.submitComment(
                 accout: selectedAccount,
                 content: text,
                 parentFullname: commentParent.parentFullname ?? "",
                 depth: commentParent.childCommentDepth
             )
-            print(comment.body ?? "no body")
         } catch {
             await MainActor.run {
                 self.error = error
@@ -49,5 +50,7 @@ class SubmitCommentViewModel: ObservableObject {
         await MainActor.run {
             isSubmitting = false
         }
+        
+        return sentComment
     }
 }

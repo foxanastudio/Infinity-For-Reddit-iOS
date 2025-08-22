@@ -11,6 +11,7 @@ struct CustomNavigationStack<Content: View>: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
     
     @StateObject private var navigationManager = NavigationManager()
+    @StateObject var commentSubmissionShareableViewModel: CommentSubmissionShareableViewModel = CommentSubmissionShareableViewModel()
     
     let content: () -> Content
     
@@ -25,12 +26,14 @@ struct CustomNavigationStack<Content: View>: View {
                     case .postDetails(let postDetailsInput, let isFromSubredditPostListing):
                         PostDetailsView(account: self.accountViewModel.account, postDetailsInput: postDetailsInput, isFromSubredditPostListing: isFromSubredditPostListing)
                             .environmentObject(navigationManager)
+                            .environmentObject(commentSubmissionShareableViewModel)
                     case .postDetailsWithId(let postId, let commentId):
                         PostDetailsView(account: self.accountViewModel.account,
                                         postDetailsInput: PostDetailsInput.postAndCommentId(postId: postId, commentId: commentId),
                                         isFromSubredditPostListing: false
                         )
                         .environmentObject(navigationManager)
+                        .environmentObject(commentSubmissionShareableViewModel)
                     case .subredditDetails(let subredditName):
                         SubredditDetailsView(subredditName: subredditName)
                             .environmentObject(navigationManager)
@@ -49,6 +52,7 @@ struct CustomNavigationStack<Content: View>: View {
                     case .submitComment(let commentParent):
                         SubmitCommentView(parent: commentParent)
                             .environmentObject(navigationManager)
+                            .environmentObject(commentSubmissionShareableViewModel)
                     case .submitTextPost:
                         SubmitTextPostView()
                             .environmentObject(navigationManager)

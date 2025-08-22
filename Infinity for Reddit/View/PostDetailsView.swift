@@ -13,13 +13,16 @@ import Alamofire
 struct PostDetailsView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
+    @EnvironmentObject private var commentSubmissionShareableViewModel: CommentSubmissionShareableViewModel
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dependencyManager) private var dependencyManager: Container
     
     @StateObject var playerManager = PlayerManager()
     @StateObject var postDetailsViewModel: PostDetailsViewModel
+    
     @State private var showSortTypeSheet: Bool = false
     @State private var navigationBarMenuKey: UUID?
+    @State private var sentCommentParent: CommentParent? = nil
     
     @AppStorage(InterfaceCommentUserDefaultsUtils.fullyCollapseCommentKey, store: .interfaceComment)
     private var fullyCollapseComment: Bool = false
@@ -159,6 +162,9 @@ struct PostDetailsView: View {
         .onChange(of: colorScheme) {
             //print(colorScheme == .dark)
         }
+        .onChange(of: commentSubmissionShareableViewModel.sentComment) {
+            print(commentSubmissionShareableViewModel.sentComment?.body ?? "No body")
+        }
         .task(id: postDetailsViewModel.loadPostAndCommentsTaskId) {
             await postDetailsViewModel.initialLoadPostAndComments()
         }
@@ -182,7 +188,9 @@ struct PostDetailsView: View {
                 
                 NavigationBarMenuItem(title: "Send comment") {
                     if let post = postDetailsViewModel.post {
-                        navigationManager.path.append(AppNavigation.submitComment(commentParent: CommentParent.post(parentPost: post)))
+                        let commentParent = CommentParent.post(parentPost: post)
+                        self.sentCommentParent = commentParent
+                        navigationManager.path.append(AppNavigation.submitComment(commentParent: commentParent))
                     }
                 }
             ])

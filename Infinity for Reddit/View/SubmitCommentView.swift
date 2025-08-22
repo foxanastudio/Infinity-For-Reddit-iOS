@@ -9,7 +9,11 @@ import SwiftUI
 import MarkdownUI
 
 struct SubmitCommentView: View {
+    @EnvironmentObject private var commentSubmissionShareableViewModel: CommentSubmissionShareableViewModel
+    @Environment(\.dismiss) var dismiss
+    
     @StateObject private var submitCommentViewModel: SubmitCommentViewModel
+    
     @State private var selectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var toolbarHeight: CGFloat = 0
     
@@ -104,7 +108,15 @@ struct SubmitCommentView: View {
                 
                 Button {
                     Task {
-                        await submitCommentViewModel.submitComment()
+                        let sentComment = await submitCommentViewModel.submitComment()
+                        if let sentComment = sentComment {
+                            await MainActor.run {
+                                commentSubmissionShareableViewModel.sentComment = sentComment
+                                dismiss()
+                            }
+                        } else {
+                            // Failed to submit this comment
+                        }
                     }
                 } label: {
                     SwiftUI.Image(systemName: "paperplane.fill")
