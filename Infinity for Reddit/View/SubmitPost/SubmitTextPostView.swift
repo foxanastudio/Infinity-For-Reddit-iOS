@@ -8,7 +8,9 @@ import SwiftUI
         
 struct SubmitTextPostView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
+    @EnvironmentObject private var subredditChooseViewModel: SubredditChooseViewModel
     @StateObject private var submitTextPostViewModel: SubmitTextPostViewModel
+    
     @State private var selectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var toolbarHeight: CGFloat = 0
     @State private var receiveReplyNotification: Bool = false
@@ -30,6 +32,7 @@ struct SubmitTextPostView: View {
                 SubredditChooseView(text: "Choose a subreddit", iconUrl: nil, action: {
                     navigationManager.path.append(AppNavigation.chooseSubredditForNewPost)
                 })
+                .environmentObject(subredditChooseViewModel)
                 
                 Toggle(isOn: $receiveReplyNotification) {
                     Text("Receive post reply notifications")

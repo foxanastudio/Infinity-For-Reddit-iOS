@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct SubscriptionItemView: View {
+    @Environment(\.dismiss) private var dismiss 
+    @EnvironmentObject private var subredditChooseViewModel: SubredditChooseViewModel
+    
     var text: String
     var iconUrl: String?
     var iconSize: CGFloat = 24

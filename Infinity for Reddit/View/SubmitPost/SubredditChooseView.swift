@@ -7,6 +7,9 @@
 import SwiftUI
 
 struct SubredditChooseView: View {
+    
+    @EnvironmentObject var subredditChooseViewModel: SubredditChooseViewModel
+    
     var text: String
     var iconUrl: String?
     var iconSize: CGFloat = 24
@@ -15,7 +18,7 @@ struct SubredditChooseView: View {
     var body: some View {
         TouchRipple {
             HStack(spacing: 0) {
-                if let icon = iconUrl {
+                if let icon = subredditChooseViewModel.selectedSubreddit?.iconUrl {
                     CustomWebImage(
                         icon,
                         width: iconSize,
@@ -31,21 +34,9 @@ struct SubredditChooseView: View {
                 Spacer()
                     .frame(width: 24)
                 
-                Text(text)
+                Text(subredditChooseViewModel.selectedSubreddit?.name ?? text)
                     .primaryText()
                     .frame(maxWidth: .infinity, alignment: .leading)
-                
-//                Button(action: {}) {
-//                    SwiftUI.Image(systemName: isFavorite ? "heart.fill" : "heart")
-//                        .foregroundColor(Color(hex: "#EE0264"))
-//                }
-//                .highPriorityGesture(
-//                    TapGesture()
-//                        .onEnded {
-//                            isFavorite.toggle()
-//                            toggleFavorite()
-//                        }
-//                )
             }
             .frame(maxWidth: .infinity)
             .padding(.horizontal, 16)

@@ -12,6 +12,7 @@ struct CustomNavigationStack<Content: View>: View {
     
     @StateObject private var navigationManager = NavigationManager()
     @StateObject var commentSubmissionShareableViewModel: CommentSubmissionShareableViewModel = CommentSubmissionShareableViewModel()
+    @StateObject var subredditChooseViewModel: SubredditChooseViewModel = SubredditChooseViewModel()
     
     let content: () -> Content
     
@@ -56,6 +57,7 @@ struct CustomNavigationStack<Content: View>: View {
                     case .submitTextPost:
                         SubmitTextPostView()
                             .environmentObject(navigationManager)
+                            .environmentObject(subredditChooseViewModel)
                     case .submitLinkPost:
                         SubmitLinkPostView()
                             .environmentObject(navigationManager)
@@ -74,6 +76,7 @@ struct CustomNavigationStack<Content: View>: View {
                     case .chooseSubredditForNewPost:
                         SubredditSelectionView()
                             .environmentObject(navigationManager)
+                            .environmentObject(subredditChooseViewModel)
                     }
                 }
                 .navigationDestination(for: MoreViewNavigation.self) { destination in

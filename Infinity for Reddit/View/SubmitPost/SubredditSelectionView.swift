@@ -55,6 +55,8 @@ struct SubredditSelectionView: View {
     struct SubredditsView: View {
         @EnvironmentObject var navigationManager: NavigationManager
         @ObservedObject var subscriptionListingViewModel: SubscriptionListingViewModel
+        @Environment(\.dismiss) private var dismiss
+        @EnvironmentObject private var subredditChooseViewModel: SubredditChooseViewModel
         
         var body: some View {
             Group {
@@ -71,8 +73,9 @@ struct SubredditSelectionView: View {
                             Section(header: Text("Favorite").listSectionHeader()) {
                                 ForEach(subscriptionListingViewModel.favoriteSubredditSubscriptions, id: \.identityInView) { subscription in
                                     SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
-                                        navigationManager.path.append(AppNavigation.subredditDetails(subredditName: subscription.name))
-                                    }) {
+                                        subredditChooseViewModel.selectedSubreddit = subscription
+                                        dismiss()
+                                    }){
                                         subscription.isFavorite.toggle()
                                         Task {
                                             await subscriptionListingViewModel.toggleFavoriteSubreddit(subscription)
@@ -87,7 +90,8 @@ struct SubredditSelectionView: View {
                         Section(header: Text("All").listSectionHeader()) {
                             ForEach(subscriptionListingViewModel.subredditSubscriptions, id: \.identityInView) { subscription in
                                 SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
-                                    navigationManager.path.append(AppNavigation.subredditDetails(subredditName: subscription.name))
+                                    subredditChooseViewModel.selectedSubreddit = subscription
+                                    dismiss()
                                 }) {
                                     subscription.isFavorite.toggle()
                                     Task {
