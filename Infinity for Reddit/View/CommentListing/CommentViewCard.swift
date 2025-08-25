@@ -32,11 +32,13 @@ struct CommentViewCard: View {
     let formatter = DateFormatter()
     private let isInPostDetails: Bool
     let onToggleExpand: (() -> Void)?
+    let onReply: (() -> Void)?
     
-    init(account: Account, comment: Comment, isInPostDetails: Bool, onToggleExpand: (() -> Void)? = nil) {
+    init(account: Account, comment: Comment, isInPostDetails: Bool, onToggleExpand: (() -> Void)? = nil, onReply: (() -> Void)? = nil) {
         formatter.dateFormat = "y-MM-dd H:mm"
         self.isInPostDetails = isInPostDetails
         self.onToggleExpand = onToggleExpand
+        self.onReply = onReply
         self.isToolbarHidden = UserDefaults.interfaceComment.bool(forKey: InterfaceCommentUserDefaultsUtils.hideToolbarKey)
         _commentViewModel = StateObject(wrappedValue: CommentViewModel(account: account, comment: comment, commentRepository: CommentRepository()))
     }
@@ -184,7 +186,19 @@ struct CommentViewCard: View {
                                     .commentIconTemplateRendering()
                                     .commentIcon()
                             }
+                            .padding(.trailing, 16)
                             .buttonStyle(.borderless)
+                            
+                            if isInPostDetails {
+                                Button(action: {
+                                    onReply?()
+                                }) {
+                                    SwiftUI.Image(systemName: "arrowshape.turn.up.left.fill")
+                                        .commentIconTemplateRendering()
+                                        .commentIcon()
+                                }
+                                .buttonStyle(.borderless)
+                            }
                         }
                         .padding(.horizontal, 16)
                         .padding(.bottom, 12)

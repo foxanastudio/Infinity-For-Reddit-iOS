@@ -103,6 +103,10 @@ struct PostDetailsView: View {
                                         }
                                     }
                                 }
+                            }, onReply: {
+                                let commentParent = CommentParent.comment(parentComment: comment)
+                                self.sentCommentParent = commentParent
+                                navigationManager.path.append(AppNavigation.submitComment(commentParent: commentParent))
                             })
                             .listPlainItemNoInsets()
                             .id(comment.id)
@@ -168,6 +172,8 @@ struct PostDetailsView: View {
                     postDetailsViewModel.insertSubmittedComment(sentComment, commentParent: sentCommentParent)
                 }
                 print(commentSubmissionShareableViewModel.sentComment?.body ?? "No body")
+                commentSubmissionShareableViewModel.sentComment = nil
+                sentCommentParent = nil
             }
         }
         .task(id: postDetailsViewModel.loadPostAndCommentsTaskId) {

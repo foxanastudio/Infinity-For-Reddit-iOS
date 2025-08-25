@@ -492,7 +492,7 @@ public class PostDetailsViewModel: ObservableObject {
                 if parentComment.isCollasped {
                     expandComments(comment: parentComment)
                 } else {
-                    self.visibleComments[index] = .comment(comment)
+                    self.visibleComments.insert(.comment(comment), at: index + 1)
                 }
             default:
                 break
