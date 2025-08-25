@@ -9,6 +9,9 @@ import SwiftUI
 struct SubredditChooseView: View {
     
     @EnvironmentObject var subredditChooseViewModel: SubredditChooseViewModel
+    @EnvironmentObject var accountViewModel: AccountViewModel
+    
+    @State private var showNoSubredditAlert = false
     
     var text: String
     var iconUrl: String?
@@ -37,6 +40,24 @@ struct SubredditChooseView: View {
                 Text(subredditChooseViewModel.selectedSubreddit?.name ?? text)
                     .primaryText()
                     .frame(maxWidth: .infinity, alignment: .leading)
+                
+                Spacer()
+                
+                Button("Rules") {
+                    if subredditChooseViewModel.selectedSubreddit == nil {
+                        showNoSubredditAlert = true
+                    } else {
+                        Task {
+                            let isAnonymous: Bool = accountViewModel.account.isAnonymous()
+                            await subredditChooseViewModel.fetchRules(
+                                isAnonymous: isAnonymous
+                            )
+                        }
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.blue)
+                .controlSize(.regular)
             }
             .frame(maxWidth: .infinity)
             .padding(.horizontal, 16)
@@ -45,6 +66,11 @@ struct SubredditChooseView: View {
             .onTapGesture {
                 action()
             }
+            .alert("No Subreddit Selected",
+                   isPresented: $showNoSubredditAlert,
+                   actions: { Button("OK", role: .cancel) { } },
+                   message: { Text("Please select a subreddit first") }
+            )
         }
     }
 }
