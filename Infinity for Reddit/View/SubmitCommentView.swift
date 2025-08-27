@@ -16,6 +16,7 @@ struct SubmitCommentView: View {
     
     @State private var selectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var toolbarHeight: CGFloat = 0
+    @State private var showMarkdownPreview = false
     
     init(parent: CommentParent) {
         _submitCommentViewModel = StateObject(
@@ -101,7 +102,7 @@ struct SubmitCommentView: View {
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button {
-                    
+                    showMarkdownPreview = true
                 } label: {
                     SwiftUI.Image(systemName: "eye")
                 }
@@ -122,6 +123,9 @@ struct SubmitCommentView: View {
                     SwiftUI.Image(systemName: "paperplane.fill")
                 }
             }
+        }
+        .sheet(isPresented: $showMarkdownPreview) {
+            MarkdownViewerSheet(markdown: submitCommentViewModel.text)
         }
     }
 }

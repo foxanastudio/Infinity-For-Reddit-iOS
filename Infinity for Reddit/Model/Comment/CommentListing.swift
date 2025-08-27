@@ -70,7 +70,7 @@ public class CommentListingRootClass: NSObject, NSCoding{
 }
 
 public class CommentListing : NSObject, NSCoding, Validatable {
-    var comments : [Comment]! = [Comment]()
+    var comments : [Comment] = [Comment]()
     var commentMore: CommentMore?
     var after : String!
     var before : String!

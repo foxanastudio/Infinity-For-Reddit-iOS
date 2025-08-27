@@ -12,6 +12,7 @@ struct PrimaryTextViewModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
+            .fixedSize(horizontal: false, vertical: true)
             //.font()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor))
     }
@@ -22,6 +23,7 @@ struct SecondaryTextViewModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
+            .fixedSize(horizontal: false, vertical: true)
             //.font()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.secondaryTextColor))
     }
@@ -43,6 +45,7 @@ struct PostInfoTextViewModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
+            .fixedSize(horizontal: false, vertical: true)
             //.font()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.postIconAndInfoColor))
     }
@@ -53,6 +56,7 @@ struct CommentInfoTextViewModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
+            .fixedSize(horizontal: false, vertical: true)
             //.font()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.commentIconAndInfoColor))
     }
@@ -63,6 +67,7 @@ struct UsernameTextViewModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
+            .fixedSize(horizontal: false, vertical: true)
             //.font()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.username))
     }
@@ -82,6 +87,7 @@ struct UsernameOnPostTextViewModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
+            .fixedSize(horizontal: false, vertical: true)
             //.font()
             .foregroundColor(usernameColor)
     }
@@ -92,6 +98,7 @@ struct SubredditTextViewModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
+            .fixedSize(horizontal: false, vertical: true)
             //.font()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.subreddit))
     }
@@ -102,6 +109,7 @@ struct PostTitleTextViewModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
+            .fixedSize(horizontal: false, vertical: true)
             //.font()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.postTitleColor))
     }
@@ -112,6 +120,7 @@ struct PostContentTextViewModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
+            .fixedSize(horizontal: false, vertical: true)
             //.font()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.postContentColor))
     }
@@ -122,6 +131,7 @@ struct CommentTextViewModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
+            .fixedSize(horizontal: false, vertical: true)
             //.font()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.commentColor))
     }

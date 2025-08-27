@@ -353,7 +353,7 @@ public class PostDetailsViewModel: ObservableObject {
     }
     
     public func collapseComments(comment: Comment) {
-        guard comment.replies?.comments?.count ?? -1 > 0 else {
+        guard comment.replies?.comments.count ?? -1 > 0 else {
             return
         }
         
@@ -381,7 +381,7 @@ public class PostDetailsViewModel: ObservableObject {
     }
     
     public func expandComments(comment: Comment) {
-        guard comment.replies?.comments?.count ?? -1 > 0 else {
+        guard comment.replies?.comments.count ?? -1 > 0 else {
             return
         }
         
@@ -472,6 +472,33 @@ public class PostDetailsViewModel: ObservableObject {
             self.sortTypeKind = sortTypeKind
             loadPostAndCommentsTaskId = UUID()
             UserDefaults.sortType?.set(sortTypeKind.rawValue, forKey: SortTypeUserDetailsUtils.postCommentSortTypeKey)
+        }
+    }
+    
+    func insertSubmittedComment(_ comment: Comment, commentParent: CommentParent) {
+        switch commentParent {
+        case .post(parentPost: let post):
+            guard post.id == self.post?.id else { return }
+            self.visibleComments.insert(.comment(comment), at: 0)
+        case .comment(parentComment: let parentComment):
+            guard let visibleIndex = self.visibleComments.firstIndex(where: { $0.id == parentComment.id }) else { return }
+            guard let allIndex = self.allComments.firstIndex(where: { $0.id == parentComment.id }) else { return }
+            switch visibleComments[visibleIndex] {
+            case .comment(let parentComment):
+                if let replies = parentComment.replies {
+                    replies.comments.insert(comment, at: 0)
+                } else {
+                    parentComment.replies = CommentListing(reply: comment)
+                }
+                self.allComments.insert(.comment(comment), at: allIndex + 1)
+                if parentComment.isCollasped {
+                    expandComments(comment: parentComment)
+                } else {
+                    self.visibleComments.insert(.comment(comment), at: visibleIndex + 1)
+                }
+            default:
+                break
+            }
         }
     }
 }

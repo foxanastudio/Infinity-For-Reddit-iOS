@@ -296,6 +296,9 @@
     "No posts" : {
 
     },
+    "No Subreddit Selected" : {
+
+    },
     "No subreddits" : {
 
     },
@@ -315,6 +318,9 @@
 
     },
     "Online: %lld" : {
+
+    },
+    "Please select a subreddit first" : {
 
     },
     "Post" : {
@@ -390,6 +396,9 @@
 
     },
     "Restart the app to see the changes" : {
+
+    },
+    "Rules" : {
 
     },
     "Save" : {

@@ -103,6 +103,10 @@ struct PostDetailsView: View {
                                         }
                                     }
                                 }
+                            }, onReply: {
+                                let commentParent = CommentParent.comment(parentComment: comment)
+                                self.sentCommentParent = commentParent
+                                navigationManager.path.append(AppNavigation.submitComment(commentParent: commentParent))
                             })
                             .listPlainItemNoInsets()
                             .id(comment.id)
@@ -163,7 +167,13 @@ struct PostDetailsView: View {
             //print(colorScheme == .dark)
         }
         .onChange(of: commentSubmissionShareableViewModel.sentComment) {
-            print(commentSubmissionShareableViewModel.sentComment?.body ?? "No body")
+            if let sentComment = commentSubmissionShareableViewModel.sentComment {
+                if let sentCommentParent = self.sentCommentParent {
+                    postDetailsViewModel.insertSubmittedComment(sentComment, commentParent: sentCommentParent)
+                }
+                commentSubmissionShareableViewModel.sentComment = nil
+                sentCommentParent = nil
+            }
         }
         .task(id: postDetailsViewModel.loadPostAndCommentsTaskId) {
             await postDetailsViewModel.initialLoadPostAndComments()

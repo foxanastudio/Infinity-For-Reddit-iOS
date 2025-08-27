@@ -19,6 +19,7 @@ struct MarkdownViewModifier: ViewModifier {
             }.text {
                 ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor))
             })
+            .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -33,6 +34,7 @@ struct PostContentMarkdownViewModifier: ViewModifier {
             }.text {
                 ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.postContentColor))
             })
+            .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -47,5 +49,6 @@ struct CommentMarkdownViewModifier: ViewModifier {
             }.text {
                 ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.commentColor))
             })
+            .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

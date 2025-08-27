@@ -78,8 +78,8 @@ struct UserDetailsView: View {
                     }
                     .padding(.bottom, 10)
                     
-                    userData.description.map {
-                        Markdown($0)
+                    if let description = userData.description, !description.isEmpty {
+                        Markdown(description)
                             .themedMarkdown()
                             .padding(0)
                             .markdownLinkHandler { url in

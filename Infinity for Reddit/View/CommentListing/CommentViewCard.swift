@@ -32,11 +32,13 @@ struct CommentViewCard: View {
     let formatter = DateFormatter()
     private let isInPostDetails: Bool
     let onToggleExpand: (() -> Void)?
+    let onReply: (() -> Void)?
     
-    init(account: Account, comment: Comment, isInPostDetails: Bool, onToggleExpand: (() -> Void)? = nil) {
+    init(account: Account, comment: Comment, isInPostDetails: Bool, onToggleExpand: (() -> Void)? = nil, onReply: (() -> Void)? = nil) {
         formatter.dateFormat = "y-MM-dd H:mm"
         self.isInPostDetails = isInPostDetails
         self.onToggleExpand = onToggleExpand
+        self.onReply = onReply
         self.isToolbarHidden = UserDefaults.interfaceComment.bool(forKey: InterfaceCommentUserDefaultsUtils.hideToolbarKey)
         _commentViewModel = StateObject(wrappedValue: CommentViewModel(account: account, comment: comment, commentRepository: CommentRepository()))
     }
@@ -94,8 +96,8 @@ struct CommentViewCard: View {
                 
                 if !((commentViewModel.comment.isCollasped && fullyCollapseComment && commentViewModel.comment.hasExpandedBefore) || (commentViewModel.comment.isFilteredOut && !commentViewModel.comment.hasExpandedBefore)) {
                     Group {
-                        if commentViewModel.comment.bodyProcessedMarkdown != nil {
-                            Markdown(commentViewModel.comment.bodyProcessedMarkdown!)
+                        if let processedMarkdown = commentViewModel.comment.bodyProcessedMarkdown {
+                            Markdown(processedMarkdown)
                                 .markdownImageProvider(WebImageProvider(mediaMetadata: commentViewModel.comment.mediaMetadata))
                                 .font(.system(size: 24))
                                 .padding(.horizontal, 16)
@@ -152,7 +154,7 @@ struct CommentViewCard: View {
                             
                             Spacer()
                             
-                            if let onToggleExpand, commentViewModel.comment.replies?.comments?.count ?? -1 > 0 {
+                            if let onToggleExpand, commentViewModel.comment.replies?.comments.count ?? -1 > 0 {
                                 Button(action: {
                                     onToggleExpand()
                                 }) {
@@ -184,7 +186,19 @@ struct CommentViewCard: View {
                                     .commentIconTemplateRendering()
                                     .commentIcon()
                             }
+                            .padding(.trailing, 16)
                             .buttonStyle(.borderless)
+                            
+                            if isInPostDetails {
+                                Button(action: {
+                                    onReply?()
+                                }) {
+                                    SwiftUI.Image(systemName: "arrowshape.turn.up.left.fill")
+                                        .commentIconTemplateRendering()
+                                        .commentIcon()
+                                }
+                                .buttonStyle(.borderless)
+                            }
                         }
                         .padding(.horizontal, 16)
                         .padding(.bottom, 12)

@@ -141,15 +141,13 @@ struct SubredditDetailsView: View {
                             }
                             .padding(.bottom, 16)
                             
-                            if subredditData.sidebarDescription?.isEmpty ?? true == false {
-                                subredditData.sidebarDescription.map {
-                                    Markdown($0)
-                                        .themedMarkdown()
-                                        .padding(.bottom, 8)
-                                        .markdownLinkHandler { url in
-                                            LinkHandler.shared.handle(url: url)
-                                        }
-                                }
+                            if let description = subredditData.sidebarDescription, !description.isEmpty {
+                                Markdown(description)
+                                    .themedMarkdown()
+                                    .padding(.bottom, 8)
+                                    .markdownLinkHandler { url in
+                                        LinkHandler.shared.handle(url: url)
+                                    }
                             }
                         }
                         .padding(.horizontal, 16)

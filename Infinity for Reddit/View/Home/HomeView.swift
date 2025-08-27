@@ -24,6 +24,12 @@ struct HomeView: View {
     @StateObject private var tab4NavigationBarMenuManager: NavigationBarMenuManager = NavigationBarMenuManager()
     @StateObject private var tab5NavigationBarMenuManager: NavigationBarMenuManager = NavigationBarMenuManager()
     
+    @StateObject private var tab1SnackbarManager: SnackbarManager = SnackbarManager()
+    @StateObject private var tab2SnackbarManager: SnackbarManager = SnackbarManager()
+    @StateObject private var tab3SnackbarManager: SnackbarManager = SnackbarManager()
+    @StateObject private var tab4SnackbarManager: SnackbarManager = SnackbarManager()
+    @StateObject private var tab5SnackbarManager: SnackbarManager = SnackbarManager()
+    
     @StateObject private var homeViewModel = HomeViewModel()
     
     @State private var selectedTab: Tab = .home
@@ -38,20 +44,24 @@ struct HomeView: View {
         ZStack {
             TabView(selection: $selectedTab) {
                 Group {
-                    CustomNavigationStack {
-                        PostListingView(
-                            account: accountViewModel.account,
-                            postListingMetadata: PostListingMetadata(
-                                // Anonymous subscriptions will be fetched later in PostListingViewModel
-                                postListingType: accountViewModel.account.isAnonymous() ? .anonymousFrontPage(concatenatedSubscriptions: nil) : .frontPage,
-                                headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
-                                queries: nil,
-                                params: nil
-                            ),
-                            handleToolbarMenu: false
-                        )
-                        .setUpHomeTabViewChildNavigationBar()
-                        .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
+                    ZStack {
+                        CustomNavigationStack {
+                            PostListingView(
+                                account: accountViewModel.account,
+                                postListingMetadata: PostListingMetadata(
+                                    // Anonymous subscriptions will be fetched later in PostListingViewModel
+                                    postListingType: accountViewModel.account.isAnonymous() ? .anonymousFrontPage(concatenatedSubscriptions: nil) : .frontPage,
+                                    headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
+                                    queries: nil,
+                                    params: nil
+                                ),
+                                handleToolbarMenu: false
+                            )
+                            .setUpHomeTabViewChildNavigationBar()
+                            .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
+                        }
+                        
+                        Snackbar()
                     }
                     .id(accountViewModel.account.username)
                     .tabItem {
@@ -59,6 +69,7 @@ struct HomeView: View {
                     }
                     .tag(Tab.home)
                     .environmentObject(tab1NavigationBarMenuManager)
+                    .environmentObject(tab1SnackbarManager)
                     
                     CustomNavigationStack {
                         Group {
@@ -79,6 +90,7 @@ struct HomeView: View {
                     }
                     .tag(Tab.subscriptions)
                     .environmentObject(tab2NavigationBarMenuManager)
+                    .environmentObject(tab2SnackbarManager)
                     
                     if !accountViewModel.account.isAnonymous() {
                         CustomNavigationStack {
@@ -96,6 +108,7 @@ struct HomeView: View {
                         .badge(homeViewModel.hasNewMessages ? "!" : nil)
                         .environmentObject(tab3NavigationBarMenuManager)
                         .environmentObject(homeViewModel)
+                        .environmentObject(tab3SnackbarManager)
                     }
                     
                     CustomNavigationStack {
@@ -109,6 +122,7 @@ struct HomeView: View {
                     }
                     .tag(Tab.search)
                     .environmentObject(tab4NavigationBarMenuManager)
+                    .environmentObject(tab4SnackbarManager)
                     
                     CustomNavigationStack {
                         MoreView()
@@ -121,6 +135,7 @@ struct HomeView: View {
                     }
                     .tag(Tab.more)
                     .environmentObject(tab5NavigationBarMenuManager)
+                    .environmentObject(tab5SnackbarManager)
                 }
                 .themedTabViewGroup()
             }
