@@ -50,10 +50,6 @@ struct SubredditChooseView: View {
                         showNoSubredditAlert = true
                     } else {
                         Task {
-//                            let isAnonymous: Bool = accountViewModel.account.isAnonymous()
-                            await subredditChooseViewModel.fetchRules(
-                                isAnonymous: false
-                            )
                             showRulesSheet = true
                         }
                     }

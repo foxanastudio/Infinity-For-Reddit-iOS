@@ -12,7 +12,7 @@ struct CustomNavigationStack<Content: View>: View {
     
     @StateObject private var navigationManager = NavigationManager()
     @StateObject var commentSubmissionShareableViewModel: CommentSubmissionShareableViewModel = CommentSubmissionShareableViewModel()
-    @StateObject var subredditChooseViewModel: SubredditChooseViewModel = SubredditChooseViewModel(ruleRepository: RuleRepository())
+    @StateObject var subredditChooseViewModel: SubredditChooseViewModel = SubredditChooseViewModel(ruleRepository: RuleRepository(), flairRepository: FlairRepository())
     
     let content: () -> Content
     

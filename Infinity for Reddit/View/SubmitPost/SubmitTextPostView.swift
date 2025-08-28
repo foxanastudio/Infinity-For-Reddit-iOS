@@ -9,6 +9,7 @@ import SwiftUI
 struct SubmitTextPostView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
     @EnvironmentObject private var subredditChooseViewModel: SubredditChooseViewModel
+    @EnvironmentObject private var themeViewModel: CustomThemeViewModel
     @StateObject private var submitTextPostViewModel: SubmitTextPostViewModel
     
     @State private var selectedRange: NSRange = NSRange(location: 0, length: 0)
@@ -34,6 +35,41 @@ struct SubmitTextPostView: View {
                 })
                 .environmentObject(subredditChooseViewModel)
                 .environmentObject(navigationManager)
+                
+                Divider()
+                
+                HStack(spacing: 16) {
+                    if !subredditChooseViewModel.flairs.isEmpty {
+                        Button(action: { print("click flair") }) {
+                            Text("Flair")
+                        }
+                        .font(.system(size: 12))
+                        .buttonStyle(.borderedProminent)
+                        .background(Color(hex: themeViewModel.currentCustomTheme.backgroundColor))
+                        .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor))
+                        .controlSize(.small)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor), lineWidth: 0.5)
+                        )
+                    }
+                    
+                    Button(action: { print("click spoiler") }) {
+                        Text("Spoiler")
+                    }
+                    .font(.system(size: 12))
+                    .buttonStyle(.borderedProminent)
+                    .background(Color(hex: themeViewModel.currentCustomTheme.backgroundColor))
+                    .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor))
+                    .controlSize(.small)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor), lineWidth: 0.5)
+                    )
+                    
+                    Spacer()
+                }
+                .padding(16)
                 
                 Toggle(isOn: $receiveReplyNotification) {
                     Text("Receive post reply notifications")
