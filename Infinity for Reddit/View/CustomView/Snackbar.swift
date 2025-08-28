@@ -26,8 +26,12 @@ struct Snackbar: View {
                     
                     if let actionText = snackbarManager.actionText {
                         Button(action: {
-                            snackbarManager.action?()
-                            snackbarManager.dismiss()
+                            withAnimation(.linear(duration: 0.3)) {
+                                isVisible = false
+                            } completion: {
+                                snackbarManager.action?()
+                                snackbarManager.dismiss()
+                            }
                         }) {
                             Text(actionText)
                                 .foregroundStyle(Color.white)
