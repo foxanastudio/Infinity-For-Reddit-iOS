@@ -24,7 +24,7 @@ struct Snackbar: View {
                     RowText(snackbarManager.text)
                         .foregroundStyle(Color.white)
                     
-                    if let actionText = snackbarManager.actionText {
+                    if let actionText = snackbarManager.actionText, !actionText.isEmpty {
                         Button(action: {
                             withAnimation(.linear(duration: 0.3)) {
                                 isVisible = false

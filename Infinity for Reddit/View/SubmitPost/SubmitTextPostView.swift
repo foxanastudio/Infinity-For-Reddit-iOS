@@ -13,6 +13,8 @@ struct SubmitTextPostView: View {
     @StateObject private var submitTextPostViewModel: SubmitTextPostViewModel
     
     @State private var selectedRange: NSRange = NSRange(location: 0, length: 0)
+    @State private var titleTextViewCanFocus: Bool = true
+    @State private var contentTextViewCanFocus: Bool = true
     @State private var toolbarHeight: CGFloat = 0
     @State private var receiveReplyNotification: Bool = false
     @State private var showSelectSubredditView: Bool = false
@@ -81,7 +83,7 @@ struct SubmitTextPostView: View {
                 Divider()
                 
                 ZStack(alignment: .topLeading) {
-                    MarkdownTextField(text: $submitTextPostViewModel.title, selectedRange: $selectedRange)
+                    MarkdownTextField(text: $submitTextPostViewModel.title, selectedRange: $selectedRange, canFocus: $titleTextViewCanFocus)
                         .frame(maxHeight: 10)
                     
                     if submitTextPostViewModel.title.isEmpty {
@@ -93,7 +95,7 @@ struct SubmitTextPostView: View {
                 .padding(16)
                 
                 ZStack(alignment: .topLeading) {
-                    MarkdownTextField(text: $submitTextPostViewModel.content, selectedRange: $selectedRange)
+                    MarkdownTextField(text: $submitTextPostViewModel.content, selectedRange: $selectedRange, canFocus: $contentTextViewCanFocus)
                         .frame(minHeight: 300)
                     
                     if submitTextPostViewModel.content.isEmpty {

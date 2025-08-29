@@ -10,11 +10,13 @@ import MarkdownUI
 
 struct SubmitCommentView: View {
     @EnvironmentObject private var commentSubmissionShareableViewModel: CommentSubmissionShareableViewModel
+    @EnvironmentObject private var snackbarManager: SnackbarManager
     @Environment(\.dismiss) var dismiss
     
     @StateObject private var submitCommentViewModel: SubmitCommentViewModel
     
     @State private var selectedRange: NSRange = NSRange(location: 0, length: 0)
+    @State private var textViewCanFocus: Bool = true
     @State private var toolbarHeight: CGFloat = 0
     @State private var showMarkdownPreview = false
     
@@ -28,73 +30,80 @@ struct SubmitCommentView: View {
     }
     
     var body: some View {
-        ZStack {
-            VStack(spacing: 0) {
-                ScrollView {
-                    VStack(spacing: 0) {
-                        if let title = submitCommentViewModel.commentParent.title {
-                            RowText(title)
-                                .primaryText()
-                                .padding(.horizontal, 16)
-                                .padding(.top, 16)
-                                .padding(.bottom, 8)
-                        }
-                        
-                        if let bodyProcessedMarkdown = submitCommentViewModel.commentParent.bodyProcessedMarkdown {
-                            Markdown(bodyProcessedMarkdown)
-                                .markdownImageProvider(WebImageProvider(mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata))
-                                .font(.system(size: 24))
-                                .padding(.horizontal, 16)
-                                .padding(.top, 8)
-                                .padding(.bottom, 16)
-                                .themedPostCommentMarkdown()
-                                .markdownLinkHandler { url in
-                                    LinkHandler.shared.handle(url: url)
-                                }
-                        } else if let body = submitCommentViewModel.commentParent.body, !body.isEmpty {
-                            Markdown(body)
-                                .markdownImageProvider(WebImageProvider(mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata))
-                                .font(.system(size: 24))
-                                .padding(.horizontal, 16)
-                                .padding(.top, 8)
-                                .padding(.bottom, 16)
-                                .themedPostCommentMarkdown()
-                                .markdownLinkHandler { url in
-                                    LinkHandler.shared.handle(url: url)
-                                }
-                        } else {
-                            Spacer()
-                                .frame(height: 8)
-                        }
-                        
-                        Divider()
-                        
-                        UserPicker {
-                            submitCommentViewModel.selectedAccount = $0
-                        }
-                        
-                        ZStack(alignment: .topLeading) {
-                            MarkdownTextField(text: $submitCommentViewModel.text, selectedRange: $selectedRange)
-                                .frame(minHeight: 300)
-                            
-                            if submitCommentViewModel.text.isEmpty {
-                                Text("Your interesting thoughts here")
-                                    .secondaryText()
+        VStack(spacing: 0) {
+            ZStack {
+                VStack(spacing: 0) {
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            if let title = submitCommentViewModel.commentParent.title {
+                                RowText(title)
+                                    .primaryText()
+                                    .padding(.horizontal, 16)
+                                    .padding(.top, 16)
+                                    .padding(.bottom, 8)
                             }
+                            
+                            if let bodyProcessedMarkdown = submitCommentViewModel.commentParent.bodyProcessedMarkdown {
+                                Markdown(bodyProcessedMarkdown)
+                                    .markdownImageProvider(WebImageProvider(mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata))
+                                    .font(.system(size: 24))
+                                    .padding(.horizontal, 16)
+                                    .padding(.top, 8)
+                                    .padding(.bottom, 16)
+                                    .themedPostCommentMarkdown()
+                                    .markdownLinkHandler { url in
+                                        LinkHandler.shared.handle(url: url)
+                                    }
+                            } else if let body = submitCommentViewModel.commentParent.body, !body.isEmpty {
+                                Markdown(body)
+                                    .markdownImageProvider(WebImageProvider(mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata))
+                                    .font(.system(size: 24))
+                                    .padding(.horizontal, 16)
+                                    .padding(.top, 8)
+                                    .padding(.bottom, 16)
+                                    .themedPostCommentMarkdown()
+                                    .markdownLinkHandler { url in
+                                        LinkHandler.shared.handle(url: url)
+                                    }
+                            } else {
+                                Spacer()
+                                    .frame(height: 8)
+                            }
+                            
+                            Divider()
+                            
+                            UserPicker {
+                                submitCommentViewModel.selectedAccount = $0
+                            }
+                            
+                            ZStack(alignment: .topLeading) {
+                                MarkdownTextField(text: $submitCommentViewModel.text, selectedRange: $selectedRange, canFocus: $textViewCanFocus)
+                                    .frame(minHeight: 300)
+                                    .contentShape(Rectangle())
+                                
+                                if submitCommentViewModel.text.isEmpty {
+                                    Text("Your interesting thoughts here")
+                                        .secondaryText()
+                                }
+                            }
+                            .padding(16)
                         }
-                        .padding(16)
                     }
+                    
+                    Spacer()
+                        .frame(height: toolbarHeight)
                 }
                 
-                Spacer()
-                    .frame(height: toolbarHeight)
+                MarkdownToolbar(
+                    text: $submitCommentViewModel.text,
+                    selectedRange: $selectedRange,
+                    toolbarHeight: $toolbarHeight
+                )
             }
             
-            MarkdownToolbar(
-                text: $submitCommentViewModel.text,
-                selectedRange: $selectedRange,
-                toolbarHeight: $toolbarHeight
-            )
+            KeyboardToolbar {
+                textViewCanFocus = false
+            }
         }
         .frame(maxHeight: .infinity)
         .themedNavigationBar()
@@ -111,16 +120,27 @@ struct SubmitCommentView: View {
                     Task {
                         let sentComment = await submitCommentViewModel.submitComment()
                         if let sentComment = sentComment {
+                            snackbarManager.showSnackbar(text: "Submitting comment. Please wait.")
                             await MainActor.run {
                                 commentSubmissionShareableViewModel.sentComment = sentComment
+                                snackbarManager.dismiss()
                                 dismiss()
                             }
                         } else {
+                            snackbarManager.showSnackbar(text: "Failed to submit comment. Error: \(submitCommentViewModel.error?.localizedDescription ?? "Unknown error")")
                             // Failed to submit this comment
                         }
                     }
                 } label: {
                     SwiftUI.Image(systemName: "paperplane.fill")
+                }
+            }
+            
+            ToolbarItemGroup(placement: .keyboard) {
+                Button {
+                    textViewCanFocus = false
+                } label: {
+                    Text("fuck")
                 }
             }
         }

@@ -12,6 +12,7 @@ struct MarkdownTextField: UIViewRepresentable {
     
     @Binding var text: String
     @Binding var selectedRange: NSRange
+    @Binding var canFocus: Bool
 
     class Coordinator: NSObject, UITextViewDelegate {
         var parent: MarkdownTextField
@@ -57,6 +58,13 @@ struct MarkdownTextField: UIViewRepresentable {
         }
         if uiView.selectedRange != selectedRange {
             uiView.selectedRange = selectedRange
+        }
+        
+        DispatchQueue.main.async {
+            if uiView.isFirstResponder && !canFocus {
+                uiView.resignFirstResponder()
+                self.canFocus = true
+            }
         }
     }
 }

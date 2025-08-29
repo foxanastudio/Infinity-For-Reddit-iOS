@@ -8,9 +8,9 @@
 import Foundation
 
 class SnackbarManager: ObservableObject {
-    @Published var showSnackbar: Bool = true
-    @Published var text: String = "asdfasdfasdf asdfasdfasfasdf sdfdsfsdasdfasdf asdfasdfasdf adsfasdfa sdfasdfasf s"
-    @Published var actionText: String? = "dismiss"
+    @Published var showSnackbar: Bool = false
+    @Published var text: String = ""
+    @Published var actionText: String? = nil
     @Published var action: (() -> Void)? = nil
     
     func dismiss() {

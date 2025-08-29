@@ -26,13 +26,15 @@ struct MarkdownToolbar: View {
                     TouchRipple(backgroundShape: Circle(), action: { applyMarkdown("**") }) {
                         SwiftUI.Image(systemName: "bold")
                             .primaryIcon()
-                            .padding(16)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 16)
                     }
                     
                     TouchRipple(backgroundShape: Circle(), action: { applyMarkdown("*") }) {
                         SwiftUI.Image(systemName: "italic")
                             .primaryIcon()
-                            .padding(16)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 16)
                     }
                     
                     TouchRipple(backgroundShape: Circle(), action: {
@@ -50,19 +52,22 @@ struct MarkdownToolbar: View {
                     }) {
                         SwiftUI.Image(systemName: "link")
                             .primaryIcon()
-                            .padding(16)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 16)
                     }
                     
                     TouchRipple(backgroundShape: Circle(), action: { applyMarkdown("~~") }) {
                         SwiftUI.Image(systemName: "strikethrough")
                             .primaryIcon()
-                            .padding(16)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 16)
                     }
                     
                     TouchRipple(backgroundShape: Circle(), action: { applyMarkdown("^(", ")") }) {
                         SwiftUI.Image(systemName: "textformat.superscript")
                             .primaryIcon()
-                            .padding(16)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 16)
                     }
                     
                     TouchRipple(backgroundShape: Circle(), action: {
@@ -73,49 +78,57 @@ struct MarkdownToolbar: View {
                     }) {
                         SwiftUI.Image(systemName: "h.circle")
                             .primaryIcon()
-                            .padding(16)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 16)
                     }
                     
                     TouchRipple(backgroundShape: Circle(), action: { applyMarkdown(left: "1. ") }) {
                         SwiftUI.Image(systemName: "list.number")
                             .primaryIcon()
-                            .padding(16)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 16)
                     }
                     
                     TouchRipple(backgroundShape: Circle(), action: { applyMarkdown(left: "* ") }) {
                         SwiftUI.Image(systemName: "list.bullet")
                             .primaryIcon()
-                            .padding(16)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 16)
                     }
                     
                     TouchRipple(backgroundShape: Circle(), action: { applyMarkdown(">!", "!<")}) {
                         SwiftUI.Image(systemName: "exclamationmark.triangle.fill")
                             .primaryIcon()
-                            .padding(16)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 16)
                     }
                     
                     TouchRipple(backgroundShape: Circle(), action: { applyMarkdown("> ", "\n\n")}) {
                         SwiftUI.Image(systemName: "quote.opening")
                             .primaryIcon()
-                            .padding(16)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 16)
                     }
                     
                     TouchRipple(backgroundShape: Circle(), action: { applyMarkdown("```\n", "\n```\n")}) {
                         SwiftUI.Image(systemName: "chevron.left.forwardslash.chevron.right")
                             .primaryIcon()
-                            .padding(16)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 16)
                     }
                     
                     TouchRipple(backgroundShape: Circle(), action: {}) {
                         SwiftUI.Image(systemName: "photo")
                             .primaryIcon()
-                            .padding(16)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 16)
                     }
                     
                     TouchRipple(backgroundShape: Circle(), action: {}) {
                         SwiftUI.Image("gif")
                             .primaryIcon()
-                            .padding(16)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 16)
                     }
                 }
             }
