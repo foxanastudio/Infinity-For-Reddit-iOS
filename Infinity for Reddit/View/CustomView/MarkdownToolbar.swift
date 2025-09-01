@@ -12,7 +12,7 @@ struct MarkdownToolbar: View {
     @Binding var selectedRange: NSRange
     @Binding var toolbarHeight: CGFloat
     
-    @FocusState private var focusedField: FieldType?
+    @FocusState.Binding var focusedField: MarkdownFieldType?
     
     @State private var activeAlert: ActiveAlert? = nil
     @State private var linkText: String = ""
@@ -282,10 +282,6 @@ struct MarkdownToolbar: View {
         }
         text = newText
     }
-    
-    private enum FieldType: Hashable {
-        case urlText, urlLink
-    }
 }
 
 private enum ActiveAlert: Identifiable {
@@ -301,4 +297,8 @@ private enum ActiveAlert: Identifiable {
         case .header: return "Insert Header"
         }
     }
+}
+
+enum MarkdownFieldType: Hashable {
+    case urlText, urlLink
 }

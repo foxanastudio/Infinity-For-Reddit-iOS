@@ -18,6 +18,7 @@ struct SubmitCommentView: View {
     @State private var selectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var textViewCanFocus: Bool = true
     @State private var toolbarHeight: CGFloat = 0
+    @FocusState private var markdownFocusedField: MarkdownFieldType?
     @State private var showMarkdownPreview = false
     
     init(parent: CommentParent) {
@@ -97,12 +98,14 @@ struct SubmitCommentView: View {
                 MarkdownToolbar(
                     text: $submitCommentViewModel.text,
                     selectedRange: $selectedRange,
-                    toolbarHeight: $toolbarHeight
+                    toolbarHeight: $toolbarHeight,
+                    focusedField: $markdownFocusedField
                 )
             }
             
             KeyboardToolbar {
                 textViewCanFocus = false
+                markdownFocusedField = nil
             }
         }
         .frame(maxHeight: .infinity)

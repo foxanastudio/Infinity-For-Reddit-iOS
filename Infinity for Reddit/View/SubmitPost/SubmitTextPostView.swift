@@ -12,10 +12,12 @@ struct SubmitTextPostView: View {
     @EnvironmentObject private var themeViewModel: CustomThemeViewModel
     @StateObject private var submitTextPostViewModel: SubmitTextPostViewModel
     
+    @FocusState private var markdownToolbarFocusedField: MarkdownFieldType?
+    
     @State private var selectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var titleTextViewCanFocus: Bool = true
     @State private var contentTextViewCanFocus: Bool = true
-    @State private var toolbarHeight: CGFloat = 0
+    @State private var markdownToolbarHeight: CGFloat = 0
     @State private var receiveReplyNotification: Bool = false
     @State private var showSelectSubredditView: Bool = false
     
@@ -111,7 +113,8 @@ struct SubmitTextPostView: View {
             MarkdownToolbar(
                 text: $submitTextPostViewModel.content,
                 selectedRange: $selectedRange,
-                toolbarHeight: $toolbarHeight
+                toolbarHeight: $markdownToolbarHeight,
+                focusedField: $markdownToolbarFocusedField
             )
         }
         .themedNavigationBar()
