@@ -17,7 +17,10 @@ struct CustomizePostFilterView: View {
     
     @FocusState private var focusedField: FieldType?
     
-    init(_ postFilter: PostFilter?) {
+    private let onApplyPostFilter: ((PostFilter) -> Void)?
+    
+    init(_ postFilter: PostFilter?, onApplyPostFilter: ((PostFilter) -> Void)? = nil) {
+        self.onApplyPostFilter = onApplyPostFilter
         _customizePostFilterViewModel = StateObject(
             wrappedValue: CustomizePostFilterViewModel(
                 postFilter: postFilter,
@@ -413,6 +416,12 @@ struct CustomizePostFilterView: View {
         }
         .themedNavigationBar()
         .toolbar {
+            if let onApplyPostFilter = onApplyPostFilter {
+                Button("", systemImage: "checkmark.circle") {
+                    onApplyPostFilter(customizePostFilterViewModel.getPostFilter())
+                }
+            }
+            
             Button("", systemImage: "tray.and.arrow.down.fill") {
                 if customizePostFilterViewModel.savePostFilter() {
                     dismiss()
@@ -420,6 +429,9 @@ struct CustomizePostFilterView: View {
                     // TODO handle exception
                 }
             }
+        }
+        .applyIf(onApplyPostFilter != nil) {
+            $0.interactiveDismissDisabled(true)
         }
     }
     

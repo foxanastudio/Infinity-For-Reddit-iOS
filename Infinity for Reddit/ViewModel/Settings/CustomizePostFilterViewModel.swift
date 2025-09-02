@@ -104,4 +104,33 @@ public class CustomizePostFilterViewModel: ObservableObject {
         
         return customizePostFilterRepository.savePostFilter(postFilter)
     }
+    
+    func getPostFilter() -> PostFilter {
+        return PostFilter(
+            id: id,
+            name: name,
+            maxVote: maxVote,
+            minVote: minVote,
+            maxComments: maxComments,
+            minComments: minComments,
+            onlySensitive: onlySensitive,
+            onlySpoiler: onlySpoiler,
+            postTitleExcludesRegex: excludesRegex,
+            postTitleContainsRegex: containsRegex,
+            postTitleExcludesStrings: excludesKeywords,
+            postTitleContainsStrings: containsKeywords,
+            excludeSubreddits: excludeSubreddits,
+            excludeUsers: excludeUsers,
+            containFlairs: containFlairs,
+            excludeFlairs: excludeFlairs,
+            excludeDomains: excludeDomains,
+            containDomains: containDomains,
+            containTextType: showText,
+            containLinkType: showLink,
+            containImageType: showImage,
+            containGifType: showGif,
+            containVideoType: showVideo,
+            containGalleryType: showGallery
+        )
+    }
 }

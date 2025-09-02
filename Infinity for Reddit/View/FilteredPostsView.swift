@@ -13,6 +13,7 @@ struct FilteredPostsView: View {
     
     @StateObject private var filteredPostsViewModel: FilteredPostsViewModel
     
+    @State private var showCustomizePostFilterSheet: Bool = false
     @State private var navigationBarMenuKey: UUID?
     
     let postListingMetadata: PostListingMetadata
@@ -28,7 +29,8 @@ struct FilteredPostsView: View {
         PostListingView(
             account: accountViewModel.account,
             postListingMetadata: postListingMetadata,
-            handleToolbarMenu: false
+            handleToolbarMenu: false,
+            showFilterPostsOption: false
         )
         .addTitleToInlineNavigationBar("Filtered Posts")
         .themedNavigationBar()
@@ -41,9 +43,20 @@ struct FilteredPostsView: View {
             }
             navigationBarMenuKey = navigationBarMenuManager.push([
                 NavigationBarMenuItem(title: "Filter Posts") {
-                    
+                    showCustomizePostFilterSheet = true
                 }
             ])
+        }
+        .onDisappear {
+            guard let navigationBarMenuKey else { return }
+            navigationBarMenuManager.pop(key: navigationBarMenuKey)
+        }
+        .sheet(isPresented: $showCustomizePostFilterSheet) {
+            CustomizePostFilterView(
+                filteredPostsViewModel.postFilter
+            ) { postFilter in
+                filteredPostsViewModel.postFilter = postFilter
+            }
         }
     }
 }

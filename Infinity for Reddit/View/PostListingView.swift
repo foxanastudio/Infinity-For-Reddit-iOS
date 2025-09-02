@@ -27,15 +27,17 @@ struct PostListingView: View {
     private let postListingMetadata: PostListingMetadata
     private var isSubredditPostListing: Bool = false
     private let handleToolbarMenu: Bool
+    private let showFilterPostsOption: Bool
     private var isRootView: Bool = true
     
-    init(account: Account, postListingMetadata: PostListingMetadata, handleToolbarMenu: Bool = true) {
+    init(account: Account, postListingMetadata: PostListingMetadata, handleToolbarMenu: Bool = true, showFilterPostsOption: Bool = true) {
         self.account = account
         self.postListingMetadata = postListingMetadata
         if case .subreddit = postListingMetadata.postListingType {
             isSubredditPostListing = true
         }
         self.handleToolbarMenu = handleToolbarMenu
+        self.showFilterPostsOption = showFilterPostsOption
         
         _postListingViewModel = StateObject(
             wrappedValue: PostListingViewModel(
@@ -46,7 +48,7 @@ struct PostListingView: View {
         )
     }
     
-    init(account: Account, postListingMetadata: PostListingMetadata, isRootView: Bool) {
+    init(account: Account, postListingMetadata: PostListingMetadata, isRootView: Bool, showFilterPostsOption: Bool = true) {
         self.account = account
         self.isRootView = isRootView
         self.postListingMetadata = postListingMetadata
@@ -54,6 +56,7 @@ struct PostListingView: View {
             isSubredditPostListing = true
         }
         self.handleToolbarMenu = false
+        self.showFilterPostsOption = showFilterPostsOption
         
         _postListingViewModel = StateObject(
             wrappedValue: PostListingViewModel(
@@ -138,24 +141,27 @@ struct PostListingView: View {
             if let key = navigationBarMenuKey {
                 navigationBarMenuManager.pop(key: key)
             }
-            navigationBarMenuKey = navigationBarMenuManager.push([
+            var options = [
                 NavigationBarMenuItem(title: "Refresh") {
                     postListingViewModel.refreshPosts()
                 },
                 
                 NavigationBarMenuItem(title: "Sort") {
                     showSortTypeKindSheet = true
-                },
-                
-                NavigationBarMenuItem(title: "Filter Posts") {
+                }
+            ]
+            
+            if showFilterPostsOption {
+                options.append(NavigationBarMenuItem(title: "Filter Posts") {
                     navigationManager.path.append(
                         AppNavigation.filterPosts(
-                            postListingMetadata: postListingMetadata,
-                            postFilter: PostFilter()
+                            postListingMetadata: postListingMetadata
                         )
                     )
-                }
-            ])
+                })
+            }
+            
+            navigationBarMenuKey = navigationBarMenuManager.push(options)
         }
         .onDisappear {
             guard let navigationBarMenuKey else { return }
