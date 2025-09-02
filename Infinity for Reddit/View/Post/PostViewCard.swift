@@ -101,7 +101,8 @@ struct PostViewCard: View {
                     SensitiveTag()
                 }
                 
-                FlairView(flairRichtext: postViewModel.post.linkFlairRichtext)
+                FlairView(flairRichtext: postViewModel.post.linkFlairRichtext,
+                          flairText: postViewModel.post.linkFlairText)
                 
                 if postViewModel.post.archived {
                     ArchivedTag()
