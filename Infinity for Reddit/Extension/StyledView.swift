@@ -225,4 +225,14 @@ extension View {
     func neutralTextButton() -> some View {
         self.modifier(NeutralTextButtonViewModifier())
     }
+    
+    func appForegroundBackgroundListener(
+        onAppEntersForeground: @escaping () -> Void,
+        onAppEntersBackground: @escaping () -> Void
+    ) -> some View {
+        self.modifier(AppForegroundBackgroundViewModifier(
+            onAppEntersForeground: onAppEntersForeground,
+            onAppEntersBackground: onAppEntersBackground
+        ))
+    }
 }

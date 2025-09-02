@@ -10,8 +10,8 @@ import AVFoundation
 
 class VideoFullScreenViewModel: ObservableObject {
     @Published var player: AVPlayer = .init()
-    @Published var isLoading: Bool = false
-    @Published var isLoaded: Bool = false
+    @Published private var isLoading: Bool = false
+    @Published private var isLoaded: Bool = false
     
     func loadAndPlay(url: URL) async {
         guard !isLoaded, !isLoading else {

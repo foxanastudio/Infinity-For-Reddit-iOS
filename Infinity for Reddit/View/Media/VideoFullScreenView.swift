@@ -12,8 +12,6 @@ struct VideoFullScreenView: View {
     @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
     @EnvironmentObject var namespaceManager: NamespaceManager
     
-    @Environment(\.scenePhase) private var scenePhase
-    
     @ObservedObject private var videoFullScreenViewModel: VideoFullScreenViewModel
     @State private var scale: CGFloat = 1.0
     @GestureState private var dragOffset: CGSize = .zero
@@ -42,15 +40,11 @@ struct VideoFullScreenView: View {
                 .frame(height: 400)
                 .offset(y: currentDragOffset)
         }
-        .onChange(of: scenePhase) { oldPhase, newPhase in
-            switch newPhase {
-            case .background, .inactive:
-                videoFullScreenViewModel.pause()
-            case .active:
-                videoFullScreenViewModel.play()
-            @unknown default: break
-            }
-        }
+        .appForegroundBackgroundListener(onAppEntersForeground: {
+            videoFullScreenViewModel.play()
+        }, onAppEntersBackground: {
+            videoFullScreenViewModel.pause()
+        })
         .task {
             await videoFullScreenViewModel.loadAndPlay(url: url)
         }

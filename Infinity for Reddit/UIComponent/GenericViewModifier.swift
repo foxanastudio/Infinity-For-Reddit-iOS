@@ -202,3 +202,23 @@ struct FilledCardBackgroundViewModifier: ViewModifier {
             .background(Color(hex: themeViewModel.currentCustomTheme.filledCardViewBackgroundColor))
     }
 }
+
+struct AppForegroundBackgroundViewModifier: ViewModifier {
+    @Environment(\.scenePhase) private var scenePhase
+    
+    let onAppEntersForeground: () -> Void
+    let onAppEntersBackground: () -> Void
+    
+    func body(content: Content) -> some View {
+        content
+            .onChange(of: scenePhase) { oldPhase, newPhase in
+                switch newPhase {
+                case .background, .inactive:
+                    onAppEntersBackground()
+                case .active:
+                    onAppEntersForeground()
+                @unknown default: break
+                }
+            }
+    }
+}
