@@ -37,6 +37,7 @@ struct HomeView: View {
     @State private var selectedTab: Tab = .home
     @State private var showProfile: Bool = false
     @State private var timerIsActive = true
+    @State private var showNewPostSheet: Bool = false
     
     let timer = Timer.publish(every: 15 * 60, on: .main, in: .common).autoconnect()
     
@@ -95,6 +96,12 @@ struct HomeView: View {
                     .environmentObject(tab2SnackbarManager)
                     
                     if !accountViewModel.account.isAnonymous() {
+                        Color.clear
+                            .tabItem {
+                                Label("New Post", systemImage: "plus.circle")
+                            }
+                            .tag(Tab.newPost)
+                        
                         CustomNavigationStack {
                             InboxView(
                                 account: accountViewModel.account
@@ -111,20 +118,20 @@ struct HomeView: View {
                         .environmentObject(tab3NavigationBarMenuManager)
                         .environmentObject(homeViewModel)
                         .environmentObject(tab3SnackbarManager)
+                    } else {
+                        CustomNavigationStack {
+                            SearchView(username: accountViewModel.account.username)
+                                .setUpHomeTabViewChildNavigationBar()
+                                .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
+                        }
+                        .id(accountViewModel.account.username)
+                        .tabItem {
+                            Label("Search", systemImage: "magnifyingglass")
+                        }
+                        .tag(Tab.search)
+                        .environmentObject(tab4NavigationBarMenuManager)
+                        .environmentObject(tab4SnackbarManager)
                     }
-                    
-                    CustomNavigationStack {
-                        SearchView(username: accountViewModel.account.username)
-                            .setUpHomeTabViewChildNavigationBar()
-                            .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
-                    }
-                    .id(accountViewModel.account.username)
-                    .tabItem {
-                        Label("Search", systemImage: "magnifyingglass")
-                    }
-                    .tag(Tab.search)
-                    .environmentObject(tab4NavigationBarMenuManager)
-                    .environmentObject(tab4SnackbarManager)
                     
                     CustomNavigationStack {
                         MoreView()
@@ -149,11 +156,14 @@ struct HomeView: View {
                 print(docsDir)
             }
             .id(accountViewModel.account.username)
-            .onChange(of: selectedTab) { _, newTab in
+            .onChange(of: selectedTab) { oldTab, newTab in
                 print("Tab selection changed to: \(newTab)")
                 
                 if newTab == .inbox {
                     homeViewModel.userViewedInbox()
+                } else if newTab == .newPost {
+                    selectedTab = oldTab
+                    showNewPostSheet = true
                 }
             }
             
@@ -219,10 +229,15 @@ struct HomeView: View {
                 }
             }
         }
+        .sheet(isPresented: $showNewPostSheet) {
+            NewPostSheet()
+                .themedList()
+                .presentationDetents([.medium, .large])
+        }
     }
     
     enum Tab {
-        case home, subscriptions, inbox, search, more
+        case home, subscriptions, inbox, newPost, search, more
         
         var navigationTitle: String {
             switch self {
@@ -231,6 +246,7 @@ struct HomeView: View {
             case .inbox: return "Inbox"
             case .search: return "Search"
             case .more: return "More"
+            default: return ""
             }
         }
     }

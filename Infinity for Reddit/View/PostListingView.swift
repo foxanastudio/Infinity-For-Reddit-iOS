@@ -18,7 +18,6 @@ struct PostListingView: View {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
     
     @StateObject var postListingViewModel: PostListingViewModel
-    @State private var showNewPostMenu: Bool = false
     @State private var showSortTypeKindSheet: Bool = false
     @State private var showSortTypeTimeSheet: Bool = false
     @State private var upcomingSortTypeKind: SortType.Kind?
@@ -146,22 +145,12 @@ struct PostListingView: View {
                 
                 NavigationBarMenuItem(title: "Sort") {
                     showSortTypeKindSheet = true
-                },
-                
-                NavigationBarMenuItem(title: "New Post") {
-                    showNewPostMenu = true
-                },
+                }
             ])
         }
         .onDisappear {
             guard let navigationBarMenuKey else { return }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
-        }
-        .sheet(isPresented: $showNewPostMenu) {
-            NewPostSheet()
-                .themedList()
-                .presentationDetents([.medium, .large])
-                .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor))
         }
         .sheet(isPresented: $showSortTypeKindSheet) {
             SortTypeKindSheet(
