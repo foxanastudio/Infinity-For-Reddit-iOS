@@ -53,8 +53,10 @@ struct FilteredPostsView: View {
         }
         .sheet(isPresented: $showCustomizePostFilterSheet) {
             CustomizePostFilterView(
-                filteredPostsViewModel.postFilter
+                filteredPostsViewModel.postFilter,
+                showInSheet: true
             ) { postFilter in
+                print(postFilter)
                 filteredPostsViewModel.postFilter = postFilter
             }
         }

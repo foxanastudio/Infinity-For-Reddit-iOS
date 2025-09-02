@@ -17,9 +17,11 @@ struct CustomizePostFilterView: View {
     
     @FocusState private var focusedField: FieldType?
     
+    private let showInSheet: Bool
     private let onApplyPostFilter: ((PostFilter) -> Void)?
     
-    init(_ postFilter: PostFilter?, onApplyPostFilter: ((PostFilter) -> Void)? = nil) {
+    init(_ postFilter: PostFilter?, showInSheet: Bool = false, onApplyPostFilter: ((PostFilter) -> Void)? = nil) {
+        self.showInSheet = showInSheet
         self.onApplyPostFilter = onApplyPostFilter
         _customizePostFilterViewModel = StateObject(
             wrappedValue: CustomizePostFilterViewModel(
@@ -31,6 +33,41 @@ struct CustomizePostFilterView: View {
     
     var body: some View {
         VStack(spacing: 0) {
+            if showInSheet {
+                HStack(spacing: 0) {
+                    Text("Cancel")
+                        .neutralTextButton()
+                        .onTapGesture {
+                            dismiss()
+                        }
+                    
+                    Spacer()
+                    
+                    if let onApplyPostFilter = onApplyPostFilter {
+                        Text("Apply")
+                            .positiveTextButton()
+                            .padding(.trailing, 16)
+                            .onTapGesture {
+                                onApplyPostFilter(customizePostFilterViewModel.getPostFilter())
+                                dismiss()
+                            }
+                    }
+                    
+                    Text("Save")
+                        .positiveTextButton()
+                        .onTapGesture {
+                            if customizePostFilterViewModel.savePostFilter() {
+                                onApplyPostFilter?(customizePostFilterViewModel.getPostFilter())
+                                dismiss()
+                            } else {
+                                // TODO handle exception
+                                onApplyPostFilter?(customizePostFilterViewModel.getPostFilter())
+                            }
+                        }
+                }
+                .padding(16)
+            }
+            
             ScrollViewReader { proxy in
                 ScrollView {
                     FilledCardView {
@@ -415,22 +452,24 @@ struct CustomizePostFilterView: View {
             }
         }
         .themedNavigationBar()
-        .toolbar {
-            if let onApplyPostFilter = onApplyPostFilter {
-                Button("", systemImage: "checkmark.circle") {
-                    onApplyPostFilter(customizePostFilterViewModel.getPostFilter())
+        .applyIf(!showInSheet) {
+            $0.toolbar {
+                if let onApplyPostFilter = onApplyPostFilter {
+                    Button("", systemImage: "checkmark.circle") {
+                        onApplyPostFilter(customizePostFilterViewModel.getPostFilter())
+                    }
                 }
-            }
-            
-            Button("", systemImage: "tray.and.arrow.down.fill") {
-                if customizePostFilterViewModel.savePostFilter() {
-                    dismiss()
-                } else {
-                    // TODO handle exception
+                
+                Button("", systemImage: "tray.and.arrow.down.fill") {
+                    if customizePostFilterViewModel.savePostFilter() {
+                        dismiss()
+                    } else {
+                        // TODO handle exception
+                    }
                 }
             }
         }
-        .applyIf(onApplyPostFilter != nil) {
+        .applyIf(showInSheet) {
             $0.interactiveDismissDisabled(true)
         }
     }
