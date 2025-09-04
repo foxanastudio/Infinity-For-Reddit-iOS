@@ -29,11 +29,13 @@ struct FilteredPostsView: View {
         PostListingView(
             account: accountViewModel.account,
             postListingMetadata: postListingMetadata,
+            externalPostFilter: filteredPostsViewModel.postFilter,
             handleToolbarMenu: false,
             showFilterPostsOption: false
         )
         .addTitleToInlineNavigationBar("Filtered Posts")
         .themedNavigationBar()
+        .id(filteredPostsViewModel.postFilter)
         .toolbar {
             NavigationBarMenu()
         }

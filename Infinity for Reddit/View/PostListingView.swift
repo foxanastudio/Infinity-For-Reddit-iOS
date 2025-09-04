@@ -30,7 +30,12 @@ struct PostListingView: View {
     private let showFilterPostsOption: Bool
     private var isRootView: Bool = true
     
-    init(account: Account, postListingMetadata: PostListingMetadata, handleToolbarMenu: Bool = true, showFilterPostsOption: Bool = true) {
+    init(account: Account,
+         postListingMetadata: PostListingMetadata,
+         externalPostFilter: PostFilter? = nil,
+         handleToolbarMenu: Bool = true,
+         showFilterPostsOption: Bool = true
+    ) {
         self.account = account
         self.postListingMetadata = postListingMetadata
         if case .subreddit = postListingMetadata.postListingType {
@@ -42,13 +47,19 @@ struct PostListingView: View {
         _postListingViewModel = StateObject(
             wrappedValue: PostListingViewModel(
                 postListingMetadata: postListingMetadata,
+                externalPostFilter: externalPostFilter,
                 postListingRepository: PostListingRepository(),
                 readPostsRepository: ReadPostsRepository()
             )
         )
     }
     
-    init(account: Account, postListingMetadata: PostListingMetadata, isRootView: Bool, showFilterPostsOption: Bool = true) {
+    init(account: Account,
+         postListingMetadata: PostListingMetadata,
+         externalPostFilter: PostFilter? = nil,
+         isRootView: Bool,
+         showFilterPostsOption: Bool = true
+    ) {
         self.account = account
         self.isRootView = isRootView
         self.postListingMetadata = postListingMetadata
@@ -61,6 +72,7 @@ struct PostListingView: View {
         _postListingViewModel = StateObject(
             wrappedValue: PostListingViewModel(
                 postListingMetadata: postListingMetadata,
+                externalPostFilter: externalPostFilter,
                 postListingRepository: PostListingRepository(),
                 readPostsRepository: ReadPostsRepository()
             )

@@ -85,9 +85,12 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         }
     }
     
-    public func getPostFilter(postListingType: PostListingType) -> PostFilter {
+    public func getPostFilter(postListingType: PostListingType, externalPostFilter: PostFilter?) -> PostFilter {
         do {
-            let postFilters = try postFilterDao.getValidPostFilters(usage: postListingType.postFilterUsageType.rawValue, nameOfUsage: postListingType.postFilterNameOfUsage)
+            var postFilters = try postFilterDao.getValidPostFilters(usage: postListingType.postFilterUsageType.rawValue, nameOfUsage: postListingType.postFilterNameOfUsage)
+            if let externalPostFilter = externalPostFilter {
+                postFilters.append(externalPostFilter)
+            }
             return PostFilter.mergePostFilter(postFilters)
         } catch {
             return PostFilter()

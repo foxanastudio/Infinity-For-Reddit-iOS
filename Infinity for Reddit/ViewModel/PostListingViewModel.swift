@@ -45,6 +45,7 @@ public class PostListingViewModel: ObservableObject {
     }
     
     private var postListingMetadata: PostListingMetadata
+    private var externalPostFilter: PostFilter?
     private var postFilter: PostFilter?
     private var lastLoadedSortType: SortType? = nil
     private var allPostIds = Set<String>()
@@ -67,11 +68,13 @@ public class PostListingViewModel: ObservableObject {
     // MARK: - Initializer
     init(
         postListingMetadata: PostListingMetadata,
+        externalPostFilter: PostFilter?,
         postListingRepository: PostListingRepositoryProtocol,
         readPostsRepository: ReadPostsRepositoryProtocol
     ) {
         self.sortType = postListingMetadata.postListingType.savedSortType
         self.postListingMetadata = postListingMetadata
+        self.externalPostFilter = externalPostFilter
         self.postListingRepository = postListingRepository
         self.readPostsRepository = readPostsRepository
         
@@ -304,7 +307,10 @@ public class PostListingViewModel: ObservableObject {
     }
     
     func fetchPostFilter() {
-        self.postFilter = postListingRepository.getPostFilter(postListingType: postListingMetadata.postListingType)
+        self.postFilter = postListingRepository.getPostFilter(
+            postListingType: postListingMetadata.postListingType,
+            externalPostFilter: externalPostFilter
+        )
         self.postFilter?.allowSensitive = sensitiveContent
         self.postFilter?.allowSpoiler = spoilerContent
     }
