@@ -20,6 +20,8 @@ struct SubmitTextPostView: View {
     @State private var markdownToolbarHeight: CGFloat = 0
     @State private var receiveReplyNotification: Bool = false
     @State private var showSelectSubredditView: Bool = false
+    @State private var showFlairSheet: Bool = false
+    @State private var isSpoiler: Bool = false
     
     init() {
         _submitTextPostViewModel = StateObject(
@@ -44,32 +46,35 @@ struct SubmitTextPostView: View {
                 
                 HStack(spacing: 16) {
                     if !subredditChooseViewModel.flairs.isEmpty {
-                        Button(action: { print("click flair") }) {
-                            Text("Flair")
+                        Button(action: {
+                            showFlairSheet = true
+                        }) {
+                            Text(submitTextPostViewModel.selectedFlair?.text ?? "Flair")
+                                .themedPillButton(
+                                    isSelected: submitTextPostViewModel.selectedFlair != nil,
+                                    selectedBackGround: themeViewModel.currentCustomTheme.flairBackgroundColor,
+                                    selectedForeGround: themeViewModel.currentCustomTheme.flairTextColor,
+                                    defaultBackGround: themeViewModel.currentCustomTheme.backgroundColor,
+                                    defaultForeGround: themeViewModel.currentCustomTheme.primaryTextColor,
+                                    defaultBorder: themeViewModel.currentCustomTheme.primaryTextColor
+                                )
+                            
                         }
-                        .font(.system(size: 12))
-                        .buttonStyle(.borderedProminent)
-                        .background(Color(hex: themeViewModel.currentCustomTheme.backgroundColor))
-                        .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor))
-                        .controlSize(.small)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 6)
-                                .stroke(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor), lineWidth: 0.5)
-                        )
                     }
                     
-                    Button(action: { print("click spoiler") }) {
+                    Button(action: {
+                        isSpoiler.toggle()
+                    }) {
                         Text("Spoiler")
+                            .themedPillButton(
+                                isSelected: isSpoiler,
+                                selectedBackGround: themeViewModel.currentCustomTheme.spoilerBackgroundColor,
+                                selectedForeGround: themeViewModel.currentCustomTheme.spoilerTextColor,
+                                defaultBackGround: themeViewModel.currentCustomTheme.backgroundColor,
+                                defaultForeGround: themeViewModel.currentCustomTheme.primaryTextColor,
+                                defaultBorder: themeViewModel.currentCustomTheme.primaryTextColor
+                            )
                     }
-                    .font(.system(size: 12))
-                    .buttonStyle(.borderedProminent)
-                    .background(Color(hex: themeViewModel.currentCustomTheme.backgroundColor))
-                    .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor))
-                    .controlSize(.small)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor), lineWidth: 0.5)
-                    )
                     
                     Spacer()
                 }
@@ -133,6 +138,16 @@ struct SubmitTextPostView: View {
                     SwiftUI.Image(systemName: "paperplane.fill")
                 }
             }
+        }
+        .sheet(isPresented: $showFlairSheet) {
+            CustomNavigationStack {
+                FlairChooseSheet()
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
+                    .environmentObject(subredditChooseViewModel)
+                    .environmentObject(submitTextPostViewModel)
+            }
+            
         }
     }
 }

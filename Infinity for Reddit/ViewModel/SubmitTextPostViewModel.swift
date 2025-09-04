@@ -11,6 +11,7 @@ class SubmitTextPostViewModel: ObservableObject {
     @Published var title: String = ""  
     @Published var content: String = ""
     @Published var selectedAccount: Account
+    @Published var selectedFlair: Flair?
     
     init() {
         self.selectedAccount = AccountViewModel.shared.account

@@ -235,4 +235,30 @@ extension View {
             onAppEntersBackground: onAppEntersBackground
         ))
     }
+    
+    func themedPillButton(
+        isSelected: Bool,
+        selectedBackGround: Int,
+        selectedForeGround: Int,
+        defaultBackGround: Int,
+        defaultForeGround: Int,
+        defaultBorder: Int,
+        cornerRadius: CGFloat = 6,
+        fontSize: CGFloat = 12,
+        borderWidth: CGFloat = 0.5
+    ) -> some View {
+        self.modifier(
+            PillButtonViewModifier(
+                isSelected: isSelected,
+                selectedBackGround: selectedBackGround,
+                selectedForeGround: selectedForeGround,
+                defaultBackGround: defaultBackGround,
+                defaultForeGround: defaultForeGround,
+                defaultBorder: defaultBorder,
+                cornerRadius: cornerRadius,
+                fontSize: fontSize,
+                borderWidth: borderWidth
+            )
+        )
+    }
 }
