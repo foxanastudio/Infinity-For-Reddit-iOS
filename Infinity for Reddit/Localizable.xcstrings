@@ -56,6 +56,9 @@
     "Check Notifications Interval" : {
 
     },
+    "Choose color" : {
+
+    },
     "Clear All" : {
 
     },
@@ -411,9 +414,6 @@
 
     },
     "Security" : {
-
-    },
-    "Select a color" : {
 
     },
     "Select Sort Time" : {
@@ -2221,6 +2221,7 @@
       }
     },
     "theme_name_description" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
