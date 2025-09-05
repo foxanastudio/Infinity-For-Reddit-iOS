@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct CustomizeCustomThemeView: View {
+    @Environment(\.dismiss) var dismiss
+    
     @StateObject var customizeCustomThemeViewModel: CustomizeCustomThemeViewModel
     @State var title: String?
     @State var showColorPicker: Bool = false
@@ -18,7 +20,7 @@ struct CustomizeCustomThemeView: View {
     
     var body: some View {
         List {
-            NameEntry()
+            NameEntry(customizeCustomThemeViewModel: customizeCustomThemeViewModel)
             
             ForEach(customizeCustomThemeViewModel.customThemeFields, id: \.self) { fieldName in
                 if customizeCustomThemeViewModel.customThemeFieldsBoolType.contains(fieldName) {
@@ -47,6 +49,7 @@ struct CustomizeCustomThemeView: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
                     customizeCustomThemeViewModel.saveCustomTheme()
+                    dismiss()
                 }) {
                     SwiftUI.Image(systemName: "tray.and.arrow.down")
                         .navigationBarImage()
@@ -58,71 +61,89 @@ struct CustomizeCustomThemeView: View {
         .addTitleToInlineNavigationBar("Customize", 1.0)
     }
     
-    private func NameEntry() -> some View {
-        return HStack(alignment: .center) {
-            VStack(alignment: .leading) {
-                Text(customizeCustomThemeViewModel.customTheme.name)
-                    .primaryText()
-                
-                Spacer()
-                    .frame(height: 8)
-                
-                Text(NSLocalizedString("theme_name_description", comment: ""))
-                    .font(.system(size: 14))
-                    .secondaryText()
-            }
-        }
-    }
-    
-    private func ColorEntry(fieldName: String, title: String, description: String, color: IdentifiableBinding<Int>) -> some View {
-        return HStack(alignment: .center) {
-            VStack(alignment: .leading) {
-                Text(title)
-                    .primaryText()
-                
-                Spacer()
-                    .frame(height: 8)
-                
-                Text(description)
-                    .font(.system(size: 14))
-                    .secondaryText()
-            }
-            
-            Spacer()
-            
-            ColorPicker("Select a color", selection: Binding(
-                get: { Color(hex: color.binding.wrappedValue) },
-                set: { newColor in
-                    color.binding.wrappedValue = newColor.toHex()
+    private struct NameEntry: View {
+        @ObservedObject var customizeCustomThemeViewModel: CustomizeCustomThemeViewModel
+        
+        var body: some View {
+            HStack(alignment: .center) {
+                VStack(alignment: .leading) {
+                    Text(customizeCustomThemeViewModel.customTheme.name)
+                        .primaryText()
+                    
+                    Spacer()
+                        .frame(height: 8)
+                    
+                    Text(NSLocalizedString("theme_name_description", comment: ""))
+                        .font(.system(size: 14))
+                        .secondaryText()
                 }
-            ))
-            .frame(width: 24, height: 24)
-            .labelsHidden()
+            }
         }
-        .frame(maxWidth: .infinity)
     }
     
-    private func BooleanEntry(fieldName: String, title: String, description: String, isEnabled: Binding<Bool>) -> some View {
-        return HStack(alignment: .center) {
-            VStack(alignment: .leading) {
-                Text(title)
-                    .primaryText()
+    private struct ColorEntry: View {
+        let fieldName: String
+        let title: String
+        let description: String
+        let color: IdentifiableBinding<Int>
+        
+        var body: some View {
+            HStack(alignment: .center) {
+                VStack(alignment: .leading) {
+                    Text(title)
+                        .primaryText()
+                    
+                    Spacer()
+                        .frame(height: 8)
+                    
+                    Text(description)
+                        .font(.system(size: 14))
+                        .secondaryText()
+                }
                 
                 Spacer()
-                    .frame(height: 8)
                 
-                Text(description)
-                    .font(.system(size: 14))
-                    .secondaryText()
-            }
-            
-            Spacer()
-            
-            Toggle(isOn: isEnabled) {}
+                ColorPicker("Select a color", selection: Binding(
+                    get: { Color(hex: color.binding.wrappedValue) },
+                    set: { newColor in
+                        color.binding.wrappedValue = newColor.toHex()
+                    }
+                ))
+                .frame(width: 24, height: 24)
                 .labelsHidden()
-                .themedToggle()
+            }
+            .frame(maxWidth: .infinity)
         }
-        .frame(maxWidth: .infinity)
+    }
+    
+    private struct BooleanEntry: View {
+        let fieldName: String
+        let title: String
+        let description: String
+        let isEnabled: Binding<Bool>
+        
+        var body: some View {
+            HStack(alignment: .center) {
+                VStack(alignment: .leading) {
+                    Text(title)
+                        .primaryText()
+                    
+                    Spacer()
+                        .frame(height: 8)
+                    
+                    Text(description)
+                        .font(.system(size: 14))
+                        .secondaryText()
+                }
+                
+                Spacer()
+                
+                Toggle(isOn: isEnabled) {}
+                    .labelsHidden()
+                    .themedToggle()
+            }
+            .frame(maxWidth: .infinity)
+        }
     }
     
     private func getWrappedBinding<T>(for binding: Binding<T>) -> IdentifiableBinding<T> {
