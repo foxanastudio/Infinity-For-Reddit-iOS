@@ -83,5 +83,6 @@ struct MoreView: View {
             .listPlainItem()
         }
         .themedList()
+        .rootViewBackground()
     }
 }

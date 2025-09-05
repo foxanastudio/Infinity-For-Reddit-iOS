@@ -41,6 +41,7 @@ struct AnonymousSubscriptionsView: View {
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
         }
+        .rootViewBackground()
         .navigationTitle("Subscriptions")
     }
     

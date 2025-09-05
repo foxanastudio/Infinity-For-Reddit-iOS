@@ -97,8 +97,8 @@ struct HomeView: View {
                     if !accountViewModel.account.isAnonymous() {
                         CustomNavigationStack {
                             NewPostTypeChooserView()
-                            .setUpHomeTabViewChildNavigationBar()
-                            .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
+                                .setUpHomeTabViewChildNavigationBar()
+                                .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
                         }
                         .id(accountViewModel.account.username)
                         .tabItem {

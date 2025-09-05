@@ -82,11 +82,14 @@ struct PostListingView: View {
     var body: some View {
         Group {
             if postListingViewModel.posts.isEmpty {
-                if postListingViewModel.isInitialLoading || postListingViewModel.isInitialLoad {
-                    ProgressIndicator()
-                } else {
-                    Text("No posts")
+                ZStack {
+                    if postListingViewModel.isInitialLoading || postListingViewModel.isInitialLoad {
+                        ProgressIndicator()
+                    } else {
+                        Text("No posts")
+                    }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 if isRootView {
                     List {
@@ -138,6 +141,7 @@ struct PostListingView: View {
                 }
             }
         }
+        .rootViewBackground()
         .applyIf(handleToolbarMenu) {
             $0.toolbar {
                 NavigationBarMenu()

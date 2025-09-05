@@ -38,5 +38,6 @@ struct NewPostTypeChooserView: View {
                 }
             }
         }
+        .rootViewBackground()
     }
 }

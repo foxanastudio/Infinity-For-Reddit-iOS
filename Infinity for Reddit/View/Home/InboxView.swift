@@ -37,8 +37,13 @@ struct InboxView: View {
             
             Spacer()
         }
-        .onAppear { applyPendingRouteIfAny() }
-        .onChange(of: homeViewModel.pendingInboxRoute, initial: true) { _, _  in applyPendingRouteIfAny() }
+        .rootViewBackground()
+        .onAppear {
+            applyPendingRouteIfAny()
+        }
+        .onChange(of: homeViewModel.pendingInboxRoute, initial: true) { _, _  in
+            applyPendingRouteIfAny()
+        }
     }
     
     private func applyPendingRouteIfAny() {

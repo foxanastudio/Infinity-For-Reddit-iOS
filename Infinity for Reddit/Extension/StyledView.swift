@@ -261,4 +261,8 @@ extension View {
             )
         )
     }
+    
+    func rootViewBackground() -> some View {
+        self.modifier(RootViewBackgroundViewModifier())
+    }
 }

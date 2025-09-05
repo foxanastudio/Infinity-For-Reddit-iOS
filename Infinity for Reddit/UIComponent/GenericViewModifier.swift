@@ -222,3 +222,12 @@ struct AppForegroundBackgroundViewModifier: ViewModifier {
             }
     }
 }
+
+struct RootViewBackgroundViewModifier: ViewModifier {
+    @EnvironmentObject var themeViewModel: CustomThemeViewModel
+    
+    func body(content: Content) -> some View {
+        content
+            .background(Color(hex: themeViewModel.currentCustomTheme.backgroundColor))
+    }
+}

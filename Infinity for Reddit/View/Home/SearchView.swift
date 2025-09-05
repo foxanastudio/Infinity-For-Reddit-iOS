@@ -102,5 +102,6 @@ struct SearchView: View {
                 isTextFieldFocused = false
             }
         }
+        .rootViewBackground()
     }
 }
