@@ -166,5 +166,10 @@ struct SubmitTextPostView: View {
             }
             
         }
+        .onChange(of: subredditChooseViewModel.selectedSubreddit?.name ?? "") { _, _ in
+            submitTextPostViewModel.selectedFlair = nil
+            isSpoiler = false
+            isNSFW = false
+        }
     }
 }
