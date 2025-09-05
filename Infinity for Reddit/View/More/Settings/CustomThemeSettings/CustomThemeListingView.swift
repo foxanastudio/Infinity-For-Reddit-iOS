@@ -10,7 +10,7 @@ import Swinject
 import GRDB
 
 struct CustomThemeListingView: View {
-    @Environment(\.dependencyManager) private var dependencyManager: Container
+    @EnvironmentObject private var navigationmanager: NavigationManager
     
     @StateObject private var customThemeListingViewModel = CustomThemeListingViewModel()
     
@@ -23,9 +23,10 @@ struct CustomThemeListingView: View {
     var body: some View {
         List {
             ForEach(customThemeListingViewModel.customThemes, id: \.self.id) { customTheme in
-                NavigationLink(destination: CustomizeCustomThemeView(customTheme: customTheme)) {
-                    ThemeListItem(themeName: customTheme.name, primaryColor: Color(hex: customTheme.colorPrimary))
+                ThemeListItem(themeName: customTheme.name, primaryColor: Color(hex: customTheme.colorPrimary)) {
+                    navigationmanager.path.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customTheme: customTheme))
                 }
+                .listPlainItemNoInsets()
             }
         }
         .themedList()
@@ -33,16 +34,28 @@ struct CustomThemeListingView: View {
         .addTitleToInlineNavigationBar("Custom Themes")
     }
     
-    func ThemeListItem(themeName: String, primaryColor: Color) -> some View {
-        HStack {
-            Circle()
-                .fill(primaryColor)
-                .frame(width: 24, height: 24)
-            
-            Spacer()
-                .frame(width: 16)
-            
-            Text(themeName)
+    struct ThemeListItem: View {
+        let themeName: String
+        let primaryColor: Color
+        let onTap: () -> Void
+        
+        var body: some View {
+            TouchRipple(action: onTap) {
+                HStack(spacing: 0) {
+                    Circle()
+                        .fill(primaryColor)
+                        .frame(width: 24, height: 24)
+                    
+                    Spacer()
+                        .frame(width: 24)
+                    
+                    Text(themeName)
+                    
+                    Spacer()
+                }
+                .padding(16)
+                .contentShape(Rectangle())
+            }
         }
     }
 }
