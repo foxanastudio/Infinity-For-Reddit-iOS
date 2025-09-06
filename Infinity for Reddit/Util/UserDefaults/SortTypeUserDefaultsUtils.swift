@@ -27,8 +27,8 @@ enum SortTypeUserDetailsUtils {
     static let subredditPostSortTypeBaseKey = "subreddit_post_sort_type_"
     static let subredditPostSortTimeBaseKey = "subreddit_post_sort_time_"
     static func getSubredditPost(subredditName: String) -> SortType {
-        let sortTypeKind = SortType.Kind(rawValue: UserDefaults.sortType?.string(forKey: subredditPostSortTypeBaseKey + subredditName) ?? SortType.Kind.hot.rawValue) ?? SortType.Kind.hot
-        let sortTypeTime = SortType.Time(rawValue: UserDefaults.sortType?.string(forKey: subredditPostSortTimeBaseKey + subredditName) ?? SortType.Time.all.rawValue) ?? SortType.Time.all
+        let sortTypeKind = SortType.Kind(rawValue: UserDefaults.sortType?.string(forKey: subredditPostSortTypeBaseKey + subredditName) ?? SortTypeSettingsUserDefaultsUtils.subredditDefaultSortType) ?? SortType.Kind.hot
+        let sortTypeTime = SortType.Time(rawValue: UserDefaults.sortType?.string(forKey: subredditPostSortTimeBaseKey + subredditName) ?? SortTypeSettingsUserDefaultsUtils.subredditDefaultSortTime) ?? SortType.Time.all
         return .init(type: sortTypeKind, time: sortTypeTime)
     }
 
@@ -43,8 +43,8 @@ enum SortTypeUserDetailsUtils {
     static let userPostSortTypeBaseKey = "user_post_sort_type_"
     static let userPostSortTimeBaseKey = "user_post_sort_time_"
     static func getUserPost(username: String) -> SortType {
-        let sortTypeKind = SortType.Kind(rawValue: UserDefaults.sortType?.string(forKey: userPostSortTypeBaseKey + username) ?? SortType.Kind.new.rawValue) ?? SortType.Kind.new
-        let sortTypeTime = SortType.Time(rawValue: UserDefaults.sortType?.string(forKey: userPostSortTimeBaseKey + username) ?? SortType.Time.all.rawValue) ?? SortType.Time.all
+        let sortTypeKind = SortType.Kind(rawValue: UserDefaults.sortType?.string(forKey: userPostSortTypeBaseKey + username) ?? SortTypeSettingsUserDefaultsUtils.userDefaultSortType) ?? SortType.Kind.new
+        let sortTypeTime = SortType.Time(rawValue: UserDefaults.sortType?.string(forKey: userPostSortTimeBaseKey + username) ?? SortTypeSettingsUserDefaultsUtils.userDefaultSortTime) ?? SortType.Time.all
         return .init(type: sortTypeKind, time: sortTypeTime)
     }
 

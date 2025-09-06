@@ -11,6 +11,7 @@ import GRDB
 
 struct ContentSensitivityFilterSettingsView: View {
     @Environment(\.dependencyManager) private var dependencyManager: Container
+    
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.sensitiveContentKey, store: .contentSensitivityFilter) private var sensitiveContent: Bool = false
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSensitiveImagesKey, store: .contentSensitivityFilter) private var blurSensitiveImages: Bool = false
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.doNotBlurSensitiveImagesInSensitiveSubredditsKey, store: .contentSensitivityFilter) private var doNotBlurSensitiveImagesInSensitiveSubreddits: Bool = false

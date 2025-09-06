@@ -103,6 +103,11 @@ public class PostDetailsViewModel: ObservableObject {
             let postDetails: PostDetailsRootClass
             switch postDetailsInput {
             case .post(let post):
+                if SortTypeSettingsUserDefaultsUtils.respectSubredditRecommendedCommentSortType {
+                    await MainActor.run {
+                        self.sortTypeKind = SortType.Kind(rawValue: post.suggestedSort) ?? self.sortTypeKind
+                    }
+                }
                 postDetails = try await postDetailsRepository.fetchComments(
                     postId: post.id,
                     queries: ["sort": sortTypeKind.rawValue]
@@ -471,7 +476,9 @@ public class PostDetailsViewModel: ObservableObject {
         if sortTypeKind != self.sortTypeKind {
             self.sortTypeKind = sortTypeKind
             loadPostAndCommentsTaskId = UUID()
-            UserDefaults.sortType?.set(sortTypeKind.rawValue, forKey: SortTypeUserDetailsUtils.postCommentSortTypeKey)
+            if SortTypeSettingsUserDefaultsUtils.saveSortType && !SortTypeSettingsUserDefaultsUtils.respectSubredditRecommendedCommentSortType {
+                UserDefaults.sortType?.set(sortTypeKind.rawValue, forKey: SortTypeUserDetailsUtils.postCommentSortTypeKey)
+            }
         }
     }
     

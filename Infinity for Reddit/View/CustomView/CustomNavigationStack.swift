@@ -179,7 +179,7 @@ struct CustomNavigationStack<Content: View>: View {
                         CommentFilterUsageListingView(commentFilterId: commentFilterId)
                             .environmentObject(navigationManager)
                     case .sortType:
-                        EmptyView()
+                        SortTypeSettingsView()
                     case .downloadLocation:
                         DownloadLocationSettingsView()
                             .environmentObject(navigationManager)
