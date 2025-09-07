@@ -31,13 +31,16 @@ struct ImageFullScreenView: View {
                 .edgesIgnoringSafeArea(.all)
                 .ignoresSafeArea()
             
-            CustomWebImage(
-                url?.absoluteString ?? "",
-                aspectRatio: aspectRatio,
-                handleImageTapGesture: false,
-                matchedGeometryEffectId: matchedGeometryEffectId
-            )
-            .offset(currentDragOffset)
+            ZoomableScrollView {
+                CustomWebImage(
+                    url?.absoluteString ?? "",
+                    aspectRatio: aspectRatio,
+                    handleImageTapGesture: false,
+                    matchedGeometryEffectId: matchedGeometryEffectId
+                )
+                .offset(currentDragOffset)
+            }
+            .background(Color.clear)
         }
         .gesture(
             DragGesture()
@@ -62,6 +65,7 @@ struct ImageFullScreenView: View {
                 .onEnded { value in
                     if hasStartedDragging && abs(value.translation.height) > 100 {
                         withAnimation {
+                            currentDragOffset = .zero
                             onDismiss()
                         }
                     } else {
