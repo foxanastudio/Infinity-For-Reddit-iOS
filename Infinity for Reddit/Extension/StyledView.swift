@@ -265,4 +265,18 @@ extension View {
     func rootViewBackground() -> some View {
         self.modifier(RootViewBackgroundViewModifier())
     }
+    
+    func mediaGesture(
+        minZoomScale: CGFloat = 1,
+        doubleTapZoomScale: CGFloat = 2,
+        outOfBoundsColor: Color? = nil,
+        onDragEnded: @escaping (CGAffineTransform) -> Bool
+    ) -> some View {
+        self.modifier(MediaGestureViewModifier(
+            minZoomScale: minZoomScale,
+            doubleTapZoomScale: doubleTapZoomScale,
+            outOfBoundsColor: outOfBoundsColor,
+            onDragEnded: onDragEnded
+        ))
+    }
 }

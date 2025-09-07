@@ -37,3 +37,45 @@ struct ViewHeightKeyTestScreen: PreferenceKey {
         value += nextValue()
     }
 }
+
+extension View {
+    @ViewBuilder
+    func modify(@ViewBuilder _ fn: (Self) -> some View) -> some View {
+        fn(self)
+    }
+    
+    @ViewBuilder
+    func animatableTransformEffect(_ transform: CGAffineTransform) -> some View {
+        scaleEffect(
+            x: transform.scaleX,
+            y: transform.scaleY,
+            anchor: .zero
+        )
+        .offset(x: transform.tx, y: transform.ty)
+    }
+}
+
+extension UnitPoint {
+    func scaledBy(_ size: CGSize) -> CGPoint {
+        .init(
+            x: x * size.width,
+            y: y * size.height
+        )
+    }
+}
+
+extension CGAffineTransform {
+    static func anchoredScale(scale: CGFloat, anchor: CGPoint) -> CGAffineTransform {
+        CGAffineTransform(translationX: anchor.x, y: anchor.y)
+            .scaledBy(x: scale, y: scale)
+            .translatedBy(x: -anchor.x, y: -anchor.y)
+    }
+    
+    var scaleX: CGFloat {
+        sqrt(a * a + c * c)
+    }
+    
+    var scaleY: CGFloat {
+        sqrt(b * b + d * d)
+    }
+}
