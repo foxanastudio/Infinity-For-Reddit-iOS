@@ -141,6 +141,7 @@ struct CustomWebImage<Placeholder: View, Fallback: View>: View {
                             customOnTapGesture?()
                         })
                     }
+                    .scaledToFit()
             }
         }
         .id(urlString)
