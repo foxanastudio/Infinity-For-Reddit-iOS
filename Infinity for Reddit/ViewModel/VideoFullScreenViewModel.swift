@@ -15,6 +15,9 @@ class VideoFullScreenViewModel: ObservableObject {
     
     func loadAndPlay(url: URL) async {
         guard !isLoaded, !isLoading else {
+            if player.currentItem != nil {
+                player.play()
+            }
             return
         }
         
@@ -22,23 +25,38 @@ class VideoFullScreenViewModel: ObservableObject {
             isLoading = true
         }
         
-        let item = AVPlayerItem(url: url)
-        
-        player.replaceCurrentItem(with: item)
-        
-        await MainActor.run {
-            isLoaded = true
-            isLoading = true
+        do {
+            let item = try await loadPlayerItem(from: url)
+            player.replaceCurrentItem(with: item)
             
-            player.play()
-            
-            NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime,
-                                                   object: player.currentItem,
-                                                   queue: .main) { _ in
-                self.player.seek(to: .zero)
-                self.player.play()
+            await MainActor.run {
+                isLoaded = true
+                isLoading = false
+                
+                player.play()
+                
+                NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime,
+                                                       object: player.currentItem,
+                                                       queue: .main) { _ in
+                    self.player.seek(to: .zero)
+                    self.player.play()
+                }
+            }
+        } catch {
+            await MainActor.run {
+                isLoaded = true
+                isLoading = false
             }
         }
+    }
+    
+    private func loadPlayerItem(from url: URL) async throws -> AVPlayerItem {
+        let asset = AVURLAsset(url: url)
+        let playable = try await asset.load(.isPlayable)
+        guard playable else {
+            throw NSError(domain: "VideoLoadingError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Asset is not playable."])
+        }
+        return AVPlayerItem(asset: asset)
     }
     
     func play() {

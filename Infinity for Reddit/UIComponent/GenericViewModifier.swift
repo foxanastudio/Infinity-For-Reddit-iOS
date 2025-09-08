@@ -206,17 +206,17 @@ struct FilledCardBackgroundViewModifier: ViewModifier {
 struct AppForegroundBackgroundViewModifier: ViewModifier {
     @Environment(\.scenePhase) private var scenePhase
     
-    let onAppEntersForeground: () -> Void
-    let onAppEntersBackground: () -> Void
+    let onAppEntersForeground: (() -> Void)?
+    let onAppEntersBackground: (() -> Void)?
     
     func body(content: Content) -> some View {
         content
             .onChange(of: scenePhase) { oldPhase, newPhase in
                 switch newPhase {
                 case .background, .inactive:
-                    onAppEntersBackground()
+                    onAppEntersBackground?()
                 case .active:
-                    onAppEntersForeground()
+                    onAppEntersForeground?()
                 @unknown default: break
                 }
             }

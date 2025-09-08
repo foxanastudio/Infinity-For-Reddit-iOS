@@ -140,18 +140,13 @@ private struct MarkdownVideoPlayerWithControls: View {
         .applyIf(aspectRatio != nil) {
             $0.aspectRatio(aspectRatio!, contentMode: .fit)
         }
-        .onAppear {
-            manager.play()
-        }
         .onDisappear {
             manager.pause()
         }
         .task {
             await manager.loadAndPlay(url: url)
         }
-        .appForegroundBackgroundListener(onAppEntersForeground: {
-            manager.play()
-        }, onAppEntersBackground: {
+        .appForegroundBackgroundListener(onAppEntersBackground: {
             manager.pause()
         })
     }

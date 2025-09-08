@@ -227,8 +227,8 @@ extension View {
     }
     
     func appForegroundBackgroundListener(
-        onAppEntersForeground: @escaping () -> Void,
-        onAppEntersBackground: @escaping () -> Void
+        onAppEntersForeground: (() -> Void)? = nil,
+        onAppEntersBackground: (() -> Void)? = nil
     ) -> some View {
         self.modifier(AppForegroundBackgroundViewModifier(
             onAppEntersForeground: onAppEntersForeground,
