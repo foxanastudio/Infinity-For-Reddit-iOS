@@ -14,10 +14,19 @@ extension UserDefaults {
     static let sortType = UserDefaults(suiteName: "com.docilealligator.infinityforreddit.sort_type")
     static let sortTypeSettings = UserDefaults.standard
     static let theme = UserDefaults.standard
+    static let video = UserDefaults.standard
 }
 
 extension UserDefaults {
     func bool(forKey key: String, _ defaultValue: Bool) -> Bool {
         object(forKey: key) == nil ? defaultValue : bool(forKey: key)
+    }
+    
+    func double(forKey key: String, _ defaultValue: Double) -> Double {
+        object(forKey: key) == nil ? defaultValue : double(forKey: key)
+    }
+    
+    func integer(forKey key: String, _ defaultValue: Int) -> Int {
+        object(forKey: key) == nil ? defaultValue : integer(forKey: key)
     }
 }
