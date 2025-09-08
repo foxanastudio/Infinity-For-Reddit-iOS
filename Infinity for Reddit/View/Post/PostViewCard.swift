@@ -173,11 +173,13 @@ struct PostViewCard: View {
                     .postContent()
                     .padding(.horizontal, 16)
             } else if case .video(let videoUrl, _) = postViewModel.post.postType {
-                if let preview = postViewModel.post.preview, preview.images.count > 0 {
-                    MarkdownVideoPlayer(videoURL: URL(string: videoUrl)!, aspectRatio: preview.images[0].source.aspectRatio)
-                } else {
-                    MarkdownVideoPlayer(videoURL: URL(string: videoUrl)!, aspectRatio: nil)
-                        .frame(height: 400)
+                Spacer()
+                    .frame(height: 10)
+                
+                PostVideoView(post: postViewModel.post, videoUrl: videoUrl, blurSensitiveImages: $blurSensitiveImages, blurSpoilerImages: $blurSpoilerImages) {
+                    Task {
+                        await postViewModel.readPost()
+                    }
                 }
             } else if let preview = postViewModel.post.preview, preview.images.count > 0, let url = preview.images[0].source.url {
                 Spacer()
