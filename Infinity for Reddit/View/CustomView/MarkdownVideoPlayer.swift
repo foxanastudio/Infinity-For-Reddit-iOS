@@ -13,9 +13,9 @@ struct MarkdownVideoPlayer: View {
     
     let videoURL: URL
     let player: AVPlayer
-    private let aspectRatio: CGSize
+    private let aspectRatio: CGSize?
     
-    init(videoURL: URL, aspectRatio: CGSize) {
+    init(videoURL: URL, aspectRatio: CGSize?) {
         self.videoURL = videoURL
         self.player = AVPlayer(url: videoURL)
         self.aspectRatio = aspectRatio
@@ -44,7 +44,9 @@ struct MarkdownVideoPlayer: View {
 //                }
             }
         }
-        .aspectRatio(aspectRatio, contentMode: .fit)
+        .applyIf(aspectRatio != nil) {
+            $0.aspectRatio(aspectRatio!, contentMode: .fit)
+        }
         .onAppear {
             if (!showPlayer) {
                 showPlayer = true
@@ -70,9 +72,9 @@ private struct MarkdownVideoAVPlayer: UIViewControllerRepresentable {
 private struct MarkdownVideoPlayerWithControls: View {
     @StateObject private var manager: VideoPlayerViewModel
     
-    private let aspectRatio: CGSize
+    private let aspectRatio: CGSize?
 
-    init(url: URL, aspectRatio: CGSize) {
+    init(url: URL, aspectRatio: CGSize?) {
         _manager = StateObject(wrappedValue: VideoPlayerViewModel(url: url))
         self.aspectRatio = aspectRatio
     }
@@ -133,7 +135,9 @@ private struct MarkdownVideoPlayerWithControls: View {
             .opacity(manager.showControls ? 1 : 0)
             .animation(.easeInOut(duration: 0.3), value: manager.showControls)
         }
-        .aspectRatio(aspectRatio, contentMode: .fit)
+        .applyIf(aspectRatio != nil) {
+            $0.aspectRatio(aspectRatio!, contentMode: .fit)
+        }
         .onAppear {
             manager.player.play()
         }
