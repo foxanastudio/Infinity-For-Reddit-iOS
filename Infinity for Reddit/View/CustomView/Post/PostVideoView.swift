@@ -23,9 +23,9 @@ struct PostVideoView: View {
         if VideoSettingsUserDefaultsUtils.canAutoplayVideo(videoAutoplay: videoAutoplay, isWifiConnected: networkManager.isWifiConnected)
             && ((post.over18 && autoplaySensitiveVideo) || !post.over18) {
             if let preview = post.preview, preview.images.count > 0 {
-                MarkdownVideoPlayer(videoURL: URL(string: videoUrl)!, aspectRatio: preview.images[0].source.aspectRatio)
+                InlineVideoPlayer(videoURL: URL(string: videoUrl)!, aspectRatio: preview.images[0].source.aspectRatio)
             } else {
-                MarkdownVideoPlayer(videoURL: URL(string: videoUrl)!, aspectRatio: nil)
+                InlineVideoPlayer(videoURL: URL(string: videoUrl)!, aspectRatio: nil)
                     .frame(height: 400)
             }
         } else {

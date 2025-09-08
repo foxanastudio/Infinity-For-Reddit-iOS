@@ -60,7 +60,7 @@ struct WebImageProvider: ImageProvider {
             } else if media.e == MediaMetadata.redditVideoType {
                 VStack {
                     if let url = URL(string: media.hlsUrl) {
-                        MarkdownVideoPlayer(videoURL: url, aspectRatio: CGSize(width: media.x, height: media.y))
+                        InlineVideoPlayer(videoURL: url, aspectRatio: CGSize(width: media.x, height: media.y))
                             .id(url)
                     }
                     

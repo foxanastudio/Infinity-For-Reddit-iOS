@@ -1,5 +1,5 @@
 //
-//  MarkdownVideoPlayer.swift
+//  InlineVideoPlayer.swift
 //  Infinity for Reddit
 //
 //  Created by Docile Alligator on 2025-06-22.
@@ -8,7 +8,7 @@
 import SwiftUI
 import AVKit
 
-struct MarkdownVideoPlayer: View {
+struct InlineVideoPlayer: View {
     @State private var showPlayer = false
     
     let videoURL: URL
@@ -24,7 +24,7 @@ struct MarkdownVideoPlayer: View {
     var body: some View {
         ZStack {
             if showPlayer {
-                MarkdownVideoPlayerWithControls(url: videoURL, aspectRatio: aspectRatio)
+                InlineVideoPlayerWithControls(url: videoURL, aspectRatio: aspectRatio)
             } else {
                 // For future video autoplay setting
 //                VStack {
@@ -55,7 +55,7 @@ struct MarkdownVideoPlayer: View {
     }
 }
 
-private struct MarkdownVideoAVPlayer: UIViewControllerRepresentable {
+private struct InlineVideoAVPlayer: UIViewControllerRepresentable {
     let player: AVPlayer
 
     func makeUIViewController(context: Context) -> AVPlayerViewController {
@@ -69,7 +69,7 @@ private struct MarkdownVideoAVPlayer: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {}
 }
 
-private struct MarkdownVideoPlayerWithControls: View {
+private struct InlineVideoPlayerWithControls: View {
     @StateObject private var manager: VideoPlayerViewModel
     
     private let url: URL
@@ -83,7 +83,7 @@ private struct MarkdownVideoPlayerWithControls: View {
 
     var body: some View {
         ZStack() {
-            MarkdownVideoAVPlayer(player: manager.player)
+            InlineVideoAVPlayer(player: manager.player)
                 .contentShape(Rectangle())
                 .onTapGesture {
                     manager.toggleControls()
