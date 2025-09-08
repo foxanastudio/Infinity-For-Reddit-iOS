@@ -8,52 +8,84 @@
 import SwiftUI
 
 struct ZoomableScrollView<Content: View>: UIViewRepresentable {
-    private var content: Content
+    var content: Content
     
     init(@ViewBuilder content: () -> Content) {
         self.content = content()
     }
     
     func makeUIView(context: Context) -> UIScrollView {
-        // set up the UIScrollView
         let scrollView = UIScrollView()
-        scrollView.delegate = context.coordinator  // for viewForZooming(in:)
-        scrollView.maximumZoomScale = 20
-        scrollView.minimumZoomScale = 1
+        scrollView.delegate = context.coordinator
+        scrollView.minimumZoomScale = 1.0
+        scrollView.maximumZoomScale = 4.0
         scrollView.bouncesZoom = true
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.showsVerticalScrollIndicator = false
         
-        // create a UIHostingController to hold our SwiftUI content
+        // host SwiftUI content
         let hostedView = context.coordinator.hostingController.view!
-        hostedView.translatesAutoresizingMaskIntoConstraints = true
-        hostedView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        hostedView.frame = scrollView.bounds
-        hostedView.backgroundColor = .clear
+        hostedView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(hostedView)
+        
+        NSLayoutConstraint.activate([
+            hostedView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            hostedView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            hostedView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            hostedView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            hostedView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            hostedView.heightAnchor.constraint(equalTo: scrollView.heightAnchor)
+        ])
+        
+        // add double tap gesture
+        let doubleTap = UITapGestureRecognizer(target: context.coordinator,
+                                               action: #selector(Coordinator.handleDoubleTap(_:)))
+        doubleTap.numberOfTapsRequired = 2
+        scrollView.addGestureRecognizer(doubleTap)
         
         return scrollView
     }
     
-    func makeCoordinator() -> Coordinator {
-        return Coordinator(hostingController: UIHostingController(rootView: self.content))
-    }
-    
     func updateUIView(_ uiView: UIScrollView, context: Context) {
-        // update the hosting controller's SwiftUI content
-        context.coordinator.hostingController.rootView = self.content
-        assert(context.coordinator.hostingController.view.superview == uiView)
+        context.coordinator.hostingController.rootView = content
     }
     
-    // MARK: - Coordinator
+    func makeCoordinator() -> Coordinator {
+        Coordinator(content: content)
+    }
     
     class Coordinator: NSObject, UIScrollViewDelegate {
         var hostingController: UIHostingController<Content>
         
-        init(hostingController: UIHostingController<Content>) {
-            self.hostingController = hostingController
+        init(content: Content) {
+            hostingController = UIHostingController(rootView: content)
+            hostingController.view.backgroundColor = .clear
         }
         
         func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-            return hostingController.view
+            hostingController.view
+        }
+        
+        @objc func handleDoubleTap(_ recognizer: UITapGestureRecognizer) {
+            guard let scrollView = recognizer.view as? UIScrollView else { return }
+            
+            if scrollView.zoomScale == 1.0 {
+                // zoom in around tap point
+                let pointInView = recognizer.location(in: hostingController.view)
+                let newZoomScale: CGFloat = 2
+                let scrollViewSize = scrollView.bounds.size
+                
+                let w = scrollViewSize.width / newZoomScale
+                let h = scrollViewSize.height / newZoomScale
+                let x = pointInView.x - (w / 2.0)
+                let y = pointInView.y - (h / 2.0)
+                
+                let rectToZoom = CGRect(x: x, y: y, width: w, height: h)
+                scrollView.zoom(to: rectToZoom, animated: true)
+            } else {
+                // zoom out
+                scrollView.setZoomScale(1.0, animated: true)
+            }
         }
     }
 }
