@@ -122,18 +122,15 @@ struct SubmitTextPostView: View {
                             
                             Divider()
                             
-                            ZStack(alignment: .topLeading) {
-                                MarkdownTextField(text: $submitTextPostViewModel.title, selectedRange: $titleSelectedRange, canFocus: $titleTextViewCanFocus)
-                                    .frame(maxHeight: 10)
-                                    .focused($focusedField, equals: .title)
-                                    .contentShape(Rectangle())
-                                
-                                if submitTextPostViewModel.title.isEmpty {
-                                    Text("Title")
-                                        .secondaryText()
-                                        .bold()
-                                }
-                            }
+                            CustomTextField(
+                                "Title",
+                                text: $submitTextPostViewModel.title,
+                                singleLine: true,
+                                keyboardType: .default,
+                                showBorder: false,
+                                fieldType: .title,
+                                focusedField: $focusedField
+                            )
                             .padding(16)
                             
                             ZStack(alignment: .topLeading) {
@@ -155,20 +152,17 @@ struct SubmitTextPostView: View {
                     
                 }
                 
-                MarkdownToolbar(
-                    text: focusedField == .title
-                    ? $submitTextPostViewModel.title
-                    : $submitTextPostViewModel.content,
-                    selectedRange: focusedField == .title
-                    ? $titleSelectedRange
-                    : $bodySelectedRange,
-                    toolbarHeight: $markdownToolbarHeight,
-                    focusedField: $markdownToolbarFocusedField
-                )
+                if focusedField == .body {
+                    MarkdownToolbar(
+                        text: $submitTextPostViewModel.content,
+                        selectedRange: $bodySelectedRange,
+                        toolbarHeight: $markdownToolbarHeight,
+                        focusedField: $markdownToolbarFocusedField
+                    )
+                }
             }
             
             KeyboardToolbar {
-                titleTextViewCanFocus = false
                 contentTextViewCanFocus = false
                 markdownToolbarFocusedField = nil
                 focusedField = nil
