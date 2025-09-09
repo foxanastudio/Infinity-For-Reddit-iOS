@@ -143,13 +143,14 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
         player.pause()
     }
     
-    func toggleMute() {
+    func toggleMute() -> Bool {
         if isMuted {
             player.isMuted = false
         } else {
             player.isMuted = true
         }
         isMuted.toggle()
+        return isMuted
     }
     
     func seek(to time: Double) {

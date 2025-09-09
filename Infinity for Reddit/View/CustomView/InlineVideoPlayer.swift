@@ -72,6 +72,8 @@ private struct InlineVideoAVPlayer: UIViewControllerRepresentable {
 }
 
 private struct InlineVideoPlayerWithControls: View {
+    @Environment(\.postListingVideoManager) private var postListingVideoManager: PostListingVideoManager?
+    
     @StateObject private var manager: VideoPlayerViewModel
     
     private let url: URL
@@ -133,8 +135,9 @@ private struct InlineVideoPlayerWithControls: View {
                     
                     if manager.hasAudio {
                         Button(action: {
-                            manager.toggleMute()
+                            let isMuted = manager.toggleMute()
                             manager.resetControlsTimer()
+                            postListingVideoManager?.isMuted = isMuted
                         }) {
                             SwiftUI.Image(systemName: manager.isMuted ? "speaker.slash" : "speaker.wave.2")
                                 .resizable()
@@ -161,7 +164,7 @@ private struct InlineVideoPlayerWithControls: View {
             manager.pause()
         }
         .task {
-            await manager.loadAndPlay(url: url, muteVideo: muteVideo)
+            await manager.loadAndPlay(url: url, muteVideo: (postListingVideoManager?.syncMuteAcrossFeed ?? false) ? (postListingVideoManager?.isMuted ?? false) : muteVideo)
         }
         .appForegroundBackgroundListener(onAppEntersBackground: {
             manager.pause()

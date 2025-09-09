@@ -18,6 +18,7 @@ struct PostListingView: View {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
     
     @StateObject var postListingViewModel: PostListingViewModel
+    @StateObject var postListingVideoManager: PostListingVideoManager = .init()
     @State private var showSortTypeKindSheet: Bool = false
     @State private var showSortTypeTimeSheet: Bool = false
     @State private var upcomingSortTypeKind: SortType.Kind?
@@ -208,5 +209,6 @@ struct PostListingView: View {
             }
             .presentationDetents([.medium, .large])
         }
+        .environment(\.postListingVideoManager, postListingVideoManager)
     }
 }

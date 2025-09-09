@@ -27,7 +27,7 @@ struct PostVideoView: View {
                 InlineVideoPlayer(videoURL: URL(string: videoUrl)!, aspectRatio: preview.images[0].source.aspectRatio, muteVideo: muteAutoplayingVideo)
             } else {
                 InlineVideoPlayer(videoURL: URL(string: videoUrl)!, aspectRatio: nil, muteVideo: muteAutoplayingVideo)
-                    .frame(height: 400)
+                .frame(height: 400)
             }
         } else {
             if let preview = post.preview, preview.images.count > 0, let url = post.preview.images[0].source.url {
