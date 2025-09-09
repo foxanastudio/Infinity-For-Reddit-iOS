@@ -149,6 +149,15 @@ struct PostDetailsViewCard: View {
                 // May not have a preview!!!!!!
                 GalleryCarousel(post: postViewModel.post)
                     .aspectRatio(preview.s.aspectRatio, contentMode: .fit)
+            } else if case .video(let videoUrl, _) = postViewModel.post.postType {
+                Spacer()
+                    .frame(height: 10)
+                
+                PostVideoView(post: postViewModel.post, videoUrl: videoUrl) {
+                    Task {
+                        await postViewModel.readPost()
+                    }
+                }
             } else if postViewModel.post.postType != .text, let preview = postViewModel.post.preview, preview.images.count > 0, let url = preview.images[0].source.url {
                 Spacer()
                     .frame(height: 10)

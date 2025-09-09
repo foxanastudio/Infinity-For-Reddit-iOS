@@ -19,7 +19,9 @@ class PostListingVideoManager: ObservableObject {
         
         NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
             .sink { [weak self] _ in
-                self?.syncMuteAcrossFeed = UserDefaults.video.bool(forKey: VideoSettingsUserDefaultsUtils.syncMuteAcrossFeedKey)
+                DispatchQueue.main.async {
+                    self?.syncMuteAcrossFeed = UserDefaults.video.bool(forKey: VideoSettingsUserDefaultsUtils.syncMuteAcrossFeedKey)
+                }
             }
             .store(in: &cancellables)
     }
