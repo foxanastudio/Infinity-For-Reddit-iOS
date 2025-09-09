@@ -136,7 +136,7 @@ private struct InlineVideoPlayerWithControls: View {
                             manager.toggleMute()
                             manager.resetControlsTimer()
                         }) {
-                            SwiftUI.Image(systemName: manager.isMuted ? "speaker.wave.2" : "speaker.slash")
+                            SwiftUI.Image(systemName: manager.isMuted ? "speaker.slash" : "speaker.wave.2")
                                 .resizable()
                                 .frame(width: 24, height: 24)
                                 .foregroundColor(.white)
