@@ -131,7 +131,16 @@ struct CustomWebImage<Placeholder: View, Fallback: View>: View {
                     .applyIf(imageAspectRatio != nil) {
                         $0.aspectRatio(imageAspectRatio!.width / imageAspectRatio!.height, contentMode: centerCrop ? .fill : .fit)
                     }
+                    .applyIf(centerCrop) {
+                        $0.scaledToFill()
+                    }
+                    .applyIf(!centerCrop) {
+                        $0.scaledToFit()
+                    }
                     .frame(width: width, height: height)
+                    .applyIf(centerCrop) {
+                        $0.clipped()
+                    }
                     .applyIf(handleImageTapGesture) {
                         $0.mediaTapGesture(post: post, aspectRatio: imageAspectRatio, matchedGeometryEffectId: matchedGeometryEffectId)
                     }
@@ -141,7 +150,6 @@ struct CustomWebImage<Placeholder: View, Fallback: View>: View {
                             customOnTapGesture?()
                         })
                     }
-                    .scaledToFit()
             }
         }
         .id(urlString)
