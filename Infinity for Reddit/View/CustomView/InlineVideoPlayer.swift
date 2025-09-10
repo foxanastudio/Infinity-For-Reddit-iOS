@@ -88,7 +88,7 @@ private struct InlineVideoPlayerWithControls: View {
     }
 
     var body: some View {
-        ZStack() {
+        ZStack {
             InlineVideoAVPlayer(player: manager.player)
                 .contentShape(Rectangle())
                 .onTapGesture {

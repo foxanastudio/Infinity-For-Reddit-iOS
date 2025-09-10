@@ -105,7 +105,7 @@ struct CustomWebImage<Placeholder: View, Fallback: View>: View {
                         .contentShape(Rectangle())
                     }
                     .applyIf(imageAspectRatio != nil) {
-                        $0.aspectRatio(imageAspectRatio!.width / imageAspectRatio!.height, contentMode: centerCrop ? .fill : .fit)
+                        $0.aspectRatio(imageAspectRatio!.width / imageAspectRatio!.height, contentMode: .fit)
                     }
                     .frame(width: width, height: height)
                     // Using highPriorityGesture here as a workaround to handle tap gesture in a TabView.
@@ -129,7 +129,7 @@ struct CustomWebImage<Placeholder: View, Fallback: View>: View {
                     }
                     .clipShape(circleClipped ? AnyShape(Circle()) : AnyShape(Rectangle()))
                     .applyIf(imageAspectRatio != nil) {
-                        $0.aspectRatio(imageAspectRatio!.width / imageAspectRatio!.height, contentMode: centerCrop ? .fill : .fit)
+                        $0.aspectRatio(imageAspectRatio!.width / imageAspectRatio!.height, contentMode: .fit)
                     }
                     .applyIf(centerCrop) {
                         $0.scaledToFill()

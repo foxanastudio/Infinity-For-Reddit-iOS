@@ -187,7 +187,7 @@ struct PostViewCard: View {
                 Spacer()
                     .frame(height: 10)
                 
-                PostVideoView(post: postViewModel.post, videoUrl: videoUrl) {
+                PostVideoView(post: postViewModel.post, videoUrl: videoUrl, inPostListing: true) {
                     Task {
                         await postViewModel.readPost()
                     }
@@ -196,43 +196,40 @@ struct PostViewCard: View {
                 Spacer()
                     .frame(height: 10)
                 
-                GeometryReader { geo in
-                    ZStack(alignment: .topLeading) {
-                        CustomWebImage(
-                            url,
-                            //width: limitMediaHeight ? geo.size.width : nil,
-                            height: limitMediaHeight ? 200 : nil,
-                            aspectRatio: limitMediaHeight ? nil : preview.images[0].source.aspectRatio,
-                            centerCrop: true,
-                            matchedGeometryEffectId: UUID().uuidString,
-                            post: postViewModel.post,
-                            blur: (postViewModel.post.over18 && blurSensitiveImages) || (postViewModel.post.spoiler && blurSpoilerImages)
-                        )
-                        .simultaneousGesture(
-                            TapGesture()
-                                .onEnded {
-                                    Task {
-                                        await postViewModel.readPost()
-                                    }
+                ZStack(alignment: .topLeading) {
+                    CustomWebImage(
+                        url,
+                        height: limitMediaHeight ? 200 : nil,
+                        aspectRatio: limitMediaHeight ? nil : preview.images[0].source.aspectRatio,
+                        centerCrop: true,
+                        matchedGeometryEffectId: UUID().uuidString,
+                        post: postViewModel.post,
+                        blur: (postViewModel.post.over18 && blurSensitiveImages) || (postViewModel.post.spoiler && blurSpoilerImages)
+                    )
+                    .simultaneousGesture(
+                        TapGesture()
+                            .onEnded {
+                                Task {
+                                    await postViewModel.readPost()
                                 }
-                        )
-                        
-                        switch postViewModel.post.postType {
-                        case .video, .imgurVideo, .redgifs, .streamable:
-                            SwiftUI.Image(systemName: "play.circle")
-                                .resizable()
-                                .mediaIndicator()
-                                .padding(12)
-                                .frame(width: 64, height: 64)
-                        case .link:
-                            SwiftUI.Image(systemName: "link.circle")
-                                .resizable()
-                                .mediaIndicator()
-                                .padding(12)
-                                .frame(width: 64, height: 64)
-                        default:
-                            EmptyView()
-                        }
+                            }
+                    )
+                    
+                    switch postViewModel.post.postType {
+                    case .video, .imgurVideo, .redgifs, .streamable:
+                        SwiftUI.Image(systemName: "play.circle")
+                            .resizable()
+                            .mediaIndicator()
+                            .padding(12)
+                            .frame(width: 64, height: 64)
+                    case .link:
+                        SwiftUI.Image(systemName: "link.circle")
+                            .resizable()
+                            .mediaIndicator()
+                            .padding(12)
+                            .frame(width: 64, height: 64)
+                    default:
+                        EmptyView()
                     }
                 }
                 .frame(maxWidth: .infinity)
