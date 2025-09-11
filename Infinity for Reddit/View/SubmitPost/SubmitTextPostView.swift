@@ -7,11 +7,6 @@
 import SwiftUI
 import MarkdownUI
 
-enum PostField: Hashable {
-    case title
-    case body
-}
-
 struct SubmitTextPostView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
     @EnvironmentObject private var subredditChooseViewModel: SubredditChooseViewModel
@@ -19,7 +14,7 @@ struct SubmitTextPostView: View {
     @StateObject private var submitTextPostViewModel: SubmitTextPostViewModel
     
     @FocusState private var markdownToolbarFocusedField: MarkdownFieldType?
-    @FocusState private var focusedField: PostField?
+    @FocusState private var focusedField: FieldType?
     
     @State private var titleTextViewCanFocus: Bool = true
     @State private var contentTextViewCanFocus: Bool = true
@@ -136,7 +131,6 @@ struct SubmitTextPostView: View {
                             ZStack(alignment: .topLeading) {
                                 MarkdownTextField(text: $submitTextPostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
                                     .frame(minHeight: 300)
-                                    .focused($focusedField, equals: .body)
                                     .contentShape(Rectangle())
                                 
                                 if submitTextPostViewModel.content.isEmpty {
@@ -152,14 +146,12 @@ struct SubmitTextPostView: View {
                     
                 }
                 
-                if focusedField == .body {
-                    MarkdownToolbar(
-                        text: $submitTextPostViewModel.content,
-                        selectedRange: $bodySelectedRange,
-                        toolbarHeight: $markdownToolbarHeight,
-                        focusedField: $markdownToolbarFocusedField
-                    )
-                }
+                MarkdownToolbar(
+                    text: $submitTextPostViewModel.content,
+                    selectedRange: $bodySelectedRange,
+                    toolbarHeight: $markdownToolbarHeight,
+                    focusedField: $markdownToolbarFocusedField
+                )
             }
             
             KeyboardToolbar {
@@ -204,5 +196,9 @@ struct SubmitTextPostView: View {
         .sheet(isPresented: $showMarkdownPreview) {
             MarkdownViewerSheet(markdown: submitTextPostViewModel.content)
         }
+    }
+    
+    private enum FieldType: Hashable {
+        case title
     }
 }
