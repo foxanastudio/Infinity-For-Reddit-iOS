@@ -34,11 +34,13 @@ struct PostViewCard: View {
     
     let isSubredditPostListing: Bool
     let onPostTypeClicked: () -> Void
+    let onSensitiveClicked: () -> Void
     
-    init(account: Account, post: Post, isSubredditPostListing: Bool, width: CGFloat? = nil, onPostTypeClicked: @escaping () -> Void) {
+    init(account: Account, post: Post, isSubredditPostListing: Bool, width: CGFloat? = nil, onPostTypeClicked: @escaping () -> Void, onSensitiveClicked: @escaping () -> Void) {
         self.width = width
         self.isSubredditPostListing = isSubredditPostListing
         self.onPostTypeClicked = onPostTypeClicked
+        self.onSensitiveClicked = onSensitiveClicked
         _postViewModel = StateObject(wrappedValue: PostViewModel(account: account, post: post, postRepository: PostRepository()))
     }
     
@@ -112,6 +114,9 @@ struct PostViewCard: View {
                 
                 if postViewModel.post.over18 {
                     SensitiveTag()
+                        .onTapGesture {
+                            onSensitiveClicked()
+                        }
                 }
                 
                 if !hidePostFlair {

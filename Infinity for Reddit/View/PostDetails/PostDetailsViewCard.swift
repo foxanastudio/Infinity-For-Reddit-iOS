@@ -109,6 +109,18 @@ struct PostDetailsViewCard: View {
                 
                 if postViewModel.post.over18 {
                     SensitiveTag()
+                        .onTapGesture {
+                            var postFilter = PostFilter()
+                            postFilter.onlySensitive = true
+                            navigationManager.path.append(
+                                AppNavigation.filteredPosts(
+                                    postListingMetadata: PostListingMetadata.getSubredditMetadadata(
+                                        subredditName: postViewModel.post.subreddit, accountViewModel: accountViewModel
+                                    ),
+                                    postFilter: postFilter
+                                )
+                            )
+                        }
                 }
                 
                 if !hidePostFlair {

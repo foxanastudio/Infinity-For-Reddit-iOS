@@ -97,6 +97,8 @@ struct PostListingView: View {
                         ForEach(postListingViewModel.posts, id: \.id) { post in
                             PostViewCard(account: account, post: post, isSubredditPostListing: isSubredditPostListing, onPostTypeClicked: {
                                 onPostTypeClicked(post: post)
+                            }, onSensitiveClicked: {
+                                onSensitiveClicked(post: post)
                             })
                             //.id(post.id)
                             .listPlainItemNoInsets()
@@ -125,6 +127,8 @@ struct PostListingView: View {
                     ForEach(postListingViewModel.posts, id: \.id) { post in
                         PostViewCard(account: account, post: post, isSubredditPostListing: isSubredditPostListing, width: nil, onPostTypeClicked: {
                             onPostTypeClicked(post: post)
+                        }, onSensitiveClicked: {
+                            onSensitiveClicked(post: post)
                         })
                         .id(post.id)
                         .listPlainItemNoInsets()
@@ -222,6 +226,19 @@ struct PostListingView: View {
                 AppNavigation.filteredPosts(
                     postListingMetadata: postListingMetadata,
                     postFilter: PostFilter.constructPostFilter(postType: post.postType)
+                )
+            )
+        }
+    }
+    
+    private func onSensitiveClicked(post: Post) {
+        if showFilterPostsOption {
+            var postFilter = PostFilter()
+            postFilter.onlySensitive = true
+            navigationManager.path.append(
+                AppNavigation.filteredPosts(
+                    postListingMetadata: postListingMetadata,
+                    postFilter: postFilter
                 )
             )
         }

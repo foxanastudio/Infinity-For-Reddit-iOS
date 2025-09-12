@@ -59,7 +59,7 @@ struct PostListingScrollView: View {
                 if isRootView {
                     List {
                         ForEach(postListingViewModel.posts, id: \.id) { post in
-                            PostViewCard(account: account, post: post, isSubredditPostListing: false, onPostTypeClicked: {})
+                            PostViewCard(account: account, post: post, isSubredditPostListing: false, onPostTypeClicked: {}, onSensitiveClicked: {})
                                 .id(post.id)
                                 .listPlainItemNoInsets()
                         }
@@ -75,7 +75,7 @@ struct PostListingScrollView: View {
                     .themedList()
                 } else {
                     ForEach(postListingViewModel.posts, id: \.id) { post in
-                        PostViewCard(account: account, post: post, isSubredditPostListing: false, onPostTypeClicked: {})
+                        PostViewCard(account: account, post: post, isSubredditPostListing: false, onPostTypeClicked: {}, onSensitiveClicked: {})
                             .id(post.id)
                             .listPlainItemNoInsets()
                     }
