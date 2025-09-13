@@ -47,7 +47,7 @@ struct HomeView: View {
             TabView(selection: $selectedTab) {
                 Group {
                     ZStack {
-                        CustomNavigationStack {
+                        CustomNavigationStack(fullScreenMediaViewModel: fullScreenMediaViewModel) {
                             PostListingView(
                                 account: accountViewModel.account,
                                 postListingMetadata: PostListingMetadata(
@@ -73,7 +73,7 @@ struct HomeView: View {
                     .environmentObject(tab1NavigationBarMenuManager)
                     .environmentObject(tab1SnackbarManager)
                     
-                    CustomNavigationStack {
+                    CustomNavigationStack(fullScreenMediaViewModel: fullScreenMediaViewModel) {
                         Group {
                             if accountViewModel.account.isAnonymous() {
                                 AnonymousSubscriptionsView()
@@ -95,7 +95,7 @@ struct HomeView: View {
                     .environmentObject(tab2SnackbarManager)
                     
                     if !accountViewModel.account.isAnonymous() {
-                        CustomNavigationStack {
+                        CustomNavigationStack(fullScreenMediaViewModel: fullScreenMediaViewModel) {
                             NewPostTypeChooserView()
                                 .setUpHomeTabViewChildNavigationBar()
                                 .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
@@ -109,7 +109,7 @@ struct HomeView: View {
                         .environmentObject(homeViewModel)
                         .environmentObject(tab3SnackbarManager)
                         
-                        CustomNavigationStack {
+                        CustomNavigationStack(fullScreenMediaViewModel: fullScreenMediaViewModel) {
                             InboxView(
                                 account: accountViewModel.account
                             )
@@ -126,7 +126,7 @@ struct HomeView: View {
                         .environmentObject(homeViewModel)
                         .environmentObject(tab4SnackbarManager)
                     } else {
-                        CustomNavigationStack {
+                        CustomNavigationStack(fullScreenMediaViewModel: fullScreenMediaViewModel) {
                             SearchView(username: accountViewModel.account.username)
                                 .setUpHomeTabViewChildNavigationBar()
                                 .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
@@ -140,7 +140,7 @@ struct HomeView: View {
                         .environmentObject(tab4SnackbarManager)
                     }
                     
-                    CustomNavigationStack {
+                    CustomNavigationStack(fullScreenMediaViewModel: fullScreenMediaViewModel) {
                         MoreView()
                             .setUpHomeTabViewChildNavigationBar()
                             .addTitleToInlineNavigationBar(selectedTab.navigationTitle)

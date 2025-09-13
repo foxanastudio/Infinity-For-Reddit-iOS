@@ -10,11 +10,16 @@ import SwiftUI
 struct CustomNavigationStack<Content: View>: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
     
-    @StateObject private var navigationManager = NavigationManager()
+    @StateObject private var navigationManager: NavigationManager
     @StateObject var commentSubmissionShareableViewModel: CommentSubmissionShareableViewModel = CommentSubmissionShareableViewModel()
     @StateObject var subredditChooseViewModel: SubredditChooseViewModel = SubredditChooseViewModel(ruleRepository: RuleRepository(), flairRepository: FlairRepository())
     
     let content: () -> Content
+    
+    init(fullScreenMediaViewModel: FullScreenMediaViewModel, @ViewBuilder content: @escaping () -> Content) {
+        _navigationManager = StateObject(wrappedValue: NavigationManager(fullScreenMediaViewModel: fullScreenMediaViewModel))
+        self.content = content
+    }
     
     var body: some View {
         NavigationStack(path: $navigationManager.path) {

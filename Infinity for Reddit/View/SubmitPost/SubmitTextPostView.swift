@@ -178,13 +178,11 @@ struct SubmitTextPostView: View {
             }
         }
         .sheet(isPresented: $showFlairSheet) {
-            CustomNavigationStack {
-                FlairChooseSheet()
-                    .presentationDetents([.medium, .large])
-                    .presentationDragIndicator(.visible)
-                    .environmentObject(subredditChooseViewModel)
-                    .environmentObject(submitTextPostViewModel)
-            }
+            FlairChooseSheet()
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
+                .environmentObject(subredditChooseViewModel)
+                .environmentObject(submitTextPostViewModel)
             
         }
         .onChange(of: subredditChooseViewModel.selectedSubreddit?.name ?? "") { _, _ in

@@ -10,15 +10,27 @@ import SwiftUI
 class NavigationManager: ObservableObject {
     @Published var path = NavigationPath()
     
+    var fullScreenMediaViewModel: FullScreenMediaViewModel
+    
+    init(fullScreenMediaViewModel: FullScreenMediaViewModel) {
+        self.fullScreenMediaViewModel = fullScreenMediaViewModel
+    }
+    
     func openLink(_ link: String) {
-        if let destination = LinkHandler.shared.handle(link: link) {
+        let linkDestination = LinkHandler.shared.handle(link: link)
+        if case .navigation(let destination) = linkDestination {
             path.append(destination)
+        } else if case .openInBrowser(let url) = linkDestination {
+            UIApplication.shared.open(url)
         }
     }
     
     func openLink(_ url: URL) {
-        if let destination = LinkHandler.shared.handle(url: url) {
+        let linkDestination = LinkHandler.shared.handle(url: url)
+        if case .navigation(let destination) = linkDestination {
             path.append(destination)
+        } else if case .openInBrowser(let url) = linkDestination {
+            UIApplication.shared.open(url)
         }
     }
 }
