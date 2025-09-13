@@ -11,13 +11,28 @@ class SubredditChooseViewModel: ObservableObject {
     
     @Published var selectedSubreddit: SubscribedSubredditData? = nil {
         didSet {
-            rules = []
-            flairs = []
+            errorMessage = nil
+            isLoadingRules = false
+            isLoadingFlairs = false
+            
+            if let name = selectedSubreddit?.name {
+                rules = rulesDict[name] ?? []
+                flairs = flairsDict[name] ?? []
+            } else {
+                rules = []
+                flairs = []
+            }
         }
     }
-    @Published var error: Error?
+    @Published var errorMessage: String?
     @Published var rules: [Rule] = []
     @Published var flairs: [Flair] = []
+    
+    @Published var isLoadingRules: Bool = false
+    @Published var isLoadingFlairs: Bool = false
+    
+    private var rulesDict: [String: [Rule]] = [:]
+    private var flairsDict: [String: [Flair]] = [:]
     
     private var ruleRepository: RuleRepositoryProtocol
     private var flairRepository: FlairRepositoryProtocol
@@ -27,47 +42,60 @@ class SubredditChooseViewModel: ObservableObject {
         self.flairRepository = flairRepository
     }
     
-    func fetchRules(isAnonymous: Bool) async {
+    func fetchRules(isAnonymous: Bool, force: Bool = false) async {
+        guard let name = selectedSubreddit?.name, !name.isEmpty else {
+            self.rules = []
+            return
+        }
+        
+        if !force, let cached = rulesDict[name] {
+            self.rules = cached
+            return
+        }
+        
+        isLoadingRules = true
+        errorMessage = nil
+        
         do {
             try Task.checkCancellation()
-            guard let name = selectedSubreddit?.name, !name.isEmpty else {
-                self.rules = []
-                return
-            }
-            
             let fetched = try await ruleRepository.fetchRules(subreddit: name, isAnonymous: isAnonymous)
-            
             try Task.checkCancellation()
             
-            self.rules = fetched
-            
-            print(rules)
-            
+            rules = fetched
+            rulesDict[name] = fetched
         } catch {
-            self.rules = []
-            print("Error fetching rules: \(error)")
+            rules = []
+            errorMessage = "Failed to load rules: \(error.localizedDescription)"
+            rulesDict[name] = []
         }
+        
+        isLoadingRules = false
     }
     
-    func fetchFlairs() async {
+    func fetchFlairs(force: Bool = false) async {
+        guard let name = selectedSubreddit?.name, !name.isEmpty else { return }
+        
+        if !force, let cached = flairsDict[name] {
+            self.flairs = cached
+            return
+        }
+        
+        isLoadingFlairs = true
+        errorMessage = nil
+        
         do {
             try Task.checkCancellation()
-            guard let name = selectedSubreddit?.name, !name.isEmpty else {
-                self.flairs = []
-                return
-            }
-            
             let fetched = try await flairRepository.fetchFlairs(subreddit: name)
-            
             try Task.checkCancellation()
             
-            self.flairs = fetched
-            
-            print(flairs)
-            
+            flairs = fetched
+            flairsDict[name] = fetched
         } catch {
-            self.flairs = []
-            print("Error fetching flairs: \(error)")
+            flairs = []
+            errorMessage = "Failed to load flairs: \(error.localizedDescription)"
+            flairsDict[name] = []
         }
+        
+        isLoadingFlairs = false
     }
 }
