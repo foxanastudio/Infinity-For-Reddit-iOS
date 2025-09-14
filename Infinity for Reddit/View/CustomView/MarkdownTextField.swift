@@ -43,7 +43,7 @@ struct MarkdownTextField: UIViewRepresentable {
     func makeUIView(context: Context) -> UITextView {
         let textView = UITextView()
         textView.font = UIFont.preferredFont(forTextStyle: .body)
-        textView.isScrollEnabled = false
+        textView.isScrollEnabled = true
         textView.delegate = context.coordinator
         textView.borderStyle = .none
         textView.tintColor = UIColor(Color(hex: customThemeViewModel.currentCustomTheme.colorPrimaryLightTheme))
