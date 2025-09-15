@@ -16,9 +16,11 @@ struct SubredditListingView: View {
     @State private var showSortTypeKindSheet: Bool = false
     @State private var navigationBarMenuKey: UUID?
     private let account: Account
+    var onSelect: ((Subreddit) -> Void)?
     
-    init(account: Account, query: String) {
+    init(account: Account, query: String, onSelect: ((Subreddit) -> Void)? = nil) {
         self.account = account
+        self.onSelect = onSelect
         
         _subredditListingViewModel = StateObject(
             wrappedValue: SubredditListingViewModel(
@@ -69,7 +71,13 @@ struct SubredditListingView: View {
                         .contentShape(Rectangle())
                         .listPlainItem()
                         .onTapGesture {
-                            navigationManager.path.append(AppNavigation.subredditDetails(subredditName: subreddit.displayName))
+                            if let onSelect {
+                                onSelect(subreddit)
+                            } else {
+                                navigationManager.path.append(
+                                    AppNavigation.subredditDetails(subredditName: subreddit.displayName)
+                                )
+                            }
                         }
                     }
                     if subredditListingViewModel.hasMorePages {

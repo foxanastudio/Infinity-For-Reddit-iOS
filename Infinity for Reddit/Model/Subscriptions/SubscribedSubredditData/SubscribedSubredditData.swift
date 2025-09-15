@@ -37,3 +37,15 @@ class SubscribedSubredditData: Codable, FetchableRecord, PersistableRecord {
     
     public static let databaseSelection: [SQLSelectable] = CodingKeys.allCases.map { $0 }
 }
+
+extension SubscribedSubredditData {
+    static func fromSubreddit(_ s: Subreddit, username: String) -> SubscribedSubredditData {
+        return SubscribedSubredditData(
+            fullName: s.name ?? "",    
+            name: s.displayName ?? "",
+            iconUrl: s.iconImg ?? s.communityIcon,
+            username: username,
+            isFavorite: false
+        )
+    }
+}

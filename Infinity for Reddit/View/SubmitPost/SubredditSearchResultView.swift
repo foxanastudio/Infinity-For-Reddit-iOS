@@ -8,6 +8,9 @@ import SwiftUI
 
 struct SubredditSearchResultView: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
+    @EnvironmentObject var subredditChooseViewModel: SubredditChooseViewModel
+    @EnvironmentObject var navigationManager: NavigationManager
+    @Environment(\.dismiss) var dismiss
     @StateObject private var searchResultsViewModel: SearchResultsViewModel
     @State private var selectedOption = 0
     
@@ -17,7 +20,12 @@ struct SubredditSearchResultView: View {
     
     var body: some View {
         VStack {
-            SubredditListingView(account: accountViewModel.account, query: searchResultsViewModel.query)
+            SubredditListingView(account: accountViewModel.account, query: searchResultsViewModel.query) { subreddit in
+                subredditChooseViewModel.selectedSubreddit = SubscribedSubredditData.fromSubreddit(subreddit, username: accountViewModel.account.username)
+                if navigationManager.path.count >= 3 {
+                    navigationManager.path.removeLast(3)
+                }
+            }
         }
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Subreddits")
