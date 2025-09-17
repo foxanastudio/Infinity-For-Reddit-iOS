@@ -39,16 +39,20 @@ struct TogglePreference: View {
                 Spacer()
                     .frame(width: 24)
                 
-                Toggle(isOn: $isEnabled) {
-                    Text(title)
+                VStack {
+                    RowText(title)
                         .primaryText()
                     
                     if let subtitle = subtitle {
-                        Text(subtitle)
+                        RowText(subtitle)
                             .secondaryText()
                     }
                 }
-                .themedToggle()
+                .frame(maxWidth: .infinity)
+                
+                Toggle(isOn: $isEnabled) {}
+                    .themedToggle()
+                    .excludeFromTouchRipple()
             }
             .contentShape(Rectangle())
             .padding(.horizontal, 16)
