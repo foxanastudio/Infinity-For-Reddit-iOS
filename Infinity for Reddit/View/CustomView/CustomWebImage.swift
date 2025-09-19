@@ -88,7 +88,7 @@ struct CustomWebImage<Placeholder: View, Fallback: View>: View {
     // MARK: - Body Implementation
 
     var body: some View {
-        ZStack {
+        Group {
             if shouldLoadFallbackImage || urlString == nil {
                 if let fallbackViewBuilder = fallbackViewBuilder {
                     fallbackViewBuilder()

@@ -32,11 +32,11 @@ struct AccountSheet: View {
                 ZStack {
                     CustomWebImage(
                         accountViewModel.account.bannerImageUrl,
-                        height: 150,
+                        height: 120,
                         handleImageTapGesture: false,
                         fallbackView: {
                             Spacer()
-                                .frame(height: 150)
+                                .frame(height: 120)
                         }
                     )
                     
