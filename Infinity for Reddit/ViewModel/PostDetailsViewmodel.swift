@@ -40,6 +40,10 @@ public class PostDetailsViewModel: ObservableObject {
     
     private var cancellables = Set<AnyCancellable>()
     
+    enum PostDetailsViewModelError: Error {
+        case postFetchError
+    }
+    
     // MARK: - Initializer
     init(account: Account, postDetailsInput: PostDetailsInput, postDetailsRepository: PostDetailsRepositoryProtocol, isContinueThread: Bool = false) {
         self.account = account
@@ -125,7 +129,7 @@ public class PostDetailsViewModel: ObservableObject {
                         queries: ["sort": sortTypeKind.rawValue, "context": String(singleThreadContext)]
                     )
                     if !hasUsedRecommendedSort && SortTypeSettingsUserDefaultsUtils.respectSubredditRecommendedCommentSortType {
-                        if let suggestedSort = SortType.Kind(rawValue: postDetails.postListing.posts[0].suggestedSort) {
+                        if !postDetails.postListing.posts.isEmpty, let suggestedSort = SortType.Kind(rawValue: postDetails.postListing.posts[0].suggestedSort) {
                             await MainActor.run {
                                 self.sortTypeKind =  suggestedSort
                             }
@@ -140,7 +144,7 @@ public class PostDetailsViewModel: ObservableObject {
                         queries: ["sort": sortTypeKind.rawValue]
                     )
                     if !hasUsedRecommendedSort && SortTypeSettingsUserDefaultsUtils.respectSubredditRecommendedCommentSortType {
-                        if let suggestedSort = SortType.Kind(rawValue: postDetails.postListing.posts[0].suggestedSort) {
+                        if !postDetails.postListing.posts.isEmpty, let suggestedSort = SortType.Kind(rawValue: postDetails.postListing.posts[0].suggestedSort) {
                             await MainActor.run {
                                 self.sortTypeKind =  suggestedSort
                             }
@@ -163,8 +167,11 @@ public class PostDetailsViewModel: ObservableObject {
             
             try Task.checkCancellation()
             
-            await MainActor.run {
+            try await MainActor.run {
                 if shouldLoadPost {
+                    if postDetails.postListing.posts.isEmpty {
+                        throw PostDetailsViewModelError.postFetchError
+                    }
                     // TODO error handling here in case there is no post
                     self.post = postDetails.postListing.posts[0]
                 }
