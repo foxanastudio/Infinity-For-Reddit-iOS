@@ -18,12 +18,17 @@ class VideoFetcher {
     }
     
     private let redgifsSession: Session
+    private let streamableSession: Session
     
     private init() {
-        guard let resolvedSession = DependencyManager.shared.container.resolve(Session.self, name: "redgifs") else {
-            fatalError("Failed to resolve Session")
+        guard let resolvedRedgifsSession = DependencyManager.shared.container.resolve(Session.self, name: "redgifs") else {
+            fatalError("Failed to resolve redgifs Session in VideoFetcher")
         }
-        redgifsSession = resolvedSession
+        guard let resolvedStreamableSession = DependencyManager.shared.container.resolve(Session.self, name: "streamable") else {
+            fatalError("Failed to resolve streamable Session in VideoFetcher")
+        }
+        redgifsSession = resolvedRedgifsSession
+        streamableSession = resolvedStreamableSession
     }
     
     func fetchRedgifsVideo(id: String) async throws -> URL? {
@@ -54,7 +59,17 @@ class VideoFetcher {
         }
     }
     
-    func fetchStreamableVideo(url: URL) async throws -> URL? {
-        return nil
+    func fetchStreamableVideo(shortCode: String) async throws -> Streamable {
+        let data = try await streamableSession.request(StreamableAPI.getStreamableData(shortCode: shortCode))
+            .validate()
+            .serializingData(automaticallyCancelling: true)
+            .value
+        
+        let json = JSON(data)
+        if let error = json.error {
+            throw VideoFetcherError.JSONDecodingError(error.localizedDescription)
+        }
+        
+        return try Streamable(fromJson: json)
     }
 }
