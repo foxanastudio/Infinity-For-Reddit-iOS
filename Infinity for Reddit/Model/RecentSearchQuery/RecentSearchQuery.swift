@@ -13,18 +13,18 @@ public struct RecentSearchQuery: Codable, FetchableRecord, PersistableRecord {
     var username: String
     var searchQuery: String
     var searchInSubredditOrUserName: String?
-    var multiRedditPath: String?
-    var multiRedditDisplayName: String?
+    var customFeedPath: String?
+    var customFeedDisplayName: String?
     var searchInThingType: SearchInThingType
     var time: Int64
     
-    init(username: String, searchQuery: String, searchInSubredditOrUserName: String? = nil, multiRedditPath: String? = nil,
-         multiRedditDisplayName: String? = nil, searchInThingType: SearchInThingType, time: Int64) {
+    init(username: String, searchQuery: String, searchInSubredditOrUserName: String? = nil, customFeedPath: String? = nil,
+         customFeedDisplayName: String? = nil, searchInThingType: SearchInThingType, time: Int64) {
         self.username = username
         self.searchQuery = searchQuery
         self.searchInSubredditOrUserName = searchInSubredditOrUserName
-        self.multiRedditPath = multiRedditPath
-        self.multiRedditDisplayName = multiRedditDisplayName
+        self.customFeedPath = customFeedPath
+        self.customFeedDisplayName = customFeedDisplayName
         self.searchInThingType = searchInThingType
         self.time = time
     }
@@ -33,8 +33,8 @@ public struct RecentSearchQuery: Codable, FetchableRecord, PersistableRecord {
         case username
         case searchQuery = "search_query"
         case searchInSubredditOrUserName = "search_in_subreddit_or_user_name"
-        case multiRedditPath = "search_in_multireddit_path"
-        case multiRedditDisplayName = "search_in_multireddit_display_name"
+        case customFeedPath = "search_in_multireddit_path"
+        case customFeedDisplayName = "search_in_multireddit_display_name"
         case searchInThingType = "search_in_thing_type"
         case time
     }

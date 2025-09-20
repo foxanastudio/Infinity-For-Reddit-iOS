@@ -100,7 +100,7 @@ struct SearchView: View {
                         if let onSearch = onSearchCustomAction {
                             onSearch(search.searchQuery)
                         } else {
-                            navigationManager.path.append(AppNavigation.searchResults(query: search.searchQuery, searchInSubredditOrUserName: search.searchInSubredditOrUserName, searchInMultiReddit: search.multiRedditPath, searchInThingType: search.searchInThingType))
+                            navigationManager.path.append(AppNavigation.searchResults(query: search.searchQuery, searchInSubredditOrUserName: search.searchInSubredditOrUserName, searchInMultiReddit: search.customFeedPath, searchInThingType: search.searchInThingType))
                         }
                     }) {
                         VStack(alignment: .leading, spacing: 2) {
@@ -118,7 +118,7 @@ struct SearchView: View {
                                 Text("u/\(search.searchInSubredditOrUserName ?? "")")
                                     .username()
                             case .customFeed:
-                                Text(search.multiRedditDisplayName ?? "")
+                                Text(search.customFeedDisplayName ?? "")
                                     .secondaryText()
                             }
                         }

@@ -95,7 +95,7 @@ class SearchViewModel: ObservableObject {
             username: username,
             query: query,
             searchInSubredditOrUserName: searchInSubredditOrUserName,
-            multiRedditPath: searchInCustomFeed,
+            customFeedPath: searchInCustomFeed,
             customFeedDisplayName: searchInCustomFeedDisplayName,
             searchInThingType: searchInThingType,
             time: Int64(Date().timeIntervalSince1970)

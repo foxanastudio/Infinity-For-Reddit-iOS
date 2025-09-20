@@ -9,7 +9,7 @@ public protocol SearchRepositoryProtocol {
     func saveSearchQuery(username: String,
                          query: String,
                          searchInSubredditOrUserName: String?,
-                         multiRedditPath: String?,
+                         customFeedPath: String?,
                          customFeedDisplayName: String?,
                          searchInThingType: SearchInThingType,
                          time: Int64)

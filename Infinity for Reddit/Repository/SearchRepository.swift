@@ -19,7 +19,7 @@ class SearchRepository: SearchRepositoryProtocol {
     func saveSearchQuery(username: String,
                          query: String,
                          searchInSubredditOrUserName: String?,
-                         multiRedditPath: String?,
+                         customFeedPath: String?,
                          customFeedDisplayName: String?,
                          searchInThingType: SearchInThingType,
                          time: Int64
@@ -32,8 +32,8 @@ class SearchRepository: SearchRepositoryProtocol {
                             username: username,
                             searchQuery: query,
                             searchInSubredditOrUserName: searchInSubredditOrUserName,
-                            multiRedditPath: multiRedditPath,
-                            multiRedditDisplayName: customFeedDisplayName,
+                            customFeedPath: customFeedPath,
+                            customFeedDisplayName: customFeedDisplayName,
                             searchInThingType: searchInThingType,
                             time: time
                         )
