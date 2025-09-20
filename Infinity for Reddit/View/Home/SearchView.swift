@@ -31,6 +31,7 @@ struct SearchView: View {
                 CustomTextField("Search",
                                 text: $searchViewModel.query,
                                 singleLine: true,
+                                showBorder: false,
                                 fieldType: .search,
                                 focusedField: $focusedField)
                 .submitLabel(.search)
