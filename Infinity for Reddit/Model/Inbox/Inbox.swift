@@ -38,13 +38,10 @@ public class Inbox : NSObject {
     var subredditNamePrefixed : String!
     var type : String!
     var wasComment : Bool!
-    
-    /**
-     * Instantiate the instance using the passed json values to set the properties values
-     */
-    init(fromJson json: JSON!, kind: String!, messageWhere: MessageWhere?){
-        if json.isEmpty{
-            return
+
+    init(fromJson json: JSON!, kind: String!, messageWhere: MessageWhere?) throws {
+        if json.isEmpty {
+            throw JSONError.invalidData
         }
         self.kind = kind
         associatedAwardingId = json["associated_awarding_id"].stringValue
@@ -68,7 +65,11 @@ public class Inbox : NSObject {
         parentId = json["parent_id"].stringValue
         let repliesJson = json["replies"]
         if repliesJson.type == .dictionary, let messageWhere = messageWhere {
-            replies = InboxListingRootClass(fromJson: json["replies"], messageWhere: messageWhere)
+            do {
+                replies = try InboxListingRootClass(fromJson: json["replies"], messageWhere: messageWhere)
+            } catch {
+                print("Error parsing InboxListingRootClass in Inbox: \(error.localizedDescription)")
+            }
         }
         score = json["score"].intValue
         subject = json["subject"].stringValue

@@ -67,6 +67,6 @@ public class InboxListingRepository: InboxListingRepositoryProtocol {
             throw InboxRepositoryError.JSONDecodingError(error.localizedDescription)
         }
         
-        return InboxListingRootClass(fromJson: json, messageWhere: messageWhere).data
+        return try InboxListingRootClass(fromJson: json, messageWhere: messageWhere).data
     }
 }
