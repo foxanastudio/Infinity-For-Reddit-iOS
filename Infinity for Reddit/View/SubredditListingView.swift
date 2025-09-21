@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct SubredditListingView: View {
-    @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     
@@ -90,9 +89,6 @@ struct SubredditListingView: View {
                 .scrollBounceBehavior(.basedOnSize)
                 .themedList()
             }
-        }
-        .onChange(of: colorScheme) {
-            //print(colorScheme == .dark)
         }
         .task(id: subredditListingViewModel.loadSubredditsTaskId) {
             await subredditListingViewModel.initialLoadSubreddits()

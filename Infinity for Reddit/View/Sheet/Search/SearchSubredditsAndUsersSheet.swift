@@ -12,34 +12,28 @@ struct SearchSubredditsAndUsersSheet: View {
     
     @Environment(\.dismiss) var dismiss
     
-    let onSearch: (String) -> Void
+    @State private var queryItem: Item?
+    
     let onThingSelected: (SearchInThing) -> Void
     
     var body: some View {
-        VStack(spacing: 0) {
-            ZStack {
-                Text("Search Subreddits and Users")
-                    .primaryText()
-                
-                HStack(spacing: 0) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Text("Cancel")
-                            .neutralTextButton()
-                    }
-                    
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity)
-                .padding(16)
-            }
-            
-            SearchView { query in
-                onSearch(query)
-                dismiss()
-            }
+        SearchView { query in
+            queryItem = Item(query: query)
         }
         .id(accountViewModel.account.username)
+        .addTitleToInlineNavigationBar("Search Subreddits and Users")
+        .sheet(item: $queryItem) { queryItem in
+            NavigationStack {
+                SubredditAndUserSearchResultSheet(query: queryItem.query) { searchInThing in
+                    onThingSelected(searchInThing)
+                    dismiss()
+                }
+            }
+        }
+    }
+    
+    private struct Item: Identifiable {
+        let id = UUID()
+        let query: String
     }
 }

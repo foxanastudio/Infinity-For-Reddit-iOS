@@ -19,24 +19,6 @@ struct SubredditAndUserSearchResultSheet: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            ZStack {
-                Text("Select a Destination")
-                    .primaryText()
-                
-                HStack(spacing: 0) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Text("Cancel")
-                            .neutralTextButton()
-                    }
-                    
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity)
-                .padding(16)
-            }
-            
             SegmentedPicker(selectedValue: $selectedOption, values: ["Subreddits", "Users"])
                 .padding(4)
             
@@ -56,5 +38,17 @@ struct SubredditAndUserSearchResultSheet: View {
             .tabViewStyle(.page(indexDisplayMode: .never))
         }
         .id(accountViewModel.account.username)
+        .themedNavigationBar()
+        .addTitleToInlineNavigationBar("Select a Destination")
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    Text("Cancel")
+                        .navigationBarPrimaryText()
+                }
+            }
+        }
     }
 }

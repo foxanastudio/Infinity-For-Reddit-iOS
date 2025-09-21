@@ -45,15 +45,6 @@ struct AnonymousSubscriptionsView: View {
             .tabViewStyle(.page(indexDisplayMode: .never))
         }
         .rootViewBackground()
-        .navigationTitle("Subscriptions")
-//        .navigationDestination(for: SearchSubredditNavigation.self) { destination in
-//            switch destination {
-//            case .searchSubreddit:
-//                SearchSubredditsView { subscribedSubredditData in
-//                    
-//                }
-//            }
-//        }
     }
     
     struct AnonymousSubredditsView: View {

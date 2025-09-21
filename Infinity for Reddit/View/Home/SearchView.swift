@@ -15,7 +15,7 @@ struct SearchView: View {
     @FocusState var focusedField: FieldType?
     
     @State private var showSelectSearchInThingSheet: Bool = false
-    @State private var showSearchSubredditsAndUsersView: Bool = false
+    
     @State private var showSubredditAndUserSearchResultView: Bool = false
     @State private var searchThingQuery: String = ""
     
@@ -150,27 +150,11 @@ struct SearchView: View {
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Search")
         .sheet(isPresented: $showSelectSearchInThingSheet) {
-            SelectSearchInThingSheet(onSearchThing: {
-                showSearchSubredditsAndUsersView = true
-            }) { searchInThing in
-                searchViewModel.searchInThing = searchInThing
+            NavigationStack {
+                SelectSearchInThingSheet { searchInThing in
+                    searchViewModel.searchInThing = searchInThing
+                }
             }
-        }
-        .sheet(isPresented: $showSearchSubredditsAndUsersView) {
-            SearchSubredditsAndUsersSheet(onSearch: { query in
-                self.searchThingQuery = query
-                showSubredditAndUserSearchResultView = true
-            }) { searchInThing in
-                searchViewModel.searchInThing = searchInThing
-                showSearchSubredditsAndUsersView = false
-            }
-        }
-        .sheet(isPresented: $showSubredditAndUserSearchResultView) {
-            SubredditAndUserSearchResultSheet(query: searchThingQuery) { searchInThing in
-                searchViewModel.searchInThing = searchInThing
-                showSubredditAndUserSearchResultView = false
-            }
-            .id(searchThingQuery)
         }
     }
     

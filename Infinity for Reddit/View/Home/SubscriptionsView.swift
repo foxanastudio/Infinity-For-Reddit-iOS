@@ -52,7 +52,6 @@ struct SubscriptionsView: View {
             .tabViewStyle(.page(indexDisplayMode: .never))
         }
         .rootViewBackground()
-        .navigationTitle("Subscriptions")
         .task {
             await subscriptionListingViewModel.loadSubscriptionsOnline()
             await subscriptionListingViewModel.loadMyCustomFeedsOnline()

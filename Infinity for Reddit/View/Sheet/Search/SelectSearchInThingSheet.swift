@@ -12,36 +12,12 @@ struct SelectSearchInThingSheet: View {
     @EnvironmentObject private var navigationManager: NavigationManager
     @Environment(\.dismiss) private var dismiss
     
-    let onSearchThing: () -> Void
+    @State private var showSearchSubredditsAndUsersView: Bool = false
+    
     let onSelectThing: (SearchInThing) -> Void
     
     var body: some View {
-        VStack(spacing: 0) {
-            ZStack {
-                Text("Select a Destination")
-                    .primaryText()
-                
-                HStack(spacing: 0) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Text("Cancel")
-                            .neutralTextButton()
-                    }
-                    
-                    Spacer()
-                    
-                    Button {
-                        onSearchThing()
-                        dismiss()
-                    } label: {
-                        SwiftUI.Image(systemName: "magnifyingglass")
-                            .primaryIcon()
-                    }
-                }
-                .padding(16)
-            }
-            
+        ZStack {
             if accountViewModel.account.isAnonymous() {
                 AnonymousSubscriptionsView() { searchInThing in
                     onSelectThing(searchInThing)
@@ -49,6 +25,34 @@ struct SelectSearchInThingSheet: View {
                 }
             } else {
                 SubscriptionsView()  { searchInThing in
+                    onSelectThing(searchInThing)
+                    dismiss()
+                }
+            }
+        }
+        .themedNavigationBar()
+        .addTitleToInlineNavigationBar("Subscriptions")
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    Text("Cancel")
+                        .navigationBarPrimaryText()
+                }
+            }
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    showSearchSubredditsAndUsersView = true
+                } label: {
+                    SwiftUI.Image(systemName: "magnifyingglass")
+                }
+            }
+        }
+        .sheet(isPresented: $showSearchSubredditsAndUsersView) {
+            NavigationStack {
+                SearchSubredditsAndUsersSheet { searchInThing in
                     onSelectThing(searchInThing)
                     dismiss()
                 }
