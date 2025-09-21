@@ -13,29 +13,33 @@ struct SimpleTouchItemRow: View {
     var action: (() -> Void)?
     
     var body: some View {
-        TouchRipple(action: action) {
-            HStack(spacing: 0) {
-                if let icon = icon {
-                    SwiftUI.Image(systemName: icon)
-                        .primaryIcon()
-                        .frame(width: 24, height: 24, alignment: .leading)
-                        .padding(0)
-                } else {
-                    Spacer()
-                        .frame(width: 24)
-                }
-                
-                Spacer()
-                    .frame(width: 24)
-                
-                Text(text)
-                    .primaryText()
-                    .frame(maxWidth: .infinity, alignment: .leading)
+        HStack(spacing: 0) {
+            if let icon = icon {
+                SwiftUI.Image(systemName: icon)
+                    .primaryIcon()
+                    .frame(width: 24, height: 24, alignment: .leading)
+                    .padding(0)
+            } else {
+                Spacer().frame(width: 24)
             }
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
-            .contentShape(Rectangle())
+            
+            Spacer().frame(width: 24)
+            
+            Text(text)
+                .primaryText()
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 16)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            action?()
+        }
+        .background {
+            TouchRipple(backgroundShape: Rectangle()) {
+                Rectangle().fill(Color.clear)
+            }
         }
     }
 }
