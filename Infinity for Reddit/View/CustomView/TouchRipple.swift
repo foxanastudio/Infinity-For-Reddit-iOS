@@ -73,7 +73,8 @@ struct TouchRipple<Content: View, BackgroundShape: Shape>: View {
                         if dragDistance <= maxTapMovement {
                             action?()
                         }
-                    }
+                    },
+                including: .subviews
             )
     }
     

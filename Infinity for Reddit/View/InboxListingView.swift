@@ -76,25 +76,30 @@ struct InboxMessageItemView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            TouchRipple(action: {
+            VStack {
+                Text(account.username == inbox.author ? inbox.dest : inbox.author)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .username()
+                
+                Text(inbox.subject)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .primaryText()
+                
+                Text(inbox.body)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .lineLimit(1)
+                    .secondaryText()
+            }
+            .contentShape(Rectangle())
+            .padding(16)
+            .onTapGesture {
                 navigationManager.path.append(AppNavigation.inboxConversation(inbox: inbox))
-            }) {
-                VStack {
-                    Text(account.username == inbox.author ? inbox.dest : inbox.author)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .username()
-                    
-                    Text(inbox.subject)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .primaryText()
-                    
-                    Text(inbox.body)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .lineLimit(1)
-                        .secondaryText()
+            }
+            .background {
+                TouchRipple(backgroundShape: Rectangle()) {
+                    Rectangle()
+                        .fill(Color.clear)
                 }
-                .contentShape(Rectangle())
-                .padding(16)
             }
             
             Divider()
@@ -116,25 +121,30 @@ struct InboxNotificationItemView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            TouchRipple(action: {
+            VStack {
+                Text(inbox.author)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .username()
+                
+                Text(inbox.linkTitle)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .primaryText()
+                
+                Text(inbox.body)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .lineLimit(1)
+                    .secondaryText()
+            }
+            .contentShape(Rectangle())
+            .padding(16)
+            .onTapGesture {
                 navigationManager.openLink(inbox.context)
-            }) {
-                VStack {
-                    Text(inbox.author)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .username()
-                    
-                    Text(inbox.linkTitle)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .primaryText()
-                    
-                    Text(inbox.body)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .lineLimit(1)
-                        .secondaryText()
+            }
+            .background {
+                TouchRipple(backgroundShape: Rectangle()) {
+                    Rectangle()
+                        .fill(Color.clear)
                 }
-                .contentShape(Rectangle())
-                .padding(16)
             }
             
             Divider()
