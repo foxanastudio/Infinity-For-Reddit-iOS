@@ -39,6 +39,90 @@ struct TouchRipple<Content: View, BackgroundShape: Shape>: View {
             .onPreferenceChange(ExcludedViewsKey.self) { dict in
                 excludedViews = dict[id] ?? []
             }
+            .modify {
+                if #available(iOS 26, *) {
+                    $0.gesture(
+                        SimultaneousGesture(
+                            onBegan: {
+                                print("Long Press Began")
+                            },
+                            onChanged: { recognizer in
+                                let location = recognizer.location(in: recognizer.view)
+                                if dragStartLocation == nil {
+                                    dragStartLocation = location
+                                }
+                                
+                                guard let start = dragStartLocation else { return }
+                                
+                                let distance = hypot(location.x - start.x, location.y - start.y)
+                                
+                                if distance <= maxTapMovement && validTouch && isOutsideExcludedViews(location) {
+                                    if !isPressed {
+                                        isPressed = true
+                                    }
+                                } else {
+                                    validTouch = false
+                                    if isPressed {
+                                        isPressed = false
+                                    }
+                                }
+                            },
+                            onEnded: { recognizer in
+                                defer {
+                                    dragStartLocation = nil
+                                    isPressed = false
+                                    validTouch = true
+                                }
+
+                                guard let start = dragStartLocation, validTouch else { return }
+                                let location = recognizer.location(in: recognizer.view)
+                                let dragDistance = hypot(location.x - start.x, location.y - start.y)
+                                
+                                if dragDistance <= maxTapMovement {
+                                    action?()
+                                }
+                            }
+                        )
+                    )
+                } else {
+                    $0.simultaneousGesture(
+                        DragGesture(minimumDistance: 0)
+                            .onChanged { value in
+                                if dragStartLocation == nil {
+                                    dragStartLocation = value.startLocation
+                                }
+                                
+                                guard let start = dragStartLocation else { return }
+                                let distance = hypot(value.location.x - start.x, value.location.y - start.y)
+                                
+                                if distance <= maxTapMovement && validTouch && isOutsideExcludedViews(value.location) {
+                                    if !isPressed {
+                                        isPressed = true
+                                    }
+                                } else {
+                                    validTouch = false
+                                    if isPressed {
+                                        isPressed = false
+                                    }
+                                }
+                            }
+                            .onEnded { value in
+                                defer {
+                                    dragStartLocation = nil
+                                    isPressed = false
+                                    validTouch = true
+                                }
+
+                                guard let start = dragStartLocation, validTouch else { return }
+                                let dragDistance = hypot(value.location.x - start.x, value.location.y - start.y)
+                                
+                                if dragDistance <= maxTapMovement {
+                                    action?()
+                                }
+                            }
+                    )
+                }
+            }
             .simultaneousGesture(
                 DragGesture(minimumDistance: 0)
                     .onChanged { value in
@@ -73,8 +157,7 @@ struct TouchRipple<Content: View, BackgroundShape: Shape>: View {
                         if dragDistance <= maxTapMovement {
                             action?()
                         }
-                    },
-                including: .subviews
+                    }
             )
     }
     
@@ -126,5 +209,76 @@ private struct ExcludeFromTouchRippleViewModifier: ViewModifier {
 extension View {
     func excludeFromTouchRipple() -> some View {
         modifier(ExcludeFromTouchRippleViewModifier())
+    }
+}
+
+struct SimultaneousGesture: UIGestureRecognizerRepresentable {
+    let onBegan: () -> Void
+    let onChanged: (UILongPressGestureRecognizer) -> Void
+    let onEnded: (UILongPressGestureRecognizer) -> Void
+
+    init(onBegan: @escaping () -> Void = {},
+         onChanged: @escaping (UILongPressGestureRecognizer) -> Void,
+         onEnded: @escaping (UILongPressGestureRecognizer) -> Void = {_ in }) {
+        self.onBegan = onBegan
+        self.onChanged = onChanged
+        self.onEnded = onEnded
+    }
+    
+    func makeUIGestureRecognizer(context: Context) -> UILongPressGestureRecognizer {
+        let gestureRecognizer = UILongPressGestureRecognizer()
+        
+        // Configure the long press gesture
+        gestureRecognizer.minimumPressDuration = 0.0 // Immediate recognition
+        gestureRecognizer.allowableMovement = CGFloat.greatestFiniteMagnitude // Allow movement
+        gestureRecognizer.delegate = context.coordinator
+        
+        return gestureRecognizer
+    }
+    
+    func handleUIGestureRecognizerAction(_ gestureRecognizer: UILongPressGestureRecognizer, context: Context) {
+        switch gestureRecognizer.state {
+        case .began:
+            onBegan()
+            onChanged(gestureRecognizer)
+        case .changed:
+            onChanged(gestureRecognizer)
+        case .ended, .cancelled:
+            onEnded(gestureRecognizer)
+        default:
+            break
+        }
+    }
+    
+    func updateUIGestureRecognizer(_ gestureRecognizer: UILongPressGestureRecognizer, context: Context) {
+        // No updates needed
+    }
+    
+    func makeCoordinator(converter: CoordinateSpaceConverter) -> Coordinator {
+        Coordinator()
+    }
+    
+    class Coordinator: NSObject, UIGestureRecognizerDelegate {
+        // Key method for simultaneous recognition with ScrollView
+        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+            return true
+        }
+        
+        // Optional: Add conditions to fail early if needed
+        func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+            // Add any conditions here to fail early if the gesture is invalid
+            return true
+        }
+    }
+}
+
+extension View {
+    @ViewBuilder
+    func modify(@ViewBuilder _ transform: (Self) -> (some View)?) -> some View {
+        if let view = transform(self), !(view is EmptyView) {
+            view
+        } else {
+            self
+        }
     }
 }
