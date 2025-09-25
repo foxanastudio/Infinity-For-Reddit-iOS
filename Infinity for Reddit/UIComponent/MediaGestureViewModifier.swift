@@ -15,7 +15,8 @@ struct MediaGestureViewModifier: ViewModifier {
     @State private var lastTransform: CGAffineTransform = .identity
     @State private var transform: CGAffineTransform = .identity
     @State private var contentSize: CGSize = .zero
-    var onDragEnded: (CGAffineTransform) -> Bool
+    let onDragEnded: (CGAffineTransform) -> Bool
+    let onDismiss: () -> Void
     
     func body(content: Content) -> some View {
         if let outOfBoundsColor = outOfBoundsColor {
@@ -130,8 +131,12 @@ struct MediaGestureViewModifier: ViewModifier {
             }
             .onEnded { _ in
                 if onDragEnded(transform) {
-                    transform = .identity
-                    lastTransform = .identity
+                    withAnimation {
+                        onDismiss()
+                    } completion: {
+                        transform = .identity
+                        lastTransform = .identity
+                    }
                 } else {
                     onEndGesture()
                 }
@@ -177,6 +182,10 @@ struct MediaGestureViewModifier: ViewModifier {
     }
     
     private func opacityForBackground(maxYDistance: CGFloat) -> Double {
+        if transform.scaleX > minZoomScale || transform.scaleY > minZoomScale {
+            return 1
+        }
+        
         let yDistance = min(abs(transform.ty), maxYDistance)
         return Double(1 - (yDistance / maxYDistance))
     }
