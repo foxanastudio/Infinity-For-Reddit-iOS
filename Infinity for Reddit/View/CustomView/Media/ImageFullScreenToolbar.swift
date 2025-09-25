@@ -90,7 +90,7 @@ struct ImageFullScreenToolbar: View {
                     }
                     
                     Button {
-                        onShare()
+                        fullScreenMediaToolbarViewModel.shareImage()
                     } label: {
                         SwiftUI.Image(systemName: "square.and.arrow.up")
                             .font(.system(size: buttonSize))

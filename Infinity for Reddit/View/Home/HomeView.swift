@@ -195,6 +195,7 @@ struct HomeView: View {
                         fullScreenMediaViewModel.dismiss()
                     }
                     .id(urlString)
+                    .zIndex(1)
                 }
             }
         }
