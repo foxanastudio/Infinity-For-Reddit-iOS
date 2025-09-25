@@ -34,9 +34,6 @@ struct SubmitImageToolbar: View {
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 8)
-        .background(
-            Capsule().fill(Color(hex: "ED9FB7"))
-        )
         .padding(.bottom, 8)
     }
 }

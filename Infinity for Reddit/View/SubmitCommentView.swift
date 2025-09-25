@@ -21,6 +21,7 @@ struct SubmitCommentView: View {
     @State private var toolbarHeight: CGFloat = 0
     @FocusState private var markdownFocusedField: MarkdownFieldType?
     @State private var showMarkdownPreview = false
+    @State private var cursorPosition: CGPoint = .zero
     
     init(parent: CommentParent) {
         _submitCommentViewModel = StateObject(
@@ -80,7 +81,6 @@ struct SubmitCommentView: View {
                             
                             ZStack(alignment: .topLeading) {
                                 MarkdownTextField(text: $submitCommentViewModel.text, selectedRange: $selectedRange, canFocus: $textViewCanFocus)
-                                    .frame(minHeight: 300)
                                     .contentShape(Rectangle())
                                 
                                 if submitCommentViewModel.text.isEmpty {

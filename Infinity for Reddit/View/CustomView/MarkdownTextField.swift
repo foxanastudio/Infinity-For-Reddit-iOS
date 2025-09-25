@@ -13,6 +13,21 @@ struct MarkdownTextField: UIViewRepresentable {
     @Binding var text: String
     @Binding var selectedRange: NSRange
     @Binding var canFocus: Bool
+    
+    class GrowingTextView: UITextView {
+        override var intrinsicContentSize: CGSize {
+            let safeWidth = max(bounds.width, 1)
+            let fittingSize = CGSize(width: safeWidth, height: .greatestFiniteMagnitude)
+            let size = sizeThatFits(fittingSize)
+        
+            if size.width.isNaN || size.height.isNaN || size.width.isInfinite || size.height.isInfinite {
+                let lineHeight = font?.lineHeight ?? 20
+                let defaultHeight = lineHeight + textContainerInset.top + textContainerInset.bottom
+                return CGSize(width: safeWidth, height: defaultHeight)
+            }
+            return size
+        }
+    }
 
     class Coordinator: NSObject, UITextViewDelegate {
         var parent: MarkdownTextField
@@ -20,7 +35,7 @@ struct MarkdownTextField: UIViewRepresentable {
         init(parent: MarkdownTextField) {
             self.parent = parent
         }
-
+        
         func textViewDidChange(_ textView: UITextView) {
             let text = textView.text
             DispatchQueue.main.async {
@@ -41,9 +56,9 @@ struct MarkdownTextField: UIViewRepresentable {
     }
 
     func makeUIView(context: Context) -> UITextView {
-        let textView = UITextView()
+        let textView = GrowingTextView()
         textView.font = UIFont.preferredFont(forTextStyle: .body)
-        textView.isScrollEnabled = true
+        textView.isScrollEnabled = false
         textView.delegate = context.coordinator
         textView.borderStyle = .none
         textView.tintColor = UIColor(Color(hex: customThemeViewModel.currentCustomTheme.colorPrimaryLightTheme))

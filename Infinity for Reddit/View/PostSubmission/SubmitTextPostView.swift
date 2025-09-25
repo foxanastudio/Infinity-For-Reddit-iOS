@@ -19,6 +19,7 @@ struct SubmitTextPostView: View {
     @State private var titleSelectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var bodySelectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var showMarkdownPreview: Bool = false
+    @State private var cursorPosition: CGPoint = .zero
     
     init() {
         _postSubmissionContextViewModel = StateObject(
@@ -62,7 +63,6 @@ struct SubmitTextPostView: View {
                             
                             ZStack(alignment: .topLeading) {
                                 MarkdownTextField(text: $submitTextPostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
-                                    .frame(minHeight: 300)
                                     .contentShape(Rectangle())
                                 
                                 if submitTextPostViewModel.content.isEmpty {

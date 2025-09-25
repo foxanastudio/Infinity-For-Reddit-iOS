@@ -19,6 +19,7 @@ struct SubmitImagePostView: View {
     @State private var titleSelectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var bodySelectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var showMarkdownPreview: Bool = false
+    @State private var cursorPosition: CGPoint = .zero
     
     init() {
         _postSubmissionContextViewModel = StateObject(
@@ -61,16 +62,18 @@ struct SubmitImagePostView: View {
                             VStack {
                                 ZStack(alignment: .topLeading) {
                                     MarkdownTextField(text: $submitImagePostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
-                                        .frame(minHeight: 300)
                                         .contentShape(Rectangle())
                                     
                                     if submitImagePostViewModel.content.isEmpty {
                                         Text("Content")
                                             .secondaryText()
                                     }
+                                    
                                 }
                                 .padding(16)
                                 
+                                SubmitImageToolbar()
+                                    .frame(maxWidth: .infinity)
                             }
                         }
                     }
