@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		46978AED2E863D7100EAF60F /* MijickCamera in Frameworks */ = {isa = PBXBuildFile; productRef = 46978AEC2E863D7100EAF60F /* MijickCamera */; };
 		55155AE12CFD5BCF003D5F14 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 55155AE02CFD5BCF003D5F14 /* GRDB */; };
 		554918CB2E26D8ED00355B48 /* Flow in Frameworks */ = {isa = PBXBuildFile; productRef = 554918CA2E26D8ED00355B48 /* Flow */; };
 		555F0B842D07AD53003A1CA7 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 555F0B832D07AD53003A1CA7 /* SDWebImageSwiftUI */; };
@@ -66,6 +67,7 @@
 			files = (
 				555F0B842D07AD53003A1CA7 /* SDWebImageSwiftUI in Frameworks */,
 				55949B882CFA7EAD002D1C46 /* Swinject in Frameworks */,
+				46978AED2E863D7100EAF60F /* MijickCamera in Frameworks */,
 				55C7421F2CFD1E4300853D4E /* SwiftyJSON in Frameworks */,
 				559389B12E459F600062724F /* Kingfisher in Frameworks */,
 				55AAB5322D3A9E3E006816B2 /* MarkdownUI in Frameworks */,
@@ -142,6 +144,7 @@
 				5588B8542E0A30A1004CDAA2 /* IdentifiedCollections */,
 				554918CA2E26D8ED00355B48 /* Flow */,
 				559389B02E459F600062724F /* Kingfisher */,
+				46978AEC2E863D7100EAF60F /* MijickCamera */,
 			);
 			productName = "Infinity for Reddit";
 			productReference = 559BD2332CF7D58500621685 /* Infinity for Reddit.app */;
@@ -235,6 +238,7 @@
 				5588B8532E0A30A1004CDAA2 /* XCRemoteSwiftPackageReference "swift-identified-collections" */,
 				554918C92E26D8ED00355B48 /* XCRemoteSwiftPackageReference "SwiftUI-Flow" */,
 				559389AF2E459F600062724F /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				46978AEB2E863D7100EAF60F /* XCRemoteSwiftPackageReference "Camera" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 559BD2342CF7D58500621685 /* Products */;
@@ -439,7 +443,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Infinity for Reddit/Preview Content\"";
-				DEVELOPMENT_TEAM = 5372BY2RR8;
+				DEVELOPMENT_TEAM = 5MP2CT86K8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Infinity-for-Reddit-Info.plist";
@@ -470,7 +474,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Infinity for Reddit/Preview Content\"";
-				DEVELOPMENT_TEAM = 5372BY2RR8;
+				DEVELOPMENT_TEAM = 5MP2CT86K8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Infinity-for-Reddit-Info.plist";
@@ -603,6 +607,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		46978AEB2E863D7100EAF60F /* XCRemoteSwiftPackageReference "Camera" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Mijick/Camera.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.2;
+			};
+		};
 		55155ADF2CFD5BCF003D5F14 /* XCRemoteSwiftPackageReference "GRDB.swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/groue/GRDB.swift.git";
@@ -678,6 +690,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		46978AEC2E863D7100EAF60F /* MijickCamera */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 46978AEB2E863D7100EAF60F /* XCRemoteSwiftPackageReference "Camera" */;
+			productName = MijickCamera;
+		};
 		55155AE02CFD5BCF003D5F14 /* GRDB */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 55155ADF2CFD5BCF003D5F14 /* XCRemoteSwiftPackageReference "GRDB.swift" */;

@@ -1,5 +1,5 @@
 {
-  "originHash" : "7bf56d4b0ebb7d3a5031eaddb544f6878a944d9b0ec407c3a16e00807c89e396",
+  "originHash" : "4634d981ccc25832e1b95b8c09c18deca97ba7eb793e421dbc10905fd7b04beb",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "513364f870f6bfc468f9d2ff0a95caccc10044c5",
         "version" : "5.10.2"
+      }
+    },
+    {
+      "identity" : "camera",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Mijick/Camera.git",
+      "state" : {
+        "revision" : "3cb2b56003910f765d7a5d39d2c2cb49717519cf",
+        "version" : "3.0.2"
       }
     },
     {
@@ -116,6 +125,15 @@
       "state" : {
         "revision" : "be9dbcc7b86811bc131539a20c6f9c2d3e56919f",
         "version" : "2.9.1"
+      }
+    },
+    {
+      "identity" : "timer",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Mijick/Timer",
+      "state" : {
+        "revision" : "342371c33c3f084d82a4818447ba77d858064c85",
+        "version" : "2.0.0"
       }
     }
   ],
