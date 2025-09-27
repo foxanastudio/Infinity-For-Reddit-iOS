@@ -7,6 +7,7 @@
 import SwiftUI
 import MarkdownUI
 import MijickCamera
+import PhotosUI
 
 struct SubmitImagePostView: View {
     @StateObject private var postSubmissionContextViewModel: PostSubmissionContextViewModel
@@ -22,6 +23,8 @@ struct SubmitImagePostView: View {
     @State private var showMarkdownPreview: Bool = false
     @State private var cursorPosition: CGPoint = .zero
     @State private var showCamera: Bool = false
+    @State private var showPhotoPicker: Bool = false
+    @State private var selectedPhotoItem: PhotosPickerItem? = nil
     
     init() {
         _postSubmissionContextViewModel = StateObject(
@@ -75,14 +78,16 @@ struct SubmitImagePostView: View {
                                 .padding(16)
                                 
                                 SubmitImageToolbar(
-                                    onCameraTap: {
-                                        showCamera = true
-                                    },
-                                    onPhotoPickerTap: {
-                                        print("Photo Picker Button Tapped")
-                                    }
+                                    onCameraTap: { showCamera = true },
+                                    onPhotoPickerTap: { showPhotoPicker = true }
                                 )
                                 .frame(maxWidth: .infinity)
+                                .photosPicker(
+                                    isPresented: $showPhotoPicker,
+                                    selection: $selectedPhotoItem,
+                                    matching: .images,
+                                    photoLibrary: .shared()
+                                )
                             }
                         }
                     }
@@ -129,8 +134,9 @@ struct SubmitImagePostView: View {
         }
         .fullScreenCover(isPresented: $showCamera) {
             MCamera()
-                .onImageCaptured { image, controller in
-                    submitImagePostViewModel.capturedImage = image
+                .onImageCaptured { capturedImage, controller in
+                    submitImagePostViewModel.capturedImage = capturedImage
+                    print("Captured Image: \(capturedImage.description)")
                     controller.closeMCamera()
                 }
                 .setCloseMCameraAction {
@@ -146,6 +152,16 @@ struct SubmitImagePostView: View {
                     ).cameraOutputSwitchAllowed(false)
                 }
                 .startSession()
+        }
+        .onChange(of: selectedPhotoItem) { _, newSelectedItem in
+            Task {
+                if let selectedItem = newSelectedItem,
+                   let imageData = try? await selectedItem.loadTransferable(type: Data.self),
+                   let pickedImage = UIImage(data: imageData) {
+                    submitImagePostViewModel.capturedImage = pickedImage
+                    print("Picked Image: \(pickedImage.description)")
+                }
+            }
         }
     }
     
