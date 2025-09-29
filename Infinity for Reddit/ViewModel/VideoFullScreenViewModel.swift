@@ -180,8 +180,8 @@ class VideoFullScreenViewModel: ObservableObject {
     private func downloadMediaAsync(urlString: String, post: Post?) async {
         do {
             let downloadMediaType: DownloadMediaType
-            if let post = post, case .video(_, let downloadUrl) = post.postType {
-                downloadMediaType = .video(downloadUrlString: downloadUrl, fileName: "test.mp4")
+            if let post = post, case .video = post.postType {
+                downloadMediaType = .redditVideo(post: post)
             } else {
                 downloadMediaType = .video(downloadUrlString: urlString, fileName: "test.mp4")
             }
@@ -194,6 +194,7 @@ class VideoFullScreenViewModel: ObservableObject {
                     }
                 })
         } catch {
+            print(error)
             await MainActor.run {
                 self.error = error
             }
