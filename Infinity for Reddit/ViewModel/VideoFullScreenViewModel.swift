@@ -7,6 +7,7 @@
 
 import Foundation
 import AVFoundation
+import SwiftUI
 
 class VideoFullScreenViewModel: ObservableObject {
     @Published var player: AVPlayer = .init()
@@ -18,6 +19,7 @@ class VideoFullScreenViewModel: ObservableObject {
     @Published var hasAudio: Bool = false
     @Published var isMuted: Bool = false
     @Published var downloadProgress: Double = 0
+    @Published var isShowingController: Bool = false
     @Published private var error: Error?
     
     private var currentItemObserver: NSKeyValueObservation?
@@ -25,6 +27,7 @@ class VideoFullScreenViewModel: ObservableObject {
     private var statusObserver: NSKeyValueObservation?
     private var audioTrackObserver: NSKeyValueObservation?
     private var downloadTask: Task<Void, Never>?
+    private var timer: Timer?
     
     enum VideoPlayerError: Error {
         case invalidURL
@@ -205,7 +208,31 @@ class VideoFullScreenViewModel: ObservableObject {
         }
     }
     
+    func toggleController() {
+        isShowingController.toggle()
+        if isShowingController {
+            resetControllerTimer()
+        }
+    }
+    
+    func resetControllerTimer() {
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { [weak self] _ in
+            DispatchQueue.main.async {
+                withAnimation {
+                    self?.isShowingController = false
+                }
+            }
+        }
+    }
+    
+    func removeControllerTimer() {
+        timer?.invalidate()
+        timer = nil
+    }
+    
     deinit {
+        timer?.invalidate()
         NotificationCenter.default.removeObserver(self)
         self.player.replaceCurrentItem(with: nil)
     }

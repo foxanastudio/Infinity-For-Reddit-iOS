@@ -21,7 +21,7 @@ struct VideoFullScreenView: View {
     @State private var currentDragOffset = 0.0
     @State private var hasStartedDragging: Bool = false
     @State private var isAnimatingBack: Bool = false
-    @State private var isShowingController: Bool = false
+    
     @State private var isPlaying: Bool = true
     @State private var playbackSpeed: Double = 1
     
@@ -50,11 +50,11 @@ struct VideoFullScreenView: View {
                 .offset(y: currentDragOffset)
                 .onTapGesture {
                     withAnimation {
-                        isShowingController.toggle()
+                        videoFullScreenViewModel.toggleController()
                     }
                 }
             
-            if isShowingController {
+            if videoFullScreenViewModel.isShowingController {
                 VideoController(
                     isPlaying: $isPlaying,
                     duration: $videoFullScreenViewModel.duration,
@@ -79,6 +79,8 @@ struct VideoFullScreenView: View {
                     onDownload: {
                         videoFullScreenViewModel.downloadMedia(urlString: urlString, post: post)
                     },
+                    onResetControllerTimer: videoFullScreenViewModel.resetControllerTimer,
+                    onRemoveControllerTimer: videoFullScreenViewModel.removeControllerTimer,
                     onDismiss: {
                         withAnimation {
                             onDismiss()
@@ -87,7 +89,7 @@ struct VideoFullScreenView: View {
                 )
                 .onTapGesture {
                     withAnimation {
-                        isShowingController.toggle()
+                        videoFullScreenViewModel.toggleController()
                     }
                 }
                 .zIndex(1)
@@ -112,6 +114,7 @@ struct VideoFullScreenView: View {
             .throttle(for: .milliseconds(500), scheduler: RunLoop.main, latest: true)
         ) { newValue in
             if videoFullScreenViewModel.isSeekingProgress {
+                videoFullScreenViewModel.resetControllerTimer()
                 videoFullScreenViewModel.player.seek(
                     to: CMTime(seconds: newValue, preferredTimescale: 600)
                 )
@@ -151,7 +154,7 @@ struct VideoFullScreenView: View {
                 .onEnded { value in
                     if hasStartedDragging && abs(value.translation.height) > 100 {
                         withAnimation(.linear(duration: 0.25)) {
-                            isShowingController = false
+                            videoFullScreenViewModel.toggleController()
                             if value.translation.height < 0 {
                                 // Dragged up
                                 currentDragOffset = -UIScreen.main.bounds.height
@@ -187,11 +190,15 @@ struct VideoController: View {
     @Binding var hasAudio: Bool
     @Binding var isMuted: Bool
     @Binding var playbackSpeed: Double
-    let title: String?
     
+    @State var showPlaybackSpeedSheet: Bool = false
+    
+    let title: String?
     let onFastForward: () -> Void
     let onRewind: () -> Void
     let onDownload: () -> Void
+    let onResetControllerTimer: () -> Void
+    let onRemoveControllerTimer: () -> Void
     let onDismiss: () -> Void
     
     var body: some View {
@@ -222,41 +229,23 @@ struct VideoController: View {
                         }
                         .onTapGesture {
                             isMuted.toggle()
+                            onResetControllerTimer()
                         }
                     }
                     
                     Button {
                         onDownload()
+                        onResetControllerTimer()
                     } label: {
                         SwiftUI.Image(systemName: "arrow.down.square")
                             .font(.system(size: 24))
                             .foregroundStyle(.white)
                     }
                     
-                    Menu {
-                        Menu {
-                            ForEach(Array(VideoUserDefaultsUtils.playbackSpeeds.indices), id: \.self) { index in
-                                Button {
-                                    playbackSpeed = VideoUserDefaultsUtils.playbackSpeeds[index]
-                                } label: {
-                                    HStack {
-                                        Text(VideoUserDefaultsUtils.playbackSpeedsText[index])
-                                            .primaryText()
-                                        
-                                        Spacer()
-                                        
-                                        if playbackSpeed == VideoUserDefaultsUtils.playbackSpeeds[index] {
-                                            SwiftUI.Image(systemName: "checkmark")
-                                        }
-                                    }
-                                }
-                            }
-                        } label: {
-                            Text("Speed")
-                                .primaryText()
-                        }
+                    Button {
+                        showPlaybackSpeedSheet.toggle()
                     } label: {
-                        SwiftUI.Image(systemName: "ellipsis.circle")
+                        SwiftUI.Image(systemName: "gauge.with.dots.needle.67percent")
                             .font(.system(size: 24))
                             .foregroundStyle(.white)
                     }
@@ -271,6 +260,7 @@ struct VideoController: View {
             HStack(spacing: 48) {
                 Button {
                     onRewind()
+                    onResetControllerTimer()
                 } label: {
                     SwiftUI.Image(systemName: "backward.fill")
                         .font(.system(size: 24))
@@ -279,6 +269,7 @@ struct VideoController: View {
                 
                 Button {
                     isPlaying.toggle()
+                    onResetControllerTimer()
                 } label: {
                     SwiftUI.Image(systemName: isPlaying ? "pause.fill" : "play.fill")
                         .font(.system(size: 48))
@@ -287,6 +278,7 @@ struct VideoController: View {
                 
                 Button {
                     onFastForward()
+                    onResetControllerTimer()
                 } label: {
                     SwiftUI.Image(systemName: "forward.fill")
                         .font(.system(size: 24))
@@ -309,6 +301,7 @@ struct VideoController: View {
                     
                     Slider(value: $currentTime, in: 0...duration, onEditingChanged: { isEditing in
                         isSeekingProgress = isEditing
+                        onResetControllerTimer()
                     })
                     .padding(.horizontal, 16)
                     
@@ -321,6 +314,19 @@ struct VideoController: View {
         }
         .frame(maxWidth: .infinity)
         .background(Color.gray.opacity(0.2))
+        .onChange(of: showPlaybackSpeedSheet) { oldValue, newValue in
+            if newValue {
+                onRemoveControllerTimer()
+            } else {
+                onResetControllerTimer()
+            }
+        }
+        .sheet(isPresented: $showPlaybackSpeedSheet) {
+            PlaybackSpeedSheet(playbackSpeed: $playbackSpeed) {
+                showPlaybackSpeedSheet = false
+            }
+            .presentationDetents([.medium])
+        }
     }
     
     private func formatTime(_ seconds: Double) -> String {
@@ -328,5 +334,37 @@ struct VideoController: View {
         let mins = Int(seconds) / 60
         let secs = Int(seconds) % 60
         return String(format: "%02d:%02d", mins, secs)
+    }
+}
+
+private struct PlaybackSpeedSheet: View {
+    @Binding var playbackSpeed: Double
+    
+    let onDismiss: () -> Void
+    
+    var body: some View {
+        ScrollView {
+            VStack {
+                ForEach(Array(VideoUserDefaultsUtils.playbackSpeeds.indices), id: \.self) { index in
+                    Button {
+                        playbackSpeed = VideoUserDefaultsUtils.playbackSpeeds[index]
+                        onDismiss()
+                    } label: {
+                        HStack {
+                            Text(VideoUserDefaultsUtils.playbackSpeedsText[index])
+                                .primaryText()
+                            
+                            Spacer()
+                            
+                            if playbackSpeed == VideoUserDefaultsUtils.playbackSpeeds[index] {
+                                SwiftUI.Image(systemName: "checkmark.seal")
+                                    .primaryIcon()
+                            }
+                        }
+                    }
+                    .padding(16)
+                }
+            }
+        }
     }
 }
