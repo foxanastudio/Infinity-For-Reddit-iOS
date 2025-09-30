@@ -154,7 +154,8 @@ struct VideoFullScreenView: View {
                 .onEnded { value in
                     if hasStartedDragging && abs(value.translation.height) > 100 {
                         withAnimation(.linear(duration: 0.25)) {
-                            videoFullScreenViewModel.toggleController()
+                            videoFullScreenViewModel.removeControllerTimer()
+                            videoFullScreenViewModel.isShowingController = false
                             if value.translation.height < 0 {
                                 // Dragged up
                                 currentDragOffset = -UIScreen.main.bounds.height
