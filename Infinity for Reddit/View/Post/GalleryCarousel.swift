@@ -18,13 +18,11 @@ struct GalleryCarousel: View {
     
     let post: Post
     let items: [GalleryItem]
-    let mediaMetadata: [String: MediaMetadata]
     let onImageTap: (() -> Void)?
     
     init(post: Post, onImageTap: (() -> Void)? = nil) {
         self.post = post
         self.items = post.galleryData!.items
-        self.mediaMetadata = post.mediaMetadata!
         self.onImageTap = onImageTap
     }
     
@@ -32,26 +30,27 @@ struct GalleryCarousel: View {
         ZStack(alignment: .topLeading) {
             TabView(selection: $galleryScrollState.scrollId) {
                 ForEach(Array(items.enumerated()), id: \.offset) { index, item in
-                    if let media = mediaMetadata[item.mediaId], let preview = media.p.last {
-                        CustomWebImage(
-                            preview.u,
-                            handleImageTapGesture: false,
-                            centerCrop: true,
-                            blur: (post.over18 && blurSensitiveImages) || (post.spoiler && blurSpoilerImages),
-                            customOnTapGesture: {
-                                withAnimation {
-                                    fullScreenMediaViewModel.show(.gallery(currentUrlString: preview.u, post: post, items: items, mediaMetadata: mediaMetadata, galleryScrollState: galleryScrollState))
-                                }
-                                onImageTap?()
+                    CustomWebImage(
+                        item.urlString,
+                        handleImageTapGesture: false,
+                        centerCrop: true,
+                        blur: (post.over18 && blurSensitiveImages) || (post.spoiler && blurSpoilerImages),
+                        customOnTapGesture: {
+                            withAnimation {
+                                fullScreenMediaViewModel.show(
+                                    .gallery(
+                                        currentUrlString: item.urlString,
+                                        post: post,
+                                        items: items,
+                                        galleryScrollState: galleryScrollState
+                                    )
+                                )
                             }
-                        )
-                        .containerRelativeFrame(.horizontal, count: 1, span: 1, spacing: 0, alignment: .center)
-                        .tag(index)
-                    } else {
-                        Color.clear
-                            .containerRelativeFrame(.horizontal, count: 1, span: 1, spacing: 0, alignment: .center)
-                            .tag(index)
-                    }
+                            onImageTap?()
+                        }
+                    )
+                    .containerRelativeFrame(.horizontal, count: 1, span: 1, spacing: 0, alignment: .center)
+                    .tag(index)
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))

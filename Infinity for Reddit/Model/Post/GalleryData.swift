@@ -33,7 +33,7 @@ class GalleryItem : NSObject {
     var mediaId : String!
     
     var mimeType: String
-    var urlString: String?
+    var urlString: String!
     var fallbackUrlString: String?
     var hasFallback: Bool = false
     var captionUrl: String?

@@ -11,7 +11,7 @@ enum FullScreenMediaType {
     case image(urlString: String, aspectRatio: CGSize? = nil, post: Post? = nil, matchedGeometryEffectId: String? = nil)
     case gif(urlString: String, post: Post? = nil)
     case video(urlString: String, post: Post? = nil, videoType: VideoType = .reddit)
-    case gallery(currentUrlString: String, post: Post? = nil, items: [GalleryItem], mediaMetadata: [String: MediaMetadata], galleryScrollState: GalleryScrollState)
+    case gallery(currentUrlString: String, post: Post? = nil, items: [GalleryItem], galleryScrollState: GalleryScrollState)
     case imgurGallery(url: URL)
     case imgurAlbum(url: URL)
     case imgurImage(url: URL)
@@ -39,7 +39,7 @@ enum FullScreenMediaType {
 //                return DownloadMediaType.gif(downloadUrlString: urlString, fileName: "\(Utils.randomString()).gif")
 //            }
 //        case .video(url: let urlString, post: let post, videoType: let videoType):
-//            
+//
 //        case .gallery(let currentUrlString, let post, _, _, _):
 //            if let post {
 //                return DownloadMediaType.gif(downloadUrlString: currentUrlString, fileName: "\(post.fileNameWithoutExtension).jpg")

@@ -18,12 +18,10 @@ struct GalleryFullScreenView: View {
     @State private var isAnimatingBack: Bool = false
     
     var items: [GalleryItem]
-    var mediaMetadata: [String: MediaMetadata]
     let onDismiss: () -> Void
     
-    init(items: [GalleryItem], mediaMetadata: [String: MediaMetadata], galleryScrollState: GalleryScrollState, onDismiss: @escaping () -> Void) {
+    init(items: [GalleryItem], galleryScrollState: GalleryScrollState, onDismiss: @escaping () -> Void) {
         self.items = items
-        self.mediaMetadata = mediaMetadata
         self.galleryScrollState = galleryScrollState
         self.onDismiss = onDismiss
     }
@@ -38,18 +36,15 @@ struct GalleryFullScreenView: View {
             
             TabView(selection: $galleryScrollState.scrollId) {
                 ForEach(Array(items.enumerated()), id: \.offset) { index, item in
-                    if let media = mediaMetadata[item.mediaId], let preview = media.p.last {
-                        ZoomableScrollView {
-                            CustomWebImage(
-                                preview.u,
-                                aspectRatio: preview.aspectRatio,
-                                handleImageTapGesture: false
-                            )
-                            .offset(y: currentDragOffset)
-                        }
-                        .containerRelativeFrame(.horizontal, count: 1, span: 1, spacing: 0, alignment: .center)
-                        .tag(index)
+                    ZoomableScrollView {
+                        CustomWebImage(
+                            item.urlString,
+                            handleImageTapGesture: false
+                        )
+                        .offset(y: currentDragOffset)
                     }
+                    .containerRelativeFrame(.horizontal, count: 1, span: 1, spacing: 0, alignment: .center)
+                    .tag(index)
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
