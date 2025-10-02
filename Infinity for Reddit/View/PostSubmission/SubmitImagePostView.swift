@@ -64,48 +64,39 @@ struct SubmitImagePostView: View {
                             )
                             .padding(16)
                             
-                            VStack {
-                                ZStack(alignment: .topLeading) {
-                                    MarkdownTextField(text: $submitImagePostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
-                                        .contentShape(Rectangle())
-                                    
-                                    if submitImagePostViewModel.content.isEmpty {
-                                        Text("Content")
-                                            .secondaryText()
-                                    }
-                                    
-                                }
-                                .padding(16)
+                            ZStack(alignment: .topLeading) {
+                                MarkdownTextField(text: $submitImagePostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
+                                    .contentShape(Rectangle())
                                 
-                                if let previewImage = submitImagePostViewModel.capturedImage {
-                                    VStack {
-                                        Button(action: {
-                                            submitImagePostViewModel.clearCapturedImage()
-                                        }) {
-                                            Text("Select again")
-                                                .subreddit()
-                                        }
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        
-                                        SwiftUI.Image(uiImage: previewImage)
-                                            .resizable()
-                                            .scaledToFit()
-                                            .cornerRadius(8)
-                                    }
-                                    .padding(.horizontal, 16)
-                                } else {
-                                    SubmitImageToolbar(
-                                        onCameraTap: { showCamera = true },
-                                        onPhotoPickerTap: { showPhotoPicker = true }
-                                    )
-                                    .frame(maxWidth: .infinity)
-                                    .photosPicker(
-                                        isPresented: $showPhotoPicker,
-                                        selection: $selectedPhotoItem,
-                                        matching: .images,
-                                        photoLibrary: .shared()
-                                    )
+                                if submitImagePostViewModel.content.isEmpty {
+                                    Text("Content")
+                                        .secondaryText()
                                 }
+                            }
+                            .padding(16)
+                            
+                            if let previewImage = submitImagePostViewModel.capturedImage {
+                                VStack(spacing: 16) {
+                                    Button(action: {
+                                        submitImagePostViewModel.clearCapturedImage()
+                                    }) {
+                                        Text("Select again")
+                                            .colorAccentText()
+                                    }
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    
+                                    SwiftUI.Image(uiImage: previewImage)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .cornerRadius(8)
+                                }
+                                .padding(.horizontal, 16)
+                            } else {
+                                SelectImageToolbar(
+                                    onCameraTap: { showCamera = true },
+                                    onPhotoPickerTap: { showPhotoPicker = true }
+                                )
+                                .frame(maxWidth: .infinity)
                             }
                         }
                     }
@@ -131,7 +122,7 @@ struct SubmitImagePostView: View {
         }
         .frame(maxHeight: .infinity)
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar("Text Post")
+        .addTitleToInlineNavigationBar("Image Post")
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button {
@@ -141,7 +132,7 @@ struct SubmitImagePostView: View {
                 }
                 
                 Button {
-                    print("Submit Text Post")
+                    print("Submit Image Post")
                 } label: {
                     SwiftUI.Image(systemName: "paperplane.fill")
                 }
@@ -150,6 +141,12 @@ struct SubmitImagePostView: View {
         .sheet(isPresented: $showMarkdownPreview) {
             MarkdownViewerSheet(markdown: submitImagePostViewModel.content)
         }
+        .photosPicker(
+            isPresented: $showPhotoPicker,
+            selection: $selectedPhotoItem,
+            matching: .images,
+            photoLibrary: .shared()
+        )
         .fullScreenCover(isPresented: $showCamera) {
             MCamera()
                 .onImageCaptured { capturedImage, controller in
@@ -176,6 +173,8 @@ struct SubmitImagePostView: View {
                    let imageData = try? await selectedItem.loadTransferable(type: Data.self),
                    let pickedImage = UIImage(data: imageData) {
                     submitImagePostViewModel.setCapturedImage(pickedImage)
+                } else {
+                    // Error handling
                 }
             }
         }
@@ -186,3 +185,36 @@ struct SubmitImagePostView: View {
     }
 }
 
+private struct SelectImageToolbar: View {
+    @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
+    
+    let onCameraTap: () -> Void
+    let onPhotoPickerTap: () -> Void
+    
+    let buttonSize: CGFloat = 24
+
+    var body: some View {
+        HStack(spacing: 32) {
+            Button {
+                onCameraTap()
+            } label: {
+                SwiftUI.Image(systemName: "camera.fill")
+                    .font(.system(size: buttonSize))
+                    .foregroundColor(.white)
+                    .padding(16)
+                    .background(Circle().fill(Color(hex: customThemeViewModel.currentCustomTheme.colorAccent)))
+            }
+
+            Button {
+                onPhotoPickerTap()
+            } label: {
+                SwiftUI.Image(systemName: "photo.fill.on.rectangle.fill")
+                    .font(.system(size: buttonSize))
+                    .foregroundColor(.white)
+                    .padding(16)
+                    .background(Circle().fill(Color(hex: customThemeViewModel.currentCustomTheme.colorAccent)))
+            }
+        }
+        .padding(16)
+    }
+}
