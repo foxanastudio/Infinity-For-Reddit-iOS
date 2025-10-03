@@ -53,7 +53,7 @@ struct GalleryFullScreenView: View {
                             DragGesture()
                                 .updating($dragOffset) { value, state, _ in
                                     // Only allow vertical drag to trigger dismiss
-                                    if !hasStartedDragging && abs(value.translation.height) > abs(value.translation.width) {
+                                    if !hasStartedDragging && abs(value.translation.width) < 4 {
                                         hasStartedDragging = true
                                     }
                                     if hasStartedDragging {
@@ -62,7 +62,9 @@ struct GalleryFullScreenView: View {
                                 }
                                 .onChanged { value in
                                     // Adjust the scale based on the drag distance
-                                    currentDragOffset = value.translation.height
+                                    if hasStartedDragging {
+                                        currentDragOffset = value.translation.height
+                                    }
                                 }
                                 .onEnded { value in
                                     if hasStartedDragging && abs(value.translation.height) > 100 {

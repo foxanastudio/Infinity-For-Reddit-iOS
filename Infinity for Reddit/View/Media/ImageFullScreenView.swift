@@ -9,19 +9,14 @@ import SwiftUI
 import SDWebImageSwiftUI
 
 struct ImageFullScreenView: View {
-    @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
-    @EnvironmentObject var namespaceManager: NamespaceManager
-    
     @State private var isToolbarVisible: Bool = true
     
     let urlString: String
-    let aspectRatio: CGSize?
     let matchedGeometryEffectId: String?
     let onDismiss: () -> Void
     
-    init(urlString: String, aspectRatio: CGSize? = nil, matchedGeometryEffectId: String? = nil, onDismiss: @escaping () -> Void) {
+    init(urlString: String, matchedGeometryEffectId: String? = nil, onDismiss: @escaping () -> Void) {
         self.urlString = urlString
-        self.aspectRatio = aspectRatio
         self.matchedGeometryEffectId = matchedGeometryEffectId
         self.onDismiss = onDismiss
     }
@@ -30,7 +25,6 @@ struct ImageFullScreenView: View {
         ZStack {
             CustomWebImage(
                 urlString,
-                aspectRatio: aspectRatio,
                 handleImageTapGesture: false,
                 matchedGeometryEffectId: matchedGeometryEffectId
             )
