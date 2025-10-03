@@ -73,6 +73,7 @@ struct GalleryFullScreenView: View {
 }
 
 struct GalleryImageView: View {
+    @State private var currentImageZoom: CGFloat = 1.0
     @State private var currentDragOffset = 0.0
     @GestureState private var dragOffset: CGSize = .zero
     @State private var hasStartedDragging: Bool = false
@@ -84,22 +85,26 @@ struct GalleryImageView: View {
     
     var body: some View {
         ZStack {
-            ZoomableScrollView(content: {
-                CustomWebImage(
-                    urlString,
-                    handleImageTapGesture: false
-                )
-                .offset(y: currentDragOffset)
-            }, onSingleTap: {
-                withAnimation {
-                    isToolbarVisible.toggle()
-                }
-            })
+            ZoomableScrollView(
+                content: {
+                    CustomWebImage(
+                        urlString,
+                        handleImageTapGesture: false
+                    )
+                    .offset(y: currentDragOffset)
+                },
+                onSingleTap: {
+                    withAnimation {
+                        isToolbarVisible.toggle()
+                    }
+                },
+                currentZoomScale: $currentImageZoom
+            )
             .simultaneousGesture(
                 DragGesture()
                     .updating($dragOffset) { value, state, _ in
                         // Only allow vertical drag to trigger dismiss
-                        if !hasStartedDragging && abs(value.translation.width) < 4 {
+                        if !hasStartedDragging && abs(value.translation.width) < 4 && currentImageZoom == 1.0 {
                             hasStartedDragging = true
                         }
                         if hasStartedDragging {

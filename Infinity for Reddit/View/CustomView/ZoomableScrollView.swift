@@ -10,13 +10,15 @@ import SwiftUI
 struct ZoomableScrollView<Content: View>: UIViewRepresentable {
     var content: Content
     var onSingleTap: () -> Void
-    
-    // We must use two *local* variables in makeUIView for the initialization fix.
-    // We remove the stored properties from the struct to avoid the initialization error.
+    @Binding var currentZoomScale: CGFloat
 
-    init(@ViewBuilder content: () -> Content, onSingleTap: @escaping () -> Void) {
+    private let singleTap = UITapGestureRecognizer()
+    private let doubleTap = UITapGestureRecognizer()
+
+    init(@ViewBuilder content: () -> Content, onSingleTap: @escaping () -> Void, currentZoomScale: Binding<CGFloat>) {
         self.content = content()
         self.onSingleTap = onSingleTap
+        self._currentZoomScale = currentZoomScale
     }
     
     func makeUIView(context: Context) -> UIScrollView {
@@ -27,8 +29,7 @@ struct ZoomableScrollView<Content: View>: UIViewRepresentable {
         scrollView.bouncesZoom = true
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.showsVerticalScrollIndicator = false
-        
-        // Host SwiftUI content
+
         let hostedView = context.coordinator.hostingController.view!
         hostedView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(hostedView)
@@ -41,7 +42,7 @@ struct ZoomableScrollView<Content: View>: UIViewRepresentable {
             hostedView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
             hostedView.heightAnchor.constraint(equalTo: scrollView.heightAnchor)
         ])
-        
+
         let doubleTap = UITapGestureRecognizer(target: context.coordinator,
                                                action: #selector(Coordinator.handleDoubleTap(_:)))
         doubleTap.numberOfTapsRequired = 2
@@ -50,13 +51,10 @@ struct ZoomableScrollView<Content: View>: UIViewRepresentable {
         let singleTap = UITapGestureRecognizer(target: context.coordinator,
                                                action: #selector(Coordinator.handleSingleTap))
         singleTap.numberOfTapsRequired = 1
-        
-        // Set the delegate for the single tap to enable coexistence with pan/pinch
+
         singleTap.delegate = context.coordinator
         scrollView.addGestureRecognizer(singleTap)
-        
-        // --- 3. THE PRIORITY FIX ---
-        // Single tap must wait for the double tap to fail
+
         singleTap.require(toFail: doubleTap)
         
         return scrollView
@@ -64,11 +62,11 @@ struct ZoomableScrollView<Content: View>: UIViewRepresentable {
     
     func updateUIView(_ uiView: UIScrollView, context: Context) {
         context.coordinator.hostingController.rootView = content
-        context.coordinator.onSingleTap = onSingleTap // Update the tap closure
+        context.coordinator.onSingleTap = onSingleTap
     }
     
     func makeCoordinator() -> Coordinator {
-        Coordinator(content: content, onSingleTap: onSingleTap)
+        Coordinator(content: content, onSingleTap: onSingleTap, currentZoomScale: $currentZoomScale)
     }
     
     // MARK: - Coordinator
@@ -76,20 +74,24 @@ struct ZoomableScrollView<Content: View>: UIViewRepresentable {
     class Coordinator: NSObject, UIScrollViewDelegate, UIGestureRecognizerDelegate {
         var hostingController: UIHostingController<Content>
         var onSingleTap: () -> Void
+        var zoomScaleBinding: Binding<CGFloat> // Store the binding wrapper
         
-        init(content: Content, onSingleTap: @escaping () -> Void) {
+        init(content: Content, onSingleTap: @escaping () -> Void, currentZoomScale: Binding<CGFloat>) {
             self.hostingController = UIHostingController(rootView: content)
             self.hostingController.view.backgroundColor = .clear
             self.onSingleTap = onSingleTap
+            self.zoomScaleBinding = currentZoomScale
         }
         
         func viewForZooming(in scrollView: UIScrollView) -> UIView? {
             hostingController.view
         }
-        
-        // --- GESTURE DELEGATE METHOD (THE COEXISTENCE FIX) ---
+
+        func scrollViewDidZoom(_ scrollView: UIScrollView) {
+            zoomScaleBinding.wrappedValue = scrollView.zoomScale
+        }
+
         func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-            // Allows our custom taps to run alongside the UIScrollView's internal pan/pinch gestures.
             return gestureRecognizer is UITapGestureRecognizer
         }
         
@@ -98,7 +100,9 @@ struct ZoomableScrollView<Content: View>: UIViewRepresentable {
         @objc func handleDoubleTap(_ recognizer: UITapGestureRecognizer) {
             guard let scrollView = recognizer.view as? UIScrollView else { return }
             
-            if scrollView.zoomScale == 1.0 {
+            let targetScale: CGFloat = (scrollView.zoomScale == 1.0) ? 2.0 : 1.0
+            
+            if targetScale > 1.0 {
                 // zoom in around tap point
                 let pointInView = recognizer.location(in: hostingController.view)
                 let newZoomScale: CGFloat = 2
@@ -114,6 +118,10 @@ struct ZoomableScrollView<Content: View>: UIViewRepresentable {
             } else {
                 // zoom out
                 scrollView.setZoomScale(1.0, animated: true)
+            }
+
+            DispatchQueue.main.async {
+                self.zoomScaleBinding.wrappedValue = targetScale
             }
         }
         
