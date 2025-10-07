@@ -47,6 +47,9 @@
     "Cake day: %@" : {
 
     },
+    "Camera not available" : {
+
+    },
     "Cancel" : {
 
     },
@@ -57,6 +60,9 @@
 
     },
     "Click here to browse all comments" : {
+
+    },
+    "Close" : {
 
     },
     "Collapse" : {
@@ -120,6 +126,9 @@
 
     },
     "Done" : {
+
+    },
+    "Download all media" : {
 
     },
     "Download Location" : {
@@ -393,9 +402,6 @@
 
     },
     "Start by creating a post filter" : {
-
-    },
-    "SubmitGalleryPostView" : {
 
     },
     "SubmitPollPostView" : {

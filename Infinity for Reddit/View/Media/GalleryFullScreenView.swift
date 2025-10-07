@@ -154,19 +154,19 @@ struct GalleryImageToolbar: View {
     
     @Binding var isVisible: Bool
     
-    let onClose: () -> Void
+    let onDismiss: () -> Void
     
-    private let buttonSize: CGFloat = 24
+    private let buttonSize: CGFloat = 18
     
     init(downloadMediaType: DownloadMediaType,
          isVisible: Binding<Bool>,
-         onClose: @escaping () -> Void
+         onDismiss: @escaping () -> Void
     ) {
         _fullScreenMediaToolbarViewModel = StateObject(
             wrappedValue: FullScreenMediaToolbarViewModel(downloadMediaType: downloadMediaType)
         )
         self._isVisible = isVisible
-        self.onClose = onClose
+        self.onDismiss = onDismiss
     }
     
     var body: some View {
@@ -174,15 +174,15 @@ struct GalleryImageToolbar: View {
             if isVisible {
                 HStack {
                     Button {
-                        onClose()
+                        onDismiss()
                     } label: {
                         SwiftUI.Image(systemName: "xmark")
-                            .font(.system(size: 18))
+                            .font(.system(size: buttonSize))
                             .padding(10)
                             .foregroundColor(Color.white)
                             .background(
                                 Circle()
-                                    .fill(Color(hex: "#08cf75"))
+                                    .fill(Color(hex: "#2E2E2E"))
                             )
                     }
                     
@@ -201,13 +201,13 @@ struct GalleryImageToolbar: View {
                     } label: {
                         SwiftUI.Image(systemName: "square.and.arrow.down")
                             .font(.system(size: buttonSize))
-                            .padding(.horizontal, 8)
-                            .padding(.top, 6)
-                            .padding(.bottom, 10)
+                            .padding(.horizontal, 10)
+                            .padding(.top, 12)
+                            .padding(.bottom, 14)
                             .foregroundColor(Color.white)
                             .background(
                                 Circle()
-                                    .fill(Color(hex: "#08cf75"))
+                                    .fill(Color(hex: "#2E2E2E"))
                             )
                     }
                     
@@ -216,13 +216,28 @@ struct GalleryImageToolbar: View {
                     } label: {
                         SwiftUI.Image(systemName: "square.and.arrow.up")
                             .font(.system(size: buttonSize))
-                            .padding(.horizontal, 8)
-                            .padding(.top, 6)
-                            .padding(.bottom, 10)
+                            .padding(.horizontal, 10)
+                            .padding(.top, 12)
+                            .padding(.bottom, 14)
                             .foregroundColor(Color.white)
                             .background(
                                 Circle()
-                                    .fill(Color(hex: "#08cf75"))
+                                    .fill(Color(hex: "#2E2E2E"))
+                            )
+                    }
+                    
+                    Menu {
+                        Button("Download all media") {
+                            
+                        }
+                    } label: {
+                        SwiftUI.Image(systemName: "ellipsis.circle")
+                            .font(.system(size: buttonSize))
+                            .padding(10)
+                            .foregroundColor(Color.white)
+                            .background(
+                                Circle()
+                                    .fill(Color(hex: "#2E2E2E"))
                             )
                     }
                 }
@@ -230,7 +245,7 @@ struct GalleryImageToolbar: View {
                 .padding(.vertical, 8)
                 .background(
                     Capsule()
-                        .fill(Color(hex: "#b6f2d7", opacity: 0.5))
+                        .fill(Color(hex: "#6B6B6B", opacity: 0.5))
                 )
                 .padding(.bottom, 64)
                 .contentShape(Capsule())
