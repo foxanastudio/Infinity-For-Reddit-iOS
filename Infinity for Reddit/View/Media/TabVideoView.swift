@@ -16,6 +16,8 @@ struct TabVideoView: View {
     let post: Post?
     let videoType: VideoType
     let isSelected: Bool
+    let hasDescription: Bool
+    let onShowDescription: () -> Void
     let onDismiss: () -> Void
     
     init(urlString: String,
@@ -23,6 +25,8 @@ struct TabVideoView: View {
          videoType: VideoType,
          isSelected: Bool,
          tabViewDismissalViewModel: TabViewDismissalViewModel,
+         hasDescription: Bool,
+         onShowDescription: @escaping () -> Void,
          onDismiss: @escaping () -> Void
     ) {
         self.urlString = urlString
@@ -30,6 +34,8 @@ struct TabVideoView: View {
         self.videoType = videoType
         self._videoFullScreenViewModel = StateObject(wrappedValue: .init())
         self.isSelected = isSelected
+        self.hasDescription = hasDescription
+        self.onShowDescription = onShowDescription
         self.tabViewDismissalViewModel = tabViewDismissalViewModel
         self.onDismiss = onDismiss
     }
@@ -39,7 +45,9 @@ struct TabVideoView: View {
             urlString: urlString,
             post: nil,
             videoType: .direct,
-            videoFullScreenViewModel: videoFullScreenViewModel
+            videoFullScreenViewModel: videoFullScreenViewModel,
+            hasDescription: hasDescription,
+            onShowDescription: onShowDescription
         ) {
             onDismiss()
         }

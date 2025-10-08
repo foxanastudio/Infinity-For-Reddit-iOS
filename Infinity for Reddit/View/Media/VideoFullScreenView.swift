@@ -28,13 +28,25 @@ struct VideoFullScreenView: View {
     let urlString: String
     let post: Post?
     let videoType: VideoType
+    let hasDescription: Bool
+    let onShowDescription: (() -> Void)?
     let onDismiss: () -> Void
     
-    init(urlString: String, post: Post?, videoType: VideoType, videoFullScreenViewModel: VideoFullScreenViewModel, onDismiss: @escaping () -> Void) {
+    init(
+        urlString: String,
+        post: Post?,
+        videoType: VideoType,
+        videoFullScreenViewModel: VideoFullScreenViewModel,
+        hasDescription: Bool = false,
+        onShowDescription: (() -> Void)? = nil,
+        onDismiss: @escaping () -> Void
+    ) {
         self.urlString = urlString
         self.post = post
         self.videoType = videoType
         self.videoFullScreenViewModel = videoFullScreenViewModel
+        self.hasDescription = hasDescription
+        self.onShowDescription = onShowDescription
         self.onDismiss = onDismiss
     }
     
@@ -67,6 +79,7 @@ struct VideoFullScreenView: View {
                     isDownloading: videoFullScreenViewModel.downloadTask != nil,
                     downloadProgressTitle: videoFullScreenViewModel.downloadProgressTitle,
                     downloadProgress: videoFullScreenViewModel.downloadProgress,
+                    hasDescription: hasDescription,
                     onFastForward: {
                         let newTime = videoFullScreenViewModel.currentTime + 5
                         videoFullScreenViewModel.player.seek(
@@ -84,6 +97,7 @@ struct VideoFullScreenView: View {
                     },
                     onResetControllerTimer: videoFullScreenViewModel.resetControllerTimer,
                     onRemoveControllerTimer: videoFullScreenViewModel.removeControllerTimer,
+                    onShowDescription: onShowDescription,
                     onDismiss: {
                         videoFullScreenViewModel.resetState()
                         withAnimation {
@@ -203,11 +217,13 @@ struct VideoController: View {
     let isDownloading: Bool
     let downloadProgressTitle: String
     let downloadProgress: Double
+    let hasDescription: Bool
     let onFastForward: () -> Void
     let onRewind: () -> Void
     let onDownload: () -> Void
     let onResetControllerTimer: () -> Void
     let onRemoveControllerTimer: () -> Void
+    let onShowDescription: (() -> Void)?
     let onDismiss: () -> Void
     
     var body: some View {
@@ -257,6 +273,16 @@ struct VideoController: View {
                         SwiftUI.Image(systemName: "gauge.with.dots.needle.67percent")
                             .font(.system(size: 24))
                             .foregroundStyle(.white)
+                    }
+                    
+                    if hasDescription {
+                        Button {
+                            onShowDescription?()
+                        } label: {
+                            SwiftUI.Image(systemName: "info.circle")
+                                .font(.system(size: 24))
+                                .foregroundStyle(.white)
+                        }
                     }
                 }
                 .padding(16)

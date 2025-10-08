@@ -53,6 +53,7 @@ class ImgurMedia {
     var score : Int!
     var section : String!
     var title : String!
+    var type : String!
     var ups : Int!
     var views : Int!
 
@@ -99,8 +100,13 @@ class ImgurMedia {
         score = json["score"].intValue
         section = json["section"].stringValue
         title = json["title"].stringValue
+        type = json["type"].stringValue
         ups = json["ups"].intValue
         views = json["views"].intValue
+        
+        if images.isEmpty {
+            images.append(ImgurMediaItem(id: id, link: link, title: title, description: description, type: type))
+        }
     }
 }
 
@@ -172,5 +178,13 @@ class ImgurMediaItem: Identifiable {
         type = json["type"].stringValue
         views = json["views"].intValue
         width = json["width"].intValue
+    }
+    
+    init(id: String, link: String, title: String, description: String, type: String) {
+        self.id = id
+        self.link = link
+        self.title = title
+        self.description = description
+        self.type = type
     }
 }

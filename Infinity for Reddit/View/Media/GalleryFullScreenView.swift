@@ -62,7 +62,11 @@ struct GalleryFullScreenView: View {
                             post: nil,
                             videoType: .direct,
                             isSelected: galleryScrollState.scrollId == index,
-                            tabViewDismissalViewModel: tabViewDismissalViewModel
+                            tabViewDismissalViewModel: tabViewDismissalViewModel,
+                            hasDescription: !item.caption.isEmpty || !item.captionUrl.isEmpty,
+                            onShowDescription: {
+                                sheetGalleryItem = item
+                            }
                         ) {
                             tabViewDismissalViewModel.isDismissed = true
                             onDismiss()

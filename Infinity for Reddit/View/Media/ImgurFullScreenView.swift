@@ -40,9 +40,9 @@ struct ImgurFullScreenView: View {
                 .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
                 .edgesIgnoringSafeArea(.all)
                 .ignoresSafeArea()
-            if let imgurMedia = imgurFullScreenViewModel.imgurMedia, let images = imgurMedia.images {
+            if let imgurMedia = imgurFullScreenViewModel.imgurMedia {
                 TabView(selection: $selectedTab) {
-                    ForEach(Array(images.enumerated()), id: \.offset) { index, item in
+                    ForEach(Array(imgurMedia.images.enumerated()), id: \.offset) { index, item in
                         if item.mediaType != .video {
                             ImgurImageView(
                                 imgurMediaItem: item,
@@ -63,7 +63,11 @@ struct ImgurFullScreenView: View {
                                 post: nil,
                                 videoType: .direct,
                                 isSelected: selectedTab == index,
-                                tabViewDismissalViewModel: tabViewDismissalViewModel
+                                tabViewDismissalViewModel: tabViewDismissalViewModel,
+                                hasDescription: !item.title.isEmpty || !item.description.isEmpty,
+                                onShowDescription: {
+                                    sheetImgurMediaItem = item
+                                }
                             ) {
                                 tabViewDismissalViewModel.isDismissed = true
                                 onDismiss()
