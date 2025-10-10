@@ -84,8 +84,23 @@ struct PostDetailsView: View {
                             .frame(maxWidth: .infinity)
                             .listPlainItem()
                     } else {
-                        Text("No comments")
-                            .listPlainItem()
+                        ZStack {
+                            VStack(spacing: 8) {
+                                SwiftUI.Image(systemName: "plus.circle")
+                                    .primaryIcon()
+                                
+                                Text("No comments yet. Be the first to share your thoughts!")
+                                    .primaryText()
+                                    .multilineTextAlignment(.center)
+                            }
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                sendComment()
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(16)
+                        .listPlainItemNoInsets()
                     }
                 } else {
                     ForEach(postDetailsViewModel.visibleComments, id: \.id) { commentItem in

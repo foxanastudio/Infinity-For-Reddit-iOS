@@ -43,7 +43,8 @@ struct PostFilterSettingsView: View {
                             .primaryIcon()
                         
                         Text("Start by creating a post filter")
-                            .primaryIcon()
+                            .primaryText()
+                            .multilineTextAlignment(.center)
                         
                         Spacer()
                     }
