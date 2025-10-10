@@ -282,8 +282,8 @@ struct PostDetailsViewCard: View {
                     }
             }
             
-            HStack {
-                HStack {
+            HStack(spacing: 0) {
+                HStack(spacing: 0) {
                     Button(action: {
                         if !accountViewModel.account.isAnonymous() {
                             voteTask?.cancel()
@@ -297,6 +297,8 @@ struct PostDetailsViewCard: View {
                             .postUpvoteIcon(isUpvoted: postViewModel.post.likes == 1 && !accountViewModel.account.isAnonymous())
                     }
                     .buttonStyle(.borderless)
+                    .padding(8)
+                    .contentShape(Rectangle())
                     
                     VotesText(votes: postViewModel.post.score + postViewModel.post.likes, hideNVotes: hideNVotes)
                         .frame(width: 72, alignment: .center)
@@ -315,6 +317,8 @@ struct PostDetailsViewCard: View {
                             .postDownvoteIcon(isDownvoted: postViewModel.post.likes == -1 && !accountViewModel.account.isAnonymous())
                     }
                     .buttonStyle(.borderless)
+                    .padding(8)
+                    .contentShape(Rectangle())
                 }
                 .environment(\.layoutDirection, .leftToRight)
                 
@@ -349,8 +353,9 @@ struct PostDetailsViewCard: View {
                         .postIconTemplateRendering()
                         .postIcon()
                 }
-                .padding(.trailing, 16)
                 .buttonStyle(.borderless)
+                .padding(8)
+                .contentShape(Rectangle())
                 
                 ShareLink(item: postViewModel.post.url) {
                     SwiftUI.Image(systemName: "square.and.arrow.up")
@@ -358,11 +363,12 @@ struct PostDetailsViewCard: View {
                         .postIcon()
                 }
                 .buttonStyle(.borderless)
+                .padding(8)
+                .contentShape(Rectangle())
             }
             .environment(\.layoutDirection, voteButtonsOnTheRight ? .rightToLeft : .leftToRight)
-            .padding(.horizontal, 16)
-            .padding(.top, 8)
-            .padding(.bottom, 16)
+            .padding(.horizontal, 8)
+            .padding(.bottom, 8)
         }
         .padding(.vertical, 0)
     }
