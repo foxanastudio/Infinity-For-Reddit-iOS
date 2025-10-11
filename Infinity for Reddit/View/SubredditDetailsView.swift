@@ -39,172 +39,161 @@ struct SubredditDetailsView: View {
     var body: some View {
         GeometryReader { proxy in
             List {
-                if let subredditData = subredditDetailsViewModel.subredditData {
-                    VStack(spacing: 0) {
-                        let height = 150.0
-                        GeometryReader { headerProxy in
-                            let currentHeaderMinY = headerProxy.frame(in: .named("SCROLL")).minY
-                            let dynamicHeight = max(0, height + currentHeaderMinY * 0.4)
-                            let bannerOpacity = max(0, 1 + (currentHeaderMinY / 150))
+                VStack(spacing: 0) {
+                    let height = 150.0
+                    GeometryReader { headerProxy in
+                        let currentHeaderMinY = headerProxy.frame(in: .named("SCROLL")).minY
+                        let dynamicHeight = max(0, height + currentHeaderMinY * 0.4)
+                        let bannerOpacity = max(0, 1 + (currentHeaderMinY / 150))
+                        
+                        VStack(alignment: .center) {
+                            CustomWebImage(
+                                subredditDetailsViewModel.subredditData?.bannerUrl ?? "",
+                                width: UIScreen.main.bounds.width,
+                                height: dynamicHeight,
+                                handleImageTapGesture: false,
+                                centerCrop: true,
+                                fallbackView: {
+                                    Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
+                                        .frame(height: dynamicHeight)
+                                        .opacity(bannerOpacity)
+                                }
+                            )
+                            .opacity(bannerOpacity)
                             
-                            VStack(alignment: .center) {
-                                CustomWebImage(
-                                    subredditData.bannerUrl,
-                                    width: UIScreen.main.bounds.width,
-                                    height: dynamicHeight,
-                                    handleImageTapGesture: false,
-                                    centerCrop: true,
-                                    fallbackView: {
-                                        Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
-                                            .frame(height: dynamicHeight)
-                                            .opacity(bannerOpacity)
-                                    }
-                                )
-                                .opacity(bannerOpacity)
-                                
-                                HStack {
-                                    ProgressIndicator()
-                                        .opacity(isManuallyRefreshing || isReadyToRefresh ? 1 : 0)
-                                        .offset(y: -10)
-                                }
-                                .frame(height: isManuallyRefreshing || isReadyToRefresh ? 60 : 0)
-                                .clipped()
-                                
+                            HStack {
+                                ProgressIndicator()
+                                    .opacity(isManuallyRefreshing || isReadyToRefresh ? 1 : 0)
+                                    .offset(y: -10)
                             }
-                            .ignoresSafeArea(.container, edges: .top)
-                            .offset(y: -currentHeaderMinY)
-                            .onChange(of: currentHeaderMinY) { value in
-                                self.headerMinY = value
-                                let refreshThreshold: CGFloat = 65.0
-                                
-                                if isManuallyRefreshing { return }
-                                
-                                if isDragging && value > refreshThreshold {
-                                    self.isReadyToRefresh = true
-                                }
-                                
-                                if !isDragging || value < refreshThreshold {
-                                    self.isReadyToRefresh = false
-                                }
+                            .frame(height: isManuallyRefreshing || isReadyToRefresh ? 60 : 0)
+                            .clipped()
+                            
+                        }
+                        .ignoresSafeArea(.container, edges: .top)
+                        .offset(y: -currentHeaderMinY)
+                        .onChange(of: currentHeaderMinY) { _, newValue in
+                            self.headerMinY = newValue
+                            let refreshThreshold: CGFloat = 65.0
+                            
+                            if isManuallyRefreshing { return }
+                            
+                            if isDragging && newValue > refreshThreshold {
+                                self.isReadyToRefresh = true
+                            }
+                            
+                            if !isDragging || newValue < refreshThreshold {
+                                self.isReadyToRefresh = false
                             }
                         }
-                        .frame(height: height)
-                        
-                        VStack(spacing: 0) {
-                            HStack(spacing: 0) {
-                                CustomWebImage(
-                                    subredditData.iconUrl,
-                                    width: subredditIconSize,
-                                    height: subredditIconSize,
-                                    circleClipped: true,
-                                    handleImageTapGesture: false,
-                                    fallbackView: {
-                                        InitialLetterAvatarImageFallbackView(name: subredditData.name, size: subredditIconSize)
-                                    }
-                                )
-                                
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text("r/\(subredditData.name)")
-                                        .subreddit()
-                                    
-                                    Button(action: {
-                                        subscribeTask?.cancel()
-                                        subscribeTask = Task {
-                                            await subredditDetailsViewModel.toggleSubscribeSubreddit()
-                                        }
-                                    }) {
-                                        Text(subredditDetailsViewModel.isSubscribed ? "Subscribed" : "Subscribe")
-                                            .padding(.horizontal, 15)
-                                            .padding(.vertical, 8)
-                                            .background(Color.blue)
-                                            .foregroundColor(.white)
-                                            .cornerRadius(20)
-                                    }
+                    }
+                    .frame(height: height)
+                    
+                    VStack(spacing: 0) {
+                        HStack(spacing: 0) {
+                            CustomWebImage(
+                                subredditDetailsViewModel.subredditData?.iconUrl ?? "",
+                                width: subredditIconSize,
+                                height: subredditIconSize,
+                                circleClipped: true,
+                                handleImageTapGesture: false,
+                                fallbackView: {
+                                    InitialLetterAvatarImageFallbackView(name: subredditDetailsViewModel.subredditData?.name ?? subredditDetailsViewModel.subredditName, size: subredditIconSize)
                                 }
-                                .padding(.leading, 16)
+                            )
+                            
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("r/\(subredditDetailsViewModel.subredditData?.name ?? subredditDetailsViewModel.subredditName)")
+                                    .subreddit()
+                                
+                                Button(action: {
+                                    subscribeTask?.cancel()
+                                    subscribeTask = Task {
+                                        await subredditDetailsViewModel.toggleSubscribeSubreddit()
+                                    }
+                                }) {
+                                    Text(subredditDetailsViewModel.isSubscribed ? "Subscribed" : "Subscribe")
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 8)
+                                        .background(Color.blue)
+                                        .foregroundColor(.white)
+                                        .cornerRadius(20)
+                                }
+                            }
+                            .padding(.leading, 16)
+                            
+                            Spacer()
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 16)
+                        
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Text("Subscribers: \(subredditDetailsViewModel.subredditData?.nSubscribers ?? 0)")
+                                    .primaryText()
                                 
                                 Spacer()
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 16)
-                            
-                            VStack(alignment: .leading) {
-                                HStack {
-                                    Text("Subscribers: \(subredditData.nSubscribers ?? 0)")
-                                        .primaryText()
-                                    Spacer()
-                                    Text("Since:")
-                                        .primaryText()
-                                }
                                 
-                                HStack {
-                                    Text("Online: \(subredditData.activeUsers ?? 0)")
-                                        .primaryText()
-                                    Spacer()
+                                Text("Since:")
+                                    .primaryText()
+                            }
+                            
+                            HStack {
+                                Spacer()
+                                
+                                if let subredditData = subredditDetailsViewModel.subredditData {
                                     Text("\(subredditDetailsViewModel.formattedCakeDay(TimeInterval(subredditData.createdUTC ?? 0)))")
                                         .primaryText()
                                 }
                             }
-                            .padding(.bottom, 16)
-                            
-                            if let description = subredditData.sidebarDescription, !description.isEmpty {
-                                Markdown(description)
-                                    .themedMarkdown()
-                                    .padding(.bottom, 8)
-                                    .markdownLinkHandler { url in
-                                        navigationManager.openLink(url)
-                                    }
-                            }
                         }
-                        .padding(.horizontal, 16)
-                        .offset(y: isManuallyRefreshing || isReadyToRefresh ? 30 : 0)
-                    }
-                    .listPlainItemNoInsets()
-                    .zIndex(2)
-                    
-//                    Picker("Select Section", selection: $selectedSection) {
-//                        ForEach(0..<2, id: \.self) { index in
-//                            Text(index == 0 ? "Posts" : "About")
-//                                .tag(index)
-//                        }
-//                    }
-//                    .pickerStyle(.segmented)
-//                    .listRowInsets(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
-//                    .offset(y: isManuallyRefreshing || isReadyToRefresh ? 30 : 0)
-//                    .zIndex(0)
-//                    .animation(.easeInOut, value: selectedSection)
-                    
-                    SegmentedPicker(selectedValue: $selectedSection, values: ["Posts", "About"])
-                        .padding(4)
-                        .listRowInsets(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
-                        .offset(y: isManuallyRefreshing || isReadyToRefresh ? 30 : 0)
-                        .zIndex(0)
-                        .animation(.easeInOut, value: selectedSection)
-                        .frame(maxWidth: .infinity)
-                    
-                    Group {
-                        if selectedSection == 0 {
-                            PostListingView(
-                                account: accountViewModel.account,
-                                postListingMetadata:PostListingMetadata(
-                                    postListingType:.subreddit(subredditName: subredditDetailsViewModel.subredditName),
-                                    pathComponents: ["subreddit": "\(subredditData.name)"],
-                                    headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
-                                    queries: nil,
-                                    params: nil
-                                ),
-                                isRootView: false
-                            )
-                            .id(accountViewModel.account.username)
-                            .listRowSeparator(.hidden)
-                            .offset(y: isManuallyRefreshing || isReadyToRefresh ? 30 : 0)
-                        } else if selectedSection == 1 {
-                            SubredditAboutView(description: subredditData.description)
-                                .listRowSeparator(.hidden)
+                        .padding(.bottom, 16)
+                        
+                        if let description = subredditDetailsViewModel.subredditData?.sidebarDescription, !description.isEmpty {
+                            Markdown(description)
+                                .themedMarkdown()
+                                .padding(.bottom, 8)
+                                .markdownLinkHandler { url in
+                                    navigationManager.openLink(url)
+                                }
                         }
                     }
-                    .animation(.easeInOut, value: selectedSection)
+                    .padding(.horizontal, 16)
+                    .offset(y: isManuallyRefreshing || isReadyToRefresh ? 30 : 0)
                 }
+                .listPlainItemNoInsets()
+                .zIndex(2)
+                
+                SegmentedPicker(selectedValue: $selectedSection, values: ["Posts", "About"])
+                    .padding(4)
+                    .listRowInsets(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
+                    .offset(y: isManuallyRefreshing || isReadyToRefresh ? 30 : 0)
+                    .zIndex(0)
+                    .animation(.easeInOut, value: selectedSection)
+                    .frame(maxWidth: .infinity)
+                
+                Group {
+                    if selectedSection == 0 {
+                        PostListingView(
+                            account: accountViewModel.account,
+                            postListingMetadata:PostListingMetadata(
+                                postListingType:.subreddit(subredditName: subredditDetailsViewModel.subredditName),
+                                pathComponents: ["subreddit": "\(subredditDetailsViewModel.subredditName)"],
+                                headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
+                                queries: nil,
+                                params: nil
+                            ),
+                            isRootView: false
+                        )
+                        .id(accountViewModel.account.username)
+                        .listRowSeparator(.hidden)
+                        .offset(y: isManuallyRefreshing || isReadyToRefresh ? 30 : 0)
+                    } else if selectedSection == 1 {
+                        SubredditAboutView(subredditData: subredditDetailsViewModel.subredditData)
+                            .listRowSeparator(.hidden)
+                    }
+                }
+                .animation(.easeInOut, value: selectedSection)
             }
             .coordinateSpace(name: "SCROLL")
             .edgesIgnoringSafeArea(.top)

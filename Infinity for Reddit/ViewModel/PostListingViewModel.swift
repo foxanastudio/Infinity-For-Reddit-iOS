@@ -159,7 +159,7 @@ public class PostListingViewModel: ObservableObject {
             let postListing: PostListing
             switch postListingMetadata.postListingType.sortEmbeddingStyle {
             case .inPath:
-                var queries = ["t": sortType.time?.rawValue ?? "", "limit": "100", "after": after ?? ""]
+                var queries = ["t": sortType.time?.rawValue ?? "", "limit": "100", "after": self.after ?? ""]
                 if postListingMetadata.postListingType.canQuerySensitiveInAPICall {
                     queries["include_over_18"] = sensitiveContent ? "1" : "0"
                 }
@@ -170,7 +170,7 @@ public class PostListingViewModel: ObservableObject {
                     params: postListingMetadata.params
                 )
             case .inQuery(let key):
-                var queries = [key: sortType.type.rawValue, "t": sortType.time?.rawValue ?? "", "limit": "100", "after": after ?? ""]
+                var queries = [key: sortType.type.rawValue, "t": sortType.time?.rawValue ?? "", "limit": "100", "after": self.after ?? ""]
                 if postListingMetadata.postListingType.canQuerySensitiveInAPICall {
                     queries["include_over_18"] = sensitiveContent ? "1" : "0"
                 }
@@ -217,7 +217,7 @@ public class PostListingViewModel: ObservableObject {
                         self.posts.removeAll()
                     }
                     self.posts.append(contentsOf: realNewPosts)
-                    hasMorePages = !(after == nil || after?.isEmpty == true)
+                    hasMorePages = !(self.after == nil || self.after?.isEmpty == true)
                 }
             }
             

@@ -10,13 +10,10 @@ import SwiftyJSON
 import MarkdownUI
 
 
-class PostListingRootClass: NSObject, NSCoding{
+class PostListingRootClass: NSObject {
     var kind: String!
     var data: PostListing!
     
-    /**
-     * Instantiate the instance using the passed json values to set the properties values
-     */
     init(fromJson json: JSON!) throws {
         if json.isEmpty {
             throw JSONError.invalidData
@@ -27,57 +24,14 @@ class PostListingRootClass: NSObject, NSCoding{
         }
         kind = json["kind"].stringValue
     }
-    
-    /**
-     * Returns all the available property values in the form of [String:Any] object where the key is the approperiate json key and the value is the value of the corresponding property
-     */
-    func toDictionary() -> [String:Any]
-    {
-        var dictionary = [String:Any]()
-        if data != nil{
-            dictionary["data"] = data.toDictionary()
-        }
-        if kind != nil{
-            dictionary["kind"] = kind
-        }
-        return dictionary
-    }
-    
-    /**
-     * NSCoding required initializer.
-     * Fills the data from the passed decoder
-     */
-    @objc required init(coder aDecoder: NSCoder)
-    {
-        data = aDecoder.decodeObject(forKey: "data") as? PostListing
-        kind = aDecoder.decodeObject(forKey: "kind") as? String
-    }
-    
-    /**
-     * NSCoding required method.
-     * Encodes mode properties into the decoder
-     */
-    func encode(with aCoder: NSCoder)
-    {
-        if data != nil{
-            aCoder.encode(data, forKey: "data")
-        }
-        if kind != nil{
-            aCoder.encode(kind, forKey: "kind")
-        }
-        
-    }
 }
 
-public class PostListing : NSObject, NSCoding{
+public class PostListing : NSObject {
     var posts : [Post]! = [Post]()
     var after : String!
     var before : String!
     var dist : Int!
-    
-    /**
-     * Instantiate the instance using the passed json values to set the properties values
-     */
+
     init(fromJson json: JSON!) throws {
         if json.isEmpty {
             throw JSONError.invalidData
@@ -97,52 +51,6 @@ public class PostListing : NSObject, NSCoding{
         after = json["after"].stringValue
         before = json["before"].stringValue
         dist = json["dist"].intValue
-    }
-    
-    /**
-     * Returns all the available property values in the form of [String:Any] object where the key is the approperiate json key and the value is the value of the corresponding property
-     */
-    func toDictionary() -> [String:Any]
-    {
-        var dictionary = [String:Any]()
-        if after != nil{
-            dictionary["after"] = after
-        }
-        if before != nil{
-            dictionary["before"] = before
-        }
-        if dist != nil{
-            dictionary["dist"] = dist
-        }
-        return dictionary
-    }
-    
-    /**
-     * NSCoding required initializer.
-     * Fills the data from the passed decoder
-     */
-    @objc public required init(coder aDecoder: NSCoder)
-    {
-        after = aDecoder.decodeObject(forKey: "after") as? String
-        before = aDecoder.decodeObject(forKey: "before") as? String
-        dist = aDecoder.decodeObject(forKey: "dist") as? Int
-    }
-    
-    /**
-     * NSCoding required method.
-     * Encodes mode properties into the decoder
-     */
-    public func encode(with aCoder: NSCoder)
-    {
-        if after != nil{
-            aCoder.encode(after, forKey: "after")
-        }
-        if before != nil{
-            aCoder.encode(before, forKey: "before")
-        }
-        if dist != nil{
-            aCoder.encode(dist, forKey: "dist")
-        }
     }
 }
 
@@ -584,7 +492,7 @@ class PostMedia : NSObject {
     }
 }
 
-class RedditVideo : NSObject, NSCoding{
+class RedditVideo : NSObject {
     
     var bitrateKbps : Int!
     var dashUrl : String!
@@ -599,9 +507,6 @@ class RedditVideo : NSObject, NSCoding{
     var width : Int!
     
     
-    /**
-     * Instantiate the instance using the passed json values to set the properties values
-     */
     init(fromJson json: JSON!){
         if json.isEmpty{
             return
@@ -617,109 +522,5 @@ class RedditVideo : NSObject, NSCoding{
         scrubberMediaUrl = json["scrubber_media_url"].stringValue
         transcodingStatus = json["transcoding_status"].stringValue
         width = json["width"].intValue
-    }
-    
-    /**
-     * Returns all the available property values in the form of [String:Any] object where the key is the approperiate json key and the value is the value of the corresponding property
-     */
-    func toDictionary() -> [String:Any]
-    {
-        var dictionary = [String:Any]()
-        if bitrateKbps != nil{
-            dictionary["bitrate_kbps"] = bitrateKbps
-        }
-        if dashUrl != nil{
-            dictionary["dash_url"] = dashUrl
-        }
-        if duration != nil{
-            dictionary["duration"] = duration
-        }
-        if fallbackUrl != nil{
-            dictionary["fallback_url"] = fallbackUrl
-        }
-        if hasAudio != nil{
-            dictionary["has_audio"] = hasAudio
-        }
-        if height != nil{
-            dictionary["height"] = height
-        }
-        if hlsUrl != nil{
-            dictionary["hls_url"] = hlsUrl
-        }
-        if isGif != nil{
-            dictionary["is_gif"] = isGif
-        }
-        if scrubberMediaUrl != nil{
-            dictionary["scrubber_media_url"] = scrubberMediaUrl
-        }
-        if transcodingStatus != nil{
-            dictionary["transcoding_status"] = transcodingStatus
-        }
-        if width != nil{
-            dictionary["width"] = width
-        }
-        return dictionary
-    }
-    
-    /**
-     * NSCoding required initializer.
-     * Fills the data from the passed decoder
-     */
-    @objc required init(coder aDecoder: NSCoder)
-    {
-        bitrateKbps = aDecoder.decodeObject(forKey: "bitrate_kbps") as? Int
-        dashUrl = aDecoder.decodeObject(forKey: "dash_url") as? String
-        duration = aDecoder.decodeObject(forKey: "duration") as? Int
-        fallbackUrl = aDecoder.decodeObject(forKey: "fallback_url") as? String
-        hasAudio = aDecoder.decodeObject(forKey: "has_audio") as? Bool
-        height = aDecoder.decodeObject(forKey: "height") as? Int
-        hlsUrl = aDecoder.decodeObject(forKey: "hls_url") as? String
-        isGif = aDecoder.decodeObject(forKey: "is_gif") as? Bool
-        scrubberMediaUrl = aDecoder.decodeObject(forKey: "scrubber_media_url") as? String
-        transcodingStatus = aDecoder.decodeObject(forKey: "transcoding_status") as? String
-        width = aDecoder.decodeObject(forKey: "width") as? Int
-        
-    }
-    
-    /**
-     * NSCoding required method.
-     * Encodes mode properties into the decoder
-     */
-    func encode(with aCoder: NSCoder)
-    {
-        if bitrateKbps != nil{
-            aCoder.encode(bitrateKbps, forKey: "bitrate_kbps")
-        }
-        if dashUrl != nil{
-            aCoder.encode(dashUrl, forKey: "dash_url")
-        }
-        if duration != nil{
-            aCoder.encode(duration, forKey: "duration")
-        }
-        if fallbackUrl != nil{
-            aCoder.encode(fallbackUrl, forKey: "fallback_url")
-        }
-        if hasAudio != nil{
-            aCoder.encode(hasAudio, forKey: "has_audio")
-        }
-        if height != nil{
-            aCoder.encode(height, forKey: "height")
-        }
-        if hlsUrl != nil{
-            aCoder.encode(hlsUrl, forKey: "hls_url")
-        }
-        if isGif != nil{
-            aCoder.encode(isGif, forKey: "is_gif")
-        }
-        if scrubberMediaUrl != nil{
-            aCoder.encode(scrubberMediaUrl, forKey: "scrubber_media_url")
-        }
-        if transcodingStatus != nil{
-            aCoder.encode(transcodingStatus, forKey: "transcoding_status")
-        }
-        if width != nil{
-            aCoder.encode(width, forKey: "width")
-        }
-        
     }
 }

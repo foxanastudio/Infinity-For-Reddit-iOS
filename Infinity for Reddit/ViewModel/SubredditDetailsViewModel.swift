@@ -41,10 +41,10 @@ class SubredditDetailsViewModel: ObservableObject {
     
     // MARK: - Methods
     func toggleSubscribeSubreddit() async {
-        await subscribeSubreddit(subredditName: subredditName, action: isSubscribed ? "unsub" : "sub")
+        await subscribeSubreddit(action: isSubscribed ? "unsub" : "sub")
     }
     
-    private func subscribeSubreddit(subredditName: String, action: String) async {
+    private func subscribeSubreddit(action: String) async {
         do {
             try Task.checkCancellation()
             
