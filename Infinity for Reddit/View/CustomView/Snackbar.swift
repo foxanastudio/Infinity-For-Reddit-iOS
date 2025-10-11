@@ -26,12 +26,8 @@ struct Snackbar: View {
                     
                     if let actionText = snackbarManager.actionText, !actionText.isEmpty {
                         Button(action: {
-                            withAnimation(.linear(duration: 0.3)) {
-                                isVisible = false
-                            } completion: {
-                                snackbarManager.action?()
-                                snackbarManager.dismiss()
-                            }
+                            snackbarManager.action?()
+                            snackbarManager.dismiss()
                         }) {
                             Text(actionText)
                                 .foregroundStyle(Color.white)
@@ -46,8 +42,6 @@ struct Snackbar: View {
                 .padding(16)
                 .offset(x: dragOffset.width)
                 // To make the animation smoother
-                .opacity(isVisible ? 1 : 0)
-                .animation(.easeInOut(duration: 0.3), value: isVisible)
                 .gesture(
                     DragGesture()
                         .onChanged { value in
@@ -71,6 +65,7 @@ struct Snackbar: View {
                         }
                 )
             }
+            .transition(AnyTransition.opacity.animation(.easeInOut(duration: 0.2)))
         }
     }
 }

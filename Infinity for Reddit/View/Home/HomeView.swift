@@ -61,6 +61,7 @@ struct HomeView: View {
                         }
                         
                         Snackbar()
+                            .zIndex(1)
                     }
                     .id(accountViewModel.account.username)
                     .tabItem {
