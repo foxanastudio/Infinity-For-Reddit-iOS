@@ -168,7 +168,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
         
         var isMedia: Bool {
             switch self {
-            case .image, .imageWithUrlPreview, .gif, .redditVideo, .video, .gallery, .link, .noPreviewLink, .imgurVideo, .redgifs, .streamable:
+            case .image, .imageWithUrlPreview, .gif, .redditVideo, .video, .gallery, .link, .imgurVideo, .redgifs, .streamable:
                 return true
             default:
                 return false
