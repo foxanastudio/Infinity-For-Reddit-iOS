@@ -64,7 +64,8 @@ struct SubmitTextPostView: View {
                                 fieldType: .title,
                                 focusedField: $focusedField
                             )
-                            .padding(16)
+                            .padding(.horizontal, 16)
+                            .padding(.top, 16)
                             
                             ZStack(alignment: .topLeading) {
                                 MarkdownTextField(text: $submitTextPostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
