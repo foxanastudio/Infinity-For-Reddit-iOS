@@ -50,11 +50,15 @@ class SnackbarManager: ObservableObject {
             snackbarTask = Task {
                 try? await Task.sleep(for: .seconds(2))
                 
-                try? Task.checkCancellation()
-                
-                await MainActor.run {
-                    dismiss()
-                    snackbarTask = nil
+                do {
+                    try Task.checkCancellation()
+                    
+                    await MainActor.run {
+                        dismiss()
+                        snackbarTask = nil
+                    }
+                } catch {
+                    
                 }
             }
         }

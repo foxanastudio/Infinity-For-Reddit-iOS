@@ -66,9 +66,7 @@ struct SubmitLinkPostView: View {
                                 )
                                 
                                 Button("Suggest Title") {
-                                    Task {
-                                        await submitLinkPostViewModel.suggestTitle()
-                                    }
+                                    submitLinkPostViewModel.suggestTitle()
                                 }
                                 .buttonStyle(.borderedProminent)
                                 .tint(Color(hex: themeViewModel.currentCustomTheme.colorPrimary))
@@ -86,6 +84,8 @@ struct SubmitLinkPostView: View {
                                 fieldType: .url,
                                 focusedField: $focusedField
                             )
+                            .autocapitalization(.none)
+                            .disableAutocorrection(true)
                             .padding(16)
                             
                             ZStack(alignment: .topLeading) {
