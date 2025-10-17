@@ -58,30 +58,6 @@ class RichTextJSONConverter {
 
     func constructRichtextJSON(markdown: String) -> String {
         let markdown = MarkdownContent(markdown)
-//        for block in markdown.blocks {
-//            switch block {
-//            case .blockquote(let childBlockNodes):
-//                visitBlockquote(childBlockNodes)
-//            case .bulletedList(let isTight, let rawListItems):
-//                visitBulletedList(rawListItems)
-//            case .numberedList(let isTight, let start, let rawListItems):
-//                visitNumberedList(rawListItems)
-//            case .taskList(let isTight, let rawTaskListItems):
-//                visitTaskList(rawTaskListItems)
-//            case .codeBlock(let fenceInfo, let content):
-//                visitCodeBlock(content)
-//            case .htmlBlock(let content):
-//                text.append(content)
-//            case .paragraph(let inlineNodes):
-//                visitParagraph(inlineNodes)
-//            case .heading(let level, let inlineNodes):
-//                visitHeading(level: level, inlineNodes: inlineNodes)
-//            case .table(let rawTableColumnAlignments, let rawTableRows):
-//                visitTable(columnAlignments: rawTableColumnAlignments, rows: rawTableRows)
-//            case .thematicBreak:
-//                break
-//            }
-//        }
 
         visitBlockNodes(markdown.blocks)
         var richtext = JSON()
@@ -327,11 +303,65 @@ class RichTextJSONConverter {
         for row in rows {
             contentStack.append([])
             
-            var contentArray = contentStack.popLast() ?? []
+            visitRawTableRow(row: row, columnAlignments: columnAlignments)
+            
+            let contentArray = contentStack.popLast() ?? []
             table[CONTENT] = JSON(contentArray)
         }
         
         appendToContentStackLastItem(table)
+        
+        formats.removeAll()
+        text.removeAll()
+    }
+    
+    private func visitRawTableRow(row: RawTableRow, columnAlignments: [RawTableColumnAlignment]) {
+        for (cell, columnAlignment) in zip(row.cells, columnAlignments) {
+            contentStack.append([])
+            
+            visitRawTableCell(cell: cell, columnAlignment: columnAlignment)
+            
+            let contentArray = contentStack.popLast() ?? []
+            appendToContentStackLastItem(JSON(contentArray))
+        }
+    }
+    
+    private func visitRawTableCell(cell: RawTableCell, columnAlignment: RawTableColumnAlignment) {
+        var cellJSON: JSON = JSON()
+        contentStack.append([])
+        
+        visitInlineNodes(cell.content)
+        
+        var contentArray = contentStack.popLast() ?? []
+        
+        if !text.isEmpty {
+            var textContent: JSON = JSON()
+            textContent[TYPE].stringValue = Element.text.rawValue
+            textContent[TEXT].stringValue = text
+            
+            if !formats.isEmpty {
+                var requiredFormats: [[Int]] = []
+                for format in formats {
+                    requiredFormats.append(format)
+                }
+                textContent[FORMAT] = JSON(requiredFormats)
+            }
+            
+            contentArray.append(textContent)
+        }
+        
+        cellJSON[CONTENT] = JSON(contentArray)
+        switch columnAlignment {
+        case .none:
+            cellJSON[TABLE_CELL_ALIGNMENT].stringValue = TABLE_CELL_ALIGNMENT_LEFT
+        case .left:
+            cellJSON[TABLE_CELL_ALIGNMENT].stringValue = TABLE_CELL_ALIGNMENT_LEFT
+        case .center:
+            cellJSON[TABLE_CELL_ALIGNMENT].stringValue = TABLE_CELL_ALIGNMENT_CENTER
+        case .right:
+            cellJSON[TABLE_CELL_ALIGNMENT].stringValue = TABLE_CELL_ALIGNMENT_RIGHT
+        }
+        appendToContentStackLastItem(cellJSON)
         
         formats.removeAll()
         text.removeAll()
