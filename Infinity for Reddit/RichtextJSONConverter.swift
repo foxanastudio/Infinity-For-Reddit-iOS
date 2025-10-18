@@ -8,7 +8,7 @@
 import SwiftyJSON
 import MarkdownUI
 
-class RichTextJSONConverter {
+class RichtextJSONConverter {
     private enum Format: Int {
         case bold = 1
         case italics = 2
@@ -56,8 +56,8 @@ class RichTextJSONConverter {
         contentStack.append([])
     }
 
-    func constructRichtextJSON(markdown: String) -> String {
-        let markdown = MarkdownContent(markdown)
+    func constructRichtextJSON(markdownString: String) -> String {
+        let markdown = MarkdownContent(markdownString)
 
         visitBlockNodes(markdown.blocks)
         var richtext = JSON()
@@ -132,7 +132,7 @@ class RichTextJSONConverter {
         
         visitBlockNodes(blockNodes)
         
-        var contentArray = contentStack.popLast()
+        let contentArray = contentStack.popLast()
         blockquote[CONTENT] = JSON(contentArray ?? [])
         appendToContentStackLastItem(blockquote)
     }
@@ -144,10 +144,10 @@ class RichTextJSONConverter {
         contentStack.append([])
         
         for rawListItem in rawListItems {
-            visitBlockNodes(rawListItem.children)
+            visitRawListItem(rawListItem)
         }
         
-        var contentArray = contentStack.popLast()
+        let contentArray = contentStack.popLast()
         bulletedList[CONTENT] = JSON(contentArray ?? [])
         bulletedList[IS_ORDERED_LIST].boolValue = false
         appendToContentStackLastItem(bulletedList)
@@ -160,29 +160,55 @@ class RichTextJSONConverter {
         contentStack.append([])
         
         for rawListItem in rawListItems {
-            visitBlockNodes(rawListItem.children)
+            visitRawListItem(rawListItem)
         }
         
-        var contentArray = contentStack.popLast()
+        let contentArray = contentStack.popLast()
         numberedList[CONTENT] = JSON(contentArray ?? [])
         numberedList[IS_ORDERED_LIST].boolValue = true
         appendToContentStackLastItem(numberedList)
     }
     
-    private func visitTaskList(_ rawListItems: [RawTaskListItem]) {
+    private func visitRawListItem(_ rawListItem: RawListItem) {
+        var listItem: JSON = JSON()
+        listItem[TYPE].stringValue = Element.listItem.rawValue
+        
+        contentStack.append([])
+        
+        visitBlockNodes(rawListItem.children)
+        
+        let contentArray = contentStack.popLast()
+        listItem[CONTENT] = JSON(contentArray ?? [])
+        appendToContentStackLastItem(listItem)
+    }
+    
+    private func visitTaskList(_ rawTaskListItems: [RawTaskListItem]) {
         var taskList: JSON = JSON()
         taskList[TYPE].stringValue = Element.list.rawValue
         
         contentStack.append([])
         
-        for rawListItem in rawListItems {
-            visitBlockNodes(rawListItem.children)
+        for rawTaskListItem in rawTaskListItems {
+            visitRawTaskListItem(rawTaskListItem)
         }
         
-        var contentArray = contentStack.popLast()
+        let contentArray = contentStack.popLast()
         taskList[CONTENT] = JSON(contentArray ?? [])
         taskList[IS_ORDERED_LIST].boolValue = false
         appendToContentStackLastItem(taskList)
+    }
+    
+    private func visitRawTaskListItem(_ rawTaskListItem: RawTaskListItem) {
+        var listItem: JSON = JSON()
+        listItem[TYPE].stringValue = Element.listItem.rawValue
+        
+        contentStack.append([])
+        
+        visitBlockNodes(rawTaskListItem.children)
+        
+        let contentArray = contentStack.popLast()
+        listItem[CONTENT] = JSON(contentArray ?? [])
+        appendToContentStackLastItem(listItem)
     }
     
     private func visitCodeBlock(_ content: String) {
