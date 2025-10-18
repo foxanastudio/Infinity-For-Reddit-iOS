@@ -300,14 +300,23 @@ class RichTextJSONConverter {
         var table: JSON = JSON()
         table[TYPE].stringValue = Element.table.rawValue
         
-        for row in rows {
-            contentStack.append([])
-            
-            visitRawTableRow(row: row, columnAlignments: columnAlignments)
-            
-            let contentArray = contentStack.popLast() ?? []
-            table[CONTENT] = JSON(contentArray)
+        contentStack.append([])
+        if !rows.isEmpty {
+            visitRawTableHead(row: rows[0], columnAlignments: columnAlignments)
         }
+        let headArray = contentStack.popLast() ?? []
+        table[TABLE_HEADER_CONTENT] = JSON(headArray)
+        
+        contentStack.append([])
+        
+        for (i, row) in rows.enumerated() {
+            if i != 0 {
+                visitRawTableRow(row: row, columnAlignments: columnAlignments)
+            }
+        }
+        
+        let contentArray = contentStack.popLast() ?? []
+        table[CONTENT] = JSON(contentArray)
         
         appendToContentStackLastItem(table)
         
@@ -315,15 +324,21 @@ class RichTextJSONConverter {
         text.removeAll()
     }
     
-    private func visitRawTableRow(row: RawTableRow, columnAlignments: [RawTableColumnAlignment]) {
+    private func visitRawTableHead(row: RawTableRow, columnAlignments: [RawTableColumnAlignment]) {
         for (cell, columnAlignment) in zip(row.cells, columnAlignments) {
-            contentStack.append([])
-            
             visitRawTableCell(cell: cell, columnAlignment: columnAlignment)
-            
-            let contentArray = contentStack.popLast() ?? []
-            appendToContentStackLastItem(JSON(contentArray))
         }
+    }
+    
+    private func visitRawTableRow(row: RawTableRow, columnAlignments: [RawTableColumnAlignment]) {
+        contentStack.append([])
+        
+        for (cell, columnAlignment) in zip(row.cells, columnAlignments) {
+            visitRawTableCell(cell: cell, columnAlignment: columnAlignment)
+        }
+        
+        let contentArray = contentStack.popLast() ?? []
+        appendToContentStackLastItem(JSON(contentArray))
     }
     
     private func visitRawTableCell(cell: RawTableCell, columnAlignment: RawTableColumnAlignment) {
