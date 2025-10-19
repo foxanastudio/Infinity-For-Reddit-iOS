@@ -20,18 +20,34 @@ struct MarkdownEmbeddedImagesSheet: View {
     let onInsertImage: (UploadedImage, String) -> Void
     
     var body: some View {
-        VStack {
-            List {
-                ForEach(embeddedImages, id: \.id) { embeddedImage in
-                    UploadedImageView(uploadedImage: embeddedImage, onInsertImage: {
-                        caption = ""
-                        selectedImage = embeddedImage
-                        showCaptionAlert = true
-                    })
-                    .listPlainItemNoInsets()
+        VStack(spacing: 0) {
+            RowText("Choose an image to insert into your post content.")
+                .primaryText()
+                .padding(16)
+                .font(.system(size: 24, weight: .bold))
+            
+            ScrollView(showsIndicators: false) {
+                LazyVGrid(
+                    columns: [
+                        GridItem(.flexible(maximum: .infinity)),
+                        GridItem(.flexible(maximum: .infinity))
+                    ],
+                    alignment: .leading,
+                    spacing: 16
+                ) {
+                    ForEach(embeddedImages, id: \.id) { embeddedImage in
+                        UploadedImageView(uploadedImage: embeddedImage, onInsertImage: {
+                            caption = ""
+                            selectedImage = embeddedImage
+                            showCaptionAlert = true
+                        })
+                    }
                 }
             }
-            .themedList()
+            .padding(.horizontal, 16)
+            .padding(.bottom, 16)
+            
+            Spacer()
             
             Button {
                 onAddImage()
