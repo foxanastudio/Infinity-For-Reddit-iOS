@@ -58,7 +58,7 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
         }
         
         let interceptor = await TokenCenter.shared.getRedditPerAccountInterceptor(account: account)
-        let data = try await self.session.request(RedditOAuthAPI.submitTextPost(params: params), interceptor: interceptor)
+        let data = try await self.session.request(RedditOAuthAPI.submitPost(params: params), interceptor: interceptor)
             .validate()
             .serializingData(automaticallyCancelling: true)
             .value
@@ -109,7 +109,7 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
         }
         
         let interceptor = await TokenCenter.shared.getRedditPerAccountInterceptor(account: account)
-        let data = try await self.session.request(RedditOAuthAPI.submitTextPost(params: params), interceptor: interceptor)
+        let data = try await self.session.request(RedditOAuthAPI.submitPost(params: params), interceptor: interceptor)
             .validate()
             .serializingData(automaticallyCancelling: true)
             .value
@@ -155,7 +155,7 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
         }
         
         let interceptor = await TokenCenter.shared.getRedditPerAccountInterceptor(account: account)
-        let data = try await self.session.request(RedditOAuthAPI.submitTextPost(params: params), interceptor: interceptor)
+        let data = try await self.session.request(RedditOAuthAPI.submitPost(params: params), interceptor: interceptor)
             .validate()
             .serializingData(automaticallyCancelling: true)
             .value
@@ -200,7 +200,7 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
         }
         
         let interceptor = await TokenCenter.shared.getRedditPerAccountInterceptor(account: account)
-        let data = try await self.session.request(RedditOAuthAPI.submitTextPost(params: params), interceptor: interceptor)
+        let data = try await self.session.request(RedditOAuthAPI.submitPost(params: params), interceptor: interceptor)
             .validate()
             .serializingData(automaticallyCancelling: true)
             .value
@@ -217,6 +217,54 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
             throw SubmitPostRepositoryError.JSONDecodingError("Failed to get the ID of the submitted post.")
         } else {
             return id
+        }
+    }
+    
+    func submitGalleryPost(
+        account: Account,
+        subredditName: String,
+        title: String,
+        content: String,
+        galleryImages: [UploadedImage],
+        flair: Flair?,
+        isSpoiler: Bool,
+        isSensitive: Bool,
+        receivePostReplyNotifications: Bool
+    ) async throws -> String {
+        let redditGalleryPayload = RedditGalleryPayload(
+            subredditName: subredditName,
+            submitType: subredditName.hasPrefix("u_") ? "profile" : "subreddit",
+            title: title,
+            text: content,
+            isSpoiler: isSpoiler,
+            isNSFW: isSensitive,
+            sendReplies: receivePostReplyNotifications,
+            flair: flair,
+            items: galleryImages.map {
+                $0.toRedditGalleryPayloadItem()
+            }
+        )
+        let payloadJSON = try JSONEncoder().encode(redditGalleryPayload)
+        let payloadString = String(data: payloadJSON, encoding: .utf8)!
+        
+        let interceptor = await TokenCenter.shared.getRedditPerAccountInterceptor(account: account)
+        let data = try await self.session.request(RedditOAuthAPI.submitGalleryPost(body: payloadString), interceptor: interceptor)
+            .validate()
+            .serializingData(automaticallyCancelling: true)
+            .value
+        
+        let json = JSON(data)
+        if let error = json.error {
+            throw SubmitPostRepositoryError.JSONDecodingError(error.localizedDescription)
+        }
+        
+        try json.throwIfRedditError(defaultErrorMessage: "Failed to submit post.")
+        
+        let postUrl = json["json"]["data"]["url"].stringValue
+        if postUrl.isEmpty {
+            throw SubmitPostRepositoryError.JSONDecodingError("Failed to get the url of the submitted post.")
+        } else {
+            return postUrl
         }
     }
 }

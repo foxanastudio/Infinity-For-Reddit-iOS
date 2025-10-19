@@ -14,11 +14,16 @@ class SubmitGalleryPostViewModel: ObservableObject {
     @Published var content: String = ""
     @Published var selectedAccount: Account
     @Published var galleryImages: [UploadedImage] = []
+    @Published var submitPostTask: Task<Void, Error>?
+    @Published var submittedPostUrlString: String?
+    @Published var error: Error? = nil
     
-    let mediaUploadRepository: MediaUploadRepository
+    private let submitPostRepository: SubmitPostRepositoryProtocol
+    private let mediaUploadRepository: MediaUploadRepository
     
-    init(mediaUploadRepository: MediaUploadRepository) {
+    init(submitPostRepository: SubmitPostRepositoryProtocol, mediaUploadRepository: MediaUploadRepository) {
         self.selectedAccount = AccountViewModel.shared.account
+        self.submitPostRepository = submitPostRepository
         self.mediaUploadRepository = mediaUploadRepository
     }
     
@@ -45,5 +50,50 @@ class SubmitGalleryPostViewModel: ObservableObject {
         }
         galleryImages[index].cancelUpload()
         galleryImages.remove(at: index)
+    }
+    
+    func submitPost(
+        subreddit: SubscribedSubredditData?,
+        flair: Flair?,
+        isSpoiler: Bool,
+        isSensitive: Bool,
+        receivePostReplyNotifications: Bool
+    ) {
+        guard submitPostTask == nil else {
+            return
+        }
+        
+        guard let subreddit = subreddit, !subreddit.name.isEmpty else {
+            error = PostSubmissionError.subredditNotSelectedError
+            return
+        }
+        
+        guard !title.isEmpty else {
+            error = PostSubmissionError.noTitleError
+            return
+        }
+        
+        submittedPostUrlString = nil
+        
+        submitPostTask = Task {
+            do {
+                submittedPostUrlString = try await submitPostRepository.submitGalleryPost(
+                    account: selectedAccount,
+                    subredditName: subreddit.name,
+                    title: title,
+                    content: content,
+                    galleryImages: galleryImages,
+                    flair: flair,
+                    isSpoiler: isSpoiler,
+                    isSensitive: isSensitive,
+                    receivePostReplyNotifications: receivePostReplyNotifications
+                )
+            } catch {
+                self.error = error
+                print(error)
+            }
+            
+            self.submitPostTask = nil
+        }
     }
 }

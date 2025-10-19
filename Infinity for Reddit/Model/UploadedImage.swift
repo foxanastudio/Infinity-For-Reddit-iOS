@@ -7,7 +7,6 @@
 
 import UIKit
 
-@MainActor
 class UploadedImage: ObservableObject {
     let id: UUID = UUID()
     let image: UIImage
@@ -15,6 +14,11 @@ class UploadedImage: ObservableObject {
     @Published var isUploaded: Bool = false
     @Published var uploadError: Error?
     var imageId: String?
+    
+    // These two fields are for Reddit gallery
+    @Published var caption: String?
+    @Published var outboundUrlString: String?
+    
     let uploadImage: () async throws -> String
     var uploadTask: Task<Void, Never>?
     
@@ -23,15 +27,16 @@ class UploadedImage: ObservableObject {
         self.uploadImage = uploadImage
     }
     
+    @MainActor
     func upload() {
         uploadTask?.cancel()
         
         uploadTask = Task {
             self.isUploading = true
             do {
-                //let imageId = try await uploadImage()
-                try await Task.sleep(for: .seconds(3))
-                let imageId = Utils.randomString()
+                let imageId = try await uploadImage()
+                //try await Task.sleep(for: .seconds(3))
+                //let imageId = Utils.randomString()
                 self.imageId = imageId
                 self.isUploaded = true
                 self.isUploading = false
@@ -49,5 +54,13 @@ class UploadedImage: ObservableObject {
     func cancelUpload() {
         uploadTask?.cancel()
         uploadTask = nil
+    }
+    
+    func setOutboundUrlString(_ urlString: String) {
+        self.outboundUrlString = urlString
+    }
+    
+    func setCaption(_ caption: String) {
+        self.caption = caption
     }
 }

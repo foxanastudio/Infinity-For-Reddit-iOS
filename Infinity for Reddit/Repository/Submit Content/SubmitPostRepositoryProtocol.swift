@@ -60,4 +60,16 @@ protocol SubmitPostRepositoryProtocol {
         receivePostReplyNotifications: Bool,
         isRichTextJSON: Bool
     ) async throws -> String
+    
+    func submitGalleryPost(
+        account: Account,
+        subredditName: String,
+        title: String,
+        content: String,
+        galleryImages: [UploadedImage],
+        flair: Flair?,
+        isSpoiler: Bool,
+        isSensitive: Bool,
+        receivePostReplyNotifications: Bool
+    ) async throws -> String
 }

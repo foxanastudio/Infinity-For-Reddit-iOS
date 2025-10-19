@@ -37,8 +37,9 @@ enum RedditOAuthAPI: URLRequestConvertible {
     case favoriteCustomFeed(params: [String: String])
     case getRules(subredditName: String)
     case getFlairs(subredditName: String)
-    case submitTextPost(params: [String: String])
+    case submitPost(params: [String: String])
     case uploadMediaMetadata(params: [String: String])
+    case submitGalleryPost(body: String)
     
     private var baseURL: String {
         return "https://oauth.reddit.com"
@@ -48,7 +49,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
         switch self {
         case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getSearchPostsInSpecificThing, .getCustomFeedPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox, .getRules, .getFlairs:
             return .get
-        case .vote, .subsrcribeToSubreddit, .saveThing, .unsaveThing, .getMoreCommentsForCommentMore, .sendCommentOrReplyToMessage, .favoriteThing, .favoriteCustomFeed, .submitTextPost, .uploadMediaMetadata:
+        case .vote, .subsrcribeToSubreddit, .saveThing, .unsaveThing, .getMoreCommentsForCommentMore, .sendCommentOrReplyToMessage, .favoriteThing, .favoriteCustomFeed, .submitPost, .uploadMediaMetadata, .submitGalleryPost:
             return .post
         }
     }
@@ -111,18 +112,20 @@ enum RedditOAuthAPI: URLRequestConvertible {
             return "/r/\(subredditName)/about/rules.json"
         case .getFlairs(let subredditName):
             return "/r/\(subredditName)/api/link_flair.json"
-        case .submitTextPost:
+        case .submitPost:
             return "/api/submit"
         case .uploadMediaMetadata:
             return "/api/media/asset.json"
+        case .submitGalleryPost:
+            return "/api/submit_gallery_post.json"
         }
     }
     
     var parameters: [String: String]? {
         switch self {
-        case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getSearchPostsInSpecificThing, .getCustomFeedPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox, .getRules, .getFlairs:
+        case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getSearchPostsInSpecificThing, .getCustomFeedPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox, .getRules, .getFlairs, .submitGalleryPost:
             return nil
-        case .vote(let params), .subsrcribeToSubreddit(let params), .saveThing(let params), .unsaveThing(let params), .getMoreCommentsForCommentMore(let params), .sendCommentOrReplyToMessage(let params), .favoriteThing(let params), .favoriteCustomFeed(let params), .submitTextPost(let params), .uploadMediaMetadata(let params):
+        case .vote(let params), .subsrcribeToSubreddit(let params), .saveThing(let params), .unsaveThing(let params), .getMoreCommentsForCommentMore(let params), .sendCommentOrReplyToMessage(let params), .favoriteThing(let params), .favoriteCustomFeed(let params), .submitPost(let params), .uploadMediaMetadata(let params):
             return params
         }
     }
@@ -173,10 +176,12 @@ enum RedditOAuthAPI: URLRequestConvertible {
             return ["raw_json": "1"]
         case .getFlairs:
             return ["raw_json": "1"]
-        case .submitTextPost:
+        case .submitPost:
             return nil
         case .uploadMediaMetadata:
             return ["raw_json": "1", "gilding_detail": "1"]
+        case .submitGalleryPost:
+            return ["raw_json": "1", "resubmit": "true"]
         }
     }
     
@@ -186,7 +191,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
             return headers
         case .getInbox(_, _, let headers):
             return headers
-        case .getFrontPagePosts, .getUserData, .getSubredditData, .vote, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getSearchPostsInSpecificThing, .getCustomFeedPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .subsrcribeToSubreddit, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .saveThing, .unsaveThing, .getMoreCommentsForCommentMore, .sendCommentOrReplyToMessage, .favoriteThing, .favoriteCustomFeed, .getRules, .getFlairs, .submitTextPost, .uploadMediaMetadata:
+        case .getFrontPagePosts, .getUserData, .getSubredditData, .vote, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getSearchPostsInSpecificThing, .getCustomFeedPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .subsrcribeToSubreddit, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .saveThing, .unsaveThing, .getMoreCommentsForCommentMore, .sendCommentOrReplyToMessage, .favoriteThing, .favoriteCustomFeed, .getRules, .getFlairs, .submitPost, .uploadMediaMetadata, .submitGalleryPost:
             return nil
         }
     }
@@ -215,12 +220,18 @@ enum RedditOAuthAPI: URLRequestConvertible {
         request.method = method
         request.headers = headers ?? HTTPHeaders()
         
-        //Setup URL encoded form data
-        let formEncodedData = parameters?.map { key, value in
-            "\(key)=\(value)"
-        }.joined(separator: "&")
-        request.httpBody = formEncodedData?.data(using: .utf8)
-        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        switch self {
+        case .submitGalleryPost(let body):
+            request.httpBody = body.data(using: .utf8)
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        default:
+            //Setup URL encoded form data
+            let formEncodedData = parameters?.map { key, value in
+                "\(key)=\(value)"
+            }.joined(separator: "&")
+            request.httpBody = formEncodedData?.data(using: .utf8)
+            request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        }
         
         return request
     }

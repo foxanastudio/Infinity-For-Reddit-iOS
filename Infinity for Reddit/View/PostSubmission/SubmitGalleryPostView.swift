@@ -10,6 +10,9 @@ import MijickCamera
 import PhotosUI
 
 struct SubmitGalleryPostView: View {
+    @EnvironmentObject private var navigationManager: NavigationManager
+    @EnvironmentObject private var snackbarManager: SnackbarManager
+    
     @StateObject private var postSubmissionContextViewModel: PostSubmissionContextViewModel
     @StateObject private var submitGalleryPostViewModel: SubmitGalleryPostViewModel
     
@@ -30,7 +33,10 @@ struct SubmitGalleryPostView: View {
             wrappedValue: PostSubmissionContextViewModel(ruleRepository: RuleRepository(), flairRepository: FlairRepository())
         )
         _submitGalleryPostViewModel = StateObject(
-            wrappedValue: SubmitGalleryPostViewModel(mediaUploadRepository: MediaUploadRepository())
+            wrappedValue: SubmitGalleryPostViewModel(
+                submitPostRepository: SubmitPostRepository(),
+                mediaUploadRepository: MediaUploadRepository()
+            )
         )
     }
     
@@ -132,7 +138,13 @@ struct SubmitGalleryPostView: View {
                 }
                 
                 Button {
-                    print("Submit Gallery Post")
+                    submitGalleryPostViewModel.submitPost(
+                        subreddit: postSubmissionContextViewModel.selectedSubreddit,
+                        flair: postSubmissionContextViewModel.selectedFlair,
+                        isSpoiler: postSubmissionContextViewModel.isSpoiler,
+                        isSensitive: postSubmissionContextViewModel.isSensitive,
+                        receivePostReplyNotifications: postSubmissionContextViewModel.receivePostReplyNotification
+                    )
                 } label: {
                     SwiftUI.Image(systemName: "paperplane.fill")
                 }
@@ -155,6 +167,26 @@ struct SubmitGalleryPostView: View {
                 } else {
                     // Error handling
                 }
+            }
+        }
+        .onChange(of: submitGalleryPostViewModel.submitPostTask) { _, newValue in
+            if newValue != nil {
+                snackbarManager.showSnackbar(
+                    text: "Submitting. Please wait...",
+                    autoDismiss: false,
+                    canDismissByGesture: false
+                )
+            }
+        }
+        .onChange(of: submitGalleryPostViewModel.submittedPostUrlString) { _, newValue in
+            if let urlString = newValue {
+                snackbarManager.dismiss()
+                navigationManager.replaceCurrentScreen(urlString)
+            }
+        }
+        .onReceive(submitGalleryPostViewModel.$error) { newValue in
+            if let error = newValue {
+                snackbarManager.showSnackbar(text: error.localizedDescription)
             }
         }
         .fullScreenCover(isPresented: $showCamera) {

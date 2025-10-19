@@ -46,4 +46,11 @@ class NavigationManager: ObservableObject {
             self.path.append(destination)
         }
     }
+    
+    func replaceCurrentScreen(_ urlString: String) {
+        path.removeLast()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+            self.openLink(urlString)
+        }
+    }
 }
