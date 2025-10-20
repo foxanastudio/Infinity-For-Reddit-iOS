@@ -314,4 +314,87 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
         
         try json.throwIfRedditError(defaultErrorMessage: "Failed to submit post.")
     }
+    
+    // Returns the URL of the submitted post
+    func submitPollPost(
+        account: Account,
+        subredditName: String,
+        title: String,
+        content: String,
+        options: [String],
+        duration: Int,
+        flair: Flair?,
+        isSpoiler: Bool,
+        isSensitive: Bool,
+        receivePostReplyNotifications: Bool,
+        isRichTextJSON: Bool
+    ) async throws -> String {
+        let redditPollPayload: RedditPollPayload
+        if content.isEmpty {
+            redditPollPayload = RedditPollPayload(
+                subredditName: subredditName,
+                title: title,
+                options: options,
+                duration: duration,
+                isNsfw: isSensitive,
+                isSpoiler: isSpoiler,
+                flair: flair,
+                sendReplies: receivePostReplyNotifications,
+                submitType: subredditName.hasPrefix("u_") ? "profile" : "subreddit"
+            )
+        } else {
+            if isRichTextJSON {
+                redditPollPayload = RedditPollPayload(
+                    subredditName: subredditName,
+                    title: title,
+                    options: options,
+                    duration: duration,
+                    isNsfw: isSensitive,
+                    isSpoiler: isSpoiler,
+                    flair: flair,
+                    richTextJSON: RichtextJSONConverter().constructRichtextJSON(markdownString: content),
+                    text: nil,
+                    sendReplies: receivePostReplyNotifications,
+                    submitType: subredditName.hasPrefix("u_") ? "profile" : "subreddit"
+                )
+            } else {
+                redditPollPayload = RedditPollPayload(
+                    subredditName: subredditName,
+                    title: title,
+                    options: options,
+                    duration: duration,
+                    isNsfw: isSensitive,
+                    isSpoiler: isSpoiler,
+                    flair: flair,
+                    richTextJSON: nil,
+                    text: content,
+                    sendReplies: receivePostReplyNotifications,
+                    submitType: subredditName.hasPrefix("u_") ? "profile" : "subreddit"
+                )
+            }
+        }
+        
+        let payloadJSON = try JSONEncoder().encode(redditPollPayload)
+        let payloadString = String(data: payloadJSON, encoding: .utf8)!
+        
+        let interceptor = await TokenCenter.shared.getRedditPerAccountInterceptor(account: account)
+        let data = try await self.session.request(RedditOAuthAPI.submitPollPost(body: payloadString), interceptor: interceptor)
+            .validate()
+            .serializingData(automaticallyCancelling: true)
+            .value
+        
+        let json = JSON(data)
+        if let error = json.error {
+            throw SubmitPostRepositoryError.JSONDecodingError(error.localizedDescription)
+        }
+        
+        try json.throwIfRedditError(defaultErrorMessage: "Failed to submit post.")
+        
+        let postUrl = json["json"]["data"]["url"].stringValue
+        if postUrl.isEmpty {
+            throw SubmitPostRepositoryError.JSONDecodingError("Failed to get the url of the submitted post.")
+        } else {
+            return postUrl
+        }
+    }
 }

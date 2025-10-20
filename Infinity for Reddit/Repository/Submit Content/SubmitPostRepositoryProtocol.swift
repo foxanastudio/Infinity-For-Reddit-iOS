@@ -86,4 +86,18 @@ protocol SubmitPostRepositoryProtocol {
         receivePostReplyNotifications: Bool,
         isRichTextJSON: Bool
     ) async throws
+    
+    func submitPollPost(
+        account: Account,
+        subredditName: String,
+        title: String,
+        content: String,
+        options: [String],
+        duration: Int,
+        flair: Flair?,
+        isSpoiler: Bool,
+        isSensitive: Bool,
+        receivePostReplyNotifications: Bool,
+        isRichTextJSON: Bool
+    ) async throws -> String
 }
