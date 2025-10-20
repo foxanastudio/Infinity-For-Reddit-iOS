@@ -33,7 +33,14 @@ class SubmitVideoPostViewModel: ObservableObject {
     func setVideo(url: URL) {
         print(url)
         self.videoURL = url
-        self.thumbnail = generateThumbnail(for: url)
+        Task {
+            if let image = await generateThumbnail(for: url) {
+                self.thumbnail = image
+            } else {
+                print("Failed to generate thumbnail for \(url)")
+                self.thumbnail = nil
+            }
+        }
         print("Video URL set: \(url.lastPathComponent)")
     }
     
@@ -43,15 +50,22 @@ class SubmitVideoPostViewModel: ObservableObject {
         print("Cleared video")
     }
     
-    private func generateThumbnail(for url: URL) -> UIImage? {
+    func generateThumbnail(for url: URL) async -> UIImage? {
         let asset = AVURLAsset(url: url)
         let generator = AVAssetImageGenerator(asset: asset)
         generator.appliesPreferredTrackTransform = true
         let time = CMTime(seconds: 0, preferredTimescale: 600)
-        if let cgImage = try? generator.copyCGImage(at: time, actualTime: nil) {
-            return UIImage(cgImage: cgImage)
+
+        return await withCheckedContinuation { continuation in
+            generator.generateCGImageAsynchronously(for: time) { cgImage, _, error in
+                if let cgImage = cgImage {
+                    continuation.resume(returning: UIImage(cgImage: cgImage))
+                } else {
+                    print("Thumbnail generation failed:", error?.localizedDescription ?? "unknown error")
+                    continuation.resume(returning: nil)
+                }
+            }
         }
-        return nil
     }
     
     func submitPost(

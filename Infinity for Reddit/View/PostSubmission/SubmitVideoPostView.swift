@@ -8,6 +8,7 @@ import SwiftUI
 import MarkdownUI
 import MijickCamera
 import PhotosUI
+import AVKit
 
 struct SubmitVideoPostView: View {
     @EnvironmentObject private var snackbarManager: SnackbarManager
@@ -89,6 +90,26 @@ struct SubmitVideoPostView: View {
                                 onPhotoPickerTap: { showVideoPicker = true }
                             )
                             .frame(maxWidth: .infinity)
+                            
+                            
+//                            if let thumbnail = submitVideoPostViewModel.thumbnail {
+//                                SwiftUI.Image(uiImage: thumbnail)
+//                                    .resizable()
+//                                    .scaledToFit()
+//                                    .frame(maxWidth: .infinity)
+//                                    .frame(height: 200)
+//                                    .padding(.horizontal, 16)
+//                                    .padding(.top, 8)
+//                            }
+                            
+                            if let videoURL = submitVideoPostViewModel.videoURL {
+                                InlineVideoPlayer(videoURL: videoURL, aspectRatio: nil, muteVideo: true)
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 400)
+                                    .cornerRadius(8)
+                                    .padding(.horizontal, 16)
+                                    .padding(.top, 16)
+                            }
                         }
                     }
                     
@@ -148,19 +169,20 @@ struct SubmitVideoPostView: View {
         .onChange(of: selectedVideoItem) { _, newItem in
             Task {
                 guard let newItem else {
-                    print("No newItem found")
+                    print("No video selected")
                     return
                 }
+
                 do {
-                    print("Attempting to load video URL")
-                    if let videoURL = try await newItem.loadTransferable(type: URL.self) {
-                        print("Got URL:", videoURL)
-                        submitVideoPostViewModel.setVideo(url: videoURL)
+                    print("Importing video…")
+                    if let movie = try await newItem.loadTransferable(type: Movie.self) {
+                        print("Video imported:", movie.url)
+                        submitVideoPostViewModel.setVideo(url: movie.url)
                     } else {
-                        print("loadTransferable returned nil")
+                        print("Failed to import video (Movie returned nil)")
                     }
                 } catch {
-                    print("Threw error:", error)
+                    print("Error loading video:", error)
                 }
             }
         }
@@ -254,5 +276,24 @@ private struct SelectVideoToolbar: View {
             }
         }
         .padding(16)
+    }
+}
+
+struct Movie: Transferable {
+    let url: URL
+    
+    static var transferRepresentation: some TransferRepresentation {
+        FileRepresentation(contentType: .movie) { movie in
+            SentTransferredFile(movie.url)
+        } importing: { received in
+            let copy = URL.documentsDirectory.appending(path: "movie.mp4")
+            
+            if FileManager.default.fileExists(atPath: copy.path()) {
+                try FileManager.default.removeItem(at: copy)
+            }
+            
+            try FileManager.default.copyItem(at: received.file, to: copy)
+            return Self.init(url: copy)
+        }
     }
 }
