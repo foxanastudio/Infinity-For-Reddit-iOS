@@ -29,6 +29,7 @@ struct SubmitVideoPostView: View {
     @State private var showCamera: Bool = false
     @State private var showVideoPicker: Bool = false
     @State private var selectedVideoItem: PhotosPickerItem? = nil
+    @State private var isLoadingVideo: Bool = false
     
     init() {
         _postSubmissionContextViewModel = StateObject(
@@ -112,11 +113,16 @@ struct SubmitVideoPostView: View {
                                 }
                                 .padding(.horizontal, 16)
                             } else {
-                                SelectVideoToolbar(
-                                    onCameraTap: { showCamera = true },
-                                    onPhotoPickerTap: { showVideoPicker = true }
-                                )
-                                .frame(maxWidth: .infinity)
+                                if !isLoadingVideo {
+                                    SelectVideoToolbar(
+                                        onCameraTap: { showCamera = true },
+                                        onPhotoPickerTap: { showVideoPicker = true }
+                                    )
+                                    .frame(maxWidth: .infinity)
+                                } else {
+                                    ProgressIndicator()
+                                        .padding(.top, 100)
+                                }
                             }
                         }
                     }
@@ -176,23 +182,42 @@ struct SubmitVideoPostView: View {
         )
         .onChange(of: selectedVideoItem) { _, newItem in
             Task {
-                if let newItem,
-                   let movie = try await newItem.loadTransferable(type: Movie.self) {
-                    let fileExtension = movie.url.pathExtension.lowercased()
-                    print("Video imported:", movie.url)
-                    print("Imported video type:", fileExtension)
-                    submitVideoPostViewModel.setVideo(url: movie.url)
-                } else {
-                    // Error handling
+                guard let newItem else { return }
+                
+                isLoadingVideo = true
+                
+                do {
+                    if let movie = try await newItem.loadTransferable(type: Movie.self) {
+                        let fileExtension = movie.url.pathExtension.lowercased()
+                        print("Video imported:", movie.url)
+                        print("Imported video type:", fileExtension)
+                        submitVideoPostViewModel.setVideo(url: movie.url)
+                    } else {
+                        snackbarManager.showSnackbar(text: "Failed to import video.")
+                    }
+                } catch {
+                    print("Error loading video:", error)
+                    snackbarManager.showSnackbar(text: "Failed to import video.")
                 }
+                
+                isLoadingVideo = false
             }
         }
         .fullScreenCover(isPresented: $showCamera) {
             if Utils.checkCameraAvailability() {
                 MCamera()
                     .onVideoCaptured { videoURL, controller in
+                        isLoadingVideo = true
+                        
                         submitVideoPostViewModel.setVideo(url: videoURL)
                         controller.closeMCamera()
+                        
+                        Task {
+                            try? await Task.sleep(for: .seconds(0.8))
+                            await MainActor.run {
+                                isLoadingVideo = false
+                            }
+                        }
                     }
                     .setCloseMCameraAction {
                         showCamera = false
