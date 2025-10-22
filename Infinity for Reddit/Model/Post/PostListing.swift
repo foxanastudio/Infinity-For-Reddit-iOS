@@ -38,7 +38,7 @@ public class PostListing : NSObject {
         }
         let childrenArray = json["children"].arrayValue
         for childJSON in childrenArray {
-            if childJSON["kind"] == "t3" {
+            if childJSON["kind"].stringValue == "t3" {
                 let dataJson = childJSON["data"]
                 if !dataJson.isEmpty {
                     do {
