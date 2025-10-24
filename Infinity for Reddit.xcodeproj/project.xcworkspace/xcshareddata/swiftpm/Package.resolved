@@ -70,7 +70,7 @@
       "location" : "https://github.com/Docile-Alligator/swift-cmark-reddit",
       "state" : {
         "branch" : "gfm",
-        "revision" : "72d6173f4d2d0765ce97ee910bf7d3d903efcdc6"
+        "revision" : "812fe3d7fb803ac1599afdf61feb471bf78ba74f"
       }
     },
     {
@@ -97,7 +97,7 @@
       "location" : "https://github.com/Docile-Alligator/swift-markdown-ui.git",
       "state" : {
         "branch" : "main",
-        "revision" : "aee6d768bc072688abbe5efab65a9b543646f1a1"
+        "revision" : "ce42e817bdfbeba653456f6553e0029479d05cc4"
       }
     },
     {
