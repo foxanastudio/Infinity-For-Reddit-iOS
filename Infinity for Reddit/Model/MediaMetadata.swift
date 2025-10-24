@@ -33,7 +33,7 @@ class MediaMetadata : NSObject, ObservableObject, Identifiable {
     var hlsUrl: String!
     var isGif: Bool!
 
-    init(fromJson json: JSON!) {
+    init(fromJson json: JSON!) throws {
         if json.isEmpty{
             return
         }
@@ -46,9 +46,10 @@ class MediaMetadata : NSObject, ObservableObject, Identifiable {
             p.append(value)
         }
         let sJson = json["s"]
-        if !sJson.isEmpty {
-            s = MediaMetadataSource(fromJson: sJson)
+        guard !sJson.isEmpty else {
+            throw JSONError.invalidData
         }
+        s = MediaMetadataSource(fromJson: sJson)
         status = json["status"].stringValue
         x = json["x"].intValue
         y = json["y"].intValue

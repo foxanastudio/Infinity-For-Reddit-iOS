@@ -228,7 +228,7 @@ public class Comment : NSObject, Validatable, Identifiable, ObservableObject {
             var parsedMediaMetadata = [String: MediaMetadata]()
             
             for (key, value) in mediaMetaData {
-                let media = MediaMetadata(fromJson: value)
+                let media = try MediaMetadata(fromJson: value)
                 parsedMediaMetadata[key] = media
             }
             mediaMetadata = parsedMediaMetadata
