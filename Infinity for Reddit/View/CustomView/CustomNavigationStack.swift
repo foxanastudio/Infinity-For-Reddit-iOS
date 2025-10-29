@@ -184,9 +184,6 @@ struct CustomNavigationStack<Content: View>: View {
                             .environmentObject(navigationManager)
                     case .sortType:
                         SortTypeSettingsView()
-                    case .downloadLocation:
-                        DownloadLocationSettingsView()
-                            .environmentObject(navigationManager)
                     case .miscellaneous:
                         MiscellaneousSettingsView()
                             .environmentObject(navigationManager)
@@ -198,12 +195,6 @@ struct CustomNavigationStack<Content: View>: View {
                             .environmentObject(navigationManager)
                     case .about:
                         AboutSettingsView()
-                            .environmentObject(navigationManager)
-                    case .privacyPolicy:
-                        PrivacyPolicySettingsView()
-                            .environmentObject(navigationManager)
-                    case .redditUserAgreement:
-                        RedditUserAgreementSettingsView()
                             .environmentObject(navigationManager)
                     }
                 }

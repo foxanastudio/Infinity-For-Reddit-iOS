@@ -81,11 +81,6 @@ struct SettingsView: View {
             }
             .listPlainItemNoInsets()
             
-            PreferenceEntryWithBackground(title: "Download Location", icon: "square.and.arrow.down") {
-                navigationManager.path.append(SettingsViewNavigation.downloadLocation)
-            }
-            .listPlainItemNoInsets()
-            
             PreferenceEntryWithBackground(title: "Miscellaneous", icon: "gearshape.2") {
                 navigationManager.path.append(SettingsViewNavigation.miscellaneous)
             }
@@ -107,12 +102,12 @@ struct SettingsView: View {
             .listPlainItemNoInsets()
             
             PreferenceEntryWithBackground(title: "Privacy Policy", icon: "hand.raised.circle") {
-                navigationManager.path.append(SettingsViewNavigation.privacyPolicy)
+                navigationManager.openLink("https://docile-alligator.github.io/")
             }
             .listPlainItemNoInsets()
             
             PreferenceEntryWithBackground(title: "Reddit User Agreement", icon: "text.document", bottom: true) {
-                navigationManager.path.append(SettingsViewNavigation.redditUserAgreement)
+                navigationManager.openLink("https://www.redditinc.com/policies/user-agreement")
             }
             .listPlainItemNoInsets()
             .padding(.bottom, 16)

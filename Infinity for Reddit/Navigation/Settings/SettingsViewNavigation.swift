@@ -23,11 +23,8 @@ enum SettingsViewNavigation: Hashable {
     case createOrEditCommentFilter(commentFilter: CommentFilter? = nil)
     case commentFilterUsageListing(commentFilterId: Int)
     case sortType
-    case downloadLocation
     case miscellaneous
     case advanced
     case manageSubscription
     case about
-    case privacyPolicy
-    case redditUserAgreement
 }
