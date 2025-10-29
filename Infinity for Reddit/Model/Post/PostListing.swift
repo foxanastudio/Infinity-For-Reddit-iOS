@@ -250,7 +250,8 @@ public class Post : NSObject, ObservableObject, Identifiable {
         isRedditMediaDomain = json["is_reddit_media_domain"].boolValue
         isSelf = json["is_self"].boolValue
         isVideo = json["is_video"].boolValue
-        likes = json["likes"] == JSON.null ? 0 : json["likes"].boolValue == true ? 1 : -1
+        let likes = json["likes"] == JSON.null ? 0 : json["likes"].boolValue == true ? 1 : -1
+        self.likes = likes
         let linkFlairRichtextArray = json["link_flair_richtext"].arrayValue
         for linkFlairRichtextJson in linkFlairRichtextArray{
             linkFlairRichtext.append(FlairRichtext(fromJson: linkFlairRichtextJson))
@@ -298,7 +299,9 @@ public class Post : NSObject, ObservableObject, Identifiable {
         removedByCategory = json["removed_by_category"].stringValue
         reportReasons = json["report_reasons"].stringValue
         saved = json["saved"].boolValue
-        score = json["score"].intValue
+        var score = json["score"].intValue
+        score -= likes
+        self.score = score
         selftext = json["selftext"].stringValue
         selftextHtml = json["selftext_html"].stringValue
         sendReplies = json["send_replies"].boolValue

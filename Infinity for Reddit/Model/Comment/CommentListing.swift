@@ -214,7 +214,8 @@ public class Comment : NSObject, Validatable, Identifiable, ObservableObject {
         gilded = json["gilded"].intValue
         self.id = json["id"].stringValue
         isSubmitter = json["is_submitter"].boolValue
-        likes = json["likes"] == JSON.null ? 0 : json["likes"].boolValue == true ? 1 : -1
+        let likes = json["likes"] == JSON.null ? 0 : json["likes"].boolValue == true ? 1 : -1
+        self.likes = likes
         linkAuthor = json["link_author"].stringValue
         linkId = json["link_id"].stringValue
         linkPermalink = json["link_permalink"].stringValue
@@ -262,7 +263,9 @@ public class Comment : NSObject, Validatable, Identifiable, ObservableObject {
         }
         reportReasons = json["report_reasons"].stringValue
         saved = json["saved"].boolValue
-        score = json["score"].intValue
+        var score = json["score"].intValue
+        score -= likes
+        self.score = score
         scoreHidden = json["score_hidden"].boolValue
         sendReplies = json["send_replies"].boolValue
         stickied = json["stickied"].boolValue
