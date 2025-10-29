@@ -260,8 +260,8 @@ struct CommentViewCard: View {
         }
         .contentShape(Rectangle())
         .background((commentViewModel.comment.isCollasped && fullyCollapseComment && commentViewModel.comment.hasExpandedBefore) || (commentViewModel.comment.isFilteredOut && !commentViewModel.comment.hasExpandedBefore) ? Color(hex: customThemeViewModel.currentCustomTheme.fullyCollapsedCommentBackgroundColor) : Color.clear)
-        .onTapGesture {
-            if isInPostDetails {
+        .applyIf(isInPostDetails) {
+            $0.onTapGesture {
                 isToolbarHidden.toggle()
             }
         }

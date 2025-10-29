@@ -41,6 +41,7 @@ struct SubscriptionsView: View {
                     .tag(0)
                 } else {
                     SubscribedSubredditListingView(subscriptionListingViewModel: subscriptionListingViewModel)
+                        .tag(0)
                 }
                 
                 UsersView(subscriptionListingViewModel: subscriptionListingViewModel, customOnTapForSearchInThing: customOnTapForSearchInThing)
