@@ -134,9 +134,6 @@
     "Delete" : {
 
     },
-    "Does Not Apply to All Pages" : {
-
-    },
     "Done" : {
 
     },
@@ -203,13 +200,7 @@
     "Home" : {
 
     },
-    "Ignore Navigation Bar in Immersive Interface" : {
-
-    },
     "Image downloaded" : {
-
-    },
-    "Immersive Interface" : {
 
     },
     "Inbox" : {
@@ -333,9 +324,6 @@
 
     },
     "Preferences" : {
-
-    },
-    "Prevent the Bottom Navigation Bar Having Extra Padding" : {
 
     },
     "r/%@" : {
@@ -2190,9 +2178,6 @@
 
     },
     "Upload Image" : {
-
-    },
-    "Use Bottom Toolbar in Media Viewer" : {
 
     },
     "Video Autoplay" : {

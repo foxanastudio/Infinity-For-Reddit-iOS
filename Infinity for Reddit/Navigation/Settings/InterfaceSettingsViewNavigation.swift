@@ -7,7 +7,6 @@
 
 enum InterfaceSettingsViewNavigation: Hashable {
     case font
-    case immersiveInterface
     case timeFormat
     case post
     case postDetails

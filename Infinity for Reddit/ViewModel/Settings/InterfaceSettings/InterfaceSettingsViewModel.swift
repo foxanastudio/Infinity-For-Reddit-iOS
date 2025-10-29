@@ -15,7 +15,6 @@ class InterfaceSettingsViewModel: ObservableObject {
     @Published var hideFABInPostFeed: Bool
     @Published var enableBottomNavigation: Bool
     @Published var hideSubredditDescription: Bool
-    @Published var useBottomToolbarInMediaViewer: Bool
     @Published var voteButtonsOnTheRight: Bool
     @Published var showAbsoluteNumberOfVotes: Bool
     @Published var defaultSearchResultTab: Int
@@ -23,7 +22,6 @@ class InterfaceSettingsViewModel: ObservableObject {
     let HIDE_FAB_IN_POST_FEED = UserDefaultsUtils.HIDE_FAB_IN_POST_FEED
     let BOTTOM_APP_BAR_KEY = UserDefaultsUtils.BOTTOM_APP_BAR_KEY
     let HIDE_SUBREDDIT_DESCRIPTION = UserDefaultsUtils.HIDE_SUBREDDIT_DESCRIPTION
-    let USE_BOTTOM_TOOLBAR_IN_MEDIA_VIEWER = UserDefaultsUtils.USE_BOTTOM_TOOLBAR_IN_MEDIA_VIEWER
     let VOTE_BUTTONS_ON_THE_RIGHT_KEY = UserDefaultsUtils.VOTE_BUTTONS_ON_THE_RIGHT_KEY
     let SHOW_ABSOLUTE_NUMBER_OF_VOTES = UserDefaultsUtils.SHOW_ABSOLUTE_NUMBER_OF_VOTES
     let DEFAULT_SEARCH_RESULT_TAB = UserDefaultsUtils.DEFAULT_SEARCH_RESULT_TAB
@@ -51,10 +49,6 @@ class InterfaceSettingsViewModel: ObservableObject {
             userDefaults.set(false, forKey: HIDE_SUBREDDIT_DESCRIPTION)
         }
         
-        if userDefaults.object(forKey: USE_BOTTOM_TOOLBAR_IN_MEDIA_VIEWER) == nil {
-            userDefaults.set(false, forKey: USE_BOTTOM_TOOLBAR_IN_MEDIA_VIEWER)
-        }
-        
         if userDefaults.object(forKey: VOTE_BUTTONS_ON_THE_RIGHT_KEY) == nil {
             userDefaults.set(false, forKey: VOTE_BUTTONS_ON_THE_RIGHT_KEY)
         }
@@ -70,7 +64,6 @@ class InterfaceSettingsViewModel: ObservableObject {
         hideFABInPostFeed = userDefaults.bool(forKey: HIDE_FAB_IN_POST_FEED)
         enableBottomNavigation = userDefaults.bool(forKey: BOTTOM_APP_BAR_KEY)
         hideSubredditDescription = userDefaults.bool(forKey: HIDE_SUBREDDIT_DESCRIPTION)
-        useBottomToolbarInMediaViewer = userDefaults.bool(forKey: USE_BOTTOM_TOOLBAR_IN_MEDIA_VIEWER)
         voteButtonsOnTheRight = userDefaults.bool(forKey: VOTE_BUTTONS_ON_THE_RIGHT_KEY)
         showAbsoluteNumberOfVotes = userDefaults.bool(forKey: SHOW_ABSOLUTE_NUMBER_OF_VOTES)
         defaultSearchResultTab = userDefaults.integer(forKey: DEFAULT_SEARCH_RESULT_TAB)
@@ -90,12 +83,6 @@ class InterfaceSettingsViewModel: ObservableObject {
         $hideSubredditDescription
             .sink { [weak self] newValue in
                 self?.saveInterfaceSettings(setting: newValue, forKey: self?.HIDE_SUBREDDIT_DESCRIPTION ?? "")
-            }
-            .store(in: &cancellables)
-        
-        $useBottomToolbarInMediaViewer
-            .sink { [weak self] newValue in
-                self?.saveInterfaceSettings(setting: newValue, forKey: self?.USE_BOTTOM_TOOLBAR_IN_MEDIA_VIEWER ?? "")
             }
             .store(in: &cancellables)
         

@@ -27,15 +27,7 @@ struct InterfaceSettingsView: View {
             }
             .listPlainItemNoInsets()
             
-            PreferenceEntry(
-                title: "Immersive Interface"
-            ) {
-                navigationManager.path.append(InterfaceSettingsViewNavigation.immersiveInterface)
-            }
-            .listPlainItemNoInsets()
-            
             Toggle("Hide Subreddit Description", isOn: $interfaceSettingsViewModel.hideSubredditDescription).padding(.leading, 44.5)
-            Toggle("Use Bottom Toolbar in Media Viewer", isOn: $interfaceSettingsViewModel.useBottomToolbarInMediaViewer).padding(.leading, 44.5)
             Picker("Default Search Result Tab", selection: $interfaceSettingsViewModel.defaultSearchResultTab){
                 ForEach(0..<interfaceSettingsViewModel.searchResultTabs.count, id: \.self) { index in
                     Text(interfaceSettingsViewModel.searchResultTabs[index]).tag(index)

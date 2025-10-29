@@ -212,8 +212,6 @@ struct CustomNavigationStack<Content: View>: View {
                     switch destination {
                     case .font:
                         FontInterfaceView()
-                    case .immersiveInterface:
-                        ImmersiveInterfaceView()
                     case .timeFormat:
                         InterfaceTimeFormatView()
                     case .post:
