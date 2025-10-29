@@ -42,7 +42,7 @@ struct CommentViewCard: View {
         self.isInPostDetails = isInPostDetails
         self.onToggleExpand = onToggleExpand
         self.onReply = onReply
-        self.isToolbarHidden = UserDefaults.interfaceComment.bool(forKey: InterfaceCommentUserDefaultsUtils.hideToolbarKey)
+        self.isToolbarHidden = isInPostDetails ? UserDefaults.interfaceComment.bool(forKey: InterfaceCommentUserDefaultsUtils.hideToolbarKey) : false
         _commentViewModel = StateObject(wrappedValue: CommentViewModel(account: account, comment: comment, commentRepository: CommentRepository()))
     }
     
@@ -138,6 +138,7 @@ struct CommentViewCard: View {
                                 .buttonStyle(.borderless)
                                 .padding(8)
                                 .contentShape(Rectangle())
+                                .excludeFromTouchRipple()
 
                                 VotesText(votes: commentViewModel.comment.score + commentViewModel.comment.likes, hideNVotes: hideNVotes)
                                     .frame(width: 72, alignment: .center)
@@ -157,6 +158,7 @@ struct CommentViewCard: View {
                                 .buttonStyle(.borderless)
                                 .padding(8)
                                 .contentShape(Rectangle())
+                                .excludeFromTouchRipple()
                             }
                             .environment(\.layoutDirection, .leftToRight)
                             
@@ -242,6 +244,8 @@ struct CommentViewCard: View {
                                         .commentIconTemplateRendering()
                                         .commentIcon()
                                 }
+                                .padding(8)
+                                .excludeFromTouchRipple()
                             }
                         }
                         .environment(\.layoutDirection, voteButtonsOnTheRight ? .rightToLeft : .leftToRight)
@@ -257,7 +261,9 @@ struct CommentViewCard: View {
         .contentShape(Rectangle())
         .background((commentViewModel.comment.isCollasped && fullyCollapseComment && commentViewModel.comment.hasExpandedBefore) || (commentViewModel.comment.isFilteredOut && !commentViewModel.comment.hasExpandedBefore) ? Color(hex: customThemeViewModel.currentCustomTheme.fullyCollapsedCommentBackgroundColor) : Color.clear)
         .onTapGesture {
-            isToolbarHidden.toggle()
+            if isInPostDetails {
+                isToolbarHidden.toggle()
+            }
         }
     }
 }
