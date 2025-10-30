@@ -29,7 +29,7 @@ struct PostFilterSettingsView: View {
     }
     
     var body: some View {
-        Group {
+        RootView {
             if postFilterViewModel.postFilters.isEmpty {
                 VStack(spacing: 0) {
                     InfoPreference(title: "Restart the app to see the changes", iconUrl: "info.circle")

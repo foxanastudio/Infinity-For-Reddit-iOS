@@ -29,7 +29,7 @@ struct CommentFilterSettingsView: View {
     }
     
     var body: some View {
-        Group {
+        RootView {
             if commentFilterViewModel.commentFilters.isEmpty {
                 VStack(spacing: 0) {
                     InfoPreference(title: "Restart the app to see the changes", iconUrl: "info.circle")

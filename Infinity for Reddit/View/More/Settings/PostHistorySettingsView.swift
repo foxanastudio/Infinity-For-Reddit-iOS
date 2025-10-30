@@ -31,57 +31,59 @@ struct PostHistorySettingsView: View {
     @FocusState private var focusedField: FieldType?
     
     var body: some View {
-        VStack(spacing: 0) {
-            ScrollViewReader { proxy in
-                ScrollView {
-                    TogglePreference(isEnabled: $markPostsAsRead, title: "Mark Posts as Read")
-                        .listPlainItemNoInsets()
-                    
-                    TogglePreference(isEnabled: $limitReadPosts, title: "Limit Read Posts")
-                        .listPlainItemNoInsets()
-                    
-                    if limitReadPosts {
-                        CustomTextField(
-                            "Read Posts Limit",
-                            text: Binding(
-                                get: { String(self.readPostsLimit) },
-                                set: { self.readPostsLimit = Int($0) ?? 500 }
-                            ),
-                            singleLine: true,
-                            keyboardType: .numberPad,
-                            fieldType: .readPostsLimit,
-                            focusedField: $focusedField
-                        )
-                        .padding(.leading, 60)
-                        .padding(.trailing, 16)
-                        .padding(.vertical, 8)
-                        .listPlainItemNoInsets()
-                        .transition(.move(edge: .trailing).combined(with: .opacity))
-                        .id(FieldType.readPostsLimit)
+        RootView {
+            VStack(spacing: 0) {
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        TogglePreference(isEnabled: $markPostsAsRead, title: "Mark Posts as Read")
+                            .listPlainItemNoInsets()
+                        
+                        TogglePreference(isEnabled: $limitReadPosts, title: "Limit Read Posts")
+                            .listPlainItemNoInsets()
+                        
+                        if limitReadPosts {
+                            CustomTextField(
+                                "Read Posts Limit",
+                                text: Binding(
+                                    get: { String(self.readPostsLimit) },
+                                    set: { self.readPostsLimit = Int($0) ?? 500 }
+                                ),
+                                singleLine: true,
+                                keyboardType: .numberPad,
+                                fieldType: .readPostsLimit,
+                                focusedField: $focusedField
+                            )
+                            .padding(.leading, 60)
+                            .padding(.trailing, 16)
+                            .padding(.vertical, 8)
+                            .listPlainItemNoInsets()
+                            .transition(.move(edge: .trailing).combined(with: .opacity))
+                            .id(FieldType.readPostsLimit)
+                        }
+
+                        TogglePreference(isEnabled: $markPostsAsReadAfterVoting, title: "Mark Posts as Read After Voting")
+                            .listPlainItemNoInsets()
+
+                        TogglePreference(isEnabled: $markPostsAsReadOnScroll, title: "Mark Posts As Read on Scroll")
+                            .listPlainItemNoInsets()
+
+                        TogglePreference(isEnabled: $hideReadPosts, title: "Hide Read Posts")
+                            .listPlainItemNoInsets()
                     }
-
-                    TogglePreference(isEnabled: $markPostsAsReadAfterVoting, title: "Mark Posts as Read After Voting")
-                        .listPlainItemNoInsets()
-
-                    TogglePreference(isEnabled: $markPostsAsReadOnScroll, title: "Mark Posts As Read on Scroll")
-                        .listPlainItemNoInsets()
-
-                    TogglePreference(isEnabled: $hideReadPosts, title: "Hide Read Posts")
-                        .listPlainItemNoInsets()
-                }
-                .themedList()
-                .onChange(of: focusedField) { oldField, newField in
-                    guard let field = newField else { return }
-                    DispatchQueue.main.async {
-                        withAnimation {
-                            proxy.scrollTo(field, anchor: .center)
+                    .themedList()
+                    .onChange(of: focusedField) { oldField, newField in
+                        guard let field = newField else { return }
+                        DispatchQueue.main.async {
+                            withAnimation {
+                                proxy.scrollTo(field, anchor: .center)
+                            }
                         }
                     }
                 }
-            }
-            
-            KeyboardToolbar {
-                focusedField = nil
+                
+                KeyboardToolbar {
+                    focusedField = nil
+                }
             }
         }
         .themedNavigationBar()

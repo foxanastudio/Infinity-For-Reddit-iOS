@@ -21,15 +21,17 @@ struct CustomThemeListingView: View {
     }
     
     var body: some View {
-        List {
-            ForEach(customThemeListingViewModel.customThemes, id: \.self.id) { customTheme in
-                ThemeListItem(themeName: customTheme.name, primaryColor: Color(hex: customTheme.colorPrimary)) {
-                    navigationmanager.path.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customTheme: customTheme))
+        RootView {
+            List {
+                ForEach(customThemeListingViewModel.customThemes, id: \.self.id) { customTheme in
+                    ThemeListItem(themeName: customTheme.name, primaryColor: Color(hex: customTheme.colorPrimary)) {
+                        navigationmanager.path.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customTheme: customTheme))
+                    }
+                    .listPlainItemNoInsets()
                 }
-                .listPlainItemNoInsets()
             }
+            .themedList()
         }
-        .themedList()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Manage Themes")
     }

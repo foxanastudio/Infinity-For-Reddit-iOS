@@ -20,44 +20,47 @@ struct CustomizeCustomThemeView: View {
     }
     
     var body: some View {
-        VStack {
-            List {
-                VStack(alignment: .leading, spacing: 0) {
-                    CustomTextField("Name", text: $customizeCustomThemeViewModel.customTheme.name, singleLine: true, fieldType: FieldType.name, focusedField: $focusedField)
-                        .padding(16)
+        RootView {
+            VStack {
+                List {
+                    VStack(alignment: .leading, spacing: 0) {
+                        CustomTextField("Name", text: $customizeCustomThemeViewModel.customTheme.name, singleLine: true, fieldType: FieldType.name, focusedField: $focusedField)
+                            .padding(16)
+                        
+                        Divider()
+                    }
+                    .listPlainItemNoInsets()
                     
-                    Divider()
-                }
-                .listPlainItemNoInsets()
-                
-                ForEach(customizeCustomThemeViewModel.customThemeFields, id: \.self) { fieldName in
-                    if customizeCustomThemeViewModel.customThemeFieldsBoolType.contains(fieldName) {
-                        if let binding = getBooleanBinding(for: fieldName) {
-                            BooleanEntry(
-                                fieldName: fieldName,
-                                title: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.title ?? "",
-                                // Notice we use the same string as the title
-                                description: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.title ?? "",
-                                isEnabled: binding
-                            )
-                            .listPlainItemNoInsets()
-                        }
-                    } else {
-                        if let colorBinding = getIntBinding(for: fieldName) {
-                            ColorEntry(
-                                fieldName: fieldName,
-                                title: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.title ?? "",
-                                description: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.description ?? "",
-                                color: getWrappedBinding(for: colorBinding)
-                            )
-                            .listPlainItemNoInsets()
+                    ForEach(customizeCustomThemeViewModel.customThemeFields, id: \.self) { fieldName in
+                        if customizeCustomThemeViewModel.customThemeFieldsBoolType.contains(fieldName) {
+                            if let binding = getBooleanBinding(for: fieldName) {
+                                BooleanEntry(
+                                    fieldName: fieldName,
+                                    title: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.title ?? "",
+                                    // Notice we use the same string as the title
+                                    description: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.title ?? "",
+                                    isEnabled: binding
+                                )
+                                .listPlainItemNoInsets()
+                            }
+                        } else {
+                            if let colorBinding = getIntBinding(for: fieldName) {
+                                ColorEntry(
+                                    fieldName: fieldName,
+                                    title: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.title ?? "",
+                                    description: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.description ?? "",
+                                    color: getWrappedBinding(for: colorBinding)
+                                )
+                                .listPlainItemNoInsets()
+                            }
                         }
                     }
                 }
-            }
-            
-            KeyboardToolbar {
-                focusedField = nil
+                .themedList()
+                
+                KeyboardToolbar {
+                    focusedField = nil
+                }
             }
         }
         .toolbar {
@@ -71,7 +74,6 @@ struct CustomizeCustomThemeView: View {
                 }
             }
         }
-        .themedList()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Customize", 1.0)
     }

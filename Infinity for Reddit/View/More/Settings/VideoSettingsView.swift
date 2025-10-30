@@ -20,62 +20,64 @@ struct VideoSettingsView: View {
     @AppStorage(VideoUserDefaultsUtils.autoplaySensitiveVideoKey, store: .video) private var autoplaySensitiveVideo: Bool = true
     
     var body: some View {
-        List {
-            TogglePreference(isEnabled: $muteVideo, title: "Mute Video")
-                .listPlainItemNoInsets()
-            
-            TogglePreference(isEnabled: $muteSensitiveVideo, title: "Mute Sensitive Video")
-                .listPlainItemNoInsets()
-            
-            TogglePreference(isEnabled: $switchToLandscapeInVideoPlayer, title: "Switch to Landscape in Video Player")
-                .listPlainItemNoInsets()
-            
-            TogglePreference(isEnabled: $loopVideo, title: "Loop Video")
-                .listPlainItemNoInsets()
-            
-            BarebonePickerPreference(
-                selected: $defaultPlaybackSpeed,
-                items: VideoUserDefaultsUtils.playbackSpeeds,
-                title: "Default Playback Speed"
-            ) { speed in
-                "\(speed)x"
-            }
-            .listPlainItemNoInsets()
-            
-            BarebonePickerPreference(
-                selected: $redditVideoDefaultResolution,
-                items: VideoUserDefaultsUtils.redditVideoDefaultResolutions,
-                title: "Reddit Video Default Resolution"
-            ) { resolution in
-                if resolution == 0 {
-                    "Auto"
-                } else {
-                    "\(resolution)p"
-                }
-            }
-            .listPlainItemNoInsets()
-            
-            CustomListSection("Video Autoplay") {
+        RootView {
+            List {
+                TogglePreference(isEnabled: $muteVideo, title: "Mute Video")
+                    .listPlainItemNoInsets()
+                
+                TogglePreference(isEnabled: $muteSensitiveVideo, title: "Mute Sensitive Video")
+                    .listPlainItemNoInsets()
+                
+                TogglePreference(isEnabled: $switchToLandscapeInVideoPlayer, title: "Switch to Landscape in Video Player")
+                    .listPlainItemNoInsets()
+                
+                TogglePreference(isEnabled: $loopVideo, title: "Loop Video")
+                    .listPlainItemNoInsets()
+                
                 BarebonePickerPreference(
-                    selected: $videoAutoplay,
-                    items: VideoUserDefaultsUtils.videoAutoplayOptions,
-                    title: "Video Autoplay"
-                ) { option in
-                    VideoUserDefaultsUtils.videoAutoplayOptionsText[option]
+                    selected: $defaultPlaybackSpeed,
+                    items: VideoUserDefaultsUtils.playbackSpeeds,
+                    title: "Default Playback Speed"
+                ) { speed in
+                    "\(speed)x"
                 }
                 .listPlainItemNoInsets()
                 
-                TogglePreference(isEnabled: $muteAutoplayingVideo, title: "Mute Autoplaying Video")
-                    .listPlainItemNoInsets()
+                BarebonePickerPreference(
+                    selected: $redditVideoDefaultResolution,
+                    items: VideoUserDefaultsUtils.redditVideoDefaultResolutions,
+                    title: "Reddit Video Default Resolution"
+                ) { resolution in
+                    if resolution == 0 {
+                        "Auto"
+                    } else {
+                        "\(resolution)p"
+                    }
+                }
+                .listPlainItemNoInsets()
                 
-                TogglePreference(isEnabled: $syncMuteAcrossFeed, title: "Sync Mute Across Feed")
+                CustomListSection("Video Autoplay") {
+                    BarebonePickerPreference(
+                        selected: $videoAutoplay,
+                        items: VideoUserDefaultsUtils.videoAutoplayOptions,
+                        title: "Video Autoplay"
+                    ) { option in
+                        VideoUserDefaultsUtils.videoAutoplayOptionsText[option]
+                    }
                     .listPlainItemNoInsets()
-                
-                TogglePreference(isEnabled: $autoplaySensitiveVideo, title: "Autoplay Sensitive Video")
-                    .listPlainItemNoInsets()
+                    
+                    TogglePreference(isEnabled: $muteAutoplayingVideo, title: "Mute Autoplaying Video")
+                        .listPlainItemNoInsets()
+                    
+                    TogglePreference(isEnabled: $syncMuteAcrossFeed, title: "Sync Mute Across Feed")
+                        .listPlainItemNoInsets()
+                    
+                    TogglePreference(isEnabled: $autoplaySensitiveVideo, title: "Autoplay Sensitive Video")
+                        .listPlainItemNoInsets()
+                }
             }
+            .themedList()
         }
-        .themedList()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Video")
     }

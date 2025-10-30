@@ -16,38 +16,40 @@ struct SortTypeSettingsView: View {
     @AppStorage(SortTypeSettingsUserDefaultsUtils.respectSubredditRecommendedCommentSortTypeKey, store: .sortTypeSettings) private var respectSubredditRecommendedCommentSortType: Bool = false
     
     var body: some View {
-        ScrollView {
-            VStack {
-                TogglePreference(isEnabled: $saveSortType, title: "Save Sort Type")
-                
-                GenericPickerPreference(
-                    selected: $subredditDefaultSortType,
-                    items: SortTypeSettingsUserDefaultsUtils.subredditSortTypes,
-                    title: "Subreddit Default Sort Type"
-                )
-                
-                GenericPickerPreference(
-                    selected: $subredditDefaultSortTime,
-                    items: SortTypeSettingsUserDefaultsUtils.sortTimes,
-                    title: "Subreddit Default Sort Time"
-                )
-                
-                GenericPickerPreference(
-                    selected: $userDefaultSortType,
-                    items: SortTypeSettingsUserDefaultsUtils.userSortTypes,
-                    title: "User Default Sort Type"
-                )
-                
-                GenericPickerPreference(
-                    selected: $userDefaultSortTime,
-                    items: SortTypeSettingsUserDefaultsUtils.sortTimes,
-                    title: "User Default Sort Time"
-                )
-                
-                TogglePreference(isEnabled: $respectSubredditRecommendedCommentSortType,
-                                 title: "Respect Subreddit Recommended Comment Sort Type",
-                                 subtitle: "Comment sort type will not be saved"
-                )
+        RootView {
+            ScrollView {
+                VStack {
+                    TogglePreference(isEnabled: $saveSortType, title: "Save Sort Type")
+                    
+                    GenericPickerPreference(
+                        selected: $subredditDefaultSortType,
+                        items: SortTypeSettingsUserDefaultsUtils.subredditSortTypes,
+                        title: "Subreddit Default Sort Type"
+                    )
+                    
+                    GenericPickerPreference(
+                        selected: $subredditDefaultSortTime,
+                        items: SortTypeSettingsUserDefaultsUtils.sortTimes,
+                        title: "Subreddit Default Sort Time"
+                    )
+                    
+                    GenericPickerPreference(
+                        selected: $userDefaultSortType,
+                        items: SortTypeSettingsUserDefaultsUtils.userSortTypes,
+                        title: "User Default Sort Type"
+                    )
+                    
+                    GenericPickerPreference(
+                        selected: $userDefaultSortTime,
+                        items: SortTypeSettingsUserDefaultsUtils.sortTimes,
+                        title: "User Default Sort Time"
+                    )
+                    
+                    TogglePreference(isEnabled: $respectSubredditRecommendedCommentSortType,
+                                     title: "Respect Subreddit Recommended Comment Sort Type",
+                                     subtitle: "Comment sort type will not be saved"
+                    )
+                }
             }
         }
         .themedNavigationBar()
