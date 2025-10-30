@@ -35,11 +35,13 @@ struct CommentViewCard: View {
 
     private let isInPostDetails: Bool
     private let userIconSize: CGFloat = 24
+    let highlightComment: Bool
     let onToggleExpand: (() -> Void)?
     let onReply: (() -> Void)?
     
-    init(account: Account, comment: Comment, isInPostDetails: Bool, onToggleExpand: (() -> Void)? = nil, onReply: (() -> Void)? = nil) {
+    init(account: Account, comment: Comment, isInPostDetails: Bool, highlightComment: Bool = false, onToggleExpand: (() -> Void)? = nil, onReply: (() -> Void)? = nil) {
         self.isInPostDetails = isInPostDetails
+        self.highlightComment = highlightComment
         self.onToggleExpand = onToggleExpand
         self.onReply = onReply
         self.isToolbarHidden = isInPostDetails ? UserDefaults.interfaceComment.bool(forKey: InterfaceCommentUserDefaultsUtils.hideToolbarKey) : false
@@ -259,11 +261,17 @@ struct CommentViewCard: View {
             }
         }
         .contentShape(Rectangle())
-        .background((commentViewModel.comment.isCollasped && fullyCollapseComment && commentViewModel.comment.hasExpandedBefore) || (commentViewModel.comment.isFilteredOut && !commentViewModel.comment.hasExpandedBefore) ? Color(hex: customThemeViewModel.currentCustomTheme.fullyCollapsedCommentBackgroundColor) : Color.clear)
+        .background(backgroundColor)
         .applyIf(isInPostDetails) {
             $0.onTapGesture {
                 isToolbarHidden.toggle()
             }
         }
+    }
+    
+    private var backgroundColor: Color {
+        return (commentViewModel.comment.isCollasped && fullyCollapseComment && commentViewModel.comment.hasExpandedBefore)
+        || (commentViewModel.comment.isFilteredOut && !commentViewModel.comment.hasExpandedBefore) ? Color(hex: customThemeViewModel.currentCustomTheme.fullyCollapsedCommentBackgroundColor)
+        : (highlightComment ? Color(hex: customThemeViewModel.currentCustomTheme.singleCommentThreadBackgroundColor) : Color.clear)
     }
 }

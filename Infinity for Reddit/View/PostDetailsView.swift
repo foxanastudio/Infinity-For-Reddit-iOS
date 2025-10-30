@@ -105,27 +105,30 @@ struct PostDetailsView: View {
                 } else {
                     ForEach(postDetailsViewModel.visibleComments, id: \.id) { commentItem in
                         if case let .comment(comment) = commentItem {
-                            CommentViewCard(account: account, comment: comment, isInPostDetails: true, onToggleExpand: {
-                                if fullyCollapseComment {
-                                    if comment.isCollasped {
-                                        postDetailsViewModel.expandComments(comment: comment)
-                                    } else {
-                                        postDetailsViewModel.collapseComments(comment: comment)
-                                    }
-                                } else {
-                                    withAnimation {
+                            CommentViewCard(
+                                account: account, comment: comment, isInPostDetails: true,
+                                highlightComment: postDetailsViewModel.postDetailsInput.getHighlightCommentId == comment.id,
+                                onToggleExpand: {
+                                    if fullyCollapseComment {
                                         if comment.isCollasped {
                                             postDetailsViewModel.expandComments(comment: comment)
                                         } else {
                                             postDetailsViewModel.collapseComments(comment: comment)
                                         }
+                                    } else {
+                                        withAnimation {
+                                            if comment.isCollasped {
+                                                postDetailsViewModel.expandComments(comment: comment)
+                                            } else {
+                                                postDetailsViewModel.collapseComments(comment: comment)
+                                            }
+                                        }
                                     }
-                                }
-                            }, onReply: {
-                                let commentParent = CommentParent.comment(parentComment: comment)
-                                self.sentCommentParent = commentParent
-                                navigationManager.path.append(AppNavigation.submitComment(commentParent: commentParent))
-                            })
+                                }, onReply: {
+                                    let commentParent = CommentParent.comment(parentComment: comment)
+                                    self.sentCommentParent = commentParent
+                                    navigationManager.path.append(AppNavigation.submitComment(commentParent: commentParent))
+                                })
                             .listPlainItemNoInsets()
                             .id(comment.id)
                             .onLongPressGesture {
