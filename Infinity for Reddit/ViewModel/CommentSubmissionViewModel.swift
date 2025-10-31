@@ -8,5 +8,5 @@
 import Foundation
 
 class CommentSubmissionShareableViewModel: ObservableObject {
-    @Published var sentComment: Comment? = nil
+    @Published var submittedComment: Comment? = nil
 }

@@ -196,12 +196,12 @@ struct PostDetailsView: View {
         .onChange(of: colorScheme) {
             //print(colorScheme == .dark)
         }
-        .onChange(of: commentSubmissionShareableViewModel.sentComment) {
-            if let sentComment = commentSubmissionShareableViewModel.sentComment {
+        .onChange(of: commentSubmissionShareableViewModel.submittedComment) {
+            if let sentComment = commentSubmissionShareableViewModel.submittedComment {
                 if let sentCommentParent = self.sentCommentParent {
                     postDetailsViewModel.insertSubmittedComment(sentComment, commentParent: sentCommentParent)
                 }
-                commentSubmissionShareableViewModel.sentComment = nil
+                commentSubmissionShareableViewModel.submittedComment = nil
                 sentCommentParent = nil
             }
         }

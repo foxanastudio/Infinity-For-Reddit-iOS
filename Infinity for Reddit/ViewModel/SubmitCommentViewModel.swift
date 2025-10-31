@@ -16,13 +16,25 @@ class SubmitCommentViewModel: ObservableObject {
     @Published var text: String = ""
     @Published var embeddedImages: [UploadedImage] = []
     @Published var giphyGif: GPHMedia?
-    @Published var isSubmitting: Bool = false
+    @Published var submitCommentTask: Task<Void, Error>?
+    @Published var submittedComment: Comment?
     @Published var error: Error? = nil
     
     let commentParent: CommentParent
     
     private let submitCommentRepository: SubmitCommentRepositoryProtocol
     private let mediaUploadRepository: MediaUploadRepositoryProtocol
+    
+    enum CommentSubmissionError: LocalizedError {
+        case noContentError
+        
+        var errorDescription: String? {
+            switch self {
+            case .noContentError:
+                return "Where are your interesting thoughts?"
+            }
+        }
+    }
     
     init(commentParent: CommentParent,
          submitCommentRepository: SubmitCommentRepositoryProtocol,
@@ -34,29 +46,35 @@ class SubmitCommentViewModel: ObservableObject {
         self.mediaUploadRepository = mediaUploadRepository
     }
     
-    func submitComment() async -> Comment? {
-        guard isSubmitting == false else { return nil }
-        
-        isSubmitting = true
-        
-        var sentComment: Comment? = nil
-        do {
-            sentComment = try await submitCommentRepository.submitComment(
-                accout: selectedAccount,
-                content: text,
-                parentFullname: commentParent.parentFullname ?? "",
-                depth: commentParent.childCommentDepth,
-                embeddedImages: embeddedImages,
-                giphyGif: giphyGif
-            )
-        } catch {
-            self.error = error
-            print("Error submitting comment: \(error)")
+    func submitComment() {
+        guard submitCommentTask == nil else {
+            return
         }
         
-        isSubmitting = false
+        guard !text.isEmpty else {
+            error = CommentSubmissionError.noContentError
+            return
+        }
         
-        return sentComment
+        submittedComment = nil
+        
+        submitCommentTask = Task {
+            do {
+                submittedComment = try await submitCommentRepository.submitComment(
+                    accout: selectedAccount,
+                    content: text,
+                    parentFullname: commentParent.parentFullname ?? "",
+                    depth: commentParent.childCommentDepth,
+                    embeddedImages: embeddedImages,
+                    giphyGif: giphyGif
+                )
+            } catch {
+                self.error = error
+                print("Error submitting comment: \(error)")
+            }
+            
+            submitCommentTask = nil
+        }
     }
     
     func addEmbeddedImage(_ image: UIImage) {

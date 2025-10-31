@@ -134,20 +134,7 @@ struct SubmitCommentView: View {
                 }
                 
                 Button {
-                    Task {
-                        let sentComment = await submitCommentViewModel.submitComment()
-                        if let sentComment = sentComment {
-                            snackbarManager.showSnackbar(text: "Submitting comment. Please wait.")
-                            await MainActor.run {
-                                commentSubmissionShareableViewModel.sentComment = sentComment
-                                snackbarManager.dismiss()
-                                dismiss()
-                            }
-                        } else {
-                            snackbarManager.showSnackbar(text: "Failed to submit comment. Error: \(submitCommentViewModel.error?.localizedDescription ?? "Unknown error")")
-                            // Failed to submit this comment
-                        }
-                    }
+                    submitCommentViewModel.submitComment()
                 } label: {
                     SwiftUI.Image(systemName: "paperplane.fill")
                 }
@@ -241,6 +228,27 @@ struct SubmitCommentView: View {
                 } else {
                     // Error handling
                 }
+            }
+        }
+        .onChange(of: submitCommentViewModel.submitCommentTask) { _, newValue in
+            if newValue != nil {
+                snackbarManager.showSnackbar(
+                    text: "Submitting. Please wait...",
+                    autoDismiss: false,
+                    canDismissByGesture: false
+                )
+            }
+        }
+        .onChange(of: submitCommentViewModel.submittedComment) { _, newValue in
+            if let submittedComment = newValue {
+                commentSubmissionShareableViewModel.submittedComment = submittedComment
+                snackbarManager.dismiss()
+                dismiss()
+            }
+        }
+        .onReceive(submitCommentViewModel.$error) { newValue in
+            if let error = newValue {
+                snackbarManager.showSnackbar(text: error.localizedDescription)
             }
         }
     }
