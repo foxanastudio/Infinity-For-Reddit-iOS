@@ -50,7 +50,13 @@ struct CommentListingView: View {
                             CommentViewCard(
                                 account: accountViewModel.account,
                                 comment: comment,
-                                isInPostDetails: false
+                                isInPostDetails: false,
+                                onEdit: {
+                                    
+                                },
+                                onDelete: {
+                                    
+                                }
                             )
                             .onTapGesture {
                                 navigationManager.path.append(

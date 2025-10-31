@@ -124,10 +124,17 @@ struct PostDetailsView: View {
                                             }
                                         }
                                     }
-                                }, onReply: {
+                                },
+                                onReply: {
                                     let commentParent = CommentParent.comment(parentComment: comment)
                                     self.sentCommentParent = commentParent
                                     navigationManager.path.append(AppNavigation.submitComment(commentParent: commentParent))
+                                },
+                                onEdit: {
+                                    
+                                },
+                                onDelete: {
+                                    
                                 })
                             .listPlainItemNoInsets()
                             .id(comment.id)

@@ -10,8 +10,9 @@ import SDWebImageSwiftUI
 import MarkdownUI
 
 struct CommentViewCard: View {
-    @EnvironmentObject var customThemeViewModel: CustomThemeViewModel
-    @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject private var accountViewModel: AccountViewModel
+    @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
+    @EnvironmentObject private var navigationManager: NavigationManager
     
     @AppStorage(InterfaceCommentUserDefaultsUtils.showCommentDividerKey, store: .interfaceComment)
     private var showCommentDivider: Bool = false
@@ -38,12 +39,25 @@ struct CommentViewCard: View {
     let highlightComment: Bool
     let onToggleExpand: (() -> Void)?
     let onReply: (() -> Void)?
+    let onEdit: () -> Void
+    let onDelete: () -> Void
     
-    init(account: Account, comment: Comment, isInPostDetails: Bool, highlightComment: Bool = false, onToggleExpand: (() -> Void)? = nil, onReply: (() -> Void)? = nil) {
+    init(
+        account: Account,
+        comment: Comment,
+        isInPostDetails: Bool,
+        highlightComment: Bool = false,
+        onToggleExpand: (() -> Void)? = nil,
+        onReply: (() -> Void)? = nil,
+        onEdit: @escaping () -> Void,
+        onDelete: @escaping () -> Void
+    ) {
         self.isInPostDetails = isInPostDetails
         self.highlightComment = highlightComment
         self.onToggleExpand = onToggleExpand
         self.onReply = onReply
+        self.onEdit = onEdit
+        self.onDelete = onDelete
         self.isToolbarHidden = isInPostDetails ? UserDefaults.interfaceComment.bool(forKey: InterfaceCommentUserDefaultsUtils.hideToolbarKey) : false
         _commentViewModel = StateObject(wrappedValue: CommentViewModel(account: account, comment: comment, commentRepository: CommentRepository()))
     }
@@ -166,6 +180,28 @@ struct CommentViewCard: View {
                             
                             Spacer()
                             
+                            Menu {
+                                ShareLink(item: "https://reddit.com" + commentViewModel.comment.permalink) {
+                                    Text("Share")
+                                }
+                                
+                                if accountViewModel.account.username == commentViewModel.comment.author {
+                                    Button("Edit") {
+                                        onEdit()
+                                    }
+                                    
+                                    Button("Delete") {
+                                        onDelete()
+                                    }
+                                }
+                            } label: {
+                                SwiftUI.Image(systemName: "ellipsis.circle")
+                                    .commentIconTemplateRendering()
+                                    .commentIcon()
+                            }
+                            .padding(8)
+                            .excludeFromTouchRipple()
+                            
                             if commentViewModel.comment.depth < showFewerToolbarOptionsThreshold && isInPostDetails {
                                 if let onToggleExpand, commentViewModel.comment.hasReplies {
                                     Button(action: {
@@ -196,14 +232,14 @@ struct CommentViewCard: View {
                                 .padding(8)
                                 .contentShape(Rectangle())
                                 
-                                ShareLink(item: "https://reddit.com" + commentViewModel.comment.permalink) {
-                                    SwiftUI.Image(systemName: "square.and.arrow.up")
-                                        .commentIconTemplateRendering()
-                                        .commentIcon()
-                                }
-                                .buttonStyle(.borderless)
-                                .padding(8)
-                                .contentShape(Rectangle())
+//                                ShareLink(item: "https://reddit.com" + commentViewModel.comment.permalink) {
+//                                    SwiftUI.Image(systemName: "square.and.arrow.up")
+//                                        .commentIconTemplateRendering()
+//                                        .commentIcon()
+//                                }
+//                                .buttonStyle(.borderless)
+//                                .padding(8)
+//                                .contentShape(Rectangle())
                                 
                                 if isInPostDetails {
                                     Button(action: {
@@ -239,6 +275,16 @@ struct CommentViewCard: View {
                                     if isInPostDetails {
                                         Button("Reply") {
                                             onReply?()
+                                        }
+                                    }
+                                    
+                                    if accountViewModel.account.username == commentViewModel.comment.author {
+                                        Button("Edit") {
+                                            onEdit()
+                                        }
+                                        
+                                        Button("Delete") {
+                                            onDelete()
                                         }
                                     }
                                 } label: {
