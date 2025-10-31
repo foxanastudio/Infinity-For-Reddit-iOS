@@ -13,6 +13,7 @@ public class SubredditListingRepository: SubredditListingRepositoryProtocol {
         case NetworkError(String)
         case JSONDecodingError(String)
     }
+    
     private let session: Session
     
     public init() {

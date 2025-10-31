@@ -555,7 +555,10 @@ public class PostDetailsViewModel: ObservableObject {
         guard let visibleIndex = self.visibleComments.firstIndex(where: { $0.id == commentToBeEdited.id }) else { return }
         guard let allIndex = self.allComments.firstIndex(where: { $0.id == commentToBeEdited.id }) else { return }
         switch visibleComments[visibleIndex] {
-        case .comment:
+        case .comment(let comment):
+//            comment.bodyProcessedMarkdown = comment.bodyProcessedMarkdown
+//            comment.body = comment.body
+//            comment.objectWillChange.send()
             visibleComments[visibleIndex] = .comment(comment)
             allComments[allIndex] = .comment(comment)
         default:

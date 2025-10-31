@@ -123,7 +123,6 @@ struct CommentViewCard: View {
                                 .markdownLinkHandler { url in
                                     navigationManager.openLink(url)
                                 }
-                                .id(commentViewModel.comment.id)
                         } else {
                             Markdown(commentViewModel.comment.body)
                                 .markdownImageProvider(WebImageProvider(mediaMetadata: commentViewModel.comment.mediaMetadata))
@@ -134,7 +133,6 @@ struct CommentViewCard: View {
                                 .markdownLinkHandler { url in
                                     navigationManager.openLink(url)
                                 }
-                                .id(commentViewModel.comment.id)
                         }
                     }
                     

@@ -67,7 +67,7 @@ struct CustomNavigationStack<Content: View>: View {
                             .environmentObject(navigationManager)
                             .environmentObject(commentSubmissionShareableViewModel)
                     case .editComment(let commentToBeEdited):
-                        EditCommentView()
+                        EditCommentView(commentToBeEdited: commentToBeEdited)
                             .environmentObject(navigationManager)
                             .environmentObject(commentSubmissionShareableViewModel)
                     case .submitTextPost:
