@@ -98,19 +98,27 @@ struct PostListingView: View {
                 if isRootView {
                     List {
                         ForEach(postListingViewModel.posts, id: \.id) { post in
-                            PostViewCard(account: account, post: post, isSubredditPostListing: isSubredditPostListing, onPostTypeClicked: {
-                                onPostTypeClicked(post: post)
-                            }, onSensitiveClicked: {
-                                onSensitiveClicked(post: post)
-                            })
-                            //.id(post.id)
-                            .listPlainItemNoInsets()
-                            .onAppear {
-                                if post.subredditOrUserIcon == nil {
-                                    Task {
-                                        await postListingViewModel.loadIcon(post: post, displaySubredditIcon: !isSubredditPostListing)
+                            switch postListingViewModel.layout {
+                            case .card:
+                                PostView(
+                                    account: account,
+                                    post: post,
+                                    layout: postListingViewModel.layout,
+                                    isSubredditPostListing: isSubredditPostListing,
+                                    onPostTypeTap: { onPostTypeClicked(post: post) },
+                                    onSensitiveTap: { onSensitiveClicked(post: post) }
+                                )
+                                //.id(post.id)
+                                .listPlainItemNoInsets()
+                                .onAppear {
+                                    if post.subredditOrUserIcon == nil {
+                                        Task {
+                                            await postListingViewModel.loadIcon(post: post, displaySubredditIcon: !isSubredditPostListing)
+                                        }
                                     }
                                 }
+                            case .compact:
+                                PostViewCompact()
                             }
                         }
                         if postListingViewModel.hasMorePages {
@@ -128,19 +136,27 @@ struct PostListingView: View {
                     }
                 } else {
                     ForEach(postListingViewModel.posts, id: \.id) { post in
-                        PostViewCard(account: account, post: post, isSubredditPostListing: isSubredditPostListing, width: nil, onPostTypeClicked: {
-                            onPostTypeClicked(post: post)
-                        }, onSensitiveClicked: {
-                            onSensitiveClicked(post: post)
-                        })
-                        .id(post.id)
-                        .listPlainItemNoInsets()
-                        .onAppear {
-                            if post.subredditOrUserIcon == nil {
-                                Task {
-                                    await postListingViewModel.loadIcon(post: post, displaySubredditIcon: !isSubredditPostListing)
+                        switch postListingViewModel.layout {
+                        case .card:
+                            PostView(
+                                account: account,
+                                post: post,
+                                layout: postListingViewModel.layout,
+                                isSubredditPostListing: isSubredditPostListing,
+                                onPostTypeTap: { onPostTypeClicked(post: post) },
+                                onSensitiveTap: { onSensitiveClicked(post: post) }
+                            )
+                            .id(post.id)
+                            .listPlainItemNoInsets()
+                            .onAppear {
+                                if post.subredditOrUserIcon == nil {
+                                    Task {
+                                        await postListingViewModel.loadIcon(post: post, displaySubredditIcon: !isSubredditPostListing)
+                                    }
                                 }
                             }
+                        case .compact:
+                            PostViewCompact()
                         }
                     }
                     if postListingViewModel.hasMorePages {
@@ -228,6 +244,9 @@ struct PostListingView: View {
                 currentLayout: postListingViewModel.layout,
                 onSelectLayout: { newLayout in
                     postListingViewModel.changePostLayout(to: newLayout)
+                },
+                onResetLayout: {
+                    postListingViewModel.resetToDefaultLayout()
                 }
             )
             .presentationDetents([.medium, .large])

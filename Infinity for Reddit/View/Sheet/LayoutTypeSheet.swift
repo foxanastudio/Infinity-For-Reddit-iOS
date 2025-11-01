@@ -11,6 +11,7 @@ struct LayoutTypeSheet: View {
     
     let currentLayout: PostLayoutType
     let onSelectLayout: (PostLayoutType) -> Void
+    let onResetLayout: () -> Void
     private let availableLayouts: [PostLayoutType] = [.card, .compact]
     
     var body: some View {
@@ -33,6 +34,17 @@ struct LayoutTypeSheet: View {
                     }
                     .listPlainItemNoInsets()
                 }
+                
+                // Debug
+                IconTextButton(
+                    startIconUrl: "arrow.counterclockwise",
+                    startIconType: .systemIcon,
+                    text: "Reset to Default Layout"
+                ) {
+                    onResetLayout()
+                    dismiss()
+                }
+                .listPlainItemNoInsets()
             }
             .padding(.top, 24)
         }

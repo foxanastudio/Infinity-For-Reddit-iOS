@@ -11,14 +11,13 @@ import Flow
 
 struct PostViewCard: View {
     @EnvironmentObject private var accountViewModel: AccountViewModel
-    @EnvironmentObject var navigationManager: NavigationManager
-    @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
-    @EnvironmentObject var themeViewModel: CustomThemeViewModel
+    @EnvironmentObject private var themeViewModel: CustomThemeViewModel
     
     @StateObject var postViewModel: PostViewModel
-    @State var voteTask: Task<Void, Never>?
-    @State var saveTask: Task<Void, Never>?
+    @State private var voteTask: Task<Void, Never>?
+    @State private var saveTask: Task<Void, Never>?
     
+    // MARK: - User Preferences
     @AppStorage(InterfacePostUserDefaultsUtils.hidePostTypeKey, store: .interfacePost) private var hidePostType: Bool = false
     @AppStorage(InterfacePostUserDefaultsUtils.hidePostFlairKey, store: .interfacePost) private var hidePostFlair: Bool = false
     @AppStorage(InterfacePostUserDefaultsUtils.hideSubredditAndUserPrefixKey, store: .interfacePost) private var hideSubredditAndUserPrefix: Bool = false
@@ -30,20 +29,59 @@ struct PostViewCard: View {
     
     @State var width: CGFloat?
     
+    // MARK: - Layout Context
     let isSubredditPostListing: Bool
+    
+    // MARK: - External Callbacks
+    let onPostTap: () -> Void
+    let onIconTap: (_ post: Post) -> Void
+    let onSubredditTap: (_ post: Post) -> Void
+    let onUserTap: (_ post: Post) -> Void
+    let onVote: (_ direction: Int) -> Void
+    let onCommentsTap: () -> Void
+    let onSave: () -> Void
+    let onShare: () -> Void
     let onPostTypeClicked: () -> Void
     let onSensitiveClicked: () -> Void
+    let onOpenLink: (_ url: URL) -> Void
     
+    // MARK: - Constants
     private let iconSize: CGFloat = 24
     
-    init(account: Account, post: Post, isSubredditPostListing: Bool, width: CGFloat? = nil, onPostTypeClicked: @escaping () -> Void, onSensitiveClicked: @escaping () -> Void) {
-        self.width = width
+    // MARK: - Initializer
+    init(
+        postViewModel: PostViewModel,
+        isSubredditPostListing: Bool,
+        width: CGFloat? = nil,
+        onPostTap: @escaping () -> Void,
+        onIconTap: @escaping (_ post: Post) -> Void,
+        onSubredditTap: @escaping (_ post: Post) -> Void,
+        onUserTap: @escaping (_ post: Post) -> Void,
+        onVote: @escaping (_ direction: Int) -> Void,
+        onCommentsTap: @escaping () -> Void,
+        onSave: @escaping () -> Void,
+        onShare: @escaping () -> Void,
+        onPostTypeClicked: @escaping () -> Void,
+        onSensitiveClicked: @escaping () -> Void,
+        onOpenLink: @escaping (_ url: URL) -> Void
+    ) {
+        self._postViewModel = StateObject(wrappedValue: postViewModel)
         self.isSubredditPostListing = isSubredditPostListing
+        self.width = width
+        self.onPostTap = onPostTap
+        self.onIconTap = onIconTap
+        self.onSubredditTap = onSubredditTap
+        self.onUserTap = onUserTap
+        self.onVote = onVote
+        self.onCommentsTap = onCommentsTap
+        self.onSave = onSave
+        self.onShare = onShare
         self.onPostTypeClicked = onPostTypeClicked
         self.onSensitiveClicked = onSensitiveClicked
-        _postViewModel = StateObject(wrappedValue: PostViewModel(account: account, post: post, postRepository: PostRepository()))
+        self.onOpenLink = onOpenLink
     }
     
+    // MARK: - Body
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Spacer()
@@ -61,25 +99,19 @@ struct PostViewCard: View {
                     }
                 )
                 .frame(width: iconSize, height: iconSize)
-                .onTapGesture {
-                    if (!isSubredditPostListing) {
-                        navigationManager.path.append(AppNavigation.subredditDetails(subredditName: postViewModel.post.subreddit))
-                    } else if !postViewModel.post.isAuthorDeleted() {
-                        navigationManager.path.append(AppNavigation.userDetails(username: postViewModel.post.author))
-                    }
-                }
+                .onTapGesture { onIconTap(postViewModel.post) }
                 
                 VStack(alignment: .leading) {
                     Text(hideSubredditAndUserPrefix ? postViewModel.post.subreddit : postViewModel.post.subredditNamePrefixed)
                         .subreddit()
                         .onTapGesture {
-                            navigationManager.path.append(AppNavigation.subredditDetails(subredditName: postViewModel.post.subreddit))
+                            onSubredditTap(postViewModel.post)
                         }
                     
                     Text(hideSubredditAndUserPrefix ? postViewModel.post.author : "u/\(postViewModel.post.author ?? "")")
                         .usernameOnPost(post: postViewModel.post)
                         .onTapGesture {
-                            navigationManager.path.append(AppNavigation.userDetails(username: postViewModel.post.author))
+                            onUserTap(postViewModel.post)
                         }
                 }
                 .padding(.leading, 4)
@@ -159,14 +191,14 @@ struct PostViewCard: View {
             case .noPreviewLink:
                 if let url = URL(string: postViewModel.post.url), let domain = url.host {
                     NoPreviewLinkView(domain: domain) {
-                        navigationManager.openLink(url)
+                        onOpenLink(url)
                         Task {
                             await postViewModel.readPost()
                         }
                     }
                 } else if let crosspost = postViewModel.post.crosspostParent, let url = URL(string: crosspost.url), let domain = url.host {
                     NoPreviewLinkView(domain: domain) {
-                        navigationManager.openLink(url)
+                        onOpenLink(url)
                         Task {
                             await postViewModel.readPost()
                         }
@@ -234,12 +266,7 @@ struct PostViewCard: View {
             HStack(spacing: 0) {
                 HStack(spacing: 0) {
                     Button(action: {
-                        if !accountViewModel.account.isAnonymous() {
-                            voteTask?.cancel()
-                            voteTask = Task {
-                                await postViewModel.votePost(vote: 1)
-                            }
-                        }
+                        onVote(1)
                     }) {
                         SwiftUI.Image(systemName: postViewModel.post.likes == 1 && !accountViewModel.account.isAnonymous() ? "arrowshape.up.fill" : "arrowshape.up")
                             .postIconTemplateRendering()
@@ -256,12 +283,7 @@ struct PostViewCard: View {
                         .onTapGesture {}
                     
                     Button(action: {
-                        if !accountViewModel.account.isAnonymous() {
-                            voteTask?.cancel()
-                            voteTask = Task {
-                                await postViewModel.votePost(vote: -1)
-                            }
-                        }
+                        onVote(-1)
                     }) {
                         SwiftUI.Image(systemName: postViewModel.post.likes == -1 && !accountViewModel.account.isAnonymous() ? "arrowshape.down.fill" : "arrowshape.down")
                             .postIconTemplateRendering()
@@ -278,17 +300,20 @@ struct PostViewCard: View {
 
                 HStack {
                     if !hideNComments {
-                        Button {
-                            
-                        } label: {
-                            SwiftUI.Image(systemName: "text.bubble")
-                                .postIconTemplateRendering()
-                                .postIcon()
+                        Button(action: {
+                            onCommentsTap()
+                        }) {
+                            HStack() {
+                                SwiftUI.Image(systemName: "text.bubble")
+                                    .postIconTemplateRendering()
+                                    .postIcon()
+                                
+                                Text(String(postViewModel.post.numComments))
+                                    .postInfo()
+                            }
                         }
                         .buttonStyle(.borderless)
-                        
-                        Text(String(postViewModel.post.numComments))
-                            .postInfo()
+                        .contentShape(Rectangle())
                     }
                     
                     Spacer()
@@ -296,12 +321,7 @@ struct PostViewCard: View {
                 .padding(.leading, 16)
                 .environment(\.layoutDirection, .leftToRight)
                 
-                Button(action: {
-                    saveTask?.cancel()
-                    saveTask = Task {
-                        await postViewModel.savePost(save: !postViewModel.post.saved)
-                    }
-                }) {
+                Button(action: onSave) {
                     SwiftUI.Image(systemName: postViewModel.post.saved ? "bookmark.fill" : "bookmark")
                         .postIconTemplateRendering()
                         .postIcon()
@@ -310,7 +330,7 @@ struct PostViewCard: View {
                 .padding(8)
                 .contentShape(Rectangle())
                 
-                ShareLink(item: postViewModel.post.url) {
+                Button(action: onShare) {
                     SwiftUI.Image(systemName: "square.and.arrow.up")
                         .postIconTemplateRendering()
                         .postIcon()
@@ -332,10 +352,7 @@ struct PostViewCard: View {
         }
         .padding(.vertical, 8)
         .onTapGesture {
-            Task {
-                await postViewModel.readPost()
-            }
-            navigationManager.path.append(AppNavigation.postDetails(postDetailsInput: .post(postViewModel.post), isFromSubredditPostListing: isSubredditPostListing))
+            onPostTap()
         }
     }
 }
