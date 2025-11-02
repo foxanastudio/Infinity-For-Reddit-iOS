@@ -138,7 +138,7 @@ struct PostDetailsView: View {
                                     postDetailsViewModel.deleteComment(comment)
                                 })
                             .listPlainItemNoInsets()
-                            .id(comment.id)
+                            .id(ObjectIdentifier(comment))
                             .onLongPressGesture {
                                 if fullyCollapseComment {
                                     if comment.isCollasped {
