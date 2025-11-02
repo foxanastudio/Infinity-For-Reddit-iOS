@@ -70,21 +70,29 @@ class EditCommentRepository: EditCommentRepositoryProtocol {
         
         let thingsJson = json["json"]["data"]["things"].arrayValue
         if !thingsJson.isEmpty {
-            let comment = try Comment(fromJson: thingsJson[0]["data"])
-            if comment.id.isEmpty {
-                // This is a work around for checking if JSON parsing failed
+            let comment = try? Comment(fromJson: thingsJson[0]["data"])
+            if let comment {
+                if comment.id.isEmpty {
+                    // This is a work around for checking if JSON parsing failed
+                    return EditCommentResponse.content(content: content)
+                }
+                comment.bodyProcessedMarkdown = MarkdownContent(comment.body)
+                return EditCommentResponse.comment(comment: comment)
+            } else {
                 return EditCommentResponse.content(content: content)
             }
-            comment.bodyProcessedMarkdown = MarkdownContent(comment.body)
-            return EditCommentResponse.comment(comment: comment)
         } else {
-            let comment = try Comment(fromJson: json)
-            if comment.id.isEmpty {
-                // This is a work around for checking if JSON parsing failed
+            let comment = try? Comment(fromJson: json)
+            if let comment {
+                if comment.id.isEmpty {
+                    // This is a work around for checking if JSON parsing failed
+                    return EditCommentResponse.content(content: content)
+                }
+                comment.bodyProcessedMarkdown = MarkdownContent(comment.body)
+                return EditCommentResponse.comment(comment: comment)
+            } else {
                 return EditCommentResponse.content(content: content)
             }
-            comment.bodyProcessedMarkdown = MarkdownContent(comment.body)
-            return EditCommentResponse.comment(comment: comment)
         }
     }
 }

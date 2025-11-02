@@ -67,7 +67,7 @@ struct CommentListingView: View {
                             )
                         }
                         .listPlainItemNoInsets()
-                        .id(comment.id)
+                        .id(ObjectIdentifier(comment))
                     }
                     if commentListingViewModel.hasMorePages {
                         ProgressIndicator()

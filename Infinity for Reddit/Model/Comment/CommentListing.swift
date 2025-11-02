@@ -33,8 +33,6 @@ public class CommentListing : NSObject, Validatable {
     var dist : Int!
 
     init(fromJson json: JSON!) throws {
-        try Self.validate(json: json)
-        
         if json.isEmpty {
             throw JSONError.invalidData
         }
@@ -256,11 +254,7 @@ public class Comment : NSObject, Validatable, Identifiable, ObservableObject {
         permalink = json["permalink"].stringValue
         quarantine = json["quarantine"].boolValue
         removalReason = json["removal_reason"].stringValue
-        do {
-            replies = try CommentListing(fromJson: json["replies"]["data"])
-        } catch {
-            print("Failed to parse replies: \(error)")
-        }
+        replies = try? CommentListing(fromJson: json["replies"]["data"])
         reportReasons = json["report_reasons"].stringValue
         saved = json["saved"].boolValue
         var score = json["score"].intValue
