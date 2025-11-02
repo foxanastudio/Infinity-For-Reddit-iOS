@@ -105,7 +105,7 @@ struct EditCommentView: View {
         }
         .frame(maxHeight: .infinity)
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar("Send Comment")
+        .addTitleToInlineNavigationBar("Edit Comment")
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button {
@@ -146,7 +146,7 @@ struct EditCommentView: View {
             GiphyView()
                 .onSelectMedia { media, contentType in
                     showGiphyGifSheet = false
-                    editCommentViewModel.giphyGif = media
+                    editCommentViewModel.giphyGifId = media.id
                     
                     MarkdownUtils.insertImageOrGifIntoMarkdownString(
                         content: &editCommentViewModel.text,
@@ -220,11 +220,21 @@ struct EditCommentView: View {
                 )
             }
         }
-        .onChange(of: editCommentViewModel.editedComment) { _, newValue in
-            if let editedComment = newValue {
-                commentSubmissionShareableViewModel.editedComment = editedComment
-                snackbarManager.dismiss()
-                dismiss()
+        .onChange(of: editCommentViewModel.editedCommentResponse) { _, newValue in
+            if let editedCommentResponse = newValue {
+                switch editedCommentResponse {
+                case .comment(let comment):
+                    commentSubmissionShareableViewModel.editedComment = comment
+                    snackbarManager.dismiss()
+                    dismiss()
+                case .content(let content):
+                    editCommentViewModel.commentToBeEdited.body = content
+                    editCommentViewModel.commentToBeEdited.bodyProcessedMarkdown = MarkdownContent(content)
+                    commentSubmissionShareableViewModel.editedComment = editCommentViewModel.commentToBeEdited
+                    snackbarManager.showSnackbar(text: "Comment edited, but couldn’t fetch the update. Please refresh.")
+                    dismiss()
+                }
+                
             }
         }
         .onReceive(editCommentViewModel.$error) { newValue in

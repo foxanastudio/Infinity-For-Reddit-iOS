@@ -14,9 +14,9 @@ import GiphyUISDK
 class EditCommentViewModel: ObservableObject {
     @Published var text: String = ""
     @Published var embeddedImages: [UploadedImage] = []
-    @Published var giphyGif: GPHMedia?
+    @Published var giphyGifId: String?
     @Published var editCommentTask: Task<Void, Error>?
-    @Published var editedComment: Comment?
+    @Published var editedCommentResponse: EditCommentResponse?
     @Published var error: Error? = nil
     
     let commentToBeEdited: Comment
@@ -39,9 +39,16 @@ class EditCommentViewModel: ObservableObject {
          editCommentRepository: EditCommentRepositoryProtocol,
          mediaUploadRepository: MediaUploadRepositoryProtocol
     ) {
+        self.text = commentToBeEdited.body
         self.commentToBeEdited = commentToBeEdited
         self.editCommentRepository = editCommentRepository
         self.mediaUploadRepository = mediaUploadRepository
+        
+        commentToBeEdited.mediaMetadata?.forEach { entry in
+            if MediaMetadata.gifType == entry.value.e {
+                giphyGifId = entry.key
+            }
+        }
     }
     
     func editComment() {
@@ -54,15 +61,16 @@ class EditCommentViewModel: ObservableObject {
             return
         }
         
-        editedComment = nil
+        editedCommentResponse = nil
         
         editCommentTask = Task {
             do {
-                editedComment = try await editCommentRepository.editComment(
+                editedCommentResponse = try await editCommentRepository.editComment(
                     content: text,
                     commentFullname: commentToBeEdited.name,
+                    mediaMetadataDictionary: commentToBeEdited.mediaMetadata,
                     embeddedImages: embeddedImages,
-                    giphyGif: giphyGif
+                    giphyGifId: giphyGifId
                 )
             } catch {
                 self.error = error

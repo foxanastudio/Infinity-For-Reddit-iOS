@@ -193,6 +193,7 @@ public class CommentListingViewModel: ObservableObject {
         guard let index = self.comments.firstIndex(where: { $0.id == commentToBeEdited.id }) else { return }
         self.comments[index].bodyProcessedMarkdown = comment.bodyProcessedMarkdown
         self.comments[index].body = comment.body
+        self.comments[index].mediaMetadata = comment.mediaMetadata
         self.comments[index].edited = true
     }
     

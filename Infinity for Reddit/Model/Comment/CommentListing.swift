@@ -126,7 +126,7 @@ public class Comment : NSObject, Validatable, Identifiable, ObservableObject {
     var modReasonBy : String!
     var modReasonTitle : String!
     var modReports : [[Any]]! = [[Any]]()
-    var mediaMetadata: [String: MediaMetadata]?
+    @Published var mediaMetadata: [String: MediaMetadata]?
     var name : String!
     var noFollow : Bool!
     var numComments : Int!

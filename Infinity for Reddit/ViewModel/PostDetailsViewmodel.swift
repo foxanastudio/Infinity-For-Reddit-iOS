@@ -557,6 +557,7 @@ public class PostDetailsViewModel: ObservableObject {
         case .comment(let oldComment):
             oldComment.bodyProcessedMarkdown = comment.bodyProcessedMarkdown
             oldComment.body = comment.body
+            oldComment.mediaMetadata = comment.mediaMetadata
             oldComment.edited = true
         default:
             break
