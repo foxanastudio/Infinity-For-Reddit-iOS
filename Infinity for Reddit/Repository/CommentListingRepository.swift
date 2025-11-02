@@ -11,11 +11,23 @@ import SwiftyJSON
 import Foundation
 
 public class CommentListingRepository: CommentListingRepositoryProtocol {
-
-    enum CommentListingRepositoryError: Error {
+    enum CommentListingRepositoryError: LocalizedError {
         case NetworkError(String)
         case JSONDecodingError(String)
+        case commentIdNotFound
+        
+        var errorDescription: String? {
+            switch self {
+            case .NetworkError(let message):
+                return message
+            case .JSONDecodingError(let message):
+                return message
+            case .commentIdNotFound:
+                return "Comment ID not found"
+            }
+        }
     }
+    
     private let session: Session
     
     public init() {
@@ -53,5 +65,19 @@ public class CommentListingRepository: CommentListingRepositoryProtocol {
         }
         
         return try CommentListingRootClass(fromJson: json).data
+    }
+    
+    public func deleteComment(_ comment: Comment) async throws {
+        guard let name = comment.name else {
+            throw CommentListingRepositoryError.commentIdNotFound
+        }
+        let params = ["id": name]
+        
+        try Task.checkCancellation()
+        
+        _ = try await self.session.request(RedditOAuthAPI.deletePostOrComment(params: params))
+            .validate()
+            .serializingDecodable(Empty.self, automaticallyCancelling: true)
+            .value
     }
 }

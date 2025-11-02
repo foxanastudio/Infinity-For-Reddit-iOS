@@ -195,4 +195,24 @@ public class CommentListingViewModel: ObservableObject {
         self.comments[index].body = comment.body
         self.comments[index].edited = true
     }
+    
+    func deleteComment(_ comment: Comment) {
+        Task {
+            do {
+                try await commentListingRepository.deleteComment(comment)
+                
+                await MainActor.run {
+                    guard let index = self.comments.index(id: comment.id) else {
+                        return
+                    }
+                    self.comments.remove(at: index)
+                }
+            } catch {
+                await MainActor.run {
+                    self.error = error
+                }
+                print(error)
+            }
+        }
+    }
 }

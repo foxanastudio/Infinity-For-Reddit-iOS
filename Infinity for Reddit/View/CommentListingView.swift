@@ -62,7 +62,7 @@ struct CommentListingView: View {
                                     navigationManager.path.append(AppNavigation.editComment(commentToBeEdited: comment))
                                 },
                                 onDelete: {
-                                    
+                                    commentListingViewModel.deleteComment(comment)
                                 }
                             )
                         }
