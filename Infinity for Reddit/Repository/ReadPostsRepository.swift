@@ -8,14 +8,14 @@
 import GRDB
 
 class ReadPostsRepository: ReadPostsRepositoryProtocol {
-    private let readPostDao: ReadPostDao
+    private let readPostDao: PostHistoryDao
     
     init() {
         guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
             fatalError("Failed to resolve DatabasePool")
         }
         
-        self.readPostDao = ReadPostDao(dbPool: resolvedDBPool)
+        self.readPostDao = PostHistoryDao(dbPool: resolvedDBPool)
     }
     
     func getReadPostsIdsByIds(readPostEnabled: Bool, account: Account, postIds: [String]) -> Set<String> {

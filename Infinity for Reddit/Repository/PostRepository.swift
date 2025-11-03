@@ -18,7 +18,7 @@ class PostRepository: PostRepositoryProtocol {
     }
     
     private let session: Session
-    private let readPostDao: ReadPostDao
+    private let postHistoryDao: PostHistoryDao
     
     init() {
         guard let resolvedSession = DependencyManager.shared.container.resolve(Session.self) else {
@@ -28,7 +28,7 @@ class PostRepository: PostRepositoryProtocol {
             fatalError("Failed to resolve DatabasePool")
         }
         self.session = resolvedSession
-        self.readPostDao = ReadPostDao(dbPool: resolvedDBPool)
+        self.postHistoryDao = PostHistoryDao(dbPool: resolvedDBPool)
     }
     
     func votePost(
@@ -69,15 +69,16 @@ class PostRepository: PostRepositoryProtocol {
         }
         
         if limitReadPosts {
-            if try await readPostDao.getReadPostsCount(username: account.username) >= readPostsLimit {
-                try await readPostDao.deleteOldestReadPosts(username: account.username)
+            if try await postHistoryDao.getReadPostsCount(username: account.username) >= readPostsLimit {
+                try await postHistoryDao.deleteOldestReadPosts(username: account.username)
             }
         }
         
-        try await readPostDao.insert(
-            readPost: ReadPost(
+        try await postHistoryDao.insert(
+            postHistory: PostHistory(
                 username: account.username,
                 postId: post.id,
+                postHistoryType: .readPosts,
                 time: Int64(Date().timeIntervalSince1970)
             )
         )
