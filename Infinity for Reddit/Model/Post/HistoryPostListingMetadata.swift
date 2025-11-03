@@ -17,4 +17,8 @@ public struct HistoryPostListingMetadata: Hashable {
 
 public enum HistoryPostListingType: Codable, Hashable {
     case read
+    case upvoted
+    case downvoted
+    case hidden
+    case saved
 }

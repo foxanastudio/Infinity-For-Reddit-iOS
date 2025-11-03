@@ -43,7 +43,7 @@ struct PostHistoryDao {
         }
     }
     
-    func getAllReadPosts(username: String, before: Int64?) throws -> [PostHistory] {
+    func getAllHistoryPosts(username: String, before: Int64?, postHistoryType: PostHistoryType) throws -> [PostHistory] {
         try dbPool.read { db in
             try PostHistory.fetchAll(db, sql: """
                 SELECT *
@@ -51,7 +51,7 @@ struct PostHistoryDao {
                 WHERE username = ? AND (? IS NULL OR time < ?) AND post_history_type = ?
                 ORDER BY time DESC
                 LIMIT 100
-                """, arguments: [username, before, before, PostHistoryType.readPosts.rawValue])
+                """, arguments: [username, before, before, postHistoryType.rawValue])
         }
     }
     

@@ -52,15 +52,12 @@ public class HistoryPostListingRepository: HistoryPostListingRepositoryProtocol 
     ) async throws -> (postListing: PostListing, before: Int64) {
         let apiRequest: URLRequestConvertible
         let beforeResult: Int64
-        switch historyPostListingType {
-        case .read:
-            let postHistory = try postHistoryDao.getAllReadPosts(username: username, before: before)
-            let postFullnames = postHistory.map {
-                "t3_\($0.postId)"
-            }.joined(separator: ",")
-            beforeResult = postHistory.last?.time ?? 0
-            apiRequest = RedditOAuthAPI.getInfo(queries: ["id": postFullnames])
-        }
+        let postHistory = try postHistoryDao.getAllHistoryPosts(username: username, before: before, postHistoryType: historyPostListingType.postHistoryTypeForDB)
+        let postFullnames = postHistory.map {
+            "t3_\($0.postId)"
+        }.joined(separator: ",")
+        beforeResult = postHistory.last?.time ?? 0
+        apiRequest = RedditOAuthAPI.getInfo(queries: ["id": postFullnames])
         
         try Task.checkCancellation()
         

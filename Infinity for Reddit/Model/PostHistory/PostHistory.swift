@@ -52,4 +52,8 @@ struct PostHistory: Codable, FetchableRecord, PersistableRecord, Equatable, Hash
 
 enum PostHistoryType: Int, Codable {
     case readPosts = 0
+    case upvoted = 1
+    case downvoted = 2
+    case hidden = 3
+    case saved = 4
 }
