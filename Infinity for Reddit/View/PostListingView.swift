@@ -11,7 +11,6 @@ import GRDB
 import Alamofire
 
 struct PostListingView: View {
-    @Environment(\.colorScheme) var colorScheme
     @Environment(\.dependencyManager) private var dependencyManager: Container
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
@@ -156,9 +155,6 @@ struct PostListingView: View {
             $0.toolbar {
                 NavigationBarMenu()
             }
-        }
-        .onChange(of: colorScheme) {
-            //print(colorScheme == .dark)
         }
         .task(id: postListingViewModel.loadPostsTaskId) {
             await postListingViewModel.initialLoadPosts()

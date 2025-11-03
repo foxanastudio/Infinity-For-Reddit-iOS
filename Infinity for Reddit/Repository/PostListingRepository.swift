@@ -12,10 +12,20 @@ import Foundation
 import GRDB
 
 public class PostListingRepository: PostListingRepositoryProtocol {
-    enum PostListingRepositoryError: Error {
+    enum PostListingRepositoryError: LocalizedError {
         case NetworkError(String)
         case JSONDecodingError(String)
+        
+        var errorDescription: String? {
+            switch self {
+            case .NetworkError(let message):
+                return message
+            case .JSONDecodingError(let message):
+                return message
+            }
+        }
     }
+    
     private let session: Session
     private let subredditDao: SubredditDao
     private let postFilterDao: PostFilterDao
@@ -24,10 +34,10 @@ public class PostListingRepository: PostListingRepositoryProtocol {
     
     public init() {
         guard let resolvedSession = DependencyManager.shared.container.resolve(Session.self) else {
-            fatalError("Failed to resolve Session")
+            fatalError("Failed to resolve Session in PostListingRepository")
         }
         guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
-            fatalError( "Failed to resolve DatabasePool")
+            fatalError( "Failed to resolve DatabasePool in PostListingRepository")
         }
         self.session = resolvedSession
         self.subredditDao = SubredditDao(dbPool: resolvedDBPool)
