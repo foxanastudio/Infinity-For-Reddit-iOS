@@ -27,6 +27,7 @@ public class HistoryPostListingRepository: HistoryPostListingRepositoryProtocol 
     }
     
     private let session: Session
+    private let postHistoryDao: PostHistoryDao
     private let subredditDao: SubredditDao
     private let postFilterDao: PostFilterDao
     private var subredditOrUserIcons: [String: String] = [:]
@@ -39,17 +40,26 @@ public class HistoryPostListingRepository: HistoryPostListingRepositoryProtocol 
             fatalError( "Failed to resolve DatabasePool in HistoryPostListingRepository")
         }
         self.session = resolvedSession
+        self.postHistoryDao = PostHistoryDao(dbPool: resolvedDBPool)
         self.subredditDao = SubredditDao(dbPool: resolvedDBPool)
         self.postFilterDao = PostFilterDao(dbPool: resolvedDBPool)
     }
     
     public func fetchPosts(
-        historyPostListingType: HistoryPostListingType
-    ) async throws -> PostListing {
+        historyPostListingType: HistoryPostListingType,
+        username: String,
+        before: Int64?
+    ) async throws -> (postListing: PostListing, before: Int64) {
         let apiRequest: URLRequestConvertible
+        let beforeResult: Int64
         switch historyPostListingType {
         case .read:
-            apiRequest = RedditOAuthAPI.getInfo(queries: [:])
+            let postHistory = try postHistoryDao.getAllReadPosts(username: username, before: before)
+            let postFullnames = postHistory.map {
+                "t3_\($0.postId)"
+            }.joined(separator: ",")
+            beforeResult = postHistory.last?.time ?? 0
+            apiRequest = RedditOAuthAPI.getInfo(queries: ["id": postFullnames])
         }
         
         try Task.checkCancellation()
@@ -66,7 +76,7 @@ public class HistoryPostListingRepository: HistoryPostListingRepositoryProtocol 
             throw HistoryPostListingRepositoryError.JSONDecodingError(error.localizedDescription)
         }
         
-        return try PostListingRootClass(fromJson: json).data
+        return (try PostListingRootClass(fromJson: json).data, beforeResult)
     }
     
     public func getPostFilter(historyPostListingType: HistoryPostListingType, externalPostFilter: PostFilter?) -> PostFilter {

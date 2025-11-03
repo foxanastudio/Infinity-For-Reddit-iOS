@@ -254,7 +254,6 @@ struct RedditGRDBDatabase {
                 t.column("post_id", .text).notNull()
                 t.column("post_history_type", .integer).notNull()
                 t.column("time", .integer).notNull()
-                t.column("type", .integer).notNull()
 
                 t.primaryKey(["username", "post_id"], onConflict: .replace)
             }

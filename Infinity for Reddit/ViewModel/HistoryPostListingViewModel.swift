@@ -25,8 +25,7 @@ public class HistoryPostListingViewModel: ObservableObject {
     private var historyPostListingMetadata: HistoryPostListingMetadata
     private var externalPostFilter: PostFilter?
     private var postFilter: PostFilter?
-    private var allPostIds = Set<String>()
-    private var after: String? = nil
+    private var before: Int64? = nil
     
     // UserDefaults
     private var sensitiveContent: Bool
@@ -144,47 +143,39 @@ public class HistoryPostListingViewModel: ObservableObject {
         do {
             try Task.checkCancellation()
             
-            let postListing: PostListing
-            postListing = try await historyPostListingRepository.fetchPosts(
-                historyPostListingType: historyPostListingMetadata.historyPostListingType
+            let result = try await historyPostListingRepository.fetchPosts(
+                historyPostListingType: historyPostListingMetadata.historyPostListingType,
+                username: AccountViewModel.shared.account.username,
+                before: before
             )
             
-            try Task.checkCancellation()
+            let postListing = result.postListing
             
-            if postFilter == nil {
-                fetchPostFilter()
-            }
-            
-            let processedPosts = self.postProcessPosts(postListing.posts)
-            
-            try Task.checkCancellation()
-            
-            if (processedPosts.isEmpty) {
+            if postListing.posts.isEmpty {
                 // No more posts
                 await MainActor.run {
                     hasMorePages = false
-                    self.after = nil
+                    self.before = nil
                 }
             } else {
-                let realNewPosts = processedPosts.filter {
-                    !self.allPostIds.contains($0.id)
+                try Task.checkCancellation()
+                
+                if postFilter == nil {
+                    fetchPostFilter()
                 }
                 
-                self.after = postListing.after
+                let processedPosts = self.postProcessPosts(postListing.posts)
                 
-                allPostIds.formUnion(
-                    realNewPosts
-                        .compactMap {
-                            $0.id
-                        }
-                )
+                try Task.checkCancellation()
+                
+                self.before = result.before
                 
                 await MainActor.run {
                     if isRefreshWithContinuation {
                         self.posts.removeAll()
                     }
-                    self.posts.append(contentsOf: realNewPosts)
-                    hasMorePages = !(self.after == nil || self.after?.isEmpty == true)
+                    self.posts.append(contentsOf: processedPosts)
+                    hasMorePages = true
                 }
             }
             
@@ -228,13 +219,11 @@ public class HistoryPostListingViewModel: ObservableObject {
         isInitialLoading = false
         isLoadingMore = false
         
-        after = nil
+        before = nil
         hasMorePages = true
         if refreshPostsContinuation == nil {
             posts = []
         }
-        
-        allPostIds = Set<String>()
     }
     
     func finishPullToRefresh() {

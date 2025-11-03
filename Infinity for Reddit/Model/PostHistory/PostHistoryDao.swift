@@ -27,7 +27,7 @@ struct PostHistoryDao {
                 do {
                     let sql = """
                         SELECT * 
-                        FROM read_posts 
+                        FROM post_history 
                         WHERE username = ? AND (? IS NULL OR time < ?) AND post_history_type = ?
                         ORDER BY time DESC 
                         LIMIT 25
@@ -47,10 +47,10 @@ struct PostHistoryDao {
         try dbPool.read { db in
             try PostHistory.fetchAll(db, sql: """
                 SELECT *
-                FROM read_posts
+                FROM post_history
                 WHERE username = ? AND (? IS NULL OR time < ?) AND post_history_type = ?
                 ORDER BY time DESC
-                LIMIT 25
+                LIMIT 100
                 """, arguments: [username, before, before, PostHistoryType.readPosts.rawValue])
         }
     }
@@ -59,7 +59,7 @@ struct PostHistoryDao {
         try dbPool.read { db in
             try PostHistory.fetchOne(db, sql: """
             SELECT *
-            FROM read_posts
+            FROM post_history
             WHERE post_id = ? AND post_history_type = ?
             LIMIT 1
             """, arguments: [id, PostHistoryType.readPosts.rawValue])
@@ -70,7 +70,7 @@ struct PostHistoryDao {
         try await dbPool.read { db in
             try Int.fetchOne(db, sql: """
             SELECT COUNT(*)
-            FROM read_posts
+            FROM post_history
             WHERE username = ? AND post_history_type = ?
             """, arguments: [username, PostHistoryType.readPosts.rawValue])!
         }
@@ -79,15 +79,15 @@ struct PostHistoryDao {
     func deleteOldestReadPosts(username: String) async throws {
         try await dbPool.write { db in
             try db.execute(sql: """
-            DELETE FROM read_posts 
-            WHERE rowid IN (SELECT rowid FROM read_posts WHERE username = ? AND post_history_type = ? ORDER BY time ASC LIMIT 100)
+            DELETE FROM post_history 
+            WHERE rowid IN (SELECT rowid FROM post_history WHERE username = ? AND post_history_type = ? ORDER BY time ASC LIMIT 100)
             """, arguments: [username, PostHistoryType.readPosts.rawValue])
         }
     }
     
     func deleteAllReadPosts() throws {
         try dbPool.write { db in
-            try db.execute(sql: "DELETE FROM read_posts WHERE post_history_type = ?", arguments: [PostHistoryType.readPosts.rawValue])
+            try db.execute(sql: "DELETE FROM post_history WHERE post_history_type = ?", arguments: [PostHistoryType.readPosts.rawValue])
         }
     }
     
@@ -98,7 +98,7 @@ struct PostHistoryDao {
             let arguments: [DatabaseValueConvertible?] = ids + [username, PostHistoryType.readPosts.rawValue]
             
             return try String.fetchSet(db, sql: """
-                SELECT post_id FROM read_posts
+                SELECT post_id FROM post_history
                 WHERE post_id IN (\(placeholders))
                 AND username = ? AND post_history_type = ?
                 """, arguments: StatementArguments(arguments))
