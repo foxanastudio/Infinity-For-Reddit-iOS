@@ -112,7 +112,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
     var removedByCategory : String!
     var reportReasons : String!
     
-    var saved : Bool!
+    @Published var saved : Bool!
     var score : Int!
     @Published var selftext : String!
     @Published var selftextProcessedMarkdown : MarkdownContent?

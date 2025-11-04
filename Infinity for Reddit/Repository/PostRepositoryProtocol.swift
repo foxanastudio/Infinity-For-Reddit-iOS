@@ -12,5 +12,6 @@ protocol PostRepositoryProtocol {
     func votePost(post: Post, point: String) async throws
     func votePostAnonymous(post: Post, vote: Int) async throws
     func savePost(post: Post, save: Bool) async throws
+    func savePostAnonymous(post: Post, save: Bool) async throws
     func readPost(post: Post, account: Account, limitReadPosts: Bool, readPostsLimit: Int) async throws
 }

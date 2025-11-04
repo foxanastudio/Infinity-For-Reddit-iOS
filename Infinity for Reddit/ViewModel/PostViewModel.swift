@@ -85,6 +85,7 @@ class PostViewModel: ObservableObject {
         }
     }
     
+    @MainActor
     private func votePostAnonymous(vote: Int) async {
         let finalVote: Int
         if vote == post.likes {
@@ -98,6 +99,11 @@ class PostViewModel: ObservableObject {
     }
     
     func savePost(save: Bool) async {
+        guard !account.isAnonymous() else {
+            await savePostAnonymous(save: save)
+            return
+        }
+        
         guard let _ = account.accessToken, let _ = post.name else { return }
         
         let previousSaved = post.saved
@@ -117,6 +123,12 @@ class PostViewModel: ObservableObject {
             self.error = error
             print("Error (un)saving post: \(error)")
         }
+    }
+    
+    @MainActor
+    private func savePostAnonymous(save: Bool) async {
+        post.saved = save
+        try? await postRepository.savePostAnonymous(post: post, save: save)
     }
     
     func readPost() async {

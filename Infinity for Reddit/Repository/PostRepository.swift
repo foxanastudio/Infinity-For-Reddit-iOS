@@ -95,6 +95,26 @@ class PostRepository: PostRepositoryProtocol {
         }
     }
     
+    func savePostAnonymous(
+        post: Post,
+        save: Bool
+    ) async throws {
+        do {
+            if save {
+                try await postHistoryDao.insert(
+                    postHistory: PostHistory(
+                        username: Account.ANONYMOUS_ACCOUNT.username,
+                        postId: post.id,
+                        postHistoryType: .saved,
+                        time: Int64(Date().timeIntervalSince1970)
+                    )
+                )
+            } else {
+                try await postHistoryDao.deletePostHistory(username: Account.ANONYMOUS_ACCOUNT.username, postId: post.id, postHistoryType: .saved)
+            }
+        }
+    }
+    
     func readPost(post: Post, account: Account, limitReadPosts: Bool, readPostsLimit: Int) async throws {
         guard !account.isAnonymous() else {
             return
