@@ -65,7 +65,21 @@ struct PostView: View {
             )
             
         case .compact:
-            PostViewCompact()
+            PostViewCompact(
+                postViewModel: postViewModel,
+                isSubredditPostListing: isSubredditPostListing,
+                onPostTap: handlePostTap,
+                onIconTap: handleIconTap,
+                onSubredditTap: handleSubredditTap,
+                onUserTap: handleUserTap,
+                onVote: handleVote,
+                onCommentsTap: handleCommentsTap,
+                onSave: handleSave,
+                onShare: handleShare,
+                onPostTypeClicked: onPostTypeTap,
+                onSensitiveClicked: onSensitiveTap,
+                onOpenLink: handleOpenLink
+            )
         }
     }
 }

@@ -19,15 +19,17 @@ struct GalleryCarousel: View {
     let post: Post
     let items: [GalleryItem]
     let onImageTap: (() -> Void)?
+    let compactMode: Bool
     
-    init(post: Post, onImageTap: (() -> Void)? = nil) {
+    init(post: Post, compactMode: Bool = false, onImageTap: (() -> Void)? = nil) {
         self.post = post
         self.items = post.galleryData!.items
         self.onImageTap = onImageTap
+        self.compactMode = compactMode
     }
     
     var body: some View {
-        ZStack(alignment: .topLeading) {
+        ZStack(alignment: compactMode ? .center : .topLeading) {
             TabView(selection: $galleryScrollState.scrollId) {
                 ForEach(Array(items.enumerated()), id: \.offset) { index, item in
                     CustomWebImage(
@@ -55,11 +57,19 @@ struct GalleryCarousel: View {
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
             
-            Text("\(galleryScrollState.scrollId + 1)/\(items.count)")
-                .padding(4)
-                .galleryIndexIndicator()
-                .cornerRadius(8)
-                .padding(12)
+            if compactMode {
+                SwiftUI.Image(systemName: "square.stack")
+                    .padding(4)
+                    .galleryIndexIndicator()
+                    .cornerRadius(8)
+                    .padding(12)
+            } else {
+                Text("\(galleryScrollState.scrollId + 1)/\(items.count)")
+                    .padding(4)
+                    .galleryIndexIndicator()
+                    .cornerRadius(8)
+                    .padding(12)
+            }
         }
     }
 }
