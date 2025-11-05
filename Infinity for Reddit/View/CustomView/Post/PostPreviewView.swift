@@ -10,6 +10,7 @@ import SwiftUI
 struct PostPreviewView: View {
     let post: Post
     var inPostListing: Bool = false
+    var compactMode: Bool = false
     var onReadPost: (() -> Void)? = nil
     
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSensitiveImagesKey, store: .contentSensitivityFilter) private var blurSensitiveImages: Bool = false
@@ -18,7 +19,7 @@ struct PostPreviewView: View {
     
     var body: some View {
         if let preview = post.preview, preview.images.count > 0, let url = preview.images[0].source.url {
-            ZStack(alignment: .topLeading) {
+            ZStack(alignment: compactMode ? .center : .topLeading) {
                 CustomWebImage(
                     url,
                     height: limitMediaHeight && inPostListing ? 200 : nil,
@@ -38,18 +39,36 @@ struct PostPreviewView: View {
                 }
                 
                 switch post.postType {
-                case .redditVideo, .video, .imgurVideo, .redgifs, .streamable:
-                    SwiftUI.Image(systemName: "play.circle")
-                        .resizable()
-                        .mediaIndicator()
-                        .padding(12)
-                        .frame(width: 64, height: 64)
+                case .redditVideo, .video, .imgurVideo, .redgifs, .streamable, .gif:
+                    if compactMode {
+                        SwiftUI.Image(systemName: "play.circle")
+                            .resizable()
+                            .scaledToFit()
+                            .padding(2)
+                            .mediaIndicator()
+                            .padding(16)
+                    } else {
+                        SwiftUI.Image(systemName: "play.circle")
+                            .resizable()
+                            .mediaIndicator()
+                            .padding(12)
+                            .frame(width: 64, height: 64)
+                    }
                 case .link:
-                    SwiftUI.Image(systemName: "link.circle")
-                        .resizable()
-                        .mediaIndicator()
-                        .padding(12)
-                        .frame(width: 64, height: 64)
+                    if compactMode {
+                        SwiftUI.Image(systemName: "link.circle")
+                            .resizable()
+                            .scaledToFit()
+                            .padding(2)
+                            .mediaIndicator()
+                            .padding(16)
+                    } else {
+                        SwiftUI.Image(systemName: "link.circle")
+                            .resizable()
+                            .mediaIndicator()
+                            .padding(12)
+                            .frame(width: 64, height: 64)
+                    }
                 default:
                     EmptyView()
                 }

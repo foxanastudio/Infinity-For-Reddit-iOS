@@ -188,6 +188,10 @@ struct PostViewCompact: View {
                                 await postViewModel.readPost()
                             }
                         }
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 60, height: 60)
+                        .clipped()
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
                     } else if let crosspost = postViewModel.post.crosspostParent, let url = URL(string: crosspost.url), let domain = url.host {
                         NoPreviewLinkView(domain: domain) {
                             onOpenLink(url)
@@ -211,13 +215,8 @@ struct PostViewCompact: View {
                     .frame(width: 60, height: 60)
                     .clipped()
                     .clipShape(RoundedRectangle(cornerRadius: 8))
-                } else if !hideTextPostContent, case .text = postViewModel.post.postType, let selftextTruncated = postViewModel.post.selftextTruncated, !selftextTruncated.isEmpty {
-                    
-                    Text(selftextTruncated)
-                        .postContent()
-                        .padding(.horizontal, 16)
                 } else if case .redditVideo(let videoUrlString, _) = postViewModel.post.postType {
-                    PostVideoView(post: postViewModel.post, videoUrlString: videoUrlString, inPostListing: true) {
+                    PostVideoView(post: postViewModel.post, videoUrlString: videoUrlString, inPostListing: true, compactMode: true) {
                         Task {
                             await postViewModel.readPost()
                         }
@@ -227,7 +226,7 @@ struct PostViewCompact: View {
                     .clipped()
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                 } else if case .video(let videoUrlString, _) = postViewModel.post.postType {
-                    PostVideoView(post: postViewModel.post, videoUrlString: videoUrlString, inPostListing: true) {
+                    PostVideoView(post: postViewModel.post, videoUrlString: videoUrlString, inPostListing: true, compactMode: true) {
                         Task {
                             await postViewModel.readPost()
                         }
@@ -237,7 +236,7 @@ struct PostViewCompact: View {
                     .clipped()
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                 } else if postViewModel.post.postType.isMedia {
-                    PostPreviewView(post: postViewModel.post, inPostListing: true) {
+                    PostPreviewView(post: postViewModel.post, inPostListing: true, compactMode: true) {
                         Task {
                             await postViewModel.readPost()
                         }
@@ -246,9 +245,15 @@ struct PostViewCompact: View {
                     .frame(width: 60, height: 60)
                     .clipped()
                     .clipShape(RoundedRectangle(cornerRadius: 8))
+                } else if case .text = postViewModel.post.postType {
+                    EmptyView()
                 }
             }
             .padding(.horizontal, 16)
+            .onAppear {
+                print("Post: ", postViewModel.post.title ?? "")
+                print("Post Type of \(postViewModel.post.title ?? ""): ", postViewModel.post.postType.text)
+            }
         }
     }
 }
