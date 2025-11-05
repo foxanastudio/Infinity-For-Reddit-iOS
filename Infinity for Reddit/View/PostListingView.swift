@@ -112,7 +112,6 @@ struct PostListingView: View {
                                         $0.id == post.id
                                     }
                                     postListingViewModel.appearedPosts.append(post)
-                                    print("Fuck: \(post.title)")
                                     if post.subredditOrUserIcon == nil {
                                         Task {
                                             await postListingViewModel.loadIcon(post: post, displaySubredditIcon: !isSubredditPostListing)
@@ -145,7 +144,6 @@ struct PostListingView: View {
                             DragGesture(minimumDistance: 0)
                                 .onChanged { value in
                                     if lazyModeState == .started {
-                                        postListingViewModel.lazyModeScrolledPost = nil
                                         pauseLazyMode()
                                     }
                                 }
@@ -192,9 +190,17 @@ struct PostListingView: View {
             await postListingViewModel.initialLoadPosts()
         }
         .onAppear {
+            if lazyModeState == .paused {
+                resumeLazyMode()
+            }
+            
             setUpMenu()
         }
         .onDisappear {
+            if lazyModeState == .started {
+                pauseLazyMode()
+            }
+            
             guard let navigationBarMenuKey else { return }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
@@ -394,6 +400,7 @@ struct PostListingView: View {
     }
     
     private func pauseLazyMode() {
+        postListingViewModel.lazyModeScrolledPost = nil
         lazyModeState = .paused
         lazyMode?.cancel()
         lazyMode = nil
