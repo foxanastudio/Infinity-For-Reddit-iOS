@@ -21,7 +21,6 @@ struct PostViewCompact: View {
     @AppStorage(InterfacePostUserDefaultsUtils.hideSubredditAndUserPrefixKey, store: .interfacePost) private var hideSubredditAndUserPrefix: Bool = false
     @AppStorage(InterfacePostUserDefaultsUtils.hideNVotesKey, store: .interfacePost) private var hideNVotes: Bool = false
     @AppStorage(InterfacePostUserDefaultsUtils.hideNCommentsKey, store: .interfacePost) private var hideNComments: Bool = false
-    @AppStorage(InterfacePostUserDefaultsUtils.hideTextPostContentKey, store: .interfacePost) private var hideTextPostContent: Bool = false
     @AppStorage(InterfacePostUserDefaultsUtils.limitMediaHeightKey, store: .interfacePost) private var limitMediaHeight: Bool = false
     @AppStorage(InterfaceUserDefaultsUtils.voteButtonsOnTheRightKey, store: .interface) private var voteButtonsOnTheRight: Bool = false
     
@@ -202,45 +201,7 @@ struct PostViewCompact: View {
                     EmptyView()
                 }
                 
-                if let galleryData = postViewModel.post.galleryData,
-                   !galleryData.items.isEmpty {
-                    GalleryCarousel(post: postViewModel.post, compactMode: true) {
-                        Task {
-                            await postViewModel.readPost()
-                        }
-                    }
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 60, height: 60)
-                    .clipped()
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                } else if !hideTextPostContent, case .text = postViewModel.post.postType, let selftextTruncated = postViewModel.post.selftextTruncated, !selftextTruncated.isEmpty {
-                    Spacer()
-                        .frame(height: 6)
-                    
-                    Text(selftextTruncated)
-                        .postContent()
-                        .padding(.horizontal, 16)
-                } else if case .redditVideo(let videoUrlString, _) = postViewModel.post.postType {
-                    PostVideoView(post: postViewModel.post, videoUrlString: videoUrlString, inPostListing: true, compactMode: true) {
-                        Task {
-                            await postViewModel.readPost()
-                        }
-                    }
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 60, height: 60)
-                    .clipped()
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                } else if case .video(let videoUrlString, _) = postViewModel.post.postType {
-                    PostVideoView(post: postViewModel.post, videoUrlString: videoUrlString, inPostListing: true, compactMode: true) {
-                        Task {
-                            await postViewModel.readPost()
-                        }
-                    }
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 60, height: 60)
-                    .clipped()
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                } else if postViewModel.post.postType.isMedia {
+                if postViewModel.post.postType.isMedia {
                     PostPreviewView(post: postViewModel.post, inPostListing: true, compactMode: true) {
                         Task {
                             await postViewModel.readPost()

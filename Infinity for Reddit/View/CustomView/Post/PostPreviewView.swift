@@ -18,12 +18,12 @@ struct PostPreviewView: View {
     @AppStorage(InterfacePostUserDefaultsUtils.limitMediaHeightKey, store: .interfacePost) private var limitMediaHeight: Bool = false
     
     var body: some View {
-        if let preview = post.preview, preview.images.count > 0, let url = preview.images[0].source.url {
+        if let url = resolvedPreviewImageURL {
             ZStack(alignment: compactMode ? .center : .topLeading) {
                 CustomWebImage(
                     url,
                     height: limitMediaHeight && inPostListing ? 200 : nil,
-                    aspectRatio: limitMediaHeight && inPostListing ? nil : preview.images[0].source.aspectRatio,
+                    aspectRatio: limitMediaHeight && inPostListing ? nil : resolvedAspect,
                     centerCrop: true,
                     matchedGeometryEffectId: UUID().uuidString,
                     post: post,
@@ -69,13 +69,28 @@ struct PostPreviewView: View {
                             .padding(12)
                             .frame(width: 64, height: 64)
                     }
+                case .gallery:
+                    if compactMode {
+                        SwiftUI.Image(systemName: "square.stack")
+                            .resizable()
+                            .scaledToFit()
+                            .padding(2)
+                            .mediaIndicator()
+                            .padding(16)
+                    }
                 default:
                     EmptyView()
                 }
             }
             .frame(maxWidth: .infinity)
             .applyIf(!limitMediaHeight || !inPostListing) {
-                $0.aspectRatio(preview.images[0].source.aspectRatio, contentMode: .fit)
+                $0.modify { content in
+                    if let size = resolvedAspect {
+                        content.aspectRatio(size, contentMode: .fit)
+                    } else {
+                        content
+                    }
+                }
             }
             .applyIf(limitMediaHeight && inPostListing) {
                 $0.frame(height: 200)
@@ -99,5 +114,28 @@ struct PostPreviewView: View {
             .noPreviewPostTypeIndicatorBackground()
             .mediaTapGesture(post: post, aspectRatio: nil, matchedGeometryEffectId: nil)
         }
+    }
+    
+    private var resolvedPreviewImageURL: String? {
+        if let preview = post.preview, preview.images.count > 0, let url = preview.images[0].source.url {
+            return url
+        }
+        
+        if compactMode, let first = post.galleryData?.items.first,
+           let url = first.urlString {
+            return url
+        }
+        
+        return nil
+    }
+    
+    private var resolvedAspect: CGSize? {
+        if let ratio = post.preview?.images.first?.source.aspectRatio {
+            return ratio
+        }
+        if compactMode, post.galleryData != nil {
+            return CGSize(width: 1, height: 1)
+        }
+        return nil
     }
 }

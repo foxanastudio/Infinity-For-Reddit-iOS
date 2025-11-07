@@ -20,7 +20,6 @@ struct PostVideoView: View {
     let post: Post
     let videoUrlString: String
     var inPostListing: Bool = false
-    var compactMode: Bool = false
     var onReadPost: (() -> Void)? = nil
     
     var body: some View {
@@ -34,7 +33,7 @@ struct PostVideoView: View {
             }
         } else {
             if let preview = post.preview, preview.images.count > 0, let url = post.preview.images[0].source.url {
-                ZStack(alignment: compactMode ? .center : .topLeading) {
+                ZStack(alignment: .topLeading) {
                     CustomWebImage(
                         url,
                         height: limitMediaHeight && inPostListing ? 200 : nil,
@@ -53,24 +52,13 @@ struct PostVideoView: View {
                         )
                     }
                     
-                    if compactMode {
-                        SwiftUI.Image(systemName: "play.circle")
-                            .resizable()
-                            .scaledToFit()
-                            .padding(2)
-                            .mediaIndicator()
-                            .padding(16)
-                    } else {
-                        SwiftUI.Image(systemName: "play.circle")
-                            .resizable()
-                            .mediaIndicator()
-                            .padding(12)
-                            .frame(width: 64, height: 64)
-                    }
+                    SwiftUI.Image(systemName: "play.circle")
+                        .resizable()
+                        .mediaIndicator()
+                        .padding(12)
+                        .frame(width: 64, height: 64)
                 }
-                .applyIf(!compactMode) { view in
-                    view.frame(maxWidth: .infinity)
-                }
+                .frame(maxWidth: .infinity)
                 .applyIf(!limitMediaHeight || !inPostListing) {
                     $0.aspectRatio(preview.images[0].source.aspectRatio, contentMode: .fit)
                 }
