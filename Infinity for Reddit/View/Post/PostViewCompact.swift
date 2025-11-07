@@ -82,7 +82,7 @@ struct PostViewCompact: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Spacer()
-                .frame(height: 16)
+                .frame(height: 8)
             
             HStack(spacing: 8) {
                 CustomWebImage(
@@ -120,62 +120,60 @@ struct PostViewCompact: View {
                         .padding(.bottom, 8)
                         .postTitle()
                     
-                    HFlow(alignment: .center) {
-                        if !hidePostType {
-                            PostTypeTag(post: postViewModel.post)
-                                .onTapGesture {
-                                    onPostTypeClicked()
-                                }
-                        }
-                        
-                        if postViewModel.post.spoiler {
-                            SpoilerTag()
-                        }
-                        
-                        if postViewModel.post.over18 {
-                            SensitiveTag()
-                                .onTapGesture {
-                                    onSensitiveClicked()
-                                }
-                        }
-                        
-                        if !hidePostFlair {
-                            FlairView(flairRichtext: postViewModel.post.linkFlairRichtext,
-                                      flairText: postViewModel.post.linkFlairText)
-                        }
-                        
-                        if postViewModel.post.archived {
-                            ArchivedTag()
-                        }
-                        
-                        if postViewModel.post.locked {
-                            LockedTag()
-                        }
-                        
-                        if postViewModel.post.crosspostParent != nil {
-                            CrosspostTag()
-                        }
-                        
-                        switch postViewModel.post.postType {
-                        case .link:
-                            if let url = URL(string: postViewModel.post.url), let domain = url.host {
-                                Text(domain)
-                                    .secondaryText()
+                    if hidePostType && !postViewModel.post.spoiler
+                        && !postViewModel.post.over18 && hidePostFlair
+                        && !postViewModel.post.archived && !postViewModel.post.locked
+                        && postViewModel.post.crosspostParent == nil && postViewModel.post.postType != .link {
+                        // Not showing post metadata
+                        EmptyView()
+                    } else {
+                        HFlow(alignment: .center) {
+                            if !hidePostType {
+                                PostTypeTag(post: postViewModel.post)
+                                    .onTapGesture {
+                                        onPostTypeClicked()
+                                    }
                             }
-                        default:
-                            EmptyView()
+                            
+                            if postViewModel.post.spoiler {
+                                SpoilerTag()
+                            }
+                            
+                            if postViewModel.post.over18 {
+                                SensitiveTag()
+                                    .onTapGesture {
+                                        onSensitiveClicked()
+                                    }
+                            }
+                            
+                            if !hidePostFlair {
+                                FlairView(flairRichtext: postViewModel.post.linkFlairRichtext,
+                                          flairText: postViewModel.post.linkFlairText)
+                            }
+                            
+                            if postViewModel.post.archived {
+                                ArchivedTag()
+                            }
+                            
+                            if postViewModel.post.locked {
+                                LockedTag()
+                            }
+                            
+                            if postViewModel.post.crosspostParent != nil {
+                                CrosspostTag()
+                            }
+                            
+                            switch postViewModel.post.postType {
+                            case .link:
+                                if let url = URL(string: postViewModel.post.url), let domain = url.host {
+                                    Text(domain)
+                                        .secondaryText()
+                                }
+                            default:
+                                EmptyView()
+                            }
                         }
                     }
-                    
-                    HStack(spacing: 12) {
-                        Label("\(postViewModel.post.score)", systemImage: "arrow.up")
-                            .font(.caption)
-                        Label("\(postViewModel.post.numComments)", systemImage: "bubble.left")
-                            .font(.caption)
-                        Spacer()
-                    }
-                    .foregroundColor(.secondary)
-                    .padding(.top, 4)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
@@ -215,6 +213,13 @@ struct PostViewCompact: View {
                     .frame(width: 60, height: 60)
                     .clipped()
                     .clipShape(RoundedRectangle(cornerRadius: 8))
+                } else if !hideTextPostContent, case .text = postViewModel.post.postType, let selftextTruncated = postViewModel.post.selftextTruncated, !selftextTruncated.isEmpty {
+                    Spacer()
+                        .frame(height: 6)
+                    
+                    Text(selftextTruncated)
+                        .postContent()
+                        .padding(.horizontal, 16)
                 } else if case .redditVideo(let videoUrlString, _) = postViewModel.post.postType {
                     PostVideoView(post: postViewModel.post, videoUrlString: videoUrlString, inPostListing: true, compactMode: true) {
                         Task {
@@ -250,10 +255,100 @@ struct PostViewCompact: View {
                 }
             }
             .padding(.horizontal, 16)
-            .onAppear {
-                print("Post: ", postViewModel.post.title ?? "")
-                print("Post Type of \(postViewModel.post.title ?? ""): ", postViewModel.post.postType.text)
+//            .onAppear {
+//                print("Post: ", postViewModel.post.title ?? "")
+//                print("Post Type of \(postViewModel.post.title ?? ""): ", postViewModel.post.postType.text)
+//            }
+            
+            HStack(spacing: 0) {
+                HStack(spacing: 0) {
+                    Button(action: {
+                        onVote(1)
+                    }) {
+                        SwiftUI.Image(systemName: postViewModel.post.likes == 1 && !accountViewModel.account.isAnonymous() ? "arrowshape.up.fill" : "arrowshape.up")
+                            .postIconTemplateRendering()
+                            .postUpvoteIcon(isUpvoted: postViewModel.post.likes == 1 && !accountViewModel.account.isAnonymous())
+                    }
+                    .buttonStyle(.borderless)
+                    .padding(8)
+                    .contentShape(Rectangle())
+                    
+                    VotesText(votes: postViewModel.post.score + postViewModel.post.likes, hideNVotes: hideNVotes)
+                        .frame(width: 72, alignment: .center)
+                        .postInfo()
+                        .contentShape(Rectangle())
+                        .onTapGesture {}
+                    
+                    Button(action: {
+                        onVote(-1)
+                    }) {
+                        SwiftUI.Image(systemName: postViewModel.post.likes == -1 && !accountViewModel.account.isAnonymous() ? "arrowshape.down.fill" : "arrowshape.down")
+                            .postIconTemplateRendering()
+                            .postDownvoteIcon(isDownvoted: postViewModel.post.likes == -1 && !accountViewModel.account.isAnonymous())
+                    }
+                    .buttonStyle(.borderless)
+                    .padding(8)
+                    .contentShape(Rectangle())
+                }
+                .environment(\.layoutDirection, .leftToRight)
+                .padding(.vertical, 8)
+                .contentShape(Rectangle())
+                .onTapGesture {}
+
+                HStack {
+                    if !hideNComments {
+                        Button(action: {
+                            onCommentsTap()
+                        }) {
+                            HStack() {
+                                SwiftUI.Image(systemName: "text.bubble")
+                                    .postIconTemplateRendering()
+                                    .postIcon()
+                                
+                                Text(String(postViewModel.post.numComments))
+                                    .postInfo()
+                            }
+                        }
+                        .buttonStyle(.borderless)
+                        .contentShape(Rectangle())
+                    }
+                    
+                    Spacer()
+                }
+                .padding(.leading, 16)
+                .environment(\.layoutDirection, .leftToRight)
+                
+                Button(action: onSave) {
+                    SwiftUI.Image(systemName: postViewModel.post.saved ? "bookmark.fill" : "bookmark")
+                        .postIconTemplateRendering()
+                        .postIcon()
+                }
+                .buttonStyle(.borderless)
+                .padding(8)
+                .contentShape(Rectangle())
+                
+                Button(action: onShare) {
+                    SwiftUI.Image(systemName: "square.and.arrow.up")
+                        .postIconTemplateRendering()
+                        .postIcon()
+                }
+                .buttonStyle(.borderless)
+                .padding(8)
+                .contentShape(Rectangle())
             }
+            .environment(\.layoutDirection, voteButtonsOnTheRight ? .rightToLeft : .leftToRight)
+            .padding(.horizontal, 8)
+            
+            Divider()
+        }
+        .background {
+            TouchRipple(backgroundShape: Rectangle()) {
+                Rectangle()
+                    .fill(Color(hex: postViewModel.post.isRead ? themeViewModel.currentCustomTheme.readPostCardViewBackgroundColor : themeViewModel.currentCustomTheme.cardViewBackgroundColor))
+            }
+        }
+        .onTapGesture {
+            onPostTap()
         }
     }
 }
