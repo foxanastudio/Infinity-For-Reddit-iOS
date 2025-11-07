@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct PostPreviewView: View {
+    @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
+    
     let post: Post
     var inPostListing: Bool = false
     var compactMode: Bool = false
@@ -24,6 +26,7 @@ struct PostPreviewView: View {
                     url,
                     height: limitMediaHeight && inPostListing ? 200 : nil,
                     aspectRatio: limitMediaHeight && inPostListing ? nil : resolvedAspect,
+                    handleImageTapGesture: !(compactMode && post.postType == .gallery),
                     centerCrop: true,
                     matchedGeometryEffectId: UUID().uuidString,
                     post: post,
@@ -36,6 +39,21 @@ struct PostPreviewView: View {
                                 onReadPost?()
                             }
                     )
+                }
+                .applyIf(compactMode && inPostListing && post.postType == .gallery) {
+                    $0.onTapGesture {
+                        if let url = resolvedPreviewImageURL {
+                            fullScreenMediaViewModel.show(
+                                .gallery(
+                                    currentUrlString: url,
+                                    post: post,
+                                    items: post.galleryData?.items ?? [],
+                                    galleryScrollState: GalleryScrollState(scrollId: 0)
+                                )
+                            )
+                            onReadPost?()
+                        }
+                    }
                 }
                 
                 switch post.postType {
