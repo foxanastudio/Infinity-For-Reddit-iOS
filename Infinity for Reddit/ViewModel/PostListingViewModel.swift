@@ -489,4 +489,31 @@ public class PostListingViewModel: ObservableObject {
             $0.isRead
         }
     }
+    
+    func insertIntoAppearedPosts(_ post: Post) {
+        self.appearedPosts.removeAll {
+            $0.id == post.id
+        }
+        
+        guard !self.appearedPosts.isEmpty else {
+            appearedPosts.append(post)
+            return
+        }
+        
+        if let index = self.posts.index(id: post.id) {
+            var inserted: Bool = false
+            for (i, appearedPost) in self.appearedPosts.enumerated() {
+                if let appearedPostIndex = self.posts.index(id: appearedPost.id), index < appearedPostIndex {
+                    self.appearedPosts.insert(post, at: i)
+                    inserted = true
+                    break
+                }
+            }
+            if !inserted {
+                self.appearedPosts.append(post)
+            }
+        } else {
+            appearedPosts.append(post)
+        }
+    }
 }

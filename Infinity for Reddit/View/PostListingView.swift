@@ -111,10 +111,7 @@ struct PostListingView: View {
                                 .id(ObjectIdentifier(post))
                                 .listPlainItemNoInsets()
                                 .onAppear {
-                                    postListingViewModel.appearedPosts.removeAll {
-                                        $0.id == post.id
-                                    }
-                                    postListingViewModel.appearedPosts.append(post)
+                                    postListingViewModel.insertIntoAppearedPosts(post)
                                     
                                     if post.subredditOrUserIcon == nil {
                                         Task {
@@ -168,10 +165,7 @@ struct PostListingView: View {
                         .id(ObjectIdentifier(post))
                         .listPlainItemNoInsets()
                         .onAppear {
-                            postListingViewModel.appearedPosts.removeAll {
-                                $0.id == post.id
-                            }
-                            postListingViewModel.appearedPosts.append(post)
+                            postListingViewModel.insertIntoAppearedPosts(post)
                             
                             if post.subredditOrUserIcon == nil {
                                 Task {
