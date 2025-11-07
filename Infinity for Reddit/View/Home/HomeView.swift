@@ -46,7 +46,6 @@ struct HomeView: View {
                     ZStack {
                         CustomNavigationStack(fullScreenMediaViewModel: fullScreenMediaViewModel) {
                             PostListingView(
-                                account: accountViewModel.account,
                                 postListingMetadata: PostListingMetadata(
                                     // Anonymous subscriptions will be fetched later in PostListingViewModel
                                     postListingType: accountViewModel.account.isAnonymous() ? .anonymousFrontPage(concatenatedSubscriptions: nil) : .frontPage,

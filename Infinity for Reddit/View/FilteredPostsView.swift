@@ -27,7 +27,6 @@ struct FilteredPostsView: View {
     
     var body: some View {
         PostListingView(
-            account: accountViewModel.account,
             postListingMetadata: postListingMetadata,
             externalPostFilter: filteredPostsViewModel.postFilter,
             handleToolbarMenu: false,

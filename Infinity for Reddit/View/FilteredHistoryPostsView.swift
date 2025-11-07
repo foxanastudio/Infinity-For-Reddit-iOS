@@ -27,7 +27,6 @@ struct FilteredHistoryPostsView: View {
     
     var body: some View {
         HistoryPostListingView(
-            account: accountViewModel.account,
             historyPostListingMetadata: historyPostListingMetadata,
             externalPostFilter: filteredHistoryPostsViewModel.postFilter,
             handleToolbarMenu: false,

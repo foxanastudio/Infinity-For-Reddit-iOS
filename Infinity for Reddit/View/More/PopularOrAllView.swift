@@ -14,7 +14,6 @@ struct PopularOrAllView: View {
     
     var body: some View {
         PostListingView(
-            account: accountViewModel.account,
             postListingMetadata:PostListingMetadata(
                 postListingType:.subreddit(subredditName: subredditName),
                 pathComponents: ["subreddit": subredditName],

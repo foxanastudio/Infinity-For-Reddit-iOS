@@ -16,12 +16,11 @@ struct UpvotedView: View {
     var body: some View {
         Group {
             if accountViewModel.account.isAnonymous() {
-                HistoryPostListingView(account: accountViewModel.account, historyPostListingMetadata: HistoryPostListingMetadata(
+                HistoryPostListingView(historyPostListingMetadata: HistoryPostListingMetadata(
                     historyPostListingType: .upvoted
                 ))
             } else {
                 PostListingView(
-                    account: accountViewModel.account,
                     postListingMetadata: PostListingMetadata(
                         postListingType: .user(username: accountViewModel.account.username, userWhere: .upvoted),
                         pathComponents: ["username": accountViewModel.account.username, "where": UserWhere.upvoted.rawValue],

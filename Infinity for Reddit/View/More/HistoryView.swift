@@ -13,7 +13,7 @@ struct HistoryView: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
     
     var body: some View {
-        HistoryPostListingView(account: accountViewModel.account, historyPostListingMetadata: HistoryPostListingMetadata(
+        HistoryPostListingView(historyPostListingMetadata: HistoryPostListingMetadata(
             historyPostListingType: .read
         ))
         .themedNavigationBar()

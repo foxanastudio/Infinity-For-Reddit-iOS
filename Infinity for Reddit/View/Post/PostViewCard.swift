@@ -36,12 +36,12 @@ struct PostViewCard: View {
     
     private let iconSize: CGFloat = 24
     
-    init(account: Account, post: Post, isSubredditPostListing: Bool, width: CGFloat? = nil, onPostTypeClicked: @escaping () -> Void, onSensitiveClicked: @escaping () -> Void) {
+    init(post: Post, isSubredditPostListing: Bool, width: CGFloat? = nil, onPostTypeClicked: @escaping () -> Void, onSensitiveClicked: @escaping () -> Void) {
         self.width = width
         self.isSubredditPostListing = isSubredditPostListing
         self.onPostTypeClicked = onPostTypeClicked
         self.onSensitiveClicked = onSensitiveClicked
-        _postViewModel = StateObject(wrappedValue: PostViewModel(account: account, post: post, postRepository: PostRepository()))
+        _postViewModel = StateObject(wrappedValue: PostViewModel(account: AccountViewModel.shared.account, post: post, postRepository: PostRepository()))
     }
     
     var body: some View {

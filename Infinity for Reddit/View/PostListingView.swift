@@ -26,7 +26,6 @@ struct PostListingView: View {
     @State var lazyMode: Task<Void, Error>?
     @State var lazyModeState: LazyModeState = .stopped
     
-    private let account: Account
     private let postListingMetadata: PostListingMetadata
     private var isSubredditPostListing: Bool = false
     private let handleToolbarMenu: Bool
@@ -35,13 +34,11 @@ struct PostListingView: View {
     private var onStartLazyMode: (() -> Void)?
     private var onStopLazyMode: (() -> Void)?
     
-    init(account: Account,
-         postListingMetadata: PostListingMetadata,
+    init(postListingMetadata: PostListingMetadata,
          externalPostFilter: PostFilter? = nil,
          handleToolbarMenu: Bool = true,
          showFilterPostsOption: Bool = true
     ) {
-        self.account = account
         self.postListingMetadata = postListingMetadata
         if case .subreddit = postListingMetadata.postListingType {
             isSubredditPostListing = true
@@ -60,8 +57,7 @@ struct PostListingView: View {
         )
     }
     
-    init(account: Account,
-         postListingMetadata: PostListingMetadata,
+    init(postListingMetadata: PostListingMetadata,
          externalPostFilter: PostFilter? = nil,
          isRootView: Bool,
          showFilterPostsOption: Bool = true,
@@ -69,7 +65,6 @@ struct PostListingView: View {
          onStartLazyMode: (() -> Void)? = nil,
          onStopLazyMode: (() -> Void)? = nil
     ) {
-        self.account = account
         self.isRootView = isRootView
         self.postListingMetadata = postListingMetadata
         if case .subreddit = postListingMetadata.postListingType {
@@ -108,7 +103,7 @@ struct PostListingView: View {
                     ScrollViewReader { proxy in
                         List {
                             ForEach(postListingViewModel.posts, id: \.id) { post in
-                                PostViewCard(account: account, post: post, isSubredditPostListing: isSubredditPostListing, onPostTypeClicked: {
+                                PostViewCard(post: post, isSubredditPostListing: isSubredditPostListing, onPostTypeClicked: {
                                     onPostTypeClicked(post: post)
                                 }, onSensitiveClicked: {
                                     onSensitiveClicked(post: post)
@@ -165,7 +160,7 @@ struct PostListingView: View {
                     }
                 } else {
                     ForEach(postListingViewModel.posts, id: \.id) { post in
-                        PostViewCard(account: account, post: post, isSubredditPostListing: isSubredditPostListing, width: nil, onPostTypeClicked: {
+                        PostViewCard(post: post, isSubredditPostListing: isSubredditPostListing, width: nil, onPostTypeClicked: {
                             onPostTypeClicked(post: post)
                         }, onSensitiveClicked: {
                             onSensitiveClicked(post: post)

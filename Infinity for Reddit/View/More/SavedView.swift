@@ -23,7 +23,6 @@ struct SavedView: View {
                 Group {
                     if accountViewModel.account.isAnonymous() {
                         HistoryPostListingView(
-                            account: accountViewModel.account,
                             historyPostListingMetadata: HistoryPostListingMetadata(
                                 historyPostListingType: .saved
                             ),
@@ -31,7 +30,6 @@ struct SavedView: View {
                         )
                     } else {
                         PostListingView(
-                            account: accountViewModel.account,
                             postListingMetadata: PostListingMetadata(
                                 postListingType: .user(username: accountViewModel.account.username, userWhere: .saved),
                                 pathComponents: ["username": accountViewModel.account.username, "where": UserWhere.saved.rawValue],

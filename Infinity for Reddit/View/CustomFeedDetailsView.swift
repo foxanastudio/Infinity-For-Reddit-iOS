@@ -23,7 +23,6 @@ struct CustomFeedDetailsView: View {
     
     var body: some View {
         PostListingView(
-            account: accountViewModel.account,
             postListingMetadata: PostListingMetadata(
                 postListingType: .customFeed(path: customFeedDetailsViewModel.myCustomFeed.path),
                 pathComponents: ["multipath": customFeedDetailsViewModel.myCustomFeed.path],

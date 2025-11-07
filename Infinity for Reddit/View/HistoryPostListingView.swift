@@ -19,19 +19,16 @@ struct HistoryPostListingView: View {
     @StateObject var postListingVideoManager: PostListingVideoManager = .init()
     @State private var navigationBarMenuKey: UUID?
     @State private var showLayoutTypeSheet: Bool = false
-    
-    private let account: Account
+
     private let historyPostListingMetadata: HistoryPostListingMetadata
     private let handleToolbarMenu: Bool
     private let showFilterPostsOption: Bool
     
-    init(account: Account,
-         historyPostListingMetadata: HistoryPostListingMetadata,
+    init(historyPostListingMetadata: HistoryPostListingMetadata,
          externalPostFilter: PostFilter? = nil,
          handleToolbarMenu: Bool = true,
          showFilterPostsOption: Bool = true
     ) {
-        self.account = account
         self.historyPostListingMetadata = historyPostListingMetadata
         self.handleToolbarMenu = handleToolbarMenu
         self.showFilterPostsOption = showFilterPostsOption
@@ -61,7 +58,7 @@ struct HistoryPostListingView: View {
             } else {
                 List {
                     ForEach(historyPostListingViewModel.posts, id: \.id) { post in
-                        PostViewCard(account: account, post: post, isSubredditPostListing: false, onPostTypeClicked: {
+                        PostViewCard(post: post, isSubredditPostListing: false, onPostTypeClicked: {
                             onPostTypeClicked(post: post)
                         }, onSensitiveClicked: {
                             onSensitiveClicked(post: post)

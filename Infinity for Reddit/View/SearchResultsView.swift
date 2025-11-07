@@ -22,7 +22,7 @@ struct SearchResultsView: View {
                 .padding(4)
             
             TabView(selection: $selectedOption) {
-                PostListingView(account: accountViewModel.account, postListingMetadata: PostListingMetadata(
+                PostListingView(postListingMetadata: PostListingMetadata(
                     postListingType: PostListingType.search(
                         query: searchResultsViewModel.query,
                         searchInSubredditOrUserName: searchResultsViewModel.searchInSubredditOrUserName,
