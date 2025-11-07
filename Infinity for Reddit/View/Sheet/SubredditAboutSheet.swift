@@ -15,15 +15,18 @@ struct SubredditAboutSheet: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
+                RowText("Cakeday: \(Utils.formattedCakeDay(subredditData?.createdUTC))")
+                    .primaryText()
+                
                 if let description = subredditData?.description, !description.isEmpty {
                     Markdown(description)
                         .themedMarkdown()
-                        .padding(16)
                         .markdownLinkHandler { url in
                             navigationManager.openLink(url)
                         }
                 }
             }
+            .padding(16)
         }
     }
 }

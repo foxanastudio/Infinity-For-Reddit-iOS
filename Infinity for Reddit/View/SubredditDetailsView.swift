@@ -117,32 +117,6 @@ struct SubredditDetailsView: View {
                                 .frame(height: headerItemViewHeight)
                                 .clipped()
                                 
-                                VStack(alignment: .leading, spacing: 0) {
-                                    HStack {
-                                        Text("Subscribers: \(subredditDetailsViewModel.subredditData?.nSubscribers ?? 0)")
-                                            .primaryText()
-                                        
-                                        Spacer()
-                                        
-                                        Text("Since:")
-                                            .primaryText()
-                                    }
-                                    
-                                    HStack {
-                                        Spacer()
-                                        
-                                        if let subredditData = subredditDetailsViewModel.subredditData {
-                                            Text("\(subredditDetailsViewModel.formattedCakeDay(TimeInterval(subredditData.createdUTC ?? 0)))")
-                                                .primaryText()
-                                        }
-                                    }
-                                    .frame(height: headerItemViewHeight)
-                                    .clipped()
-                                }
-                                .padding(.bottom, 16)
-                                .frame(height: headerItemViewHeight)
-                                .clipped()
-                                
                                 if !lazyModeStarted, let description = subredditDetailsViewModel.subredditData?.sidebarDescription, !description.isEmpty {
                                     Markdown(description)
                                         .themedMarkdown()

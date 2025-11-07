@@ -7,9 +7,6 @@
     "!" : {
 
     },
-    "%@" : {
-
-    },
     "%lld days" : {
 
     },
@@ -362,9 +359,6 @@
     "Show Avatar on the Right" : {
 
     },
-    "Since:" : {
-
-    },
     "Small" : {
 
     },
@@ -387,9 +381,6 @@
 
     },
     "Subscribed %lld" : {
-
-    },
-    "Subscribers: %lld" : {
 
     },
     "Subscriptions" : {
