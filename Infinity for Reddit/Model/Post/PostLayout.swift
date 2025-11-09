@@ -10,8 +10,6 @@ enum PostLayout: Int {
     case card = 0
     case compact = 1
 
-    var id: Int { rawValue }
-
     var fullName: String {
         switch self {
         case .card:
