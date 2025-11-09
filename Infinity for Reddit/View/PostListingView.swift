@@ -52,8 +52,7 @@ struct PostListingView: View {
                 postListingMetadata: postListingMetadata,
                 externalPostFilter: externalPostFilter,
                 postListingRepository: PostListingRepository(),
-                historyPostsRepository: HistoryPostsRepository(),
-                postFeedID: postListingMetadata.getPostFeedID()
+                historyPostsRepository: HistoryPostsRepository()
             )
         )
     }
@@ -84,8 +83,7 @@ struct PostListingView: View {
                 postListingMetadata: postListingMetadata,
                 externalPostFilter: externalPostFilter,
                 postListingRepository: PostListingRepository(),
-                historyPostsRepository: HistoryPostsRepository(),
-                postFeedID: postListingMetadata.getPostFeedID()
+                historyPostsRepository: HistoryPostsRepository()
             )
         )
     }
@@ -108,7 +106,7 @@ struct PostListingView: View {
                             ForEach(postListingViewModel.posts, id: \.id) { post in
                                 PostView(
                                     post: post,
-                                    layout: postListingViewModel.layout,
+                                    postLayout: postListingViewModel.postLayout,
                                     isSubredditPostListing: isSubredditPostListing,
                                     onPostTypeTap: {
                                         onPostTypeClicked(post: post)
@@ -168,7 +166,7 @@ struct PostListingView: View {
                     ForEach(postListingViewModel.posts, id: \.id) { post in
                         PostView(
                             post: post,
-                            layout: postListingViewModel.layout,
+                            postLayout: postListingViewModel.postLayout,
                             isSubredditPostListing: isSubredditPostListing,
                             onPostTypeTap: {
                                 onPostTypeClicked(post: post)
@@ -278,13 +276,10 @@ struct PostListingView: View {
             .presentationDetents([.medium, .large])
         }
         .sheet(isPresented: $showLayoutTypeSheet) {
-            LayoutTypeSheet(
-                currentLayout: postListingViewModel.layout,
-                onSelectLayout: { newLayout in
-                    postListingViewModel.changePostLayout(to: newLayout)
-                },
-                onResetLayout: {
-                    postListingViewModel.resetToDefaultLayout()
+            PostLayoutSheet(
+                currentPostLayout: postListingViewModel.postLayout,
+                onSelectPostLayout: { newLayout in
+                    postListingViewModel.changePostLayout(newLayout)
                 }
             )
             .presentationDetents([.medium, .large])

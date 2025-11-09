@@ -1,12 +1,12 @@
 //
-// PostLayoutType.swift
+// PostLayout.swift
 // Infinity for Reddit
 //
 // Created by joeylr2042 on 2025-10-29
         
 import Foundation
 
-enum PostLayoutType: Int, CaseIterable, Codable, Identifiable {
+enum PostLayout: Int {
     case card = 0
     case compact = 1
 
@@ -14,15 +14,19 @@ enum PostLayoutType: Int, CaseIterable, Codable, Identifiable {
 
     var fullName: String {
         switch self {
-        case .card: return "Card Layout"
-        case .compact: return "Compact Layout"
+        case .card:
+            return "Card Layout"
+        case .compact:
+            return "Compact Layout"
         }
     }
 
     var icon: String {
         switch self {
-        case .card: return "rectangle.grid.1x2"
-        case .compact: return "list.bullet"
+        case .card:
+            return "rectangle.grid.1x2"
+        case .compact:
+            return "list.bullet"
         }
     }
 }

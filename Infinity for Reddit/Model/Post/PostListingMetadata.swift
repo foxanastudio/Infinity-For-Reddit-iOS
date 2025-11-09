@@ -36,37 +36,6 @@ public struct PostListingMetadata: Hashable {
             params: nil
         )
     }
-    
-    func getPostFeedID() -> String {
-        switch postListingType {
-        case .frontPage:
-            return "best_post"
-            
-        case .anonymousFrontPage(let concatenatedSubscriptions):
-            if let subs = concatenatedSubscriptions, !subs.isEmpty {
-                return "best_post_\(subs)"
-            }
-            return "best_post_anonymous"
-            
-        case .subreddit(let subredditName):
-            return "r_\(subredditName.lowercased())"
-            
-        case .user(let username, let userWhere):
-            return "u_\(username.lowercased())_\(userWhere.rawValue)"
-            
-        case .customFeed(let path):
-            return "m_\(path.lowercased())"
-            
-        case .search(let query, let searchInSubredditOrUserName, let searchInMultiReddit, _):
-            if let sr = searchInSubredditOrUserName {
-                return "search_\(sr.lowercased())_\(query.lowercased())"
-            } else if let multi = searchInMultiReddit {
-                return "search_m_\(multi.lowercased())_\(query.lowercased())"
-            } else {
-                return "search_\(query.lowercased())"
-            }
-        }
-    }
 }
 
 public enum PostListingType: Codable, Hashable {

@@ -60,7 +60,7 @@ struct HistoryPostListingView: View {
                     ForEach(historyPostListingViewModel.posts, id: \.id) { post in
                         PostView(
                             post: post,
-                            layout: historyPostListingViewModel.layout,
+                            postLayout: historyPostListingViewModel.postLayout,
                             isSubredditPostListing: false,
                             onPostTypeTap: {
                                 onPostTypeClicked(post: post)
@@ -133,13 +133,10 @@ struct HistoryPostListingView: View {
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
         .sheet(isPresented: $showLayoutTypeSheet) {
-            LayoutTypeSheet(
-                currentLayout: historyPostListingViewModel.layout,
-                onSelectLayout: { newLayout in
-                    historyPostListingViewModel.changePostLayout(to: newLayout)
-                },
-                onResetLayout: {
-                    historyPostListingViewModel.resetToDefaultLayout()
+            PostLayoutSheet(
+                currentPostLayout: historyPostListingViewModel.postLayout,
+                onSelectPostLayout: { newLayout in
+                    historyPostListingViewModel.changePostLayout(newLayout)
                 }
             )
             .presentationDetents([.medium, .large])

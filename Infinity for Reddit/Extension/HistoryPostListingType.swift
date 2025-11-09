@@ -38,3 +38,35 @@ extension HistoryPostListingType {
         }
     }
 }
+
+extension HistoryPostListingType {
+    var savedPostLayout: PostLayout {
+        switch self {
+        case .read:
+            return PostLayoutUserDefaultsUtils.history
+        case .upvoted:
+            return PostLayoutUserDefaultsUtils.history
+        case .downvoted:
+            return PostLayoutUserDefaultsUtils.history
+        case .hidden:
+            return PostLayoutUserDefaultsUtils.history
+        case .saved:
+            return PostLayoutUserDefaultsUtils.history
+        }
+    }
+    
+    func savePostLayout(postLayout: PostLayout) {
+        switch self {
+        case .read:
+            PostLayoutUserDefaultsUtils.saveHistory(postLayout)
+        case .upvoted:
+            PostLayoutUserDefaultsUtils.saveHistory(postLayout)
+        case .downvoted:
+            PostLayoutUserDefaultsUtils.saveHistory(postLayout)
+        case .hidden:
+            PostLayoutUserDefaultsUtils.saveHistory(postLayout)
+        case .saved:
+            PostLayoutUserDefaultsUtils.saveHistory(postLayout)
+        }
+    }
+}

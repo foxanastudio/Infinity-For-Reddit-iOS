@@ -30,8 +30,7 @@ struct PostListingScrollView: View {
                 postListingMetadata: postListingMetadata,
                 externalPostFilter: nil,
                 postListingRepository: PostListingRepository(),
-                historyPostsRepository: HistoryPostsRepository(),
-                postFeedID: postListingMetadata.getPostFeedID()
+                historyPostsRepository: HistoryPostsRepository()
             )
         )
     }
@@ -45,8 +44,7 @@ struct PostListingScrollView: View {
                 postListingMetadata: postListingMetadata,
                 externalPostFilter: nil,
                 postListingRepository: PostListingRepository(),
-                historyPostsRepository: HistoryPostsRepository(),
-                postFeedID: postListingMetadata.getPostFeedID()
+                historyPostsRepository: HistoryPostsRepository()
             )
         )
     }
@@ -63,7 +61,7 @@ struct PostListingScrollView: View {
                         ForEach(postListingViewModel.posts, id: \.id) { post in
                             PostView(
                                 post: post,
-                                layout: postListingViewModel.layout,
+                                postLayout: postListingViewModel.postLayout,
                                 isSubredditPostListing: false,
                                 onPostTypeTap: { },
                                 onSensitiveTap: { }
@@ -85,7 +83,7 @@ struct PostListingScrollView: View {
                     ForEach(postListingViewModel.posts, id: \.id) { post in
                         PostView(
                             post: post,
-                            layout: postListingViewModel.layout,
+                            postLayout: postListingViewModel.postLayout,
                             isSubredditPostListing: false,
                             onPostTypeTap: { },
                             onSensitiveTap: { }

@@ -13,20 +13,20 @@ struct PostView: View {
     @StateObject private var postViewModel: PostViewModel
     
     let post: Post
-    let layout: PostLayoutType
+    let postLayout: PostLayout
     let isSubredditPostListing: Bool
     let onPostTypeTap: () -> Void
     let onSensitiveTap: () -> Void
 
     init(
         post: Post,
-        layout: PostLayoutType,
+        postLayout: PostLayout,
         isSubredditPostListing: Bool,
         onPostTypeTap: @escaping () -> Void,
         onSensitiveTap: @escaping () -> Void
     ) {
         self.post = post
-        self.layout = layout
+        self.postLayout = postLayout
         self.isSubredditPostListing = isSubredditPostListing
         self.onPostTypeTap = onPostTypeTap
         self.onSensitiveTap = onSensitiveTap
@@ -40,7 +40,7 @@ struct PostView: View {
     }
 
     var body: some View {
-        switch layout {
+        switch postLayout {
         case .card:
             PostViewCard(
                 postViewModel: postViewModel,

@@ -18,9 +18,7 @@ struct SortTypeTimeSheet: View {
         ScrollView {
             VStack(spacing: 0) {
                 Text("Select Sort Time")
-                
-                Spacer()
-                    .frame(height: 16)
+                    .padding(.bottom, 16)
                 
                 ForEach(sortTypeTimeSource.availableSortTypeTimes, id: \.self) { sortTime in
                     IconTextButton(endIconUrl: sortTime == currentSortTypeTime ? "checkmark.seal" : nil, text: sortTime.fullName) {

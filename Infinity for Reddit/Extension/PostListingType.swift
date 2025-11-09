@@ -152,3 +152,39 @@ extension PostListingType {
         }
     }
 }
+
+extension PostListingType {
+    var savedPostLayout: PostLayout {
+        switch self {
+        case .frontPage:
+            return PostLayoutUserDefaultsUtils.frontPage
+        case .subreddit(let subredditName):
+            return PostLayoutUserDefaultsUtils.getSubreddit(subredditName)
+        case .user(let username, _):
+            return PostLayoutUserDefaultsUtils.getUser(username)
+        case .search:
+            return PostLayoutUserDefaultsUtils.search
+        case .customFeed(let path):
+            return PostLayoutUserDefaultsUtils.getCustomFeed(path)
+        case .anonymousFrontPage:
+            return PostLayoutUserDefaultsUtils.getSubreddit(Account.ANONYMOUS_ACCOUNT.username)
+        }
+    }
+    
+    func savePostLayout(postLayout: PostLayout) {
+        switch self {
+        case .frontPage:
+            PostLayoutUserDefaultsUtils.saveFrontPage(postLayout)
+        case .subreddit(let subredditName):
+            PostLayoutUserDefaultsUtils.saveSubreddit(subredditName, postLayout)
+        case .user(let username, _):
+            PostLayoutUserDefaultsUtils.saveUser(username, postLayout)
+        case .search:
+            PostLayoutUserDefaultsUtils.saveSearch(postLayout)
+        case .customFeed(let path):
+            PostLayoutUserDefaultsUtils.saveCustomFeed(path, postLayout)
+        case .anonymousFrontPage:
+            PostLayoutUserDefaultsUtils.saveSubreddit(Account.ANONYMOUS_ACCOUNT.username, postLayout)
+        }
+    }
+}

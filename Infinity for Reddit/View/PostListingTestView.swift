@@ -44,8 +44,7 @@ struct PostListingTestView: View {
                 postListingMetadata: postListingMetadata,
                 externalPostFilter: nil,
                 postListingRepository: PostListingRepository(),
-                historyPostsRepository: HistoryPostsRepository(),
-                postFeedID: postListingMetadata.getPostFeedID()
+                historyPostsRepository: HistoryPostsRepository()
             )
         )
     }
@@ -64,8 +63,7 @@ struct PostListingTestView: View {
                 postListingMetadata: postListingMetadata,
                 externalPostFilter: nil,
                 postListingRepository: PostListingRepository(),
-                historyPostsRepository: HistoryPostsRepository(),
-                postFeedID: postListingMetadata.getPostFeedID()
+                historyPostsRepository: HistoryPostsRepository()
             )
         )
     }
