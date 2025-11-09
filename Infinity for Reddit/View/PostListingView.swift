@@ -110,8 +110,12 @@ struct PostListingView: View {
                                     post: post,
                                     layout: postListingViewModel.layout,
                                     isSubredditPostListing: isSubredditPostListing,
-                                    onPostTypeTap: { onPostTypeClicked(post: post) },
-                                    onSensitiveTap: { onSensitiveClicked(post: post) }
+                                    onPostTypeTap: {
+                                        onPostTypeClicked(post: post)
+                                    },
+                                    onSensitiveTap: {
+                                        onSensitiveClicked(post: post)
+                                    }
                                 )
                                 .id(ObjectIdentifier(post))
                                 .listPlainItemNoInsets()
@@ -166,8 +170,12 @@ struct PostListingView: View {
                             post: post,
                             layout: postListingViewModel.layout,
                             isSubredditPostListing: isSubredditPostListing,
-                            onPostTypeTap: { onPostTypeClicked(post: post) },
-                            onSensitiveTap: { onSensitiveClicked(post: post) }
+                            onPostTypeTap: {
+                                onPostTypeClicked(post: post)
+                            },
+                            onSensitiveTap: {
+                                onSensitiveClicked(post: post)
+                            }
                         )
                         .id(ObjectIdentifier(post))
                         .listPlainItemNoInsets()
