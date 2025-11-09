@@ -78,6 +78,13 @@ public class AccountViewModel: ObservableObject {
         try accountDao.updateSubscriptionSyncTime(username: account.username, subscriptionSyncTime: account.subscriptionSyncTime)
     }
     
+    public func updateCustomFeedSyncTime() async throws {
+        await MainActor.run {
+            account.customFeedSyncTime = Int64(Date().timeIntervalSince1970)
+        }
+        try accountDao.updateCustomFeedSyncTime(username: account.username, customFeedSyncTime: account.customFeedSyncTime)
+    }
+    
     public func switchToAnonymous() throws {
         account = Account.ANONYMOUS_ACCOUNT
         try accountDao.markAllAccountsNonCurrent()

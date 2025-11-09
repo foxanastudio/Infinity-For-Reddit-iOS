@@ -19,6 +19,7 @@ public class SubscriptionListingViewModel: ObservableObject {
     @Published var myCustomFeeds: [MyCustomFeed] = []
     @Published var favoriteMyCustomFeeds: [MyCustomFeed] = []
     
+    @Published var subscriptionAndCustomFeedLoadingTaskFlag: Bool = false
     @Published var isLoadingSubscriptions: Bool = false
     @Published var isLoadingMyCustomFeeds: Bool = false
     
@@ -198,10 +199,14 @@ public class SubscriptionListingViewModel: ObservableObject {
         searchQueryPublisher.send(query)
     }
     
-    public func loadSubscriptionsOnline() async {
-        guard Int64(Date().timeIntervalSince1970) - AccountViewModel.shared.account.subscriptionSyncTime >= 60 * 60 * 24 else { return }
+    public func loadSubscriptionsOnline(forceLoad: Bool = false) async {
+        guard forceLoad || Int64(Date().timeIntervalSince1970) - AccountViewModel.shared.account.subscriptionSyncTime >= 60 * 60 * 24 else {
+            return
+        }
         
-        guard !isLoadingSubscriptions || (isLoadingSubscriptions && after != nil && after?.isEmpty != true) else { return }
+        guard !isLoadingSubscriptions || forceLoad else {
+            return
+        }
         
         await MainActor.run {
             isLoadingSubscriptions = true
@@ -245,7 +250,7 @@ public class SubscriptionListingViewModel: ObservableObject {
                         print("Unable to update subscription sync time: \(error)")
                     }
                 } else {
-                    await loadSubscriptionsOnline()
+                    await loadSubscriptionsOnline(forceLoad: true)
                 }
             }
         } catch {
@@ -318,7 +323,7 @@ public class SubscriptionListingViewModel: ObservableObject {
     }
     
     public func loadMyCustomFeedsOnline() async {
-        guard Int64(Date().timeIntervalSince1970) - AccountViewModel.shared.account.subscriptionSyncTime >= 60 * 60 * 24 else { return }
+        guard Int64(Date().timeIntervalSince1970) - AccountViewModel.shared.account.customFeedSyncTime >= 60 * 60 * 24 else { return }
         
         guard !isLoadingMyCustomFeeds else { return }
         
@@ -357,6 +362,12 @@ public class SubscriptionListingViewModel: ObservableObject {
             
             insertMyCustomFeeds(myCustomFeeds: myCustomFeedsTemp)
             
+            do {
+                try await AccountViewModel.shared.updateCustomFeedSyncTime()
+            } catch {
+                print("Unable to update custom feed sync time: \(error)")
+            }
+            
             await MainActor.run {
                 self.isLoadingMyCustomFeeds = false
                 self.myCustomFeeds = myCustomFeedsTemp
@@ -371,15 +382,16 @@ public class SubscriptionListingViewModel: ObservableObject {
         }
     }
     
-    func refreshSubscriptions(account: Account) async {
+    func refreshSubscriptions() {
         isLoadingSubscriptions = false
         isLoadingMyCustomFeeds = false
         
         after = nil
         subscriptionsPrivate = []
         
-        await loadSubscriptionsOnline()
-        await loadMyCustomFeedsOnline()
+        AccountViewModel.shared.account.subscriptionSyncTime = 0
+        AccountViewModel.shared.account.customFeedSyncTime = 0
+        subscriptionAndCustomFeedLoadingTaskFlag.toggle()
     }
     
     private func insertSubscribedThings(subredditSubscriptions: [SubscribedSubredditData], userSubscriptions: [SubscribedUserData], subreddits: [SubredditData]) {

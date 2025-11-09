@@ -23,6 +23,7 @@ public struct Account: Codable, FetchableRecord, PersistableRecord, Sendable, Eq
     var refreshToken: String?
     var code: String?
     var subscriptionSyncTime: Int64
+    var customFeedSyncTime: Int64
     var createdUTC: TimeInterval
     
     init(username: String, isCurrentUser: Bool, profileImageUrl: String? = nil, bannerImageUrl: String? = nil, karma: Int, isMod: Bool, accessToken: String? = nil, refreshToken: String? = nil, code: String? = nil, createdUTC: TimeInterval) {
@@ -36,6 +37,7 @@ public struct Account: Codable, FetchableRecord, PersistableRecord, Sendable, Eq
         self.refreshToken = refreshToken
         self.code = code
         self.subscriptionSyncTime = 0
+        self.customFeedSyncTime = 0
         self.createdUTC = createdUTC
     }
     
@@ -54,6 +56,7 @@ public struct Account: Codable, FetchableRecord, PersistableRecord, Sendable, Eq
         case refreshToken = "refresh_token"
         case code
         case subscriptionSyncTime = "subscription_sync_time"
+        case customFeedSyncTime = "custom_feed_sync_time"
         case createdUTC = "created_utc"
     }
     

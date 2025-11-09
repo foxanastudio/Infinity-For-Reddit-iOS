@@ -12,10 +12,12 @@ import Alamofire
 
 struct SubscriptionsView: View {
     @EnvironmentObject private var accountViewModel: AccountViewModel
+    @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     
     @StateObject var subscriptionListingViewModel: SubscriptionListingViewModel
 
     @State private var selectedOption = 0
+    @State private var navigationBarMenuKey: UUID?
     
     private let customOnTapForSearchInThing: ((SearchInThing) -> Void)?
     
@@ -54,9 +56,23 @@ struct SubscriptionsView: View {
                 .tabViewStyle(.page(indexDisplayMode: .never))
             }
         }
-        .task {
+        .task(id: subscriptionListingViewModel.subscriptionAndCustomFeedLoadingTaskFlag) {
             await subscriptionListingViewModel.loadSubscriptionsOnline()
             await subscriptionListingViewModel.loadMyCustomFeedsOnline()
+        }
+        .onAppear {
+            if let key = navigationBarMenuKey {
+                navigationBarMenuManager.pop(key: key)
+            }
+            navigationBarMenuKey = navigationBarMenuManager.push([
+                NavigationBarMenuItem(title: "Refresh") {
+                    subscriptionListingViewModel.refreshSubscriptions()
+                }
+            ])
+        }
+        .onDisappear {
+            guard let navigationBarMenuKey else { return }
+            navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
     }
 

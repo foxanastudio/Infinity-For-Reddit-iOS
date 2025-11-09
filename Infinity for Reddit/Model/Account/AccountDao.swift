@@ -151,6 +151,15 @@ struct AccountDao {
         }
     }
     
+    func updateCustomFeedSyncTime(username: String, customFeedSyncTime: Int64) throws {
+        try dbPool.write { db in
+            try db.execute(
+                sql: "UPDATE accounts SET custom_feed_sync_time = ? WHERE username = ?",
+                arguments: [customFeedSyncTime, username]
+            )
+        }
+    }
+    
     func getAllAccountsLiveData() -> AnyPublisher<[Account], Error> {
         ValueObservation
             .tracking {
