@@ -10,61 +10,48 @@ import Flow
 struct PostViewCompact: View {
     @EnvironmentObject private var accountViewModel: AccountViewModel
     @EnvironmentObject private var themeViewModel: CustomThemeViewModel
-    
-    @StateObject var postViewModel: PostViewModel
-    @State private var voteTask: Task<Void, Never>?
-    @State private var saveTask: Task<Void, Never>?
-    
-    // MARK: - User Preferences
+
     @AppStorage(InterfacePostUserDefaultsUtils.hidePostTypeKey, store: .interfacePost) private var hidePostType: Bool = false
     @AppStorage(InterfacePostUserDefaultsUtils.hidePostFlairKey, store: .interfacePost) private var hidePostFlair: Bool = false
     @AppStorage(InterfacePostUserDefaultsUtils.hideSubredditAndUserPrefixKey, store: .interfacePost) private var hideSubredditAndUserPrefix: Bool = false
     @AppStorage(InterfacePostUserDefaultsUtils.hideNVotesKey, store: .interfacePost) private var hideNVotes: Bool = false
     @AppStorage(InterfacePostUserDefaultsUtils.hideNCommentsKey, store: .interfacePost) private var hideNComments: Bool = false
-    @AppStorage(InterfacePostUserDefaultsUtils.limitMediaHeightKey, store: .interfacePost) private var limitMediaHeight: Bool = false
     @AppStorage(InterfaceUserDefaultsUtils.voteButtonsOnTheRightKey, store: .interface) private var voteButtonsOnTheRight: Bool = false
     
-    @State var width: CGFloat?
-    
-    // MARK: - Layout Context
+    @ObservedObject var postViewModel: PostViewModel
+    @State private var voteTask: Task<Void, Never>?
+    @State private var saveTask: Task<Void, Never>?
+
     let isSubredditPostListing: Bool
-    
-    // MARK: - External Callbacks
     let onPostTap: () -> Void
-    let onIconTap: (_ post: Post) -> Void
-    let onSubredditTap: (_ post: Post) -> Void
-    let onUserTap: (_ post: Post) -> Void
-    let onVote: (_ direction: Int) -> Void
+    let onIconTap: () -> Void
+    let onSubredditTap: () -> Void
+    let onUserTap: () -> Void
+    let onVote: (Int) -> Void
     let onCommentsTap: () -> Void
     let onSave: () -> Void
-    let onShare: () -> Void
     let onPostTypeClicked: () -> Void
     let onSensitiveClicked: () -> Void
-    let onOpenLink: (_ url: URL) -> Void
-    
-    // MARK: - Constants
+    let onOpenLink: (URL) -> Void
+
     private let iconSize: CGFloat = 24
-    
-    // MARK: - Initializer
+
     init(
         postViewModel: PostViewModel,
         isSubredditPostListing: Bool,
-        width: CGFloat? = nil,
         onPostTap: @escaping () -> Void,
-        onIconTap: @escaping (_ post: Post) -> Void,
-        onSubredditTap: @escaping (_ post: Post) -> Void,
-        onUserTap: @escaping (_ post: Post) -> Void,
-        onVote: @escaping (_ direction: Int) -> Void,
+        onIconTap: @escaping () -> Void,
+        onSubredditTap: @escaping () -> Void,
+        onUserTap: @escaping () -> Void,
+        onVote: @escaping (Int) -> Void,
         onCommentsTap: @escaping () -> Void,
         onSave: @escaping () -> Void,
-        onShare: @escaping () -> Void,
         onPostTypeClicked: @escaping () -> Void,
         onSensitiveClicked: @escaping () -> Void,
         onOpenLink: @escaping (_ url: URL) -> Void
     ) {
-        self._postViewModel = StateObject(wrappedValue: postViewModel)
+        self.postViewModel = postViewModel
         self.isSubredditPostListing = isSubredditPostListing
-        self.width = width
         self.onPostTap = onPostTap
         self.onIconTap = onIconTap
         self.onSubredditTap = onSubredditTap
@@ -72,7 +59,6 @@ struct PostViewCompact: View {
         self.onVote = onVote
         self.onCommentsTap = onCommentsTap
         self.onSave = onSave
-        self.onShare = onShare
         self.onPostTypeClicked = onPostTypeClicked
         self.onSensitiveClicked = onSensitiveClicked
         self.onOpenLink = onOpenLink
@@ -95,12 +81,14 @@ struct PostViewCompact: View {
                     }
                 )
                 .frame(width: iconSize, height: iconSize)
-                .onTapGesture { onIconTap(postViewModel.post) }
+                .onTapGesture {
+                    onIconTap()
+                }
                 
                 Text(hideSubredditAndUserPrefix ? postViewModel.post.subreddit : postViewModel.post.subredditNamePrefixed)
                     .subreddit()
                     .onTapGesture {
-                        onSubredditTap(postViewModel.post)
+                        onSubredditTap()
                     }
                 .padding(.leading, 4)
                 
@@ -112,7 +100,7 @@ struct PostViewCompact: View {
             .padding(.horizontal, 16)
             .padding(.bottom, 16)
             
-            HStack (alignment: .top, spacing: 12) {
+            HStack (alignment: .center, spacing: 12) {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(postViewModel.post.title)
                         .font(.system(size: 18))
@@ -179,8 +167,23 @@ struct PostViewCompact: View {
                 switch postViewModel.post.postType {
                 case .noPreviewLink:
                     if let url = URL(string: postViewModel.post.url), let domain = url.host {
-                        NoPreviewLinkView(domain: domain) {
+                        NoPreviewLinkView {
                             onOpenLink(url)
+                            Task {
+                                await postViewModel.readPost()
+                            }
+                        }
+                    } else if let crosspost = postViewModel.post.crosspostParent, let url = URL(string: crosspost.url), let domain = url.host {
+                        NoPreviewLinkView {
+                            onOpenLink(url)
+                            Task {
+                                await postViewModel.readPost()
+                            }
+                        }
+                    }
+                default:
+                    if postViewModel.post.postType.isMedia {
+                        PostPreviewView(post: postViewModel.post, inPostListing: true, isInCompactLayout: true) {
                             Task {
                                 await postViewModel.readPost()
                             }
@@ -189,37 +192,10 @@ struct PostViewCompact: View {
                         .frame(width: 60, height: 60)
                         .clipped()
                         .clipShape(RoundedRectangle(cornerRadius: 8))
-                    } else if let crosspost = postViewModel.post.crosspostParent, let url = URL(string: crosspost.url), let domain = url.host {
-                        NoPreviewLinkView(domain: domain) {
-                            onOpenLink(url)
-                            Task {
-                                await postViewModel.readPost()
-                            }
-                        }
                     }
-                default:
-                    EmptyView()
-                }
-                
-                if postViewModel.post.postType.isMedia {
-                    PostPreviewView(post: postViewModel.post, inPostListing: true, compactMode: true) {
-                        Task {
-                            await postViewModel.readPost()
-                        }
-                    }
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 60, height: 60)
-                    .clipped()
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                } else if case .text = postViewModel.post.postType {
-                    EmptyView()
                 }
             }
             .padding(.horizontal, 16)
-//            .onAppear {
-//                print("Post: ", postViewModel.post.title ?? "")
-//                print("Post Type of \(postViewModel.post.title ?? ""): ", postViewModel.post.postType.text)
-//            }
             
             HStack(spacing: 0) {
                 HStack(spacing: 0) {
@@ -288,7 +264,7 @@ struct PostViewCompact: View {
                 .padding(8)
                 .contentShape(Rectangle())
                 
-                Button(action: onShare) {
+                ShareLink(item: postViewModel.post.url) {
                     SwiftUI.Image(systemName: "square.and.arrow.up")
                         .postIconTemplateRendering()
                         .postIcon()
@@ -315,18 +291,20 @@ struct PostViewCompact: View {
 }
 
 private struct NoPreviewLinkView: View {
-    let domain: String
     let onTap: () -> Void
     
     var body: some View {
-//        Spacer()
-//            .frame(height: 10)
-        
-        Text(domain)
-            .noPreviewPostTypeIndicatorBackground()
-            .noPreviewPostTypeIndicator()
-            .onTapGesture {
-                onTap()
-            }
+        ZStack {
+            SwiftUI.Image(systemName: "link")
+                .aspectRatio(contentMode: .fit)
+                .clipped()
+                .noPreviewPostTypeIndicator()
+        }
+        .noPreviewPostTypeIndicatorBackground()
+        .frame(width: 60, height: 60)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .onTapGesture {
+            onTap()
+        }
     }
 }

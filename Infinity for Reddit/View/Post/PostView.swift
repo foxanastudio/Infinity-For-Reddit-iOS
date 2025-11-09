@@ -9,7 +9,6 @@ import SwiftUI
 struct PostView: View {
     @EnvironmentObject private var accountViewModel: AccountViewModel
     @EnvironmentObject private var navigationManager: NavigationManager
-    @EnvironmentObject private var themeViewModel: CustomThemeViewModel
     
     @StateObject private var postViewModel: PostViewModel
     
@@ -51,44 +50,40 @@ struct PostView: View {
             PostViewCard(
                 postViewModel: postViewModel,
                 isSubredditPostListing: isSubredditPostListing,
-                onPostTap: handlePostTap,
-                onIconTap: handleIconTap,
-                onSubredditTap: handleSubredditTap,
-                onUserTap: handleUserTap,
-                onVote: handleVote,
-                onCommentsTap: handleCommentsTap,
-                onSave: handleSave,
-                onShare: handleShare,
+                onPostTap: onPostTap,
+                onIconTap: onIconTap,
+                onSubredditTap: onSubredditTap,
+                onUserTap: onUserTap,
+                onVote: vote,
+                onCommentsTap: onCommentsTap,
+                onSave: savePost,
                 onPostTypeClicked: onPostTypeTap,
                 onSensitiveClicked: onSensitiveTap,
-                onOpenLink: handleOpenLink
+                onOpenLink: openLink
             )
-            
         case .compact:
             PostViewCompact(
                 postViewModel: postViewModel,
                 isSubredditPostListing: isSubredditPostListing,
-                onPostTap: handlePostTap,
-                onIconTap: handleIconTap,
-                onSubredditTap: handleSubredditTap,
-                onUserTap: handleUserTap,
-                onVote: handleVote,
-                onCommentsTap: handleCommentsTap,
-                onSave: handleSave,
-                onShare: handleShare,
+                onPostTap: onPostTap,
+                onIconTap: onIconTap,
+                onSubredditTap: onSubredditTap,
+                onUserTap: onUserTap,
+                onVote: vote,
+                onCommentsTap: onCommentsTap,
+                onSave: savePost,
                 onPostTypeClicked: onPostTypeTap,
                 onSensitiveClicked: onSensitiveTap,
-                onOpenLink: handleOpenLink
+                onOpenLink: openLink
             )
         }
     }
-}
-
-// MARK: - Interaction & Task Handlers
-extension PostView {
     
-    private func handlePostTap() {
-        Task { await postViewModel.readPost() }
+    private func onPostTap() {
+        Task {
+            await postViewModel.readPost()
+        }
+        
         navigationManager.path.append(
             AppNavigation.postDetails(
                 postDetailsInput: .post(post),
@@ -97,7 +92,7 @@ extension PostView {
         )
     }
     
-    private func handleIconTap(_ post: Post) {
+    private func onIconTap() {
         if !isSubredditPostListing {
             navigationManager.path.append(
                 AppNavigation.subredditDetails(subredditName: post.subreddit)
@@ -109,42 +104,39 @@ extension PostView {
         }
     }
     
-    private func handleSubredditTap(_ post: Post) {
+    private func onSubredditTap() {
         navigationManager.path.append(
             AppNavigation.subredditDetails(subredditName: post.subreddit)
         )
     }
     
-    private func handleUserTap(_ post: Post) {
+    private func onUserTap() {
         navigationManager.path.append(
             AppNavigation.userDetails(username: post.author)
         )
     }
     
-    private func handleVote(_ direction: Int) {
+    private func vote(_ direction: Int) {
         guard !accountViewModel.account.isAnonymous() else { return }
         Task {
             await postViewModel.votePost(vote: direction)
         }
     }
     
-    private func handleSave() {
+    private func savePost() {
         Task {
             await postViewModel.savePost(save: !postViewModel.post.saved)
         }
     }
     
-    private func handleCommentsTap() {
+    private func onCommentsTap() {
         // TODO: Open post details and focus on comments section.
     }
     
-    
-    private func handleShare() {
-        // Reserved for future custom share sheet logic.
-    }
-    
-    private func handleOpenLink(_ url: URL) {
+    private func openLink(_ url: URL) {
         navigationManager.openLink(url)
-        Task { await postViewModel.readPost() }
+        Task {
+            await postViewModel.readPost()
+        }
     }
 }

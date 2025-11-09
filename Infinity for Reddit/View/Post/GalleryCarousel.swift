@@ -20,7 +20,7 @@ struct GalleryCarousel: View {
     let items: [GalleryItem]
     let onImageTap: (() -> Void)?
     
-    init(post: Post, compactMode: Bool = false, onImageTap: (() -> Void)? = nil) {
+    init(post: Post, onImageTap: (() -> Void)? = nil) {
         self.post = post
         self.items = post.galleryData!.items
         self.onImageTap = onImageTap

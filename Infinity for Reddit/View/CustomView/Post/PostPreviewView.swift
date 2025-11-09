@@ -12,7 +12,7 @@ struct PostPreviewView: View {
     
     let post: Post
     var inPostListing: Bool = false
-    var compactMode: Bool = false
+    var isInCompactLayout: Bool = false
     var onReadPost: (() -> Void)? = nil
     
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSensitiveImagesKey, store: .contentSensitivityFilter) private var blurSensitiveImages: Bool = false
@@ -21,12 +21,13 @@ struct PostPreviewView: View {
     
     var body: some View {
         if let url = resolvedPreviewImageURL {
-            ZStack(alignment: compactMode ? .center : .topLeading) {
+            ZStack(alignment: isInCompactLayout ? .center : .topLeading) {
                 CustomWebImage(
                     url,
-                    height: limitMediaHeight && inPostListing ? 200 : nil,
-                    aspectRatio: limitMediaHeight && inPostListing ? nil : resolvedAspect,
-                    handleImageTapGesture: !(compactMode && post.postType == .gallery),
+                    width: isInCompactLayout ? 60 : nil,
+                    height: limitMediaHeight && inPostListing && !isInCompactLayout ? 200 : (isInCompactLayout ? 60 : nil),
+                    aspectRatio: (limitMediaHeight && inPostListing) || isInCompactLayout ? nil : resolvedAspectRatio,
+                    handleImageTapGesture: !(isInCompactLayout && post.postType == .gallery),
                     centerCrop: true,
                     matchedGeometryEffectId: UUID().uuidString,
                     post: post,
@@ -40,7 +41,7 @@ struct PostPreviewView: View {
                             }
                     )
                 }
-                .applyIf(compactMode && inPostListing && post.postType == .gallery) {
+                .applyIf(isInCompactLayout && inPostListing && post.postType == .gallery) {
                     $0.onTapGesture {
                         if let url = resolvedPreviewImageURL {
                             fullScreenMediaViewModel.show(
@@ -51,66 +52,43 @@ struct PostPreviewView: View {
                                     galleryScrollState: GalleryScrollState(scrollId: 0)
                                 )
                             )
-                            onReadPost?()
                         }
                     }
                 }
                 
                 switch post.postType {
                 case .redditVideo, .video, .imgurVideo, .redgifs, .streamable, .gif:
-                    if compactMode {
-                        SwiftUI.Image(systemName: "play.circle")
-                            .resizable()
-                            .scaledToFit()
-                            .padding(2)
-                            .mediaIndicator()
-                            .padding(16)
-                    } else {
-                        SwiftUI.Image(systemName: "play.circle")
-                            .resizable()
-                            .mediaIndicator()
-                            .padding(12)
-                            .frame(width: 64, height: 64)
-                    }
+                    SwiftUI.Image(systemName: "play.circle")
+                        .resizable()
+                        .mediaIndicator()
+                        .applyIf(!isInCompactLayout) {
+                            $0.padding(12)
+                        }
+                        .frame(width: isInCompactLayout ? 24 : 64, height: isInCompactLayout ? 24 : 64)
                 case .link:
-                    if compactMode {
-                        SwiftUI.Image(systemName: "link.circle")
-                            .resizable()
-                            .scaledToFit()
-                            .padding(2)
-                            .mediaIndicator()
-                            .padding(16)
-                    } else {
-                        SwiftUI.Image(systemName: "link.circle")
-                            .resizable()
-                            .mediaIndicator()
-                            .padding(12)
-                            .frame(width: 64, height: 64)
-                    }
+                    SwiftUI.Image(systemName: "link.circle")
+                        .resizable()
+                        .mediaIndicator()
+                        .applyIf(!isInCompactLayout) {
+                            $0.padding(12)
+                        }
+                        .frame(width: isInCompactLayout ? 24 : 64, height: isInCompactLayout ? 24 : 64)
                 case .gallery:
-                    if compactMode {
+                    if isInCompactLayout {
                         SwiftUI.Image(systemName: "square.stack")
                             .resizable()
-                            .scaledToFit()
-                            .padding(2)
                             .mediaIndicator()
-                            .padding(16)
+                            .frame(width: 24, height: 24)
                     }
                 default:
                     EmptyView()
                 }
             }
             .frame(maxWidth: .infinity)
-            .applyIf(!limitMediaHeight || !inPostListing) {
-                $0.modify { content in
-                    if let size = resolvedAspect {
-                        content.aspectRatio(size, contentMode: .fit)
-                    } else {
-                        content
-                    }
-                }
+            .applyIf((!limitMediaHeight || !inPostListing) && !isInCompactLayout) {
+                $0.aspectRatio(resolvedAspectRatio ?? CGSize(width: 0, height: 0), contentMode: .fit)
             }
-            .applyIf(limitMediaHeight && inPostListing) {
+            .applyIf(limitMediaHeight && inPostListing && !isInCompactLayout) {
                 $0.frame(height: 200)
             }
         } else if post.postType.isMedia {
@@ -135,24 +113,34 @@ struct PostPreviewView: View {
     }
     
     private var resolvedPreviewImageURL: String? {
-        if let preview = post.preview, preview.images.count > 0, let url = preview.images[0].source.url {
-            return url
-        }
-        
-        if compactMode, let first = post.galleryData?.items.first,
-           let url = first.urlString {
-            return url
+        if isInCompactLayout {
+            if let url = post.preview?.images.first?.resolutions.first?.url {
+                return url
+            } else if let url = post.preview?.images.first?.source.url {
+                return url
+            } else if let url = post.galleryData?.items.first?.urlString {
+                return url
+            }
+        } else {
+            if let url = post.preview?.images.first?.source.url {
+                return url
+            }
         }
         
         return nil
     }
     
-    private var resolvedAspect: CGSize? {
-        if let ratio = post.preview?.images.first?.source.aspectRatio {
-            return ratio
-        }
-        if compactMode, post.galleryData != nil {
-            return CGSize(width: 1, height: 1)
+    private var resolvedAspectRatio: CGSize? {
+        if isInCompactLayout {
+            if let ratio = post.preview?.images.first?.resolutions.first?.aspectRatio {
+                return ratio
+            } else if let ratio = post.preview?.images.first?.source.aspectRatio {
+                return ratio
+            }
+        } else {
+            if let ratio = post.preview?.images.first?.source.aspectRatio {
+                return ratio
+            }
         }
         return nil
     }

@@ -127,6 +127,11 @@ struct CustomWebImage<Placeholder: View, Fallback: View>: View {
                             shouldLoadFallbackImage = true
                         }
                     }
+                    .applyIf(width != nil && height != nil) {
+                        $0.setProcessor(DownsamplingImageProcessor(size: CGSize(width: width!, height: height!)))
+                            .cacheOriginalImage()
+                            .scaleFactor(UIScreen.main.scale)
+                    }
                     .clipShape(circleClipped ? AnyShape(Circle()) : AnyShape(Rectangle()))
                     .applyIf(imageAspectRatio != nil) {
                         $0.aspectRatio(imageAspectRatio!.width / imageAspectRatio!.height, contentMode: .fit)
@@ -151,5 +156,48 @@ struct CustomWebImage<Placeholder: View, Fallback: View>: View {
             }
         }
         .id(urlString)
+//        if let urlString {
+//            KFImage(URL(string: urlString))
+//                .cacheOriginalImage()
+//                .fade(duration: 0)
+//                .resizable()
+//                .backgroundDecode()
+//                .placeholder { progress in
+//                    //ProgressIndicator()
+//                }
+//                .onSuccess { result in
+//                    
+//                }
+//                .onFailure { error in
+//                    DispatchQueue.main.async {
+//                        shouldLoadFallbackImage = true
+//                    }
+//                }
+//                .applyIf(width != nil || height != nil) {
+//                    $0.setProcessor(DownsamplingImageProcessor(size: CGSize(width: width!, height: height!)))
+//                }
+//                .clipShape(circleClipped ? AnyShape(Circle()) : AnyShape(Rectangle()))
+//                .applyIf(imageAspectRatio != nil) {
+//                    $0.aspectRatio(imageAspectRatio!.width / imageAspectRatio!.height, contentMode: .fit)
+//                }
+//                .applyIf(centerCrop) {
+//                    $0.scaledToFill()
+//                }
+//                .applyIf(!centerCrop) {
+//                    $0.scaledToFit()
+//                }
+//                .frame(width: width, height: height)
+//                .clipped()
+//                .applyIf(handleImageTapGesture) {
+//                    $0.mediaTapGesture(post: post, aspectRatio: imageAspectRatio, matchedGeometryEffectId: matchedGeometryEffectId)
+//                }
+//                .applyIf(!handleImageTapGesture && customOnTapGesture != nil) {
+//                    // Using highPriorityGesture here as a workaround to handle tap gesture in a TabView.
+//                    $0.highPriorityGesture(TapGesture().onEnded {
+//                        customOnTapGesture?()
+//                    })
+//                }
+//                .id(urlString)
+//        }
     }
 }
