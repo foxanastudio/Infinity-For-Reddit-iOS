@@ -60,7 +60,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
     var approvedAtUtc : String!
     var approvedBy : String!
     var archived : Bool!
-    var author : String!
+    @Published var author : String!
     var authorFlairRichtext : [FlairRichtext]! = [FlairRichtext]()
     var authorFlairText : String!
     var authorFlairType : String!
@@ -75,7 +75,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
     var downs : Int!
     var edited : Bool!
     var galleryData : GalleryData?
-    var hidden : Bool!
+    @Published var hidden : Bool!
     var id : String!
     var isCrosspostable : Bool!
     var isOriginalContent : Bool!
@@ -112,10 +112,10 @@ public class Post : NSObject, ObservableObject, Identifiable {
     var removedByCategory : String!
     var reportReasons : String!
     
-    var saved : Bool!
+    @Published var saved : Bool!
     var score : Int!
-    var selftext : String!
-    var selftextProcessedMarkdown : MarkdownContent?
+    @Published var selftext : String!
+    @Published var selftextProcessedMarkdown : MarkdownContent?
     var selftextHtml : String!
     var selftextTruncated: String! {
         if selftext == nil {
@@ -151,6 +151,18 @@ public class Post : NSObject, ObservableObject, Identifiable {
     
     var fileNameWithoutExtension: String {
         return "\(subreddit ?? "Unknown")-\(name ?? "id")"
+    }
+    
+    var canEditBody: Bool {
+        guard let postType else {
+            return false
+        }
+        switch postType {
+        case .text:
+            return true
+        default:
+            return !selftext.isEmpty
+        }
     }
     
     enum PostType: Equatable {
@@ -228,19 +240,19 @@ public class Post : NSObject, ObservableObject, Identifiable {
             var parsedMediaMetadata = [String: MediaMetadata]()
             
             for (key, value) in mediaMetaData {
-                let media = try MediaMetadata(fromJson: value)
-                parsedMediaMetadata[key] = media
+                do {
+                    let media = try MediaMetadata(fromJson: value)
+                    parsedMediaMetadata[key] = media
+                } catch {
+                    // Ignore
+                }
             }
             mediaMetadata = parsedMediaMetadata
         }
         let galleryDataJson = json["gallery_data"]
         if !galleryDataJson.isEmpty {
             print(json["title"].stringValue)
-            do {
-                galleryData = try GalleryData(fromJson: galleryDataJson, mediaMetadataDictionary: mediaMetadata)
-            } catch {
-                // Ignore
-            }
+            galleryData = try? GalleryData(fromJson: galleryDataJson, mediaMetadataDictionary: mediaMetadata)
         }
         
         hidden = json["hidden"].boolValue

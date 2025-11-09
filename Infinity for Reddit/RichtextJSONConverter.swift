@@ -49,16 +49,18 @@ class RichtextJSONConverter {
     private let IMAGE_ID = "id"
     private let DOCUMENT = "document"
 
+    private let mediaMetadataDictionary: [String: MediaMetadata]?
     private let embeddedImages: [UploadedImage]
-    private let giphyGif: GPHMedia?
+    private let giphyGifId: String?
     
     private var text = ""
     private var formats: [[Int]] = []
     private var contentStack: [[Any]] = []
 
-    init(embeddedImages: [UploadedImage] = [], giphyGif: GPHMedia? = nil) {
+    init(mediaMetadataDictionary: [String: MediaMetadata]? = nil, embeddedImages: [UploadedImage] = [], giphyGifId: String? = nil) {
+        self.mediaMetadataDictionary = mediaMetadataDictionary
         self.embeddedImages = embeddedImages
-        self.giphyGif = giphyGif
+        self.giphyGifId = giphyGifId
         contentStack.append([])
     }
 
@@ -578,11 +580,17 @@ class RichtextJSONConverter {
             image[IMAGE_ID].stringValue = imageId
             image[CONTENT].stringValue = getImageCaption(currentCaption: "", inlineNodes: inlineNodes)
             contentStack[0].append(image)
-        } else if giphyGif?.id == imageId {
+        } else if giphyGifId == imageId {
             var gif: JSON = JSON()
             gif[TYPE].stringValue = Element.gif.rawValue
-            gif[IMAGE_ID].stringValue = "giphy|\(imageId)|downsized"
+            gif[IMAGE_ID].stringValue = imageId.hasPrefix("giphy|") ? imageId : "giphy|\(imageId)|downsized"
             contentStack[0].append(gif)
+        } else if mediaMetadataDictionary?[imageId] != nil {
+            var image: JSON = JSON()
+            image[TYPE].stringValue = Element.image.rawValue
+            image[IMAGE_ID].stringValue = imageId
+            image[CONTENT].stringValue = getImageCaption(currentCaption: "", inlineNodes: inlineNodes)
+            contentStack[0].append(image)
         }
     }
     

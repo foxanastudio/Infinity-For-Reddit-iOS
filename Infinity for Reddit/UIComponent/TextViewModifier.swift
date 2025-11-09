@@ -188,6 +188,17 @@ struct PositiveTextButtonViewModifier: ViewModifier {
     }
 }
 
+struct WarningTextButtonViewModifier: ViewModifier {
+    @EnvironmentObject var themeViewModel: CustomThemeViewModel
+    
+    func body(content: Content) -> some View {
+        content
+            //.font()
+            //.foregroundColor(Color(hex: themeViewModel.currentCustomTheme.colorPrimaryLightTheme))
+            .foregroundColor(.red)
+    }
+}
+
 struct NeutralTextButtonViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
     

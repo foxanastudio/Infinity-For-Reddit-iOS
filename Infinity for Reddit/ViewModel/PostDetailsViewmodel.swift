@@ -34,22 +34,40 @@ public class PostDetailsViewModel: ObservableObject {
     //User defaults
     private var showTopLevelCommentsFirst: Bool
     
-    public let postDetailsRepository: PostDetailsRepositoryProtocol
+    private let postDetailsRepository: PostDetailsRepositoryProtocol
+    private let historyPostsRepository: HistoryPostsRepositoryProtocol
     
     private var refreshPostsContinuation: CheckedContinuation<Void, Never>?
     
     private var cancellables = Set<AnyCancellable>()
     
-    enum PostDetailsViewModelError: Error {
+    enum PostDetailsViewModelError: LocalizedError {
         case postFetchError
+        case postNotLoadedError
+        
+        var errorDescription: String? {
+            switch self {
+            case .postFetchError:
+                return "Failed to fetch post."
+            case .postNotLoadedError:
+                return "Post not loaded."
+            }
+        }
     }
     
     // MARK: - Initializer
-    init(account: Account, postDetailsInput: PostDetailsInput, postDetailsRepository: PostDetailsRepositoryProtocol, isContinueThread: Bool = false) {
+    init(
+        account: Account,
+        postDetailsInput: PostDetailsInput,
+        postDetailsRepository: PostDetailsRepositoryProtocol,
+        historyPostsRepository: HistoryPostsRepositoryProtocol,
+        isContinueThread: Bool = false
+    ) {
         self.account = account
         self.postDetailsInput = postDetailsInput
         self.sortTypeKind = SortTypeUserDetailsUtils.postComment
         self.postDetailsRepository = postDetailsRepository
+        self.historyPostsRepository = historyPostsRepository
         self.showTopLevelCommentsFirst = InterfaceCommentUserDefaultsUtils.showTopLevelCommentsFirst
         if isContinueThread {
             self.singleThreadContext = 0
@@ -167,8 +185,7 @@ public class PostDetailsViewModel: ObservableObject {
                     throw PostDetailsViewModelError.postFetchError
                 }
                 let post = postDetails.postListing.posts[0]
-                MarkdownUtils.parseRedditImagesBlock(post)
-                post.selftextProcessedMarkdown = MarkdownContent(post.selftext)
+                await postProcessPost(post)
                 
                 await MainActor.run {
                     self.post = post
@@ -213,6 +230,20 @@ public class PostDetailsViewModel: ObservableObject {
             }
             print("Error fetching comments: \(error)")
         }
+    }
+    
+    private func postProcessPost(_ post: Post) async {
+        MarkdownUtils.parseRedditImagesBlock(post)
+        post.selftextProcessedMarkdown = MarkdownContent(post.selftext)
+        
+        if historyPostsRepository.getIfExistInHistoryPostsAnonymous(account: account, postId: post.id, postHistoryType: .upvoted) {
+            post.likes = 1
+        } else if historyPostsRepository.getIfExistInHistoryPostsAnonymous(account: account, postId: post.id, postHistoryType: .downvoted) {
+            post.likes = -1
+        }
+        
+        post.hidden = historyPostsRepository.getIfExistInHistoryPostsAnonymous(account: account, postId: post.id, postHistoryType: .hidden)
+        post.saved = historyPostsRepository.getIfExistInHistoryPostsAnonymous(account: account, postId: post.id, postHistoryType: .saved)
     }
     
     public func fetchCommentsPagination() async {
@@ -557,9 +588,123 @@ public class PostDetailsViewModel: ObservableObject {
         case .comment(let oldComment):
             oldComment.bodyProcessedMarkdown = comment.bodyProcessedMarkdown
             oldComment.body = comment.body
+            oldComment.mediaMetadata = comment.mediaMetadata
             oldComment.edited = true
         default:
             break
+        }
+    }
+    
+    func deleteComment(_ comment: Comment) {
+        Task {
+            do {
+                try await postDetailsRepository.deleteComment(comment)
+                
+                await MainActor.run {
+                    guard let allIndex = self.allComments.index(id: comment.id) else {
+                        return
+                    }
+                    if comment.hasReplies {
+                        switch self.allComments[allIndex] {
+                        case .comment(let comment):
+                            comment.author = "[deleted]"
+                            comment.body = "[deleted]"
+                            comment.bodyProcessedMarkdown = MarkdownContent("[deleted]")
+                            comment.isSubmitter = false
+                            comment.distinguished = ""
+                        default:
+                            break
+                        }
+                    } else {
+                        self.allComments.remove(at: allIndex)
+                        guard let visibleIndex = self.visibleComments.index(id: comment.id) else {
+                            return
+                        }
+                        self.visibleComments.remove(at: visibleIndex)
+                    }
+                }
+            } catch {
+                await MainActor.run {
+                    self.error = error
+                }
+                print(error)
+            }
+        }
+    }
+    
+    func editPost(_ newPost: Post) {
+        if let post {
+            post.selftext = newPost.selftext
+            post.selftextProcessedMarkdown = newPost.selftextProcessedMarkdown
+            post.mediaMetadata = newPost.mediaMetadata
+            post.edited = true
+        }
+    }
+    
+    func deletePost() {
+        guard let post else {
+            self.error = PostDetailsViewModelError.postNotLoadedError
+            return
+        }
+        
+        Task {
+            do {
+                try await postDetailsRepository.deletePost(post)
+                
+                await MainActor.run {
+                    self.post?.author = "[deleted]"
+                    self.post?.selftext = "[deleted]"
+                    self.post?.selftextProcessedMarkdown = MarkdownContent("[deleted]")
+                    self.post?.mediaMetadata = nil
+                }
+            } catch {
+                await MainActor.run {
+                    self.error = error
+                }
+                print(error)
+            }
+        }
+    }
+    
+    func toggleHidePost(onFinish: @escaping () -> Void) {
+        guard let post else {
+            self.error = PostDetailsViewModelError.postNotLoadedError
+            return
+        }
+        
+        guard !account.isAnonymous() else {
+            toggleHidePostAnonymous(post, onFinish: onFinish)
+            return
+        }
+        
+        let previousHiddenState = post.hidden ?? false
+        
+        Task {
+            do {
+                try await postDetailsRepository.toggleHidePost(post)
+                
+                await MainActor.run {
+                    self.post?.hidden = !previousHiddenState
+                    onFinish()
+                }
+            } catch {
+                await MainActor.run {
+                    self.post?.hidden = previousHiddenState
+                    self.error = error
+                    onFinish()
+                }
+                print(error)
+            }
+        }
+    }
+
+    private func toggleHidePostAnonymous(_ post: Post, onFinish: @escaping () -> Void) {
+        Task {
+            try? await postDetailsRepository.toggleHidePostAnonymous(post)
+            await MainActor.run {
+                post.hidden = !post.hidden
+                onFinish()
+            }
         }
     }
 }

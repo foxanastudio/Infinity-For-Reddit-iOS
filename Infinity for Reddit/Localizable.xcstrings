@@ -7,9 +7,6 @@
     "!" : {
 
     },
-    "%@" : {
-
-    },
     "%lld days" : {
 
     },
@@ -180,9 +177,6 @@
 
     },
     "Hide Subscribed Subreddits Section" : {
-
-    },
-    "History" : {
 
     },
     "Home" : {
@@ -365,9 +359,6 @@
     "Show Avatar on the Right" : {
 
     },
-    "Since:" : {
-
-    },
     "Small" : {
 
     },
@@ -386,13 +377,10 @@
     "Start by creating a post filter" : {
 
     },
-    "Subscribe" : {
+    "Subscribe %lld" : {
 
     },
-    "Subscribed" : {
-
-    },
-    "Subscribers: %lld" : {
+    "Subscribed %lld" : {
 
     },
     "Subscriptions" : {

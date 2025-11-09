@@ -71,27 +71,25 @@ struct MoreView: View {
                         .listPlainItemNoInsets()
                     }
                     
-                    if !accountViewModel.account.isAnonymous() {
-                        SimpleTouchItemRow(text: "Upvoted", icon:"arrowshape.up") {
-                            navigationManager.path.append(MoreViewNavigation.upvoted)
-                        }
-                        .listPlainItemNoInsets()
-                        
-                        SimpleTouchItemRow(text: "Downvoted", icon: "arrowshape.down") {
-                            navigationManager.path.append(MoreViewNavigation.downvoted)
-                        }
-                        .listPlainItemNoInsets()
-                        
-                        SimpleTouchItemRow(text: "Hidden", icon: "eye.slash") {
-                            navigationManager.path.append(MoreViewNavigation.hidden)
-                        }
-                        .listPlainItemNoInsets()
-                        
-                        SimpleTouchItemRow(text: "Saved", icon: "bookmark.fill") {
-                            navigationManager.path.append(MoreViewNavigation.saved)
-                        }
-                        .listPlainItemNoInsets()
+                    SimpleTouchItemRow(text: "Upvoted", icon:"arrowshape.up") {
+                        navigationManager.path.append(MoreViewNavigation.upvoted)
                     }
+                    .listPlainItemNoInsets()
+                    
+                    SimpleTouchItemRow(text: "Downvoted", icon: "arrowshape.down") {
+                        navigationManager.path.append(MoreViewNavigation.downvoted)
+                    }
+                    .listPlainItemNoInsets()
+                    
+                    SimpleTouchItemRow(text: "Hidden", icon: "eye.slash") {
+                        navigationManager.path.append(MoreViewNavigation.hidden)
+                    }
+                    .listPlainItemNoInsets()
+                    
+                    SimpleTouchItemRow(text: "Saved", icon: "bookmark.fill") {
+                        navigationManager.path.append(MoreViewNavigation.saved)
+                    }
+                    .listPlainItemNoInsets()
                     
                     SimpleTouchItemRow(text: "History", icon: "clock") {
                         navigationManager.path.append(MoreViewNavigation.history)

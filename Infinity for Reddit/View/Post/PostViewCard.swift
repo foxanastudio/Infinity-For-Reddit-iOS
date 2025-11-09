@@ -256,15 +256,15 @@ struct PostViewCard: View {
                     Button(action: {
                         onVote(1)
                     }) {
-                        SwiftUI.Image(systemName: postViewModel.post.likes == 1 && !accountViewModel.account.isAnonymous() ? "arrowshape.up.fill" : "arrowshape.up")
+                        SwiftUI.Image(systemName: postViewModel.post.likes == 1 ? "arrowshape.up.fill" : "arrowshape.up")
                             .postIconTemplateRendering()
-                            .postUpvoteIcon(isUpvoted: postViewModel.post.likes == 1 && !accountViewModel.account.isAnonymous())
+                            .postUpvoteIcon(isUpvoted: postViewModel.post.likes == 1)
                     }
                     .buttonStyle(.borderless)
                     .padding(8)
                     .contentShape(Rectangle())
                     
-                    VotesText(votes: postViewModel.post.score + postViewModel.post.likes, hideNVotes: hideNVotes)
+                    VotesText(votes: accountViewModel.account.isAnonymous() ? postViewModel.post.score : postViewModel.post.score + postViewModel.post.likes, hideNVotes: hideNVotes)
                         .frame(width: 72, alignment: .center)
                         .postInfo()
                         .contentShape(Rectangle())
@@ -273,9 +273,9 @@ struct PostViewCard: View {
                     Button(action: {
                         onVote(-1)
                     }) {
-                        SwiftUI.Image(systemName: postViewModel.post.likes == -1 && !accountViewModel.account.isAnonymous() ? "arrowshape.down.fill" : "arrowshape.down")
+                        SwiftUI.Image(systemName: postViewModel.post.likes == -1 ? "arrowshape.down.fill" : "arrowshape.down")
                             .postIconTemplateRendering()
-                            .postDownvoteIcon(isDownvoted: postViewModel.post.likes == -1 && !accountViewModel.account.isAnonymous())
+                            .postDownvoteIcon(isDownvoted: postViewModel.post.likes == -1)
                     }
                     .buttonStyle(.borderless)
                     .padding(8)

@@ -16,31 +16,43 @@ struct SavedView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            SegmentedPicker(selectedValue: $selectedOption, values: ["Posts", "Comments"])
+            SegmentedPicker(selectedValue: $selectedOption, values: accountViewModel.account.isAnonymous() ? ["Posts"] : ["Posts", "Comments"])
                 .padding(4)
             
             TabView(selection: $selectedOption) {
-                PostListingView(
-                    account: accountViewModel.account,
-                    postListingMetadata: PostListingMetadata(
-                        postListingType: .user(username: accountViewModel.account.username, userWhere: .saved),
-                        pathComponents: ["username": accountViewModel.account.username, "where": UserWhere.saved.rawValue],
-                        headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
-                        queries: nil,
-                        params: nil
-                    ),
-                    handleToolbarMenu: false
-                )
+                Group {
+                    if accountViewModel.account.isAnonymous() {
+                        HistoryPostListingView(
+                            historyPostListingMetadata: HistoryPostListingMetadata(
+                                historyPostListingType: .saved
+                            ),
+                            handleToolbarMenu: false
+                        )
+                    } else {
+                        PostListingView(
+                            postListingMetadata: PostListingMetadata(
+                                postListingType: .user(username: accountViewModel.account.username, userWhere: .saved),
+                                pathComponents: ["username": accountViewModel.account.username, "where": UserWhere.saved.rawValue],
+                                headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
+                                queries: nil,
+                                params: nil
+                            ),
+                            handleToolbarMenu: false
+                        )
+                    }
+                }
                 .tag(0)
                 
-                CommentListingView(
-                    commentListingMetadata: CommentListingMetadata(
-                        commentListingType:.userSaved,
-                        pathComponents: ["username": "\(accountViewModel.account.username)"],
-                        queries: nil
+                if accountViewModel.account.isAnonymous() {
+                    CommentListingView(
+                        commentListingMetadata: CommentListingMetadata(
+                            commentListingType:.userSaved,
+                            pathComponents: ["username": "\(accountViewModel.account.username)"],
+                            queries: nil
+                        )
                     )
-                )
-                .tag(1)
+                    .tag(1)
+                }
             }
         }
         .tabViewStyle(.page(indexDisplayMode: .never))

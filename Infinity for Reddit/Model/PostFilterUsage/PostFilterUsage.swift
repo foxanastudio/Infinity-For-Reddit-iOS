@@ -10,6 +10,10 @@ import GRDB
 public struct PostFilterUsage: Codable, FetchableRecord, PersistableRecord, Hashable {
     public static let databaseTableName = "post_filter_usage"
     static let HISTORY_TYPE_USAGE_READ_POSTS = "-read-posts"
+    static let HISTORY_TYPE_USAGE_UPVOTED_POSTS = "-upvoted-posts"
+    static let HISTORY_TYPE_USAGE_DOWNVOTED_POSTS = "-downvoted-posts"
+    static let HISTORY_TYPE_USAGE_HIDDEN_POSTS = "-hidden-posts"
+    static let HISTORY_TYPE_USAGE_SAVED_POSTS = "-saved-posts"
     static let NO_USAGE = "--"
     
     enum UsageType: Int, Codable {

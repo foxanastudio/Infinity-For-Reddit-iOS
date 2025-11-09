@@ -10,9 +10,14 @@ import Swinject
 import GRDB
 
 struct HistoryView: View {
-    @Environment(\.dependencyManager) private var dependencyManager: Container
+    @EnvironmentObject var accountViewModel: AccountViewModel
     
     var body: some View {
-        Text("History")
+        HistoryPostListingView(historyPostListingMetadata: HistoryPostListingMetadata(
+            historyPostListingType: .read
+        ))
+        .themedNavigationBar()
+        .addTitleToInlineNavigationBar("History")
+        .id(accountViewModel.account.username)
     }
 }

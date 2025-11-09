@@ -32,4 +32,18 @@ class Utils {
         let signature = String(bytes: imageData.prefix(4), encoding: .ascii)
         return signature == "GIF8"
     }
+    
+    static func getFormattedCakeDay(_ epochTime: Int64?) -> String {
+        guard let epochTime else {
+            return "Unknown"
+        }
+        
+        let date = Date(timeIntervalSince1970: TimeInterval(epochTime))
+        let dateFormatter = DateFormatter()
+        
+        dateFormatter.dateStyle = .medium
+        dateFormatter.timeStyle = .none
+        
+        return dateFormatter.string(from: date)
+    }
 }

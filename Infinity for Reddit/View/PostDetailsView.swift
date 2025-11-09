@@ -14,6 +14,7 @@ struct PostDetailsView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     @EnvironmentObject private var commentSubmissionShareableViewModel: CommentSubmissionShareableViewModel
+    @EnvironmentObject private var postEditingShareableViewModel: PostEditingShareableViewModel
     @Environment(\.dependencyManager) private var dependencyManager: Container
     
     @StateObject var playerManager = PlayerManager()
@@ -23,6 +24,7 @@ struct PostDetailsView: View {
     @State private var navigationBarMenuKey: UUID?
     @State private var sentCommentParent: CommentParent? = nil
     @State private var commentToBeEdited: Comment? = nil
+    @State private var activeAlert: ActiveAlert? = nil
     
     @AppStorage(InterfaceCommentUserDefaultsUtils.fullyCollapseCommentKey, store: .interfaceComment)
     private var fullyCollapseComment: Bool = false
@@ -41,6 +43,7 @@ struct PostDetailsView: View {
                 account: account,
                 postDetailsInput: postDetailsInput,
                 postDetailsRepository: PostDetailsRepository(),
+                historyPostsRepository: HistoryPostsRepository(),
                 isContinueThread: isContinueThread
             )
         )
@@ -54,6 +57,7 @@ struct PostDetailsView: View {
                         sendComment()
                     }
                     .listPlainItemNoInsets()
+                    .id(ObjectIdentifier(post))
                     .onAppear {
                         if post.subredditOrUserIconInPostDetails == nil {
                             Task {
@@ -135,10 +139,11 @@ struct PostDetailsView: View {
                                     navigationManager.path.append(AppNavigation.editComment(commentToBeEdited: comment))
                                 },
                                 onDelete: {
-                                    
-                                })
+                                    postDetailsViewModel.deleteComment(comment)
+                                }
+                            )
                             .listPlainItemNoInsets()
-                            .id(comment.id)
+                            .id(ObjectIdentifier(comment))
                             .onLongPressGesture {
                                 if fullyCollapseComment {
                                     if comment.isCollasped {
@@ -201,6 +206,9 @@ struct PostDetailsView: View {
                 await postDetailsViewModel.refreshPostAndCommentsWithContinuation()
             }
         }
+        .onChange(of: postDetailsViewModel.post) {
+            setUpMenu()
+        }
         .onChange(of: commentSubmissionShareableViewModel.submittedComment) {
             if let sentComment = commentSubmissionShareableViewModel.submittedComment {
                 if let sentCommentParent = self.sentCommentParent {
@@ -219,6 +227,12 @@ struct PostDetailsView: View {
                 commentToBeEdited = nil
             }
         }
+        .onChange(of: postEditingShareableViewModel.editedPost) { _, newValue in
+            if let editedPost = newValue {
+                postDetailsViewModel.editPost(editedPost)
+                postEditingShareableViewModel.editedPost = nil
+            }
+        }
         .task(id: postDetailsViewModel.loadPostAndCommentsTaskId) {
             await postDetailsViewModel.initialLoadPostAndComments()
         }
@@ -228,22 +242,7 @@ struct PostDetailsView: View {
             NavigationBarMenu()
         }
         .onAppear {
-            if let key = navigationBarMenuKey {
-                navigationBarMenuManager.pop(key: key)
-            }
-            navigationBarMenuKey = navigationBarMenuManager.push([
-                NavigationBarMenuItem(title: "Refresh") {
-                    postDetailsViewModel.refreshPostAndComments()
-                },
-                
-                NavigationBarMenuItem(title: "Sort") {
-                    showSortTypeSheet = true
-                },
-                
-                NavigationBarMenuItem(title: "Send comment") {
-                    sendComment()
-                }
-            ])
+            setUpMenu()
         }
         .onDisappear {
             guard let navigationBarMenuKey else { return }
@@ -258,6 +257,115 @@ struct PostDetailsView: View {
             }
             .presentationDetents([.medium, .large])
         }
+        .overlay(
+            CustomAlert(title: activeAlert?.title ?? "",
+                        confirmButtonText: activeAlert?.confirmButtonText ?? "",
+                        buttonStyle: activeAlert?.buttonStyle ?? .info,
+                        isPresented: Binding(
+                            get: { activeAlert != nil },
+                            set: { newValue in
+                                if !newValue {
+                                    activeAlert = nil
+                                }
+                            }
+                        )) {} onConfirm: {
+                            if let alert = activeAlert {
+                                switch alert {
+                                case .deletePost:
+                                    postDetailsViewModel.deletePost()
+                                }
+                            }
+                        }
+        )
+    }
+    
+    private func setUpMenu() {
+        if let key = navigationBarMenuKey {
+            navigationBarMenuManager.pop(key: key)
+        }
+        
+        let menuItems: [NavigationBarMenuItem]
+        if AccountViewModel.shared.account.username == postDetailsViewModel.post?.author {
+            if postDetailsViewModel.post?.canEditBody == true {
+                menuItems = [
+                    NavigationBarMenuItem(title: "Refresh") {
+                        postDetailsViewModel.refreshPostAndComments()
+                    },
+                    
+                    NavigationBarMenuItem(title: "Sort") {
+                        showSortTypeSheet = true
+                    },
+                    
+                    NavigationBarMenuItem(title: "Send comment") {
+                        sendComment()
+                    },
+                    
+                    NavigationBarMenuItem(title: postDetailsViewModel.post?.hidden ?? false ? "Unhide post" : "Hide post") {
+                        postDetailsViewModel.toggleHidePost {
+                            setUpMenu()
+                        }
+                    },
+                    
+                    NavigationBarMenuItem(title: "Edit post") {
+                        editPost()
+                    },
+                    
+                    NavigationBarMenuItem(title: "Delete post") {
+                        withAnimation(.linear(duration: 0.2)) {
+                            activeAlert = .deletePost
+                        }
+                    }
+                ]
+            } else {
+                menuItems = [
+                    NavigationBarMenuItem(title: "Refresh") {
+                        postDetailsViewModel.refreshPostAndComments()
+                    },
+                    
+                    NavigationBarMenuItem(title: "Sort") {
+                        showSortTypeSheet = true
+                    },
+                    
+                    NavigationBarMenuItem(title: "Send comment") {
+                        sendComment()
+                    },
+                    
+                    NavigationBarMenuItem(title: postDetailsViewModel.post?.hidden ?? false ? "Unhide post" : "Hide post") {
+                        postDetailsViewModel.toggleHidePost {
+                            setUpMenu()
+                        }
+                    },
+                    
+                    NavigationBarMenuItem(title: "Delete post") {
+                        withAnimation(.linear(duration: 0.2)) {
+                            activeAlert = .deletePost
+                        }
+                    }
+                ]
+            }
+        } else {
+            menuItems = [
+                NavigationBarMenuItem(title: "Refresh") {
+                    postDetailsViewModel.refreshPostAndComments()
+                },
+                
+                NavigationBarMenuItem(title: "Sort") {
+                    showSortTypeSheet = true
+                },
+                
+                NavigationBarMenuItem(title: "Send comment") {
+                    sendComment()
+                },
+                
+                NavigationBarMenuItem(title: postDetailsViewModel.post?.hidden ?? false ? "Unhide post" : "Hide post") {
+                    postDetailsViewModel.toggleHidePost {
+                        setUpMenu()
+                    }
+                }
+            ]
+        }
+        
+        navigationBarMenuKey = navigationBarMenuManager.push(menuItems)
     }
     
     private func sendComment() {
@@ -268,7 +376,38 @@ struct PostDetailsView: View {
         }
     }
     
-    private func editComment(_ comment: Comment) {
+    private func editPost() {
+        if let post = postDetailsViewModel.post {
+            navigationManager.path.append(AppNavigation.editPost(post: post))
+        }
+    }
+    
+    private enum ActiveAlert: Identifiable {
+        case deletePost
+
+        var id: Int {
+            hashValue
+        }
         
+        var title: String {
+            switch self {
+            case .deletePost:
+                return "Delete Post?"
+            }
+        }
+        
+        var confirmButtonText: String {
+            switch self {
+            case .deletePost:
+                return "Delete"
+            }
+        }
+        
+        var buttonStyle: AlertButtonStyle {
+            switch self {
+            case .deletePost:
+                return .warning
+            }
+        }
     }
 }

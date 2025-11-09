@@ -16,12 +16,18 @@ struct CustomAlert<Content: View>: View {
     var title: String
     var subtitle: String?
     var content: Content?
+    var dismissButtonText: String
+    var confirmButtonText: String
+    var buttonStyle: AlertButtonStyle
     var onDismiss: (() -> Void)?
     var onConfirm: (() -> Void)?
     
     init(
         title: String,
         subtitle: String? = nil,
+        dismissButtonText: String = "Cancel",
+        confirmButtonText: String = "Yes",
+        buttonStyle: AlertButtonStyle = .info,
         isPresented: Binding<Bool>,
         @ViewBuilder content: () -> Content? = { nil },
         onDismiss: (() -> Void)? = nil,
@@ -29,6 +35,9 @@ struct CustomAlert<Content: View>: View {
     ) {
         self.title = title
         self.subtitle = subtitle
+        self.dismissButtonText = dismissButtonText
+        self.confirmButtonText = confirmButtonText
+        self.buttonStyle = buttonStyle
         self._isPresented = isPresented
         self.content = content()
         self.onDismiss = onDismiss
@@ -50,6 +59,7 @@ struct CustomAlert<Content: View>: View {
                 VStack(spacing: 0) {
                     Text(title)
                         .primaryText()
+                        .font(.system(size: 20, weight: .bold))
                         .padding(.top, 16)
                         .padding(.horizontal, 16)
                     
@@ -78,7 +88,7 @@ struct CustomAlert<Content: View>: View {
                                 isPresented = false
                             }
                         }) {
-                            Text("Cancel")
+                            Text(dismissButtonText)
                                 .neutralTextButton()
                                 .frame(maxWidth: .infinity)
                                 .padding(16)
@@ -96,8 +106,13 @@ struct CustomAlert<Content: View>: View {
                                 isPresented = false
                             }
                         }) {
-                            Text("OK")
-                                .positiveTextButton()
+                            Text(confirmButtonText)
+                                .applyIf(buttonStyle == .info) {
+                                    $0.positiveTextButton()
+                                }
+                                .applyIf(buttonStyle == .warning) {
+                                    $0.warningTextButton()
+                                }
                                 .frame(maxWidth: .infinity)
                                 .padding(16)
                                 .contentShape(Rectangle())
@@ -130,4 +145,9 @@ struct MaxHeightKey: PreferenceKey {
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = max(value, nextValue())
     }
+}
+
+enum AlertButtonStyle {
+    case info
+    case warning
 }

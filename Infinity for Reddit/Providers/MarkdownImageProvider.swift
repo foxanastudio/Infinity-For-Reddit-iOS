@@ -70,6 +70,8 @@ struct WebImageProvider: ImageProvider {
                             .font(.system(size: 18))
                     }
                 }
+            } else {
+                EmptyView()
             }
         } else {
             // When there is no MediaMetadata

@@ -15,14 +15,10 @@ struct PostView: View {
     let post: Post
     let layout: PostLayoutType
     let isSubredditPostListing: Bool
-    
-    // Callback closures
     let onPostTypeTap: () -> Void
     let onSensitiveTap: () -> Void
-    
-    // MARK: - Init
+
     init(
-        account: Account,
         post: Post,
         layout: PostLayoutType,
         isSubredditPostListing: Bool,
@@ -36,14 +32,13 @@ struct PostView: View {
         self.onSensitiveTap = onSensitiveTap
         _postViewModel = StateObject(
             wrappedValue: PostViewModel(
-                account: account,
+                account: AccountViewModel.shared.account,
                 post: post,
                 postRepository: PostRepository()
             )
         )
     }
-    
-    // MARK: - Body
+
     var body: some View {
         switch layout {
         case .card:

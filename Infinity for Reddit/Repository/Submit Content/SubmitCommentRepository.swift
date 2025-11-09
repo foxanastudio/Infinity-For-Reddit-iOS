@@ -30,7 +30,7 @@ class SubmitCommentRepository: SubmitCommentRepositoryProtocol {
         if embeddedImages.isEmpty && giphyGif == nil {
             params = ["api_type": "json", "return_rtjson": "true", "text": content, "thing_id": parentFullname]
         } else {
-            params = ["api_type": "json", "return_rtjson": "true", "richtext_json": RichtextJSONConverter(embeddedImages: embeddedImages, giphyGif: giphyGif).constructRichtextJSON(markdownString: content), "text": "", "thing_id": parentFullname]
+            params = ["api_type": "json", "return_rtjson": "true", "richtext_json": RichtextJSONConverter(embeddedImages: embeddedImages, giphyGifId: giphyGif?.id).constructRichtextJSON(markdownString: content), "text": "", "thing_id": parentFullname]
         }
         print(params)
         

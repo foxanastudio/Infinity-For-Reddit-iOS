@@ -193,6 +193,27 @@ public class CommentListingViewModel: ObservableObject {
         guard let index = self.comments.firstIndex(where: { $0.id == commentToBeEdited.id }) else { return }
         self.comments[index].bodyProcessedMarkdown = comment.bodyProcessedMarkdown
         self.comments[index].body = comment.body
+        self.comments[index].mediaMetadata = comment.mediaMetadata
         self.comments[index].edited = true
+    }
+    
+    func deleteComment(_ comment: Comment) {
+        Task {
+            do {
+                try await commentListingRepository.deleteComment(comment)
+                
+                await MainActor.run {
+                    guard let index = self.comments.index(id: comment.id) else {
+                        return
+                    }
+                    self.comments.remove(at: index)
+                }
+            } catch {
+                await MainActor.run {
+                    self.error = error
+                }
+                print(error)
+            }
+        }
     }
 }

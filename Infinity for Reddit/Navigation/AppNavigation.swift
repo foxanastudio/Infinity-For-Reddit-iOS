@@ -24,5 +24,8 @@ enum AppNavigation: Hashable {
     case submitGalleryPost
     case submitPollPost
     case filterPosts(postListingMetadata: PostListingMetadata)
+    case filterHistoryPosts(historyPostListingMetadata: HistoryPostListingMetadata)
     case filteredPosts(postListingMetadata: PostListingMetadata, postFilter: PostFilter)
+    case filteredHistoryPosts(historyPostListingMetadata: HistoryPostListingMetadata, postFilter: PostFilter)
+    case editPost(post: Post)
 }

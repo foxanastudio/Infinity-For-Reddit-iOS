@@ -95,6 +95,7 @@ struct CommentViewCard: View {
                     } else {
                         VStack(alignment: .leading, spacing: 0) {
                             CommentAuthorView(comment: commentViewModel.comment)
+                                .id(commentViewModel.comment.author)
                             
                             AuthorFlairView(flairRichtext: commentViewModel.comment.authorFlairRichtext, flairText: commentViewModel.comment.authorFlairText)
                         }

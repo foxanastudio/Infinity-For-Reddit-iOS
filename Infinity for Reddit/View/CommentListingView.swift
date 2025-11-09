@@ -62,12 +62,12 @@ struct CommentListingView: View {
                                     navigationManager.path.append(AppNavigation.editComment(commentToBeEdited: comment))
                                 },
                                 onDelete: {
-                                    
+                                    commentListingViewModel.deleteComment(comment)
                                 }
                             )
                         }
                         .listPlainItemNoInsets()
-                        .id(comment.id)
+                        .id(ObjectIdentifier(comment))
                     }
                     if commentListingViewModel.hasMorePages {
                         ProgressIndicator()

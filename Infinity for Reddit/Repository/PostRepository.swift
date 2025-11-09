@@ -18,7 +18,7 @@ class PostRepository: PostRepositoryProtocol {
     }
     
     private let session: Session
-    private let readPostDao: ReadPostDao
+    private let postHistoryDao: PostHistoryDao
     
     init() {
         guard let resolvedSession = DependencyManager.shared.container.resolve(Session.self) else {
@@ -28,7 +28,7 @@ class PostRepository: PostRepositoryProtocol {
             fatalError("Failed to resolve DatabasePool")
         }
         self.session = resolvedSession
-        self.readPostDao = ReadPostDao(dbPool: resolvedDBPool)
+        self.postHistoryDao = PostHistoryDao(dbPool: resolvedDBPool)
     }
     
     func votePost(
@@ -44,6 +44,38 @@ class PostRepository: PostRepositoryProtocol {
                 .validate()
                 .serializingDecodable(Empty.self, automaticallyCancelling: true)
                 .value
+        }
+    }
+    
+    func votePostAnonymous(
+        post: Post,
+        vote: Int
+    ) async throws {
+        do {
+            if vote > 0 {
+                try await postHistoryDao.insert(
+                    postHistory: PostHistory(
+                        username: Account.ANONYMOUS_ACCOUNT.username,
+                        postId: post.id,
+                        postHistoryType: .upvoted,
+                        time: Int64(Date().timeIntervalSince1970)
+                    )
+                )
+                try await postHistoryDao.deletePostHistory(username: Account.ANONYMOUS_ACCOUNT.username, postId: post.id, postHistoryType: .downvoted)
+            } else if vote == 0 {
+                try await postHistoryDao.deletePostHistory(username: Account.ANONYMOUS_ACCOUNT.username, postId: post.id, postHistoryType: .upvoted)
+                try await postHistoryDao.deletePostHistory(username: Account.ANONYMOUS_ACCOUNT.username, postId: post.id, postHistoryType: .downvoted)
+            } else {
+                try await postHistoryDao.insert(
+                    postHistory: PostHistory(
+                        username: Account.ANONYMOUS_ACCOUNT.username,
+                        postId: post.id,
+                        postHistoryType: .downvoted,
+                        time: Int64(Date().timeIntervalSince1970)
+                    )
+                )
+                try await postHistoryDao.deletePostHistory(username: Account.ANONYMOUS_ACCOUNT.username, postId: post.id, postHistoryType: .upvoted)
+            }
         }
     }
     
@@ -63,21 +95,38 @@ class PostRepository: PostRepositoryProtocol {
         }
     }
     
-    func readPost(post: Post, account: Account, limitReadPosts: Bool, readPostsLimit: Int) async throws {
-        guard !account.isAnonymous() else {
-            return
+    func savePostAnonymous(
+        post: Post,
+        save: Bool
+    ) async throws {
+        do {
+            if save {
+                try await postHistoryDao.insert(
+                    postHistory: PostHistory(
+                        username: Account.ANONYMOUS_ACCOUNT.username,
+                        postId: post.id,
+                        postHistoryType: .saved,
+                        time: Int64(Date().timeIntervalSince1970)
+                    )
+                )
+            } else {
+                try await postHistoryDao.deletePostHistory(username: Account.ANONYMOUS_ACCOUNT.username, postId: post.id, postHistoryType: .saved)
+            }
         }
-        
+    }
+    
+    func readPost(post: Post, account: Account, limitReadPosts: Bool, readPostsLimit: Int) async throws {
         if limitReadPosts {
-            if try await readPostDao.getReadPostsCount(username: account.username) >= readPostsLimit {
-                try await readPostDao.deleteOldestReadPosts(username: account.username)
+            if try await postHistoryDao.getReadPostsCount(username: account.username) >= readPostsLimit {
+                try await postHistoryDao.deleteOldestReadPosts(username: account.username)
             }
         }
         
-        try await readPostDao.insert(
-            readPost: ReadPost(
+        try await postHistoryDao.insert(
+            postHistory: PostHistory(
                 username: account.username,
                 postId: post.id,
+                postHistoryType: .readPosts,
                 time: Int64(Date().timeIntervalSince1970)
             )
         )

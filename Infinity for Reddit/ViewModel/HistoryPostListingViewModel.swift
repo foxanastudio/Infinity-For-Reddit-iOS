@@ -1,8 +1,8 @@
 //
-//  PostListingViewModel.swift
+//  HistoryPostListingViewModel.swift
 //  Infinity for Reddit
 //
-//  Created by Docile Alligator on 2024-12-05.
+//  Created by Docile Alligator on 2025-11-03.
 //
 
 import Foundation
@@ -10,58 +10,28 @@ import Combine
 import MarkdownUI
 import GRDB
 import SwiftUI
-import IdentifiedCollections
 
-enum PostListItem: Identifiable {
-    var id: String {
-        switch self {
-        case .post(let post):
-            return post.id
-        case .loading:
-            return UUID().uuidString
-        }
-    }
-    
-    case post(Post)
-    case loading
-}
-
-public class PostListingViewModel: ObservableObject {
+public class HistoryPostListingViewModel: ObservableObject {
     // MARK: - Properties
-    @Published var posts: IdentifiedArrayOf<Post> = []
+    @Published var posts: [Post] = []
     @Published var isInitialLoad: Bool = true
     @Published var isInitialLoading: Bool = false
     @Published var isLoadingMore: Bool = false
     @Published var hasMorePages: Bool = true
     @Published var error: Error?
-    @Published var sortType: SortType
     @Published var loadPostsTaskId = UUID()
     @Published var layout: PostLayoutType
     
-    @Published var appearedPosts: [Post] = []
-    @Published var lazyModeScrolledPost: Post?
-    
-    var itemsWithLoadingIndicator: [PostListItem] {
-        if hasMorePages {
-            return posts.map { .post($0) } + [.loading]
-        } else {
-            return posts.map { .post($0) }
-        }
-    }
-    
-    private var postListingMetadata: PostListingMetadata
+    private var historyPostListingMetadata: HistoryPostListingMetadata
     private var externalPostFilter: PostFilter?
     private var postFilter: PostFilter?
-    private var lastLoadedSortType: SortType? = nil
-    private var allPostIds = Set<String>()
-    private var after: String? = nil
+    private var before: Int64? = nil
     
     // UserDefaults
     private var sensitiveContent: Bool
     private var spoilerContent: Bool
-    private var readPostEnabled: Bool = true
     
-    private let postListingRepository: PostListingRepositoryProtocol
+    private let historyPostListingRepository: HistoryPostListingRepositoryProtocol
     private let historyPostsRepository: HistoryPostsRepositoryProtocol
     
     private var refreshPostsContinuation: CheckedContinuation<Void, Never>?
@@ -75,22 +45,21 @@ public class PostListingViewModel: ObservableObject {
     
     // MARK: - Initializer
     init(
-        postListingMetadata: PostListingMetadata,
+        historyPostListingMetadata: HistoryPostListingMetadata,
         externalPostFilter: PostFilter?,
-        postListingRepository: PostListingRepositoryProtocol,
+        historyPostListingRepository: HistoryPostListingRepositoryProtocol,
         historyPostsRepository: HistoryPostsRepositoryProtocol,
         postFeedID: String
     ) {
-        self.sortType = postListingMetadata.postListingType.savedSortType
-        self.postListingMetadata = postListingMetadata
+        self.historyPostListingMetadata = historyPostListingMetadata
         self.externalPostFilter = externalPostFilter
-        self.postListingRepository = postListingRepository
+        self.historyPostListingRepository = historyPostListingRepository
         self.historyPostsRepository = historyPostsRepository
         
         self.sensitiveContent = ContentSensitivityFilterUserDetailsUtils.sensitiveContent
         self.spoilerContent = ContentSensitivityFilterUserDetailsUtils.spoilerContent
         
-        self.postFeedID = postFeedID 
+        self.postFeedID = postFeedID
         
         if let customLayout = Self.loadCustomLayout(for: postFeedID) {
             self.layout = customLayout
@@ -99,7 +68,6 @@ public class PostListingViewModel: ObservableObject {
             self.layout = PostLayoutType(rawValue: InterfacePostUserDefaultsUtils.defaultPostLayout) ?? .card
             print("Using default layout \(layout) for feed \(postFeedID)")
         }
-        
         
         NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
             .sink { [weak self] _ in
@@ -135,10 +103,6 @@ public class PostListingViewModel: ObservableObject {
     // MARK: - Methods
     
     public func initialLoadPosts() async {
-        if sortType != lastLoadedSortType {
-            await resetPostLoadingState()
-        }
-        
         guard isInitialLoad else {
             return
         }
@@ -179,99 +143,39 @@ public class PostListingViewModel: ObservableObject {
         do {
             try Task.checkCancellation()
             
-            if case .anonymousFrontPage(let concatenatedSubscriptions) = postListingMetadata.postListingType {
-                if let subscriptions = concatenatedSubscriptions {
-                    if subscriptions.isEmpty {
-                        // No anonymous subscriptions
-                    } else {
-                        postListingMetadata.pathComponents = ["subreddit": subscriptions]
-                    }
-                } else {
-                    let fetchedSubscriptions = postListingRepository.getAnonymousSubscriptionsConcatenated()
-                    postListingMetadata.postListingType = .anonymousFrontPage(concatenatedSubscriptions: fetchedSubscriptions)
-                    if fetchedSubscriptions.isEmpty {
-                        // No anonymous subscriptions
-                    } else {
-                        postListingMetadata.pathComponents = ["subreddit": fetchedSubscriptions]
-                    }
-                }
-            }
+            let result = try await historyPostListingRepository.fetchPosts(
+                historyPostListingType: historyPostListingMetadata.historyPostListingType,
+                username: AccountViewModel.shared.account.username,
+                before: before
+            )
             
-            let postListing: PostListing
-            switch postListingMetadata.postListingType.sortEmbeddingStyle {
-            case .inPath:
-                var queries = ["t": sortType.time?.rawValue ?? "", "limit": "100", "after": self.after ?? ""]
-                if postListingMetadata.postListingType.canQuerySensitiveInAPICall {
-                    queries["include_over_18"] = sensitiveContent ? "1" : "0"
-                }
-                postListing = try await postListingRepository.fetchPosts(
-                    postListingType: postListingMetadata.postListingType,
-                    pathComponents: ["sortType": sortType.type.rawValue].merging(postListingMetadata.pathComponents, uniquingKeysWith: { _, new in new }),
-                    queries: queries.merging(postListingMetadata.queries ?? [:], uniquingKeysWith: { _, new in new }),
-                    params: postListingMetadata.params
-                )
-            case .inQuery(let key):
-                var queries = [key: sortType.type.rawValue, "t": sortType.time?.rawValue ?? "", "limit": "100", "after": self.after ?? ""]
-                if postListingMetadata.postListingType.canQuerySensitiveInAPICall {
-                    queries["include_over_18"] = sensitiveContent ? "1" : "0"
-                }
-                postListing = try await postListingRepository.fetchPosts(
-                    postListingType: postListingMetadata.postListingType,
-                    pathComponents: postListingMetadata.pathComponents,
-                    queries: queries.merging(postListingMetadata.queries ?? [:], uniquingKeysWith: { _, new in new }),
-                    params: postListingMetadata.params
-                )
-            case .none:
-                var queries = ["limit": "100", "after": self.after ?? ""]
-                if postListingMetadata.postListingType.canQuerySensitiveInAPICall {
-                    queries["include_over_18"] = sensitiveContent ? "1" : "0"
-                }
-                postListing = try await postListingRepository.fetchPosts(
-                    postListingType: postListingMetadata.postListingType,
-                    pathComponents: postListingMetadata.pathComponents,
-                    queries: queries.merging(postListingMetadata.queries ?? [:], uniquingKeysWith: { _, new in new }),
-                    params: postListingMetadata.params
-                )
-            }
+            let postListing = result.postListing
             
-            try Task.checkCancellation()
-            
-            if postFilter == nil {
-                fetchPostFilter()
-            }
-            
-            let processedPosts = self.postProcessPosts(postListing.posts)
-            
-            try Task.checkCancellation()
-            
-            if (processedPosts.isEmpty) {
+            if postListing.posts.isEmpty {
                 // No more posts
                 await MainActor.run {
                     hasMorePages = false
-                    self.after = nil
+                    self.before = nil
                 }
             } else {
-                let realNewPosts = processedPosts.filter {
-                    !self.allPostIds.contains($0.id)
+                try Task.checkCancellation()
+                
+                if postFilter == nil {
+                    fetchPostFilter()
                 }
                 
-                self.after = postListing.after
+                let processedPosts = self.postProcessPosts(postListing.posts)
                 
-                allPostIds.formUnion(
-                    realNewPosts
-                        .compactMap {
-                            $0.id
-                        }
-                )
+                try Task.checkCancellation()
+                
+                self.before = result.before
                 
                 await MainActor.run {
                     if isRefreshWithContinuation {
                         self.posts.removeAll()
-                        self.appearedPosts.removeAll()
-                        self.lazyModeScrolledPost = nil
                     }
-                    self.posts.append(contentsOf: realNewPosts)
-                    hasMorePages = !(self.after == nil || self.after?.isEmpty == true)
+                    self.posts.append(contentsOf: processedPosts)
+                    hasMorePages = true
                 }
             }
             
@@ -282,8 +186,6 @@ public class PostListingViewModel: ObservableObject {
                 
                 isInitialLoading = false
                 isLoadingMore = false
-                
-                self.lastLoadedSortType = self.sortType
             }
         } catch {
             await MainActor.run {
@@ -300,33 +202,27 @@ public class PostListingViewModel: ObservableObject {
     
     @MainActor
     func refreshPostsWithContinuation() async {
+        resetPostLoadingState()
         await withCheckedContinuation { continuation in
             refreshPostsContinuation = continuation
-            lastLoadedSortType = nil
             loadPostsTaskId = UUID()
         }
     }
     
     func refreshPosts() {
-        lastLoadedSortType = nil
+        resetPostLoadingState()
         loadPostsTaskId = UUID()
     }
     
-    private func resetPostLoadingState() async {
-        await MainActor.run {
-            isInitialLoad = true
-            isInitialLoading = false
-            isLoadingMore = false
-            
-            after = nil
-            hasMorePages = true
-            if refreshPostsContinuation == nil {
-                posts.removeAll()
-                appearedPosts.removeAll()
-                lazyModeScrolledPost = nil
-            }
-            
-            allPostIds = Set<String>()
+    private func resetPostLoadingState() {
+        isInitialLoad = true
+        isInitialLoading = false
+        isLoadingMore = false
+        
+        before = nil
+        hasMorePages = true
+        if refreshPostsContinuation == nil {
+            posts.removeAll()
         }
     }
     
@@ -336,11 +232,6 @@ public class PostListingViewModel: ObservableObject {
     }
     
     func postProcessPosts(_ posts: [Post]) -> [Post] {
-        let readPostIds = historyPostsRepository.getReadPostsIdsByIds(
-            readPostEnabled: readPostEnabled,
-            account: AccountViewModel.shared.account,
-            postIds: posts.map { $0.id }
-        )
         let upvotedPostIdsAnonymous = AccountViewModel.shared.account.isAnonymous() ? historyPostsRepository.getHistoryPostsIdsByIdsAnonymous(
             account: AccountViewModel.shared.account,
             postIds: posts.map { $0.id },
@@ -363,23 +254,20 @@ public class PostListingViewModel: ObservableObject {
         ) : Set<String>()
         
         return posts.filter { post in
-            print(PostFilter.isPostAllowed(post: post, postFilter: postFilter))
-            return PostFilter.isPostAllowed(post: post, postFilter: postFilter) && !hiddenPostIdsAnonymous.contains(post.id)
+            return PostFilter.isPostAllowed(post: post, postFilter: postFilter)
         }.map {
             if !$0.selftext.isEmpty {
                 modifyPostBody($0)
                 $0.selftextProcessedMarkdown = MarkdownContent($0.selftext)
             }
             
-            if readPostIds.contains($0.id) {
-                $0.isRead = true
-            }
             if upvotedPostIdsAnonymous.contains($0.id) {
                 $0.likes = 1
             }
             if downvotedPostIdsAnonymous.contains($0.id) {
                 $0.likes = -1
             }
+            $0.hidden = hiddenPostIdsAnonymous.contains($0.id)
             $0.saved = savedPostIdsAnonymous.contains($0.id)
             
             return $0
@@ -391,41 +279,21 @@ public class PostListingViewModel: ObservableObject {
     }
     
     func fetchPostFilter() {
-        self.postFilter = postListingRepository.getPostFilter(
-            postListingType: postListingMetadata.postListingType,
+        self.postFilter = historyPostListingRepository.getPostFilter(
+            historyPostListingType: historyPostListingMetadata.historyPostListingType,
             externalPostFilter: externalPostFilter
         )
         self.postFilter?.allowSensitive = sensitiveContent
         self.postFilter?.allowSpoiler = spoilerContent
     }
     
-    func loadIcon(post: Post, displaySubredditIcon: Bool) async {
+    func loadIcon(post: Post) async {
         guard post.subredditOrUserIcon == nil else { return }
         
         do {
-            try await postListingRepository.loadIcon(post: post, displaySubredditIcon: displaySubredditIcon)
+            try await historyPostListingRepository.loadIcon(post: post)
         } catch {
             print("Load icon failed")
-        }
-    }
-    
-    func changeSortTypeKind(_ sortTypeKind: SortType.Kind) {
-        if sortTypeKind != self.sortType.type {
-            self.sortType = self.sortType.with(type: sortTypeKind)
-            loadPostsTaskId = UUID()
-            if SortTypeSettingsUserDefaultsUtils.saveSortType {
-                postListingMetadata.postListingType.saveSortType(sortType: SortType(type: sortTypeKind))
-            }
-        }
-    }
-    
-    func changeSortType(_ sortType: SortType) {
-        if sortType != self.sortType {
-            self.sortType = sortType
-            loadPostsTaskId = UUID()
-            if SortTypeSettingsUserDefaultsUtils.saveSortType {
-                postListingMetadata.postListingType.saveSortType(sortType: sortType)
-            }
         }
     }
     
@@ -479,41 +347,5 @@ public class PostListingViewModel: ObservableObject {
     
     private static func hasCustomLayout(for postFeedID: String) -> Bool {
         UserDefaults.interfacePost.object(forKey: key(for: postFeedID)) != nil
-    }
-    
-    func hideReadPosts() {
-        self.posts.removeAll {
-            $0.isRead
-        }
-        self.appearedPosts.removeAll {
-            $0.isRead
-        }
-    }
-    
-    func insertIntoAppearedPosts(_ post: Post) {
-        self.appearedPosts.removeAll {
-            $0.id == post.id
-        }
-        
-        guard !self.appearedPosts.isEmpty else {
-            appearedPosts.append(post)
-            return
-        }
-        
-        if let index = self.posts.index(id: post.id) {
-            var inserted: Bool = false
-            for (i, appearedPost) in self.appearedPosts.enumerated() {
-                if let appearedPostIndex = self.posts.index(id: appearedPost.id), index < appearedPostIndex {
-                    self.appearedPosts.insert(post, at: i)
-                    inserted = true
-                    break
-                }
-            }
-            if !inserted {
-                self.appearedPosts.append(post)
-            }
-        } else {
-            appearedPosts.append(post)
-        }
     }
 }

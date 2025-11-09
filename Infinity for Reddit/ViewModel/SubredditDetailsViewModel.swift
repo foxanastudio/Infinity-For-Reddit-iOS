@@ -78,20 +78,6 @@ class SubredditDetailsViewModel: ObservableObject {
         }
     }
     
-    func formattedCakeDay(_ timestamp: TimeInterval?) -> String {
-        guard let timestamp = timestamp else {
-            return "Unknown"
-        }
-        
-        let date = Date(timeIntervalSince1970: timestamp)
-        let dateFormatter = DateFormatter()
-        
-        dateFormatter.dateStyle = .medium
-        dateFormatter.timeStyle = .none
-        
-        return dateFormatter.string(from: date)
-    }
-    
     func fetchSubredditDetails() async {
         do {
             try Task.checkCancellation()

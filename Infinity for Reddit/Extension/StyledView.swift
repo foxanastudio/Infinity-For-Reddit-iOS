@@ -226,6 +226,10 @@ extension View {
         self.modifier(PositiveTextButtonViewModifier())
     }
     
+    func warningTextButton() -> some View {
+        self.modifier(WarningTextButtonViewModifier())
+    }
+    
     func neutralTextButton() -> some View {
         self.modifier(NeutralTextButtonViewModifier())
     }

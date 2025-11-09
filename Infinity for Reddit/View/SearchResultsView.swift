@@ -22,7 +22,7 @@ struct SearchResultsView: View {
                 .padding(4)
             
             TabView(selection: $selectedOption) {
-                PostListingView(account: accountViewModel.account, postListingMetadata: PostListingMetadata(
+                PostListingView(postListingMetadata: PostListingMetadata(
                     postListingType: PostListingType.search(
                         query: searchResultsViewModel.query,
                         searchInSubredditOrUserName: searchResultsViewModel.searchInSubredditOrUserName,
@@ -32,7 +32,7 @@ struct SearchResultsView: View {
                     headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
                     queries: ["q": searchResultsViewModel.query, "type": "link"],
                     params: nil
-                ))
+                ), handleToolbarMenu: false)
                 .tag(0)
                 
                 SubredditListingView(account: accountViewModel.account, query: searchResultsViewModel.query)

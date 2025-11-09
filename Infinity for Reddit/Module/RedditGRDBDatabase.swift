@@ -248,13 +248,14 @@ struct RedditGRDBDatabase {
                 t.primaryKey(["username", "search_query"])
             }
             
-            try db.create(table: ReadPost.databaseTableName, ifNotExists: true) { t in
+            try db.create(table: PostHistory.databaseTableName, ifNotExists: true) { t in
                 t.column("username", .text).notNull()
                     .references(Account.databaseTableName, column: "username", onDelete: .cascade)
                 t.column("post_id", .text).notNull()
+                t.column("post_history_type", .integer).notNull()
                 t.column("time", .integer).notNull()
 
-                t.primaryKey(["username", "post_id"], onConflict: .replace)
+                t.primaryKey(["username", "post_id", "post_history_type"], onConflict: .replace)
             }
         }
     }

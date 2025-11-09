@@ -12,14 +12,30 @@ import Foundation
 import GRDB
 
 public class PostDetailsRepository: PostDetailsRepositoryProtocol {
-    enum PostDetailsRepositoryError: Error {
+    enum PostDetailsRepositoryError: LocalizedError {
         case NetworkError(String)
         case JSONDecodingError(String)
+        case commentIdNotFound
+        case postIdNotFound
+        
+        var errorDescription: String? {
+            switch self {
+            case .NetworkError(let message):
+                return message
+            case .JSONDecodingError(let message):
+                return message
+            case .commentIdNotFound:
+                return "Comment ID not found"
+            case .postIdNotFound:
+                return "Post ID not found"
+            }
+        }
     }
     
     private let session: Session
     private let subredditDao: SubredditDao
     private let commentFilterDao: CommentFilterDao
+    private let postHistoryDao: PostHistoryDao
     
     public init() {
         guard let resolvedSession = DependencyManager.shared.container.resolve(Session.self) else {
@@ -31,6 +47,7 @@ public class PostDetailsRepository: PostDetailsRepositoryProtocol {
         self.session = resolvedSession
         self.subredditDao = SubredditDao(dbPool: resolvedDBPool)
         self.commentFilterDao = CommentFilterDao(dbPool: resolvedDBPool)
+        self.postHistoryDao = PostHistoryDao(dbPool: resolvedDBPool)
     }
     
     public func fetchComments(
@@ -190,6 +207,65 @@ public class PostDetailsRepository: PostDetailsRepositoryProtocol {
         
         await MainActor.run {
             post.subredditOrUserIconInPostDetails = UserDetailRootClass(fromJson: json).toUserData().iconUrl ?? ""
+        }
+    }
+    
+    public func deleteComment(_ comment: Comment) async throws {
+        guard let name = comment.name else {
+            throw PostDetailsRepositoryError.commentIdNotFound
+        }
+        let params = ["id": name]
+        
+        try Task.checkCancellation()
+        
+        _ = try await self.session.request(RedditOAuthAPI.deletePostOrComment(params: params))
+            .validate()
+            .serializingDecodable(Empty.self, automaticallyCancelling: true)
+            .value
+    }
+    
+    public func deletePost(_ post: Post) async throws {
+        guard let name = post.name else {
+            throw PostDetailsRepositoryError.postIdNotFound
+        }
+        let params = ["id": name]
+        
+        try Task.checkCancellation()
+        
+        _ = try await self.session.request(RedditOAuthAPI.deletePostOrComment(params: params))
+            .validate()
+            .serializingDecodable(Empty.self, automaticallyCancelling: true)
+            .value
+    }
+    
+    public func toggleHidePost(_ post: Post) async throws {
+        guard let name = post.name else {
+            throw PostDetailsRepositoryError.postIdNotFound
+        }
+        let params = ["id": name]
+        
+        try Task.checkCancellation()
+        
+        _ = try await self.session.request(post.hidden ? RedditOAuthAPI.unhidePost(params: params) : RedditOAuthAPI.hidePost(params: params))
+            .validate()
+            .serializingDecodable(Empty.self, automaticallyCancelling: true)
+            .value
+    }
+    
+    public func toggleHidePostAnonymous(_ post: Post) async throws {
+        do {
+            if !post.hidden {
+                try await postHistoryDao.insert(
+                    postHistory: PostHistory(
+                        username: Account.ANONYMOUS_ACCOUNT.username,
+                        postId: post.id,
+                        postHistoryType: .hidden,
+                        time: Int64(Date().timeIntervalSince1970)
+                    )
+                )
+            } else {
+                try await postHistoryDao.deletePostHistory(username: Account.ANONYMOUS_ACCOUNT.username, postId: post.id, postHistoryType: .hidden)
+            }
         }
     }
 }

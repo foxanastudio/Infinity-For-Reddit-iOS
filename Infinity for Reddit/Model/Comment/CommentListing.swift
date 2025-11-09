@@ -33,8 +33,6 @@ public class CommentListing : NSObject, Validatable {
     var dist : Int!
 
     init(fromJson json: JSON!) throws {
-        try Self.validate(json: json)
-        
         if json.isEmpty {
             throw JSONError.invalidData
         }
@@ -80,7 +78,7 @@ public class Comment : NSObject, Validatable, Identifiable, ObservableObject {
     var approvedBy : String!
     var archived : Bool!
     //    var associatedAward : AnyObject!
-    var author : String!
+    @Published var author : String!
     var authorFlairBackgroundColor : String!
     var authorFlairCssClass : String!
     var authorFlairRichtext : [FlairRichtext]! = [FlairRichtext]()
@@ -95,8 +93,8 @@ public class Comment : NSObject, Validatable, Identifiable, ObservableObject {
     //    var awarders : [AnyObject]!
     var bannedAtUtc : String!
     var bannedBy : String!
-    var body : String!
-    var bodyProcessedMarkdown : MarkdownContent?
+    @Published var body : String!
+    @Published var bodyProcessedMarkdown : MarkdownContent?
     var bodyHtml : String!
     var canGild : Bool!
     var canModPost : Bool!
@@ -126,7 +124,7 @@ public class Comment : NSObject, Validatable, Identifiable, ObservableObject {
     var modReasonBy : String!
     var modReasonTitle : String!
     var modReports : [[Any]]! = [[Any]]()
-    var mediaMetadata: [String: MediaMetadata]?
+    @Published var mediaMetadata: [String: MediaMetadata]?
     var name : String!
     var noFollow : Bool!
     var numComments : Int!
@@ -256,11 +254,7 @@ public class Comment : NSObject, Validatable, Identifiable, ObservableObject {
         permalink = json["permalink"].stringValue
         quarantine = json["quarantine"].boolValue
         removalReason = json["removal_reason"].stringValue
-        do {
-            replies = try CommentListing(fromJson: json["replies"]["data"])
-        } catch {
-            print("Failed to parse replies: \(error)")
-        }
+        replies = try? CommentListing(fromJson: json["replies"]["data"])
         reportReasons = json["report_reasons"].stringValue
         saved = json["saved"].boolValue
         var score = json["score"].intValue

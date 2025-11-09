@@ -11,10 +11,21 @@ import SwiftyJSON
 import MarkdownUI
 
 class EditCommentRepository: EditCommentRepositoryProtocol {
-    enum EditCommentRepositoryError: Error {
+    enum EditCommentRepositoryError: LocalizedError {
         case NetworkError(String)
         case JSONDecodingError(String)
         case EditCommentError(String)
+        
+        var errorDescription: String? {
+            switch self {
+            case .NetworkError(let message):
+                return message
+            case .JSONDecodingError(let message):
+                return message
+            case .EditCommentError(let message):
+                return message
+            }
+        }
     }
     
     private let session: Session
@@ -26,16 +37,20 @@ class EditCommentRepository: EditCommentRepositoryProtocol {
         self.session = resolvedSession
     }
     
-    func editComment(content: String, commentFullname: String, embeddedImages: [UploadedImage], giphyGif: GPHMedia?) async throws -> Comment? {
+    func editComment(content: String, commentFullname: String, mediaMetadataDictionary: [String: MediaMetadata]?, embeddedImages: [UploadedImage], giphyGifId: String?) async throws -> EditCommentResult? {
         guard !content.isEmpty else {
             throw EditCommentRepositoryError.EditCommentError("Where are your interesting thoughts?")
         }
         
         let params: [String : String]
-        if embeddedImages.isEmpty && giphyGif == nil {
+        if (mediaMetadataDictionary == nil || (mediaMetadataDictionary != nil && mediaMetadataDictionary!.isEmpty)) && embeddedImages.isEmpty && giphyGifId == nil {
             params = ["api_type": "json", "text": content, "thing_id": commentFullname]
         } else {
-            params = ["api_type": "json", "richtext_json": RichtextJSONConverter(embeddedImages: embeddedImages, giphyGif: giphyGif).constructRichtextJSON(markdownString: content), "text": "", "thing_id": commentFullname]
+            params = ["api_type": "json", "richtext_json": RichtextJSONConverter(
+                mediaMetadataDictionary: mediaMetadataDictionary,
+                embeddedImages: embeddedImages,
+                giphyGifId: giphyGifId
+            ).constructRichtextJSON(markdownString: content), "text": "", "thing_id": commentFullname]
         }
         print(params)
         
@@ -55,15 +70,29 @@ class EditCommentRepository: EditCommentRepositoryProtocol {
         
         let thingsJson = json["json"]["data"]["things"].arrayValue
         if !thingsJson.isEmpty {
-            let comment = try Comment(fromJson: thingsJson[0]["data"])
-            if comment.id.isEmpty {
-                // This is a work around for checking if JSON parsing failed
-                throw(EditCommentRepositoryError.EditCommentError("Failed to get your edited comment."))
+            let comment = try? Comment(fromJson: thingsJson[0]["data"])
+            if let comment {
+                if comment.id.isEmpty {
+                    // This is a work around for checking if JSON parsing failed
+                    return EditCommentResult.content(content: content)
+                }
+                comment.bodyProcessedMarkdown = MarkdownContent(comment.body)
+                return EditCommentResult.comment(comment: comment)
+            } else {
+                return EditCommentResult.content(content: content)
             }
-            comment.bodyProcessedMarkdown = MarkdownContent(comment.body)
-            return comment
+        } else {
+            let comment = try? Comment(fromJson: json)
+            if let comment {
+                if comment.id.isEmpty {
+                    // This is a work around for checking if JSON parsing failed
+                    return EditCommentResult.content(content: content)
+                }
+                comment.bodyProcessedMarkdown = MarkdownContent(comment.body)
+                return EditCommentResult.comment(comment: comment)
+            } else {
+                return EditCommentResult.content(content: content)
+            }
         }
-        
-        return nil
     }
 }

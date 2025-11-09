@@ -101,7 +101,6 @@ struct UserDetailsView: View {
                 TabView(selection: $selectedTab) {
                     ZStack {
                         PostListingView(
-                            account: accountViewModel.account,
                             postListingMetadata:PostListingMetadata(
                                 postListingType:.user(username: userData.name, userWhere: .submitted),
                                 pathComponents: ["username": "\(userData.name)"],

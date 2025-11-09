@@ -1,23 +1,22 @@
 //
-//  EditCommentView.swift
+//  EditPostView.swift
 //  Infinity for Reddit
 //
-//  Created by Docile Alligator on 2025-10-31.
+//  Created by Docile Alligator on 2025-11-02.
 //
 
 import SwiftUI
 import MarkdownUI
 import PhotosUI
 import MijickCamera
-import GiphyUISDK
 
-struct EditCommentView: View {
-    @EnvironmentObject private var commentSubmissionShareableViewModel: CommentSubmissionShareableViewModel
+struct EditPostView: View {
+    @EnvironmentObject private var postEditingShareableViewModel: PostEditingShareableViewModel
     @EnvironmentObject private var snackbarManager: SnackbarManager
     @EnvironmentObject private var navigationManager: NavigationManager
     @Environment(\.dismiss) var dismiss
     
-    @StateObject private var editCommentViewModel: EditCommentViewModel
+    @StateObject private var editPostViewModel: EditPostViewModel
     
     @State private var selectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var textViewCanFocus: Bool = true
@@ -26,16 +25,15 @@ struct EditCommentView: View {
     @State private var showMarkdownPreview = false
     @State private var cursorPosition: CGPoint = .zero
     @State private var showEmbeddedImagesSheet: Bool = false
-    @State private var showGiphyGifSheet: Bool = false
     @State private var showCamera: Bool = false
     @State private var showPhotoPicker: Bool = false
     @State private var selectedPhotoItem: PhotosPickerItem? = nil
     
-    init(commentToBeEdited: Comment) {
-        _editCommentViewModel = StateObject(
-            wrappedValue: EditCommentViewModel(
-                commentToBeEdited: commentToBeEdited,
-                editCommentRepository: EditCommentRepository(),
+    init(postToBeEdited: Post) {
+        _editPostViewModel = StateObject(
+            wrappedValue: EditPostViewModel(
+                postToBeEdited: postToBeEdited,
+                editPostRepository: EditPostRepository(),
                 mediaUploadRepository: MediaUploadRepository()
             )
         )
@@ -47,18 +45,18 @@ struct EditCommentView: View {
                 VStack(spacing: 0) {
                     ScrollView {
                         VStack(spacing: 0) {
-                            if let bodyProcessedMarkdown = editCommentViewModel.commentToBeEdited.bodyProcessedMarkdown {
+                            if let bodyProcessedMarkdown = editPostViewModel.postToBeEdited.selftextProcessedMarkdown {
                                 Markdown(bodyProcessedMarkdown)
-                                    .markdownImageProvider(WebImageProvider(mediaMetadata: editCommentViewModel.commentToBeEdited.mediaMetadata))
+                                    .markdownImageProvider(WebImageProvider(mediaMetadata: editPostViewModel.postToBeEdited.mediaMetadata))
                                     .font(.system(size: 24))
                                     .padding(16)
                                     .themedPostCommentMarkdown()
                                     .markdownLinkHandler { url in
                                         navigationManager.openLink(url)
                                     }
-                            } else if let body = editCommentViewModel.commentToBeEdited.body, !body.isEmpty {
-                                Markdown(body)
-                                    .markdownImageProvider(WebImageProvider(mediaMetadata: editCommentViewModel.commentToBeEdited.mediaMetadata))
+                            } else if let selftext = editPostViewModel.postToBeEdited.selftext, !selftext.isEmpty {
+                                Markdown(selftext)
+                                    .markdownImageProvider(WebImageProvider(mediaMetadata: editPostViewModel.postToBeEdited.mediaMetadata))
                                     .font(.system(size: 24))
                                     .padding(16)
                                     .themedPostCommentMarkdown()
@@ -72,7 +70,7 @@ struct EditCommentView: View {
                             
                             Divider()
                             
-                            MarkdownTextField(hint: "Your new interesting thoughts here", text: $editCommentViewModel.text, selectedRange: $selectedRange, canFocus: $textViewCanFocus)
+                            MarkdownTextField(hint: "Your new interesting thoughts here", text: $editPostViewModel.text, selectedRange: $selectedRange, canFocus: $textViewCanFocus)
                                 .contentShape(Rectangle())
                                 .padding(16)
                         }
@@ -83,17 +81,13 @@ struct EditCommentView: View {
                 }
                 
                 MarkdownToolbar(
-                    text: $editCommentViewModel.text,
+                    text: $editPostViewModel.text,
                     selectedRange: $selectedRange,
                     toolbarHeight: $toolbarHeight,
                     focusedField: $markdownFocusedField,
                     enableImageUpload: true,
-                    enableGifChooser: true,
                     onImageUpload: {
                         showEmbeddedImagesSheet = true
-                    },
-                    onChooseGif: {
-                        showGiphyGifSheet = true
                     }
                 )
             }
@@ -105,7 +99,7 @@ struct EditCommentView: View {
         }
         .frame(maxHeight: .infinity)
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar("Edit Comment")
+        .addTitleToInlineNavigationBar("Edit Post Body")
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button {
@@ -115,17 +109,17 @@ struct EditCommentView: View {
                 }
                 
                 Button {
-                    editCommentViewModel.editComment()
+                    editPostViewModel.editPost()
                 } label: {
                     SwiftUI.Image(systemName: "paperplane.fill")
                 }
             }
         }
         .sheet(isPresented: $showMarkdownPreview) {
-            MarkdownViewerSheet(markdown: editCommentViewModel.text)
+            MarkdownViewerSheet(markdown: editPostViewModel.text)
         }
         .sheet(isPresented: $showEmbeddedImagesSheet) {
-            MarkdownEmbeddedImagesSheet(embeddedImages: $editCommentViewModel.embeddedImages, onCaptureImage: {
+            MarkdownEmbeddedImagesSheet(embeddedImages: $editPostViewModel.embeddedImages, onCaptureImage: {
                 showEmbeddedImagesSheet = false
                 showCamera = true
             }, onSelectImage: {
@@ -135,29 +129,12 @@ struct EditCommentView: View {
                 showEmbeddedImagesSheet = false
                 
                 MarkdownUtils.insertImageOrGifIntoMarkdownString(
-                    content: &editCommentViewModel.text,
+                    content: &editPostViewModel.text,
                     selectedRange: &selectedRange,
                     caption: caption,
                     imageOrGifId: uploadedImage.imageId ?? ""
                 )
             })
-        }
-        .sheet(isPresented: $showGiphyGifSheet) {
-            GiphyView()
-                .onSelectMedia { media, contentType in
-                    showGiphyGifSheet = false
-                    editCommentViewModel.giphyGifId = media.id
-                    
-                    MarkdownUtils.insertImageOrGifIntoMarkdownString(
-                        content: &editCommentViewModel.text,
-                        selectedRange: &selectedRange,
-                        caption: "gif",
-                        imageOrGifId: media.id
-                    )
-                }
-                .presentationDetents([.medium, .large])
-                .presentationDragIndicator(.hidden)
-                .ignoresSafeArea(edges: .bottom)
         }
         .photosPicker(
             isPresented: $showPhotoPicker,
@@ -169,7 +146,7 @@ struct EditCommentView: View {
             if Utils.checkCameraAvailability() {
                 MCamera()
                     .onImageCaptured { capturedImage, controller in
-                        editCommentViewModel.addEmbeddedImage(capturedImage)
+                        editPostViewModel.addEmbeddedImage(capturedImage)
                         controller.closeMCamera()
                         showEmbeddedImagesSheet = true
                     }
@@ -205,13 +182,13 @@ struct EditCommentView: View {
                    let imageData = try? await selectedItem.loadTransferable(type: Data.self),
                    let image = UIImage(data: imageData) {
                     print(Utils.isGIF(imageData: imageData))
-                    editCommentViewModel.addEmbeddedImage(image)
+                    editPostViewModel.addEmbeddedImage(image)
                 } else {
                     // Error handling
                 }
             }
         }
-        .onChange(of: editCommentViewModel.editCommentTask) { _, newValue in
+        .onChange(of: editPostViewModel.editPostTask) { _, newValue in
             if newValue != nil {
                 snackbarManager.showSnackbar(
                     text: "Editing. Please wait...",
@@ -220,23 +197,23 @@ struct EditCommentView: View {
                 )
             }
         }
-        .onChange(of: editCommentViewModel.editCommentResult) { _, newValue in
-            if let editCommentResult = newValue {
-                switch editCommentResult {
-                case .comment(let comment):
-                    commentSubmissionShareableViewModel.editedComment = comment
+        .onChange(of: editPostViewModel.editPostResult) { _, newValue in
+            if let editPostResult = newValue {
+                switch editPostResult {
+                case .post(let post):
+                    postEditingShareableViewModel.editedPost = post
                     snackbarManager.dismiss()
                     dismiss()
                 case .content(let content):
-                    editCommentViewModel.commentToBeEdited.body = content
-                    editCommentViewModel.commentToBeEdited.bodyProcessedMarkdown = MarkdownContent(content)
-                    commentSubmissionShareableViewModel.editedComment = editCommentViewModel.commentToBeEdited
+                    editPostViewModel.postToBeEdited.selftext = content
+                    editPostViewModel.postToBeEdited.selftextProcessedMarkdown = MarkdownContent(content)
+                    postEditingShareableViewModel.editedPost = editPostViewModel.postToBeEdited
                     snackbarManager.showSnackbar(text: "Comment edited, but couldn’t fetch the update. Please refresh.")
                     dismiss()
                 }
             }
         }
-        .onReceive(editCommentViewModel.$error) { newValue in
+        .onReceive(editPostViewModel.$error) { newValue in
             if let error = newValue {
                 snackbarManager.showSnackbar(text: error.localizedDescription)
             }
