@@ -26,9 +26,11 @@ struct CommentListingView: View {
     @State private var commentToBeEdited: Comment? = nil
     
     private let commentListingMetadata: CommentListingMetadata
+    private let onScrolling: (() -> Void)?
     
-    init(commentListingMetadata: CommentListingMetadata) {
+    init(commentListingMetadata: CommentListingMetadata, onScrolling: (() -> Void)? = nil) {
         self.commentListingMetadata = commentListingMetadata
+        self.onScrolling = onScrolling
         _commentListingViewModel = StateObject(
             wrappedValue: CommentListingViewModel(
                 commentListingMetadata: commentListingMetadata,
@@ -38,7 +40,7 @@ struct CommentListingView: View {
     }
     
     var body: some View {
-        Group {
+        RootView {
             if commentListingViewModel.comments.isEmpty {
                 if commentListingViewModel.isInitialLoading || commentListingViewModel.isInitialLoad {
                     ProgressIndicator()
@@ -76,7 +78,13 @@ struct CommentListingView: View {
                             }
                             .listPlainItem()
                     }
-                }.scrollBounceBehavior(.basedOnSize)
+                }
+                .scrollBounceBehavior(.basedOnSize)
+                .onScrollPhaseChange { oldPhase, newPhase, context in
+                    if oldPhase == .interacting {
+                        onScrolling?()
+                    }
+                }
             }
         }
         .onChange(of: colorScheme) {

@@ -62,7 +62,7 @@ struct SubredditDetailsView: View {
                                         handleImageTapGesture: false,
                                         centerCrop: true,
                                         fallbackView: {
-                                            Color(hex: themeViewModel.currentCustomTheme.colorAccent)
+                                            Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
                                         }
                                     )
                                     .opacity(bannerOpacity)

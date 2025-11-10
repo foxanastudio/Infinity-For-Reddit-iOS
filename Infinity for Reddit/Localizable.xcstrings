@@ -92,6 +92,9 @@
     "Collapse Subscribed Subreddits Section" : {
 
     },
+    "Comments" : {
+
+    },
     "Comments submitted by the following users will be filtered out." : {
 
     },
@@ -261,6 +264,9 @@
 
     },
     "Please select a subreddit first" : {
+
+    },
+    "Posts" : {
 
     },
     "Posts from the following subreddits will be filtered out." : {

@@ -47,7 +47,7 @@ struct CustomNavigationStack<Content: View>: View {
                         SubredditDetailsView(subredditName: subredditName)
                             .environmentObject(navigationManager)
                     case .userDetails(let username):
-                        UserDetailsView(username: username)
+                        UserDetailsViewTest(username: username)
                             .environmentObject(navigationManager)
                             .environmentObject(commentSubmissionShareableViewModel)
                     case .search:

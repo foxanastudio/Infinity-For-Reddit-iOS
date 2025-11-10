@@ -34,6 +34,7 @@ struct PostListingView: View {
     private var pauseLazyModeExternalFlag: Bool = false
     private var onStartLazyMode: (() -> Void)?
     private var onStopLazyMode: (() -> Void)?
+    private var onScrolling: (() -> Void)?
     
     init(postListingMetadata: PostListingMetadata,
          externalPostFilter: PostFilter? = nil,
@@ -64,7 +65,8 @@ struct PostListingView: View {
          scrollProxy: ScrollViewProxy? = nil,
          pauseLazyModeExternalFlag: Bool,
          onStartLazyMode: (() -> Void)? = nil,
-         onStopLazyMode: (() -> Void)? = nil
+         onStopLazyMode: (() -> Void)? = nil,
+         onScrolling: (() -> Void)? = nil
     ) {
         self.isRootView = isRootView
         self.postListingMetadata = postListingMetadata
@@ -77,6 +79,7 @@ struct PostListingView: View {
         self.pauseLazyModeExternalFlag = pauseLazyModeExternalFlag
         self.onStartLazyMode = onStartLazyMode
         self.onStopLazyMode = onStopLazyMode
+        self.onScrolling = onScrolling
         
         _postListingViewModel = StateObject(
             wrappedValue: PostListingViewModel(
@@ -161,6 +164,11 @@ struct PostListingView: View {
                                     }
                                 }
                         )
+                        .onScrollPhaseChange { oldPhase, newPhase, context in
+                            if oldPhase == .interacting {
+                                onScrolling?()
+                            }
+                        }
                     }
                 } else {
                     ForEach(postListingViewModel.posts, id: \.id) { post in
