@@ -187,11 +187,6 @@ struct HomeView: View {
                 customThemeViewModel.setAppColorScheme(colorScheme)
             }
             .id(accountViewModel.account.username)
-            .onChange(of: selectedTab) { oldTab, newTab in
-                if newTab == .inbox {
-                    homeViewModel.markInboxAsRead()
-                }
-            }
             
             if let media = fullScreenMediaViewModel.media {
                 if case let .image(urlString, aspectRatio, post, matchedGeometryEffectId) = media {

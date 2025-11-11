@@ -12,6 +12,7 @@ public class InboxListingViewModel: ObservableObject {
     // MARK: - Properties
     @Published var messageWhere: MessageWhere
     @Published var inboxes: [Inbox] = []
+    @Published var loadInboxFlag: Bool = false
     @Published var isInitialLoad: Bool = true
     @Published var isInitialLoading: Bool = false
     @Published var isLoadingMore: Bool = false
@@ -63,43 +64,36 @@ public class InboxListingViewModel: ObservableObject {
             try Task.checkCancellation()
             
             if (inboxListing.inboxes.isEmpty) {
-                // No more inboxes
-                hasMorePages = false
+                self.hasMorePages = false
                 self.after = nil
             } else {
-                
-                self.after = inboxListing.after
-                
                 self.inboxes.append(contentsOf: inboxListing.inboxes)
-                hasMorePages = !(after == nil || after?.isEmpty == true)
+                self.after = inboxListing.after
+                self.hasMorePages = !(after == nil || after?.isEmpty == true)
             }
             
-            isInitialLoading = false
-            isLoadingMore = false
+            self.isInitialLoading = false
+            self.isLoadingMore = false
         } catch {
-            await MainActor.run {
-                self.error = error
-                
-                isInitialLoad = isInitailLoadCopy
-                isInitialLoading = false
-                isLoadingMore = false
-            }
+            self.error = error
+            
+            self.isInitialLoad = isInitailLoadCopy
+            self.isInitialLoading = false
+            self.isLoadingMore = false
             
             print("Error fetching inboxes: \(error)")
         }
     }
     
-    func refreshInboxes() async {
-        await MainActor.run {
-            isInitialLoad = true
-            isInitialLoading = false
-            isLoadingMore = false
-            
-            after = nil
-            hasMorePages = true
-            inboxes = []
-        }
+    func refreshInboxes() {
+        isInitialLoad = true
+        isInitialLoading = false
+        isLoadingMore = false
         
-        await initialLoadInboxes()
+        after = nil
+        hasMorePages = true
+        inboxes.removeAll()
+        
+        loadInboxFlag.toggle()
     }
 }

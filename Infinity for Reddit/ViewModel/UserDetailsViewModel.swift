@@ -6,12 +6,7 @@
 //
 
 import Foundation
-import GRDB
-import Combine
-import Swinject
-import Alamofire
 import SwiftUI
-import SwiftyJSON
 
 @MainActor
 class UserDetailsViewModel: ObservableObject {

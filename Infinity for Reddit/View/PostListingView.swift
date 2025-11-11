@@ -11,7 +11,6 @@ import GRDB
 import Alamofire
 
 struct PostListingView: View {
-    @Environment(\.dependencyManager) private var dependencyManager: Container
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     

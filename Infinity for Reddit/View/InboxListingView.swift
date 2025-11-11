@@ -8,15 +8,13 @@
 import SwiftUI
 
 struct InboxListingView: View {
-    @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     
     @StateObject var inboxListingViewModel: InboxListingViewModel
-    private let account: Account
+    @State private var navigationBarMenuKey: UUID?
     
-    init(account: Account, messageWhere: MessageWhere) {
-        self.account = account
-        
+    init(messageWhere: MessageWhere) {
         _inboxListingViewModel = StateObject(
             wrappedValue: InboxListingViewModel(
                 messageWhere: messageWhere,
@@ -26,20 +24,23 @@ struct InboxListingView: View {
     }
     
     var body: some View {
-        Group {
+        RootView {
             if inboxListingViewModel.inboxes.isEmpty {
-                if inboxListingViewModel.isInitialLoading || inboxListingViewModel.isInitialLoad {
-                    ProgressIndicator()
-                } else {
-                    Text("No inboxes")
+                ZStack {
+                    if inboxListingViewModel.isInitialLoading || inboxListingViewModel.isInitialLoad {
+                        ProgressIndicator()
+                    } else {
+                        Text("No items")
+                    }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 List {
                     ForEach(inboxListingViewModel.inboxes, id: \.id) { inbox in
                         if inboxListingViewModel.messageWhere == .messages {
-                            InboxMessageItemView(inbox: inbox, account: account)
+                            InboxMessageItemView(inbox: inbox)
                         } else {
-                            InboxNotificationItemView(inbox: inbox, account: account)
+                            InboxNotificationItemView(inbox: inbox)
                         }
                     }
                     if inboxListingViewModel.hasMorePages {
@@ -54,11 +55,24 @@ struct InboxListingView: View {
                 .themedList()
             }
         }
-        .onChange(of: colorScheme) {
-            //print(colorScheme == .dark)
-        }
-        .task {
+        .task(id: inboxListingViewModel.loadInboxFlag) {
             await inboxListingViewModel.initialLoadInboxes()
+        }
+        .onAppear {
+            if let key = navigationBarMenuKey {
+                navigationBarMenuManager.pop(key: key)
+            }
+            navigationBarMenuKey = navigationBarMenuManager.push([
+                NavigationBarMenuItem(title: "Refresh") {
+                    inboxListingViewModel.refreshInboxes()
+                }
+            ])
+        }
+        .onDisappear {
+            guard let navigationBarMenuKey else {
+                return
+            }
+            navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
     }
 }
@@ -69,9 +83,9 @@ struct InboxMessageItemView: View {
     @State var inbox: Inbox
     private let account: Account
     
-    init(inbox: Inbox, account: Account) {
+    init(inbox: Inbox) {
         self.inbox = inbox
-        self.account = account
+        self.account = AccountViewModel.shared.account
     }
     
     var body: some View {
@@ -109,9 +123,9 @@ struct InboxNotificationItemView: View {
     @State var inbox: Inbox
     private let account: Account
     
-    init(inbox: Inbox, account: Account) {
+    init(inbox: Inbox) {
         self.inbox = inbox
-        self.account = account
+        self.account = AccountViewModel.shared.account
     }
     
     var body: some View {

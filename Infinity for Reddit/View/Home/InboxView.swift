@@ -10,7 +10,7 @@ import Swinject
 import GRDB
 
 struct InboxView: View {
-    @Environment(\.dependencyManager) private var dependencyManager: Container
+    @EnvironmentObject var accountViewModel: AccountViewModel
     @EnvironmentObject var homeViewModel: HomeViewModel
     
     @State private var selectedOption = 0
@@ -22,23 +22,22 @@ struct InboxView: View {
     }
     
     var body: some View {
-        RootView {
-            VStack(spacing: 0) {
-                SegmentedPicker(selectedValue: $selectedOption, values: ["Notifications", "Messages"])
-                    .padding(4)
+        VStack(spacing: 0) {
+            SegmentedPicker(selectedValue: $selectedOption, values: ["Notifications", "Messages"])
+                .padding(4)
+            
+            TabView(selection: $selectedOption) {
+                InboxListingView(messageWhere: MessageWhere.inbox)
+                    .tag(0)
                 
-                TabView(selection: $selectedOption) {
-                    InboxListingView(account: account, messageWhere: MessageWhere.inbox)
-                        .tag(0)
-                    
-                    InboxListingView(account: account, messageWhere: MessageWhere.messages)
-                        .tag(1)
-                }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-                
-                Spacer()
+                InboxListingView(messageWhere: MessageWhere.messages)
+                    .tag(1)
             }
+            .tabViewStyle(.page(indexDisplayMode: .never))
+            
+            Spacer()
         }
+        .id(accountViewModel.account.username)
         .onAppear {
             applyPendingRouteIfAny()
         }
