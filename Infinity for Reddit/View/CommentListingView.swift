@@ -26,11 +26,11 @@ struct CommentListingView: View {
     @State private var commentToBeEdited: Comment? = nil
     
     private let commentListingMetadata: CommentListingMetadata
-    private let onScrolling: (() -> Void)?
+    private let onScroll: (() -> Void)?
     
-    init(commentListingMetadata: CommentListingMetadata, onScrolling: (() -> Void)? = nil) {
+    init(commentListingMetadata: CommentListingMetadata, onScroll: (() -> Void)? = nil) {
         self.commentListingMetadata = commentListingMetadata
-        self.onScrolling = onScrolling
+        self.onScroll = onScroll
         _commentListingViewModel = StateObject(
             wrappedValue: CommentListingViewModel(
                 commentListingMetadata: commentListingMetadata,
@@ -80,9 +80,11 @@ struct CommentListingView: View {
                     }
                 }
                 .scrollBounceBehavior(.basedOnSize)
-                .onScrollPhaseChange { oldPhase, newPhase, context in
-                    if newPhase == .interacting {
-                        onScrolling?()
+                .applyIf(onScroll != nil) {
+                    $0.onScrollPhaseChange { oldPhase, newPhase, context in
+                        if newPhase == .interacting {
+                            onScroll?()
+                        }
                     }
                 }
             }

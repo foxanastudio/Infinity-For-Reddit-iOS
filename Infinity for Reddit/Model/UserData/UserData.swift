@@ -19,15 +19,16 @@ public struct UserData: Codable, FetchableRecord, PersistableRecord {
     var awarderKarma: Int?
     var awardeeKarma: Int?
     var totalKarma: Int?
-    var cakeday: Double?
+    var cakeday: Int64?
     var isGold: Bool?
     var canBeFollowed: Bool?
     var isNSFW: Bool?
     var description: String?
     var title: String?
     var isSelected: Bool
+    var isSubscribed: Bool = false
     
-    init(id: String, name: String, iconUrl: String? = nil, banner: String? = nil, commentKarma: Int? = nil, linkKarma: Int? = nil, awarderKarma: Int? = nil, awardeeKarma: Int? = nil, totalKarma: Int? = nil, cakeday: Double? = nil, isGold: Bool? = nil, canBeFollowed: Bool? = nil, isNSFW: Bool? = nil, description: String? = nil, title: String? = nil) {
+    init(id: String, name: String, iconUrl: String? = nil, banner: String? = nil, commentKarma: Int? = nil, linkKarma: Int? = nil, awarderKarma: Int? = nil, awardeeKarma: Int? = nil, totalKarma: Int? = nil, cakeday: Int64? = nil, isGold: Bool? = nil, canBeFollowed: Bool? = nil, isNSFW: Bool? = nil, description: String? = nil, title: String? = nil) {
         self.id = id
         self.name = name
         self.iconUrl = iconUrl

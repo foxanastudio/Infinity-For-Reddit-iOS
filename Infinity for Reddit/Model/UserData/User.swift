@@ -16,7 +16,7 @@ public class User : NSObject {
     var awarderKarma : Int!
     var commentKarma : Int!
     var created : Double!
-    var createdUtc : Double!
+    var createdUtc : Int64!
     var hasSubscribed : Bool!
     var hasVerifiedEmail : Bool!
     var hideFromRobots : Bool!
@@ -49,7 +49,7 @@ public class User : NSObject {
         awarderKarma = json["awarder_karma"].intValue
         commentKarma = json["comment_karma"].intValue
         created = json["created"].doubleValue
-        createdUtc = json["created_utc"].doubleValue
+        createdUtc = json["created_utc"].int64Value
         hasSubscribed = json["has_subscribed"].boolValue
         hasVerifiedEmail = json["has_verified_email"].boolValue
         hideFromRobots = json["hide_from_robots"].boolValue

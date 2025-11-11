@@ -17,7 +17,6 @@ struct UserDetailsView: View {
     @StateObject var userDetailsViewModel : UserDetailsViewModel
     @State private var selectedTab = 0
     @State private var isCurrentUserProfile: Bool = true
-    @State private var subscribeTask: Task<Void, Never>?
     
     @State private var infoVisible: Bool = true
     @State private var pauseLazyModeFlag: Bool = false
@@ -71,12 +70,9 @@ struct UserDetailsView: View {
                                         .bold()
                                     
                                     Button(action: {
-                                        subscribeTask?.cancel()
-                                        subscribeTask = Task {
-                                            await userDetailsViewModel.toggleFollowUser()
-                                        }
+                                        userDetailsViewModel.toggleFollowUser()
                                     }) {
-                                        Text(userDetailsViewModel.isSubscribed ? "Followed" : "Follow")
+                                        Text(userDetailsViewModel.userData?.isSubscribed ?? false ? "Followed" : "Follow")
                                             .padding(.horizontal, 15)
                                             .padding(.vertical, 8)
                                             .background(Color.blue)
@@ -96,7 +92,7 @@ struct UserDetailsView: View {
                                 
                                 Spacer()
                                 
-                                Text("Cake day: \(userDetailsViewModel.formattedCakeDay(userDetailsViewModel.userData?.cakeday ?? 0))")
+                                Text("Cake day: \(Utils.getFormattedCakeDay(userDetailsViewModel.userData?.cakeday ?? 0))")
                                     .primaryText()
                                     .padding(.leading, 20)
                             }
@@ -141,7 +137,7 @@ struct UserDetailsView: View {
                                         }
                                     }
                                 },
-                                onScrolling: {
+                                onScroll: {
                                     if infoVisible {
                                         withAnimation {
                                             infoVisible = false
@@ -161,7 +157,7 @@ struct UserDetailsView: View {
                                     headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
                                     queries: nil
                                 ),
-                                onScrolling: {
+                                onScroll: {
                                     if infoVisible {
                                         withAnimation {
                                             infoVisible = false

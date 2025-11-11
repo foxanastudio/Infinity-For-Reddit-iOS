@@ -9,5 +9,5 @@ import Combine
 
 public protocol UserDetailsRepositoryProtocol {
     func fetchUserDetails(username: String) async throws -> UserData
-    func followUser(username: String, action: String) async throws
+    func followUser(userData: UserData, action: String) async throws
 }

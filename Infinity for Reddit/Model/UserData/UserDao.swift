@@ -41,15 +41,14 @@ struct UserDao {
         .eraseToAnyPublisher()
     }
     
-    func getUserData(userName: String) throws -> UserData? {
+    func getUserData(username: String) throws -> UserData? {
         try dbPool.read { db in
             try UserData.fetchOne(db, sql: """
                 SELECT *
                 FROM users
                 WHERE name = ? COLLATE NOCASE
                 LIMIT 1
-                """,
-                                  arguments: [userName])
+                """, arguments: [username])
         }
     }
 }
