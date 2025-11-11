@@ -122,10 +122,10 @@ public class HistoryPostListingRepository: HistoryPostListingRepositoryProtocol 
         guard post.subredditOrUserIcon == nil else { return }
         
         do {
-            let subredditDataList = try subredditDao.getSubredditDataByName(name: post.subreddit)
-            if !subredditDataList.isEmpty {
+            let subredditData = try subredditDao.getSubredditDataByName(subredditName: post.subreddit)
+            if let subredditData {
                 await MainActor.run {
-                    post.subredditOrUserIcon = subredditDataList[0].iconUrl ?? ""
+                    post.subredditOrUserIcon = subredditData.iconUrl ?? ""
                     subredditOrUserIcons[post.subreddit] = post.subredditOrUserIcon
                 }
                 return

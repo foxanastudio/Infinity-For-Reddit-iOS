@@ -8,5 +8,5 @@ import Combine
 
 public protocol SubredditDetailsRepositoryProtocol {
     func fetchSubredditDetails(subredditName: String) async throws -> SubredditData
-    func subsribeSubreddit(subredditName: String, action: String) async throws
+    func subsribeSubreddit(subredditData: SubredditData, action: String) async throws
 }

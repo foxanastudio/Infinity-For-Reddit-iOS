@@ -59,7 +59,7 @@ class UserDetailsViewModel: ObservableObject {
             } catch {
                 self.error = error
                 
-                print("Error \(action == "sub" ? "following to" : "unfollowing from") \(username): \(error)")
+                print("Error \(action == "sub" ? "following" : "unfollowing") \(username): \(error)")
             }
             
             followUserTask = nil

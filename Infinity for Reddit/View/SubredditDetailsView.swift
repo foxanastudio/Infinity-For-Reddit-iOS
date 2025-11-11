@@ -14,7 +14,6 @@ struct SubredditDetailsView: View {
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     @EnvironmentObject private var navigationManager: NavigationManager
     
-    @State private var subscribeTask: Task<Void, Never>?
     @State private var navigationBarMenuKey: UUID?
     @State private var showSubredditAboutSheet: Bool = false
     @State private var isSubredditInfoVisible: Bool = true
@@ -67,15 +66,10 @@ struct SubredditDetailsView: View {
                                     Text("r/\(subredditDetailsViewModel.subredditData?.name ?? subredditDetailsViewModel.subredditName)")
                                         .subreddit()
                                     
-                                    Button(subredditDetailsViewModel.isSubscribed ?
-                                           "Subscribed \(subredditDetailsViewModel.subredditData?.nSubscribers ?? 0)"
-                                           : "Subscribe \(subredditDetailsViewModel.subredditData?.nSubscribers ?? 0)") {
-                                        subscribeTask?.cancel()
-                                        subscribeTask = Task {
-                                            await subredditDetailsViewModel.toggleSubscribeSubreddit()
-                                        }
+                                    Button("\(subredditDetailsViewModel.subredditData?.isSubscribed ?? false ? "Subscribed" : "Subscribe") \(subredditDetailsViewModel.subredditData?.nSubscribers ?? 0)") {
+                                        subredditDetailsViewModel.toggleSubscribeSubreddit()
                                     }
-                                           .filledButton()
+                                    .filledButton()
                                 }
                                 .padding(.horizontal, 16)
                                 

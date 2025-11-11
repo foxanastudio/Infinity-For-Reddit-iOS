@@ -23,6 +23,7 @@ public struct SubredditData: Codable, FetchableRecord, PersistableRecord {
     var isNSFW: Bool?
     var activeUsers: Int?
     var isSelected: Bool = false
+    var isSubscribed: Bool = false
     
     init(id: String, name: String, fullName: String, iconUrl: String? = nil, bannerUrl: String? = nil,
          description: String? = nil, sidebarDescription: String? = nil, nSubscribers: Int, createdUTC: Int64,

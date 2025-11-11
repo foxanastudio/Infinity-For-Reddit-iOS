@@ -43,9 +43,9 @@ struct SubredditDao {
         .eraseToAnyPublisher()
     }
     
-    func getSubredditDataByName(name: String) throws -> [SubredditData] {
+    func getSubredditDataByName(subredditName: String) throws -> SubredditData? {
         try dbPool.read { db in
-            try SubredditData.fetchAll(db, sql: "SELECT * FROM subreddits WHERE name = ? COLLATE NOCASE LIMIT 1", arguments: [name])
+            try SubredditData.fetchOne(db, sql: "SELECT * FROM subreddits WHERE name = ? COLLATE NOCASE LIMIT 1", arguments: [subredditName])
         }
     }
     

@@ -35,10 +35,10 @@ public class UserDetailsRepository: UserDetailsRepositoryProtocol {
     
     public init() {
         guard let resolvedSession = DependencyManager.shared.container.resolve(Session.self) else {
-            fatalError("Failed to resolve Session")
+            fatalError("Failed to resolve Session in UserDetailsRepository")
         }
         guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
-            fatalError("Failed to resolve DatabasePool")
+            fatalError("Failed to resolve DatabasePool in UserDetailsRepository")
         }
         self.session = resolvedSession
         self.userDao = UserDao(dbPool: resolvedDBPool)
@@ -46,8 +46,6 @@ public class UserDetailsRepository: UserDetailsRepositoryProtocol {
     }
     
     public func fetchUserDetails(username: String) async throws -> UserData {
-        try Task.checkCancellation()
-        
         var userData = try? userDao.getUserData(username: username)
         if userData == nil {
             let data = try await self.session.request(

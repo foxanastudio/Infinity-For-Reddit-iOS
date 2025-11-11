@@ -156,10 +156,10 @@ public class PostDetailsRepository: PostDetailsRepositoryProtocol {
         guard post.subredditOrUserIconInPostDetails == nil else { return }
         
         do {
-            let subredditDataList = try subredditDao.getSubredditDataByName(name: post.subreddit)
-            if !subredditDataList.isEmpty {
+            let subredditData = try subredditDao.getSubredditDataByName(subredditName: post.subreddit)
+            if let subredditData {
                 await MainActor.run {
-                    post.subredditOrUserIconInPostDetails = subredditDataList[0].iconUrl ?? ""
+                    post.subredditOrUserIconInPostDetails = subredditData.iconUrl ?? ""
                 }
                 return
             }
