@@ -81,7 +81,7 @@ struct CommentListingView: View {
                 }
                 .scrollBounceBehavior(.basedOnSize)
                 .onScrollPhaseChange { oldPhase, newPhase, context in
-                    if oldPhase == .interacting {
+                    if newPhase == .interacting {
                         onScrolling?()
                     }
                 }

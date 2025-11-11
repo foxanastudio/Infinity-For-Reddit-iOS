@@ -165,7 +165,7 @@ struct PostListingView: View {
                                 }
                         )
                         .onScrollPhaseChange { oldPhase, newPhase, context in
-                            if oldPhase == .interacting {
+                            if newPhase == .interacting {
                                 onScrolling?()
                             }
                         }

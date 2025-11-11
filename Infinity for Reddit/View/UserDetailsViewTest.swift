@@ -47,7 +47,7 @@ struct UserDetailsViewTest: View {
                                 centerCrop: true,
                                 fallbackView: {
                                     Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
-                                        .frame(height: 150)
+                                        .frame(height: proxy.safeAreaInsets.top)
                                 }
                             )
                             
@@ -118,66 +118,65 @@ struct UserDetailsViewTest: View {
                     } else {
                         Spacer()
                             .frame(height: proxy.safeAreaInsets.top)
+                            .transition(.move(edge: .bottom))
+                            .animation(.easeInOut, value: infoVisible)
                     }
                     
-                    if let userData = userDetailsViewModel.userData {
-                        TabView(selection: $selectedTab) {
-                            Group {
-                                PostListingView(
-                                    postListingMetadata:PostListingMetadata(
-                                        postListingType:.user(username: userData.name, userWhere: .submitted),
-                                        pathComponents: ["username": "\(userData.name)"],
-                                        headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
-                                        queries: nil,
-                                        params: nil
-                                    ),
-                                    isRootView: true,
-                                    pauseLazyModeExternalFlag: pauseLazyModeFlag,
-                                    onStartLazyMode: {
-                                        
-                                    },
-                                    onStopLazyMode: {
-                                        
-                                    },
-                                    onScrolling: {
-                                        if infoVisible {
-                                            withAnimation {
-                                                infoVisible = false
-                                            }
+                    TabView(selection: $selectedTab) {
+                        Group {
+                            PostListingView(
+                                postListingMetadata:PostListingMetadata(
+                                    postListingType:.user(username: userDetailsViewModel.username, userWhere: .submitted),
+                                    pathComponents: ["username": "\(userDetailsViewModel.username)"],
+                                    headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
+                                    queries: nil,
+                                    params: nil
+                                ),
+                                isRootView: true,
+                                pauseLazyModeExternalFlag: pauseLazyModeFlag,
+                                onStartLazyMode: {
+                                    if infoVisible {
+                                        withAnimation {
+                                            infoVisible = false
                                         }
                                     }
-                                )
-                                .tabItem {
-                                    Label("Posts", systemImage: "list.bullet.rectangle")
-                                }
-                                .tag(0)
-                                
-                                CommentListingView(
-                                    commentListingMetadata: CommentListingMetadata(
-                                        commentListingType:.user(username: userData.name),
-                                        pathComponents: ["username": "\(userData.name)"],
-                                        headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
-                                        queries: nil
-                                    ),
-                                    onScrolling: {
-                                        if infoVisible {
-                                            withAnimation {
-                                                infoVisible = false
-                                            }
+                                },
+                                onScrolling: {
+                                    if infoVisible {
+                                        withAnimation {
+                                            infoVisible = false
                                         }
                                     }
-                                )
-                                .tabItem {
-                                    Label("Comments", systemImage: "text.bubble")
                                 }
-                                .tag(1)
+                            )
+                            .tabItem {
+                                Label("Posts", systemImage: "list.bullet.rectangle")
                             }
-                            .themedTabViewGroup()
+                            .tag(0)
+                            
+                            CommentListingView(
+                                commentListingMetadata: CommentListingMetadata(
+                                    commentListingType:.user(username: userDetailsViewModel.username),
+                                    pathComponents: ["username": "\(userDetailsViewModel.username)"],
+                                    headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
+                                    queries: nil
+                                ),
+                                onScrolling: {
+                                    if infoVisible {
+                                        withAnimation {
+                                            infoVisible = false
+                                        }
+                                    }
+                                }
+                            )
+                            .tabItem {
+                                Label("Comments", systemImage: "text.bubble")
+                            }
+                            .tag(1)
                         }
-                        .themedTabView()
-                    } else {
-                        ProgressIndicator()
+                        .themedTabViewGroup()
                     }
+                    .themedTabView()
                 }
                 .overlay(alignment: .top) {
                     Color(hex: themeViewModel.currentCustomTheme.colorPrimary)

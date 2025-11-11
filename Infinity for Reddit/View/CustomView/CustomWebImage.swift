@@ -110,7 +110,9 @@ struct CustomWebImage<Placeholder: View, Fallback: View>: View {
                     .frame(width: width, height: height)
                     // Using highPriorityGesture here as a workaround to handle tap gesture in a TabView.
                     .highPriorityGesture(TapGesture().onEnded {
-                        shouldLoadFallbackImage = false
+                        withAnimation {
+                            shouldLoadFallbackImage = false
+                        }
                     })
                 }
             } else {
@@ -124,7 +126,9 @@ struct CustomWebImage<Placeholder: View, Fallback: View>: View {
                     }
                     .onFailure { error in
                         DispatchQueue.main.async {
-                            shouldLoadFallbackImage = true
+                            withAnimation {
+                                shouldLoadFallbackImage = true
+                            }
                         }
                     }
                     .applyIf(width != nil && height != nil) {
