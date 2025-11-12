@@ -12,8 +12,7 @@ import GRDB
 struct InterfaceSettingsView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
     
-    @StateObject private var interfaceSettingsViewModel = InterfaceSettingsViewModel()
-    
+    @AppStorage(InterfaceUserDefaultsUtils.defaultSearchResultTabKey, store: .interface) private var defaultSearchResultTab: Int = 0
     @AppStorage(InterfaceUserDefaultsUtils.voteButtonsOnTheRightKey, store: .interface) private var voteButtonsOnTheRight: Bool = false
     @AppStorage(InterfaceUserDefaultsUtils.showAbsoluteNumberOfVotesKey, store: .interface) private var showAbsoluteNumberOfVotes: Bool = true
     
@@ -28,13 +27,15 @@ struct InterfaceSettingsView: View {
                 }
                 .listPlainItemNoInsets()
                 
-                Toggle("Hide Subreddit Description", isOn: $interfaceSettingsViewModel.hideSubredditDescription).padding(.leading, 44.5)
-                Picker("Default Search Result Tab", selection: $interfaceSettingsViewModel.defaultSearchResultTab){
-                    ForEach(0..<interfaceSettingsViewModel.searchResultTabs.count, id: \.self) { index in
-                        Text(interfaceSettingsViewModel.searchResultTabs[index]).tag(index)
-                    }
+                BarebonePickerPreference(
+                    selected: $defaultSearchResultTab,
+                    items: InterfaceUserDefaultsUtils.defaultSearchResultTabs,
+                    title: "Default Search Result Tab",
+                    icon: "magnifyingglass"
+                ) { tab in
+                    InterfaceUserDefaultsUtils.defaultSearchResultTabsText[tab]
                 }
-                .padding(.leading, 44.5)
+                .listPlainItemNoInsets()
                 
                 PreferenceEntry(
                     title: "Time Format",
@@ -80,5 +81,3 @@ struct InterfaceSettingsView: View {
         .addTitleToInlineNavigationBar("Interface")
     }
 }
-
-

@@ -134,9 +134,6 @@ struct CustomNavigationStack<Content: View>: View {
                     case .all:
                         PopularOrAllView(subredditName: "all")
                             .environmentObject(navigationManager)
-                    case .profile:
-                        UserDetailsView(username: self.accountViewModel.account.username)
-                            .environmentObject(navigationManager)
                     case .history:
                         HistoryView()
                             .environmentObject(navigationManager)

@@ -27,7 +27,7 @@ class NavigationManager: ObservableObject {
     
     func append(_ destination: any Hashable) {
         switch destination {
-        case AppNavigation.userDetails, MoreViewNavigation.profile:
+        case AppNavigation.userDetails:
             viewShouldHideRootTabLabels.append(true)
         default:
             viewShouldHideRootTabLabels.append(false)

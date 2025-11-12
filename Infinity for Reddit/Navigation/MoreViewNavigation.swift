@@ -8,7 +8,6 @@
 enum MoreViewNavigation: Hashable {
     case popular
     case all
-    case profile
     case history
     case upvoted
     case downvoted

@@ -6,14 +6,6 @@
 //
 
 struct UserDefaultsUtils {
-    // SettingsInterfaceView
-    static let HIDE_FAB_IN_POST_FEED = "hide_fab_in_post_feed"
-    static let BOTTOM_APP_BAR_KEY = "bottom_app_bar"
-    static let HIDE_SUBREDDIT_DESCRIPTION = "hide_subreddit_description"
-    static let VOTE_BUTTONS_ON_THE_RIGHT_KEY = "vote_buttons_on_the_right"
-    static let SHOW_ABSOLUTE_NUMBER_OF_VOTES = "show_absolute_number_of_votes"
-    static let DEFAULT_SEARCH_RESULT_TAB = "default_search_result_tab"
-    
     // FontInterfaceView
     static let FONT_FAMILY_KEY = "font_family"
     static let FONT_SIZE_KEY = "font_size"

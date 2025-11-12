@@ -66,7 +66,7 @@ struct MoreView: View {
                 CustomListSection("Account") {
                     if !accountViewModel.account.isAnonymous() {
                         SimpleTouchItemRow(text: "Profile", icon: "person.crop.circle") {
-                            navigationManager.append(MoreViewNavigation.profile)
+                            navigationManager.append(AppNavigation.userDetails(username: accountViewModel.account.username))
                         }
                         .listPlainItemNoInsets()
                     }
