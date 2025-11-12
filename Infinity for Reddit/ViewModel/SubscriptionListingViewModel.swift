@@ -515,7 +515,9 @@ public class SubscriptionListingViewModel: ObservableObject {
         } catch {
             // TODO handle error
             print("Toggle favorite subreddit error: \(error)")
-            self.error = error
+            await MainActor.run {
+                self.error = error
+            }
         }
     }
     
@@ -525,7 +527,9 @@ public class SubscriptionListingViewModel: ObservableObject {
         } catch {
             // TODO handle error
             print("Toggle favorite user error: \(error)")
-            self.error = error
+            await MainActor.run {
+                self.error = error
+            }
         }
     }
     
@@ -535,7 +539,9 @@ public class SubscriptionListingViewModel: ObservableObject {
         } catch {
             // TODO handle error
             print("Toggle favorite custom feed error: \(error)")
-            self.error = error
+            await MainActor.run {
+                self.error = error
+            }
         }
     }
     
@@ -544,7 +550,9 @@ public class SubscriptionListingViewModel: ObservableObject {
             try await subscriptionListingRepository.unsubscribeFromSubreddit(subscribedSubreddit)
         } catch {
             print("Unsubscribe from subreddit error: \(error)")
-            self.error = error
+            await MainActor.run {
+                self.error = error
+            }
         }
     }
     
@@ -553,7 +561,20 @@ public class SubscriptionListingViewModel: ObservableObject {
             try await subscriptionListingRepository.unfollowUser(subscribedUser)
         } catch {
             print("Unfollow user error: \(error)")
-            self.error = error
+            await MainActor.run {
+                self.error = error
+            }
+        }
+    }
+    
+    func deleteCustomFeed(_ myCustomFeed: MyCustomFeed) async {
+        do {
+            try await subscriptionListingRepository.deleteCustomFeed(myCustomFeed)
+        } catch {
+            print("Delete custom feed error: \(error)")
+            await MainActor.run {
+                self.error = error
+            }
         }
     }
 }

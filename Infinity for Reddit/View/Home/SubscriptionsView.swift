@@ -195,6 +195,17 @@ struct SubscriptionsView: View {
                                         }
                                     }
                                     .listPlainItemNoInsets()
+                                    .applyIf(customOnTapForSearchInThing == nil) {
+                                        $0.swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                            Button("Delete") {
+                                                Task {
+                                                    try? await Task.sleep(for: .seconds(1))
+                                                    await subscriptionListingViewModel.deleteCustomFeed(customFeed)
+                                                }
+                                            }
+                                            .tint(.red)
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -214,6 +225,17 @@ struct SubscriptionsView: View {
                                     }
                                 }
                                 .listPlainItemNoInsets()
+                                .applyIf(customOnTapForSearchInThing == nil) {
+                                    $0.swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                        Button("Delete") {
+                                            Task {
+                                                try? await Task.sleep(for: .seconds(1))
+                                                await subscriptionListingViewModel.deleteCustomFeed(customFeed)
+                                            }
+                                        }
+                                        .tint(.red)
+                                    }
+                                }
                             }
                         }
                     }

@@ -125,6 +125,11 @@ class SubscriptionListingRepository: SubscriptionListingRepositoryProtocol {
     }
     
     func deleteCustomFeed(_ customFeed: MyCustomFeed) async throws {
-        
+        try await self.session.request(RedditOAuthAPI.deleteCustomFeed(path: customFeed.path))
+            .validate()
+            .serializingData()
+            .response
+
+        try? myCustomFeedDao.deleteMyCustomFeed(path: customFeed.path, username: AccountViewModel.shared.account.username)
     }
 }
