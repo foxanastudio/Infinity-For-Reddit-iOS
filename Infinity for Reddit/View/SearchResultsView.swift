@@ -10,9 +10,15 @@ import SwiftUI
 struct SearchResultsView: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
     @StateObject private var searchResultsViewModel: SearchResultsViewModel
-    @State private var selectedOption = 0
+    @State private var selectedOption: Int
     
-    init(query: String, searchInSubredditOrUserName: String?, searchInMultiReddit: String?, searchInThingType: SearchInThingType) {
+    init(query: String,
+         searchInSubredditOrUserName: String?,
+         searchInMultiReddit: String?,
+         searchInThingType: SearchInThingType,
+         searchResultTab: Int
+    ) {
+        self.selectedOption = searchResultTab
         _searchResultsViewModel = StateObject(wrappedValue: SearchResultsViewModel(query: query, searchInSubredditOrUserName: searchInSubredditOrUserName, searchInMultiReddit: searchInMultiReddit, searchInThingType: searchInThingType))
     }
     

@@ -19,6 +19,8 @@ struct SearchView: View {
     @State private var showSubredditAndUserSearchResultView: Bool = false
     @State private var searchThingQuery: String = ""
     
+    @AppStorage(InterfaceUserDefaultsUtils.defaultSearchResultTabKey, store: .interface) private var defaultSearchResultTab: Int = 0
+    
     private let onSearchCustomAction: ((String) -> Void)?
     
     init(onSearchCustomAction: ((String) -> Void)? = nil) {
@@ -53,7 +55,8 @@ struct SearchView: View {
                                     query: searchViewModel.query,
                                     searchInSubredditOrUserName: searchViewModel.searchInSubredditOrUserName,
                                     searchInMultiReddit: searchViewModel.searchInCustomFeed,
-                                    searchInThingType: searchViewModel.searchInThingType
+                                    searchInThingType: searchViewModel.searchInThingType,
+                                    searchResultTab: defaultSearchResultTab
                                 )
                             )
                         }
@@ -108,7 +111,15 @@ struct SearchView: View {
                             if let onSearch = onSearchCustomAction {
                                 onSearch(search.searchQuery)
                             } else {
-                                navigationManager.append(AppNavigation.searchResults(query: search.searchQuery, searchInSubredditOrUserName: search.searchInSubredditOrUserName, searchInMultiReddit: search.customFeedPath, searchInThingType: search.searchInThingType))
+                                navigationManager.append(
+                                    AppNavigation.searchResults(
+                                        query: search.searchQuery,
+                                        searchInSubredditOrUserName: search.searchInSubredditOrUserName,
+                                        searchInMultiReddit: search.customFeedPath,
+                                        searchInThingType: search.searchInThingType,
+                                        searchResultTab: defaultSearchResultTab
+                                    )
+                                )
                             }
                         }) {
                             VStack(alignment: .leading, spacing: 2) {

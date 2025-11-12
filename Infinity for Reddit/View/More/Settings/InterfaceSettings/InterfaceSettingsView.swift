@@ -33,7 +33,11 @@ struct InterfaceSettingsView: View {
                     title: "Default Search Result Tab",
                     icon: "magnifyingglass"
                 ) { tab in
-                    InterfaceUserDefaultsUtils.defaultSearchResultTabsText[tab]
+                    if InterfaceUserDefaultsUtils.defaultSearchResultTabsText.indices.contains(tab) {
+                        InterfaceUserDefaultsUtils.defaultSearchResultTabsText[tab]
+                    } else {
+                        InterfaceUserDefaultsUtils.defaultSearchResultTabsText[0]
+                    }
                 }
                 .listPlainItemNoInsets()
                 

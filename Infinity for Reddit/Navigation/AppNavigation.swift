@@ -12,7 +12,7 @@ enum AppNavigation: Hashable {
     case subredditDetails(subredditName: String)
     case userDetails(username: String)
     case search
-    case searchResults(query: String, searchInSubredditOrUserName: String?, searchInMultiReddit: String?, searchInThingType: SearchInThingType)
+    case searchResults(query: String, searchInSubredditOrUserName: String?, searchInMultiReddit: String?, searchInThingType: SearchInThingType, searchResultTab: Int)
     case customFeed(myCustomFeed: MyCustomFeed)
     case inboxConversation(inbox: Inbox)
     case submitComment(commentParent: CommentParent)

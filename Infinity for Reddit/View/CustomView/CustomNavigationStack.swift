@@ -53,11 +53,13 @@ struct CustomNavigationStack<Content: View>: View {
                     case .search:
                         SearchView()
                             .environmentObject(navigationManager)
-                    case .searchResults(let query, let searchInSubredditOrUserName, let searchInMultiReddit, let searchInThingType):
-                        SearchResultsView(query: query,
-                                          searchInSubredditOrUserName: searchInSubredditOrUserName,
-                                          searchInMultiReddit: searchInMultiReddit,
-                                          searchInThingType: searchInThingType
+                    case .searchResults(let query, let searchInSubredditOrUserName, let searchInMultiReddit, let searchInThingType, let searchResultTab):
+                        SearchResultsView(
+                            query: query,
+                            searchInSubredditOrUserName: searchInSubredditOrUserName,
+                            searchInMultiReddit: searchInMultiReddit,
+                            searchInThingType: searchInThingType,
+                            searchResultTab: searchResultTab
                         )
                         .environmentObject(navigationManager)
                     case .customFeed(let myCustomFeed):
