@@ -67,11 +67,13 @@ struct SubscribedSubredditListingView: View {
                                 .listPlainItemNoInsets()
                                 .applyIf(onSelectCustomAction == nil) {
                                     $0.swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                        Button("Unsubscribe") {
+                                        Button(role: .destructive) {
                                             Task {
-                                                try? await Task.sleep(for: .seconds(1))
                                                 await subscriptionListingViewModel.unsubscribeFromSubreddit(subscription)
                                             }
+                                        } label: {
+                                            Text("Unsubscribe")
+                                                .foregroundStyle(.white)
                                         }
                                         .tint(.red)
                                     }
@@ -97,11 +99,13 @@ struct SubscribedSubredditListingView: View {
                             .listPlainItemNoInsets()
                             .applyIf(onSelectCustomAction == nil) {
                                 $0.swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                    Button("Unsubscribe") {
+                                    Button(role: .destructive) {
                                         Task {
-                                            try? await Task.sleep(for: .seconds(1))
                                             await subscriptionListingViewModel.unsubscribeFromSubreddit(subscription)
                                         }
+                                    } label: {
+                                        Text("Unsubscribe")
+                                            .foregroundStyle(.white)
                                     }
                                     .tint(.red)
                                 }

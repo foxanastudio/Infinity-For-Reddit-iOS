@@ -113,11 +113,13 @@ struct SubscriptionsView: View {
                                     .listPlainItemNoInsets()
                                     .applyIf(customOnTapForSearchInThing == nil) {
                                         $0.swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                            Button("Unfollow") {
+                                            Button(role: .destructive) {
                                                 Task {
-                                                    try? await Task.sleep(for: .seconds(1))
                                                     await subscriptionListingViewModel.unfollowUser(subscription)
                                                 }
+                                            } label: {
+                                                Text("Unfollow")
+                                                    .foregroundStyle(.white)
                                             }
                                             .tint(.red)
                                         }
@@ -143,11 +145,13 @@ struct SubscriptionsView: View {
                                 .listPlainItemNoInsets()
                                 .applyIf(customOnTapForSearchInThing == nil) {
                                     $0.swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                        Button("Unfollow") {
+                                        Button(role: .destructive) {
                                             Task {
-                                                try? await Task.sleep(for: .seconds(1))
                                                 await subscriptionListingViewModel.unfollowUser(subscription)
                                             }
+                                        } label: {
+                                            Text("Unfollow")
+                                                .foregroundStyle(.white)
                                         }
                                         .tint(.red)
                                     }
@@ -197,11 +201,13 @@ struct SubscriptionsView: View {
                                     .listPlainItemNoInsets()
                                     .applyIf(customOnTapForSearchInThing == nil) {
                                         $0.swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                            Button("Delete") {
+                                            Button(role: .destructive) {
                                                 Task {
-                                                    try? await Task.sleep(for: .seconds(1))
                                                     await subscriptionListingViewModel.deleteCustomFeed(customFeed)
                                                 }
+                                            } label: {
+                                                Text("Delete")
+                                                    .foregroundStyle(.white)
                                             }
                                             .tint(.red)
                                         }
@@ -227,11 +233,13 @@ struct SubscriptionsView: View {
                                 .listPlainItemNoInsets()
                                 .applyIf(customOnTapForSearchInThing == nil) {
                                     $0.swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                        Button("Delete") {
+                                        Button(role: .destructive) {
                                             Task {
-                                                try? await Task.sleep(for: .seconds(1))
                                                 await subscriptionListingViewModel.deleteCustomFeed(customFeed)
                                             }
+                                        } label: {
+                                            Text("Delete")
+                                                .foregroundStyle(.white)
                                         }
                                         .tint(.red)
                                     }
