@@ -352,7 +352,7 @@ struct PostListingView: View {
                     if let scrollProxy = scrollProxy, !postListingViewModel.posts.isEmpty {
                         if let scrolledParent = postListingViewModel.lazyModeScrolledPost {
                             if let index = postListingViewModel.posts.index(id: scrolledParent.id) {
-                                if index < postListingViewModel.posts.count {
+                                if index < postListingViewModel.posts.count - 1 {
                                     postListingViewModel.lazyModeScrolledPost = postListingViewModel.posts[index + 1]
                                     withAnimation {
                                         scrollProxy.scrollTo(ObjectIdentifier(postListingViewModel.posts[index + 1]), anchor: .top)
