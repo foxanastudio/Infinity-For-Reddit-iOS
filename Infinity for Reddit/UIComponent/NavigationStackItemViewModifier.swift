@@ -47,10 +47,8 @@ struct NavigationStackItemViewModifier: ViewModifier {
                 }
             }
             .themedNavigationBar()
-            .sheet(isPresented: $showProfile) {
+            .wrapContentSheet(isPresented: $showProfile) {
                 AccountSheet()
-                    .presentationDetents([.medium, .large])
-                    .presentationDragIndicator(.visible)
             }
     }
 }

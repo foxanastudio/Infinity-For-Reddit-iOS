@@ -132,14 +132,13 @@ struct HistoryPostListingView: View {
             guard let navigationBarMenuKey else { return }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
-        .sheet(isPresented: $showLayoutTypeSheet) {
+        .wrapContentSheet(isPresented: $showLayoutTypeSheet) {
             PostLayoutSheet(
                 currentPostLayout: historyPostListingViewModel.postLayout,
                 onSelectPostLayout: { newLayout in
                     historyPostListingViewModel.changePostLayout(newLayout)
                 }
             )
-            .presentationDetents([.medium, .large])
         }
         .environment(\.postListingVideoManager, postListingVideoManager)
     }

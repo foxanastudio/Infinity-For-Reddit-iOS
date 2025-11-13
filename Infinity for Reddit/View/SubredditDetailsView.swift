@@ -168,7 +168,7 @@ struct SubredditDetailsView: View {
             }
         }
         .id(accountViewModel.account.username)
-        .sheet(isPresented: $showSubredditAboutSheet) {
+        .wrapContentSheet(isPresented: $showSubredditAboutSheet) {
             SubredditAboutSheet(subredditData: subredditDetailsViewModel.subredditData)
         }
     }

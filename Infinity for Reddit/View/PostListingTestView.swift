@@ -144,7 +144,7 @@ struct PostListingTestView: View {
         .onChange(of: sensitiveContent) { oldValue, newValue in
             postListingViewModel.setSensitiveContent(newValue)
         }
-        .sheet(isPresented: $showSortTypeKindSheet) {
+        .wrapContentSheet(isPresented: $showSortTypeKindSheet) {
             SortTypeKindSheet(
                 sortTypeKindSource: postListingMetadata.postListingType,
                 currentSortTypeKind: postListingViewModel.sortType.type
@@ -156,9 +156,8 @@ struct PostListingTestView: View {
                     postListingViewModel.changeSortTypeKind(sortTypeKind)
                 }
             }
-            .presentationDetents([.medium, .large])
         }
-        .sheet(isPresented: $showSortTypeTimeSheet) {
+        .wrapContentSheet(isPresented: $showSortTypeTimeSheet) {
             SortTypeTimeSheet(
                 sortTypeTimeSource: postListingMetadata.postListingType,
                 currentSortTypeTime: postListingViewModel.sortType.time
@@ -167,7 +166,6 @@ struct PostListingTestView: View {
                     postListingViewModel.changeSortType(SortType(type: upcomingSortTypeKind, time: sortTypeTime))
                 }
             }
-            .presentationDetents([.medium, .large])
         }
     }
 }

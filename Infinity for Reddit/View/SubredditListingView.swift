@@ -114,14 +114,13 @@ struct SubredditListingView: View {
             guard let navigationBarMenuKey else { return }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
-        .sheet(isPresented: $showSortTypeKindSheet) {
+        .wrapContentSheet(isPresented: $showSortTypeKindSheet) {
             SortTypeKindSheet(
                 sortTypeKindSource: OtherSortTypeKindSource.subredditListing,
                 currentSortTypeKind: subredditListingViewModel.sortType
             ) { sortTypeKind in
                 subredditListingViewModel.changeSortTypeKind(sortTypeKind)
             }
-            .presentationDetents([.medium, .large])
         }
     }
 }

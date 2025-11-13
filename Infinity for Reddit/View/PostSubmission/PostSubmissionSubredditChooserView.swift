@@ -74,7 +74,7 @@ struct PostSubmissionSubredditChooserView: View {
                actions: { Button("OK", role: .cancel) { } },
                message: { Text("Please select a subreddit first") }
         )
-        .sheet(isPresented: $showRulesSheet) {
+        .wrapContentSheet(isPresented: $showRulesSheet) {
             SubredditRulesView()
                 .environmentObject(postSubmissionContextViewModel)
         }

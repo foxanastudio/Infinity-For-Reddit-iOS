@@ -137,7 +137,7 @@ struct CommentListingView: View {
             guard let navigationBarMenuKey else { return }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
-        .sheet(isPresented: $showSortTypeKindSheet) {
+        .wrapContentSheet(isPresented: $showSortTypeKindSheet) {
             SortTypeKindSheet(
                 sortTypeKindSource: OtherSortTypeKindSource.commentListing,
                 currentSortTypeKind: commentListingViewModel.sortType.type
@@ -149,9 +149,8 @@ struct CommentListingView: View {
                     commentListingViewModel.changeSortTypeKind(sortTypeKind: sortTypeKind)
                 }
             }
-            .presentationDetents([.medium, .large])
         }
-        .sheet(isPresented: $showSortTypeTimeSheet) {
+        .wrapContentSheet(isPresented: $showSortTypeTimeSheet) {
             SortTypeTimeSheet(
                 sortTypeTimeSource: OtherSortTypeKindSource.commentListing,
                 currentSortTypeTime: commentListingViewModel.sortType.time
@@ -160,7 +159,6 @@ struct CommentListingView: View {
                     commentListingViewModel.changeSortType(sortType: SortType(type: upcomingSortTypeKind, time: sortTypeTime))
                 }
             }
-            .presentationDetents([.medium, .large])
         }
     }
 }

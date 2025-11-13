@@ -89,7 +89,7 @@ struct PostFilterSettingsView: View {
                 navigationManager.append(SettingsViewNavigation.createOrEditPostFilter())
             }
         }
-        .sheet(isPresented: $showPostFilterOptionSheet) {
+        .wrapContentSheet(isPresented: $showPostFilterOptionSheet) {
             PostOrCommentFilterOptionSheet(
                 onEditSelected: {
                     if let postFilter = selectedPostFilter {
@@ -105,7 +105,6 @@ struct PostFilterSettingsView: View {
                     }
                 }
             )
-            .presentationDetents([.medium, .large])
         }
     }
 }

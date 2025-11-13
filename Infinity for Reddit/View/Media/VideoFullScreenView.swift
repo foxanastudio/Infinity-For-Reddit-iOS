@@ -472,11 +472,10 @@ struct VideoController<Content: View>: View {
                 onResetControllerTimer()
             }
         }
-        .sheet(isPresented: $showPlaybackSpeedSheet) {
+        .wrapContentSheet(isPresented: $showPlaybackSpeedSheet) {
             PlaybackSpeedSheet(playbackSpeed: $playbackSpeed) {
                 showPlaybackSpeedSheet = false
             }
-            .presentationDetents([.medium])
         }
     }
     

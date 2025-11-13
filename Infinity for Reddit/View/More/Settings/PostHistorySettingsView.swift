@@ -34,7 +34,7 @@ struct PostHistorySettingsView: View {
         RootView {
             VStack(spacing: 0) {
                 ScrollViewReader { proxy in
-                    ScrollView {
+                    List {
                         TogglePreference(isEnabled: $markPostsAsRead, title: "Mark Posts as Read")
                             .listPlainItemNoInsets()
                         

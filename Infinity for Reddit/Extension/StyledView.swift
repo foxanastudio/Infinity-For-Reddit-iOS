@@ -293,4 +293,18 @@ extension View {
     func urlTextField() -> some View {
         self.modifier(URLTextFieldViewModifier())
     }
+    
+    func wrapContentSheet<SheetContent: View>(
+        isPresented: Binding<Bool>,
+        showDragIndicator: Bool = true,
+        @ViewBuilder content: @escaping () -> SheetContent
+    ) -> some View {
+        modifier(
+            WrapContentSheetViewModifier(
+                isPresented: isPresented,
+                showDragIndicator: showDragIndicator,
+                sheetContent: content
+            )
+        )
+    }
 }

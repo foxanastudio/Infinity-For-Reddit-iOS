@@ -88,7 +88,7 @@ struct CommentFilterSettingsView: View {
                 navigationManager.append(SettingsViewNavigation.createOrEditCommentFilter())
             }
         }
-        .sheet(isPresented: $showCommentFilterOptionSheet) {
+        .wrapContentSheet(isPresented: $showCommentFilterOptionSheet) {
             PostOrCommentFilterOptionSheet(
                 onEditSelected: {
                     if let commentFilter = selectedCommentFilter {
@@ -104,7 +104,6 @@ struct CommentFilterSettingsView: View {
                     }
                 }
             )
-            .presentationDetents([.medium, .large])
         }
     }
 }

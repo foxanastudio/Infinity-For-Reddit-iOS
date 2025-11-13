@@ -222,7 +222,7 @@ struct PostListingView: View {
                 }
             }
         }
-        .sheet(isPresented: $showSortTypeKindSheet) {
+        .wrapContentSheet(isPresented: $showSortTypeKindSheet) {
             SortTypeKindSheet(
                 sortTypeKindSource: postListingMetadata.postListingType,
                 currentSortTypeKind: postListingViewModel.sortType.type
@@ -234,9 +234,8 @@ struct PostListingView: View {
                     postListingViewModel.changeSortTypeKind(sortTypeKind)
                 }
             }
-            .presentationDetents([.medium, .large])
         }
-        .sheet(isPresented: $showSortTypeTimeSheet) {
+        .wrapContentSheet(isPresented: $showSortTypeTimeSheet) {
             SortTypeTimeSheet(
                 sortTypeTimeSource: postListingMetadata.postListingType,
                 currentSortTypeTime: postListingViewModel.sortType.time
@@ -245,16 +244,14 @@ struct PostListingView: View {
                     postListingViewModel.changeSortType(SortType(type: upcomingSortTypeKind, time: sortTypeTime))
                 }
             }
-            .presentationDetents([.medium, .large])
         }
-        .sheet(isPresented: $showLayoutTypeSheet) {
+        .wrapContentSheet(isPresented: $showLayoutTypeSheet) {
             PostLayoutSheet(
                 currentPostLayout: postListingViewModel.postLayout,
                 onSelectPostLayout: { newLayout in
                     postListingViewModel.changePostLayout(newLayout)
                 }
             )
-            .presentationDetents([.medium, .large])
         }
         .environment(\.postListingVideoManager, postListingVideoManager)
     }

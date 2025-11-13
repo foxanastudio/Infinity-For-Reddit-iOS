@@ -77,11 +77,10 @@ struct CommentFilterUsageListingView: View {
                 showCommentFilterUsageSheet = true
             }
         }
-        .sheet(isPresented: $showCommentFilterUsageSheet) {
+        .wrapContentSheet(isPresented: $showCommentFilterUsageSheet) {
             CommentFilterUsageSheet { usageType, nameOfUsage in
                 commentFilterUsageListingViewModel.saveCommentFilterUsage(usageType: usageType, nameOfUsage: nameOfUsage)
             }
-            .presentationDetents([.medium, .large])
         }
     }
 }

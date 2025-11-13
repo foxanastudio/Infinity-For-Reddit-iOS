@@ -37,7 +37,7 @@ struct TogglePreference: View {
                 }
                 
                 Spacer()
-                    .frame(width: 24)
+                    .frame(width: 16)
                 
                 VStack {
                     RowText(title)
@@ -56,7 +56,7 @@ struct TogglePreference: View {
             }
             .contentShape(Rectangle())
             .padding(.horizontal, 16)
-            .padding(.vertical, 8)
+            .padding(.vertical, subtitle == nil ? 12 : 8)
         }
     }
 }

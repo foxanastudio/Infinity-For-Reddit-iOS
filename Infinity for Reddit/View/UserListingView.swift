@@ -110,14 +110,13 @@ struct UserListingView: View {
             guard let navigationBarMenuKey else { return }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
-        .sheet(isPresented: $showSortTypeKindSheet) {
+        .wrapContentSheet(isPresented: $showSortTypeKindSheet) {
             SortTypeKindSheet(
                 sortTypeKindSource: OtherSortTypeKindSource.userListing,
                 currentSortTypeKind: userListingViewModel.sortType
             ) { sortTypeKind in
                 userListingViewModel.changeSortTypeKind(sortTypeKind)
             }
-            .presentationDetents([.medium, .large])
         }
     }
 }

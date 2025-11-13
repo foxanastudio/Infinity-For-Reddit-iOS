@@ -248,14 +248,13 @@ struct PostDetailsView: View {
             guard let navigationBarMenuKey else { return }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
-        .sheet(isPresented: $showSortTypeSheet) {
+        .wrapContentSheet(isPresented: $showSortTypeSheet) {
             SortTypeKindSheet(
                 sortTypeKindSource: OtherSortTypeKindSource.postDetails,
                 currentSortTypeKind: postDetailsViewModel.sortTypeKind
             ) { sortTypeKind in
                 postDetailsViewModel.changeSortTypeKind(sortTypeKind: sortTypeKind)
             }
-            .presentationDetents([.medium, .large])
         }
         .overlay(
             CustomAlert(title: activeAlert?.title ?? "",
