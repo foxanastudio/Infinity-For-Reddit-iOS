@@ -12,45 +12,60 @@ import Combine
 class HomeViewModel: ObservableObject {
     @Published var hasNewMessages: Bool = false
     @Published var inboxNavigationTarget: InboxNavigationTarget?
-    private var refreshTimer: AnyCancellable?
+    @Published var inboxCount: Int = 0
+    
+    private let homeRepository: HomeRepositoryProtocol
+    private var inboxCountPollingTask: Task<Void, Never>?
+    private var hasFetchedInboxCount: Bool = false
+    private var lastInboxCountPollingTime: TimeInterval = 0
     
     struct InboxNavigationTarget: Equatable {
         let viewMessage: Bool
     }
     
-    init() {
-        NotificationCenter.default.addObserver(
-            forName: .notificationIntervalChanged,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            Task { @MainActor in
-                self?.startAutoRefresh()
+    init(homeRepository: HomeRepositoryProtocol) {
+        self.homeRepository = homeRepository
+    }
+    
+    func fetchInboxCount() async {
+        guard !hasFetchedInboxCount else {
+            return
+        }
+        
+        inboxCount = (try? await homeRepository.fetchInboxCount()) ?? 0
+        hasFetchedInboxCount = true
+    }
+    
+    func startInboxCountPolling() {
+        inboxCountPollingTask?.cancel()
+        
+        guard !AccountViewModel.shared.account.isAnonymous() else {
+            return
+        }
+        
+        inboxCountPollingTask = Task {
+            var skipFirstWait: Bool = false
+            let currentTime = Date().timeIntervalSince1970
+            if currentTime - lastInboxCountPollingTime < TimeInterval(NotificationUserDefaultsUtils.notificationInterval * 60) {
+                try? await Task.sleep(for: .seconds(lastInboxCountPollingTime + TimeInterval(NotificationUserDefaultsUtils.notificationInterval * 60) - currentTime))
+                skipFirstWait = true
             }
+            repeat {
+                if !skipFirstWait {
+                    try? await Task.sleep(for: .seconds(NotificationUserDefaultsUtils.notificationInterval * 60))
+                } else {
+                    skipFirstWait = false
+                }
+                if !Task.isCancelled {
+                    inboxCount = (try? await homeRepository.fetchInboxCount()) ?? 0
+                }
+                lastInboxCountPollingTime = Date().timeIntervalSince1970
+            } while !Task.isCancelled
         }
     }
     
-    func refreshInboxMessages() async {
-        print("Foreground Refresh: Pull & notify via unified pipeline.")
-        let newMessagesAvailable = await PullNotificationBackgroundTaskManager.shared.pullNotificationsForAllAccounts()
-    }
-    
-    func startAutoRefresh() {
-        stopAutoRefresh()
-        
-        let refreshInterval = NotificationUserDefaultsUtils.notificationInterval
-        refreshTimer = Timer.publish(every: TimeInterval(refreshInterval * 60), on: .main, in: .common)
-            .autoconnect()
-            .sink { [weak self] _ in
-                guard let self else { return }
-                _ = Task {
-                    await self.refreshInboxMessages()
-                }
-            }
-    }
-    
-    func stopAutoRefresh() {
-        refreshTimer?.cancel()
-        refreshTimer = nil
+    func stopInboxCountPolling() {
+        inboxCountPollingTask?.cancel()
+        inboxCountPollingTask = nil
     }
 }

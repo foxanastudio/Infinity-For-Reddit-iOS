@@ -49,6 +49,7 @@ struct Infinity: App {
     var body: some Scene {
         WindowGroup {
             HomeView()
+                .id(accountViewModel.account.username)
                 .environment(\.dependencyManager, DependencyManager.shared.container)
                 .environmentObject(accountViewModel)
                 .environmentObject(customThemeViewModel)

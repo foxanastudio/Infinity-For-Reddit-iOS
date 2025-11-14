@@ -30,7 +30,7 @@ struct HomeView: View {
     @StateObject private var tab4SnackbarManager: SnackbarManager = SnackbarManager()
     @StateObject private var tab5SnackbarManager: SnackbarManager = SnackbarManager()
     
-    @StateObject private var homeViewModel = HomeViewModel()
+    @StateObject private var homeViewModel = HomeViewModel(homeRepository: HomeRepository())
     
     @StateObject private var videoFullScreenViewModel = VideoFullScreenViewModel()
     
@@ -133,6 +133,7 @@ struct HomeView: View {
                             Label("Inbox", systemImage: "envelope")
                         }
                         .tag(Tab.inbox)
+                        .badge(homeViewModel.inboxCount > 0 ? String(homeViewModel.inboxCount) : nil)
                         .environmentObject(tab4NavigationBarMenuManager)
                         .environmentObject(homeViewModel)
                         .environmentObject(tab4SnackbarManager)
@@ -233,6 +234,9 @@ struct HomeView: View {
                 }
             }
         }
+        .task {
+            await homeViewModel.fetchInboxCount()
+        }
         .onChange(of: colorScheme) {
             customThemeViewModel.setAppColorScheme(colorScheme)
         }
@@ -240,14 +244,16 @@ struct HomeView: View {
             if newValue.isAnonymous(), case .inbox = selectedTab {
                 selectedTab = .home
             }
+            
+            homeViewModel.startInboxCountPolling()
         }
         .environmentObject(NamespaceManager(animation))
         .appForegroundBackgroundListener(onAppEntersForeground: {
             if NotificationUserDefaultsUtils.enableNotification {
-                homeViewModel.startAutoRefresh()
+                homeViewModel.startInboxCountPolling()
             }
         }, onAppEntersBackground: {
-            homeViewModel.stopAutoRefresh()
+            homeViewModel.stopInboxCountPolling()
         })
         .onReceive(NotificationCenter.default.publisher(for: .inboxDeepLink)) { note in
             let accountName = (note.userInfo?["accountName"] as? String) ?? ""
@@ -263,15 +269,17 @@ struct HomeView: View {
                 }
             }
         }
-        .onReceive(NotificationCenter.default.publisher(for: .notificationToggleChanged)) { note in
-            let enabled = (note.userInfo?["enabled"] as? Bool) ?? false
-            if enabled {
+        .onReceive(NotificationCenter.default.publisher(for: .notificationToggleChanged)) { _ in
+            if NotificationUserDefaultsUtils.enableNotification {
                 print("Foreground refresh enabled")
-                homeViewModel.startAutoRefresh()
+                homeViewModel.startInboxCountPolling()
             } else {
                 print("Foreground refresh disabled")
-                homeViewModel.stopAutoRefresh()
+                homeViewModel.stopInboxCountPolling()
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .notificationIntervalChanged)) { _ in
+            homeViewModel.startInboxCountPolling()
         }
     }
     
