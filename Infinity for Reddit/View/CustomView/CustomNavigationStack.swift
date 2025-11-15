@@ -238,6 +238,7 @@ struct CustomNavigationStack<Content: View>: View {
                     switch destination {
                     case .font:
                         FontInterfaceView()
+                            .environmentObject(navigationManager)
                     case .timeFormat:
                         InterfaceTimeFormatView()
                     case .post:
@@ -249,6 +250,12 @@ struct CustomNavigationStack<Content: View>: View {
                     }
                 }
                 .environmentObject(navigationManager)
+                .navigationDestination(for: FontSettingsViewNavigation.self) { destination in
+                    switch destination {
+                    case .fontPreview:
+                        FontPreviewView()
+                    }
+                }
         }
         .themedNavigationBarBackButton()
         .onChange(of: navigationManager.path) { _, newValue in

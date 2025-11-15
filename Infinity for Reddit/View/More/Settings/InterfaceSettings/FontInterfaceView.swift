@@ -10,62 +10,87 @@ import Swinject
 import GRDB
 
 struct FontInterfaceView: View {
-    @StateObject private var fontInterfaceViewModel = FontInterfaceViewModel()
+    @EnvironmentObject private var navigationManager: NavigationManager
+    
+    @AppStorage(InterfaceFontUserDefaultsUtils.fontFamilyKey, store: .interfacePost) private var fontFamily: Int = 0
+    @AppStorage(InterfaceFontUserDefaultsUtils.fontSizeKey, store: .interfacePost) private var fontSize: Int = 2
+    @AppStorage(InterfaceFontUserDefaultsUtils.titleFontFamilyKey, store: .interfacePost) private var titleFontFamily: Int = 0
+    @AppStorage(InterfaceFontUserDefaultsUtils.titleFontSizeKey, store: .interfacePost) private var titleFontSize: Int = 2
+    @AppStorage(InterfaceFontUserDefaultsUtils.contentFontFamilyKey, store: .interfacePost) private var contentFontFamily: Int = 0
+    @AppStorage(InterfaceFontUserDefaultsUtils.contentFontSizeKey, store: .interfacePost) private var contentFontSize: Int = 2
+    
     
     var body: some View {
         List{
-            Section{
-                NavigationLink(destination: FontInterfaceView()){
-                    Text("Font Preview").padding(.leading, 44.5)
-                }
+            PreferenceEntry(
+                title: "Font Preview"
+            ) {
+                navigationManager.append(FontSettingsViewNavigation.fontPreview)
             }
+            .listPlainItemNoInsets()
+            
             CustomListSection("Font") {
-                Picker("Font Family", selection: $fontInterfaceViewModel.fontFamily){
-                    ForEach(0..<fontInterfaceViewModel.families.count, id: \.self) { index in
-                        Text(fontInterfaceViewModel.families[index]).tag(index)
-                    }
+                BarebonePickerPreference(
+                    selected: $fontFamily,
+                    items: InterfaceFontUserDefaultsUtils.fontFamilies,
+                    title: "Font Family"
+                ) { family in
+                    InterfaceFontUserDefaultsUtils.fontFamiliesText[family]
                 }
-                .padding(.leading, 44.5)
+                .listPlainItemNoInsets()
                 
-                Picker("Font Size", selection: $fontInterfaceViewModel.fontSize){
-                    ForEach(0..<fontInterfaceViewModel.sizes.count, id: \.self) { index in
-                        Text(fontInterfaceViewModel.sizes[index]).tag(index)
-                    }
+                BarebonePickerPreference(
+                    selected: $fontSize,
+                    items: InterfaceFontUserDefaultsUtils.fontSizes,
+                    title: "Font Size"
+                ) { size in
+                    InterfaceFontUserDefaultsUtils.fontSizesText[size]
                 }
-                .padding(.leading, 44.5)
+                .listPlainItemNoInsets()
             }
+            
             CustomListSection("Title") {
-                Picker("Title Font Family", selection: $fontInterfaceViewModel.titleFontFamily){
-                    ForEach(0..<fontInterfaceViewModel.families.count, id: \.self) { index in
-                        Text(fontInterfaceViewModel.families[index]).tag(index)
-                    }
+                BarebonePickerPreference(
+                    selected: $titleFontFamily,
+                    items: InterfaceFontUserDefaultsUtils.fontFamilies,
+                    title: "Title Font Family"
+                ) { family in
+                    InterfaceFontUserDefaultsUtils.fontFamiliesText[family]
                 }
-                .padding(.leading, 44.5)
+                .listPlainItemNoInsets()
                 
-                Picker("Title Font Size", selection: $fontInterfaceViewModel.titleFontSize){
-                    ForEach(0..<fontInterfaceViewModel.sizes.count, id: \.self) { index in
-                        Text(fontInterfaceViewModel.sizes[index]).tag(index)
-                    }
+                BarebonePickerPreference(
+                    selected: $titleFontSize,
+                    items: InterfaceFontUserDefaultsUtils.fontSizes,
+                    title: "Title Font Size"
+                ) { size in
+                    InterfaceFontUserDefaultsUtils.fontSizesText[size]
                 }
-                .padding(.leading, 44.5)
-                
+                .listPlainItemNoInsets()
             }
+            
             CustomListSection("Content") {
-                Picker("Content Font Family", selection: $fontInterfaceViewModel.contentFontFamily){
-                    ForEach(0..<fontInterfaceViewModel.families.count, id: \.self) { index in
-                        Text(fontInterfaceViewModel.families[index]).tag(index)
-                    }
+                BarebonePickerPreference(
+                    selected: $contentFontFamily,
+                    items: InterfaceFontUserDefaultsUtils.fontFamilies,
+                    title: "Content Font Family"
+                ) { family in
+                    InterfaceFontUserDefaultsUtils.fontFamiliesText[family]
                 }
-                .padding(.leading, 44.5)
+                .listPlainItemNoInsets()
                 
-                Picker("Content Font Size", selection: $fontInterfaceViewModel.contentFontSize){
-                    ForEach(0..<fontInterfaceViewModel.contentSizes.count, id: \.self) { index in
-                        Text(fontInterfaceViewModel.contentSizes[index]).tag(index)
-                    }
+                BarebonePickerPreference(
+                    selected: $contentFontSize,
+                    items: InterfaceFontUserDefaultsUtils.contentFontSizes,
+                    title: "Content Font Size"
+                ) { size in
+                    InterfaceFontUserDefaultsUtils.contentFontSizesText[size]
                 }
-                .padding(.leading, 44.5)
-
+                .listPlainItemNoInsets()
             }
         }
+        .themedList()
+        .themedNavigationBar()
+        .addTitleToInlineNavigationBar("Font")
     }
 }

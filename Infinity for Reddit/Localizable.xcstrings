@@ -114,12 +114,6 @@
     "Comments will be filtered out if they contain the following keywords." : {
 
     },
-    "Content Font Family" : {
-
-    },
-    "Content Font Size" : {
-
-    },
     "Continue Thread" : {
 
     },
@@ -157,15 +151,6 @@
 
     },
     "Followed" : {
-
-    },
-    "Font Family" : {
-
-    },
-    "Font Preview" : {
-
-    },
-    "Font Size" : {
 
     },
     "Fully collapse" : {
@@ -2123,12 +2108,6 @@
           }
         }
       }
-    },
-    "Title Font Family" : {
-
-    },
-    "Title Font Size" : {
-
     },
     "To only see sensitive or spoiler posts, please turn on the corresponding switch." : {
 
