@@ -114,14 +114,14 @@ class PullNotificationBackgroundTaskManager {
                 let threadId = "inbox.\(account.username.lowercased())"
                 
                 var info: [String: Any] = [
-                    "accountName": account.username,
-                    "kind": inbox.inboxKind
+                    AppDeepLink.accountNameKey: account.username,
+                    AppDeepLink.kindKey: inbox.inboxKind
                 ]
                 if let fullname = inbox.name {
-                    info["messageFullname"] = fullname
+                    info[AppDeepLink.fullnameKey] = fullname
                 }
                 if let context = inbox.context {
-                    info["context"] = context
+                    info[AppDeepLink.contextKey] = context
                 }
                 
                 try? await NotificationDelegate.shared.postNotification(

@@ -57,35 +57,31 @@ class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
         
         let userInfo = response.notification.request.content.userInfo
         
-        guard let accountName = userInfo["accountName"] as? String,
-              let inboxKind = userInfo["kind"] as? Inbox.InboxKind else {
+        guard let accountName = userInfo[AppDeepLink.accountNameKey] as? String,
+              let inboxKind = userInfo[AppDeepLink.kindKey] as? Inbox.InboxKind else {
             completion()
             return
         }
         
-        let fullname = userInfo["messageFullname"] as? String
+        let fullname = userInfo[AppDeepLink.fullnameKey] as? String
         
         var deepLinkUrl: URL?
         
         switch inboxKind {
         case .comment, .link:
-            if let context = userInfo["context"] as? String,
-               let externalUrl = URL(string: context) {
-                deepLinkUrl = AppDeepLink.toExternalLink(
-                    url: externalUrl,
+            if let context = userInfo[AppDeepLink.contextKey] as? String {
+                deepLinkUrl = AppDeepLink.getContextURL(
+                    context: context,
                     account: accountName,
                     fullname: fullname
                 )
             }
-            
-        case .message, .account, .subreddit, .unknown:
-            deepLinkUrl = AppDeepLink.toInbox(
+        case .message, .account, .subreddit, .award, .unknown:
+            deepLinkUrl = AppDeepLink.getInboxURL(
                 account: accountName,
                 viewMessage: (inboxKind == .message),
                 fullname: fullname
             )
-        case .award:
-            break
         }
         
         if let url = deepLinkUrl {

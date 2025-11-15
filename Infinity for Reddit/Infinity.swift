@@ -57,22 +57,26 @@ struct Infinity: App {
                 .environmentObject(networkManager)
                 .environment(\.defaultMinListRowHeight, 0)
                 .onOpenURL { url in
-                    guard let parsed = AppDeepLink.parse(url) else { return }
-                    switch parsed {
-                    case .external(let external):
-                        LinkHandler.shared.handle(url: external)
-
+                    guard let appDeepLinkType = AppDeepLink.getAppDeepLinkType(url) else {
+                        return
+                    }
+                    switch appDeepLinkType {
+                    case .url(let url):
+                        // TODO handle link
+                        break
                     case .inbox(let account, let viewMessage, let fullname):
                         var info: [String: Any] = [
-                            "accountName": account,
-                            "viewMessage": viewMessage
+                            AppDeepLink.accountNameKey: account,
+                            AppDeepLink.viewMessageKey: viewMessage
                         ]
-                        if let fullname { info["messageFullname"] = fullname }
+                        if let fullname {
+                            info[AppDeepLink.fullnameKey] = fullname
+                        }
                         NotificationCenter.default.post(name: .inboxDeepLink, object: nil, userInfo: info)
-                    case .link(let externalUrl, let account, _):
+                    case .context(let account, let context, let fullname):
                         Task {
                             await accountViewModel.switchToAccountIfNeeded(account)
-                            LinkHandler.shared.handle(url: externalUrl)
+                            LinkHandler.shared.handle(link: context)
                         }
                     }
                 }
