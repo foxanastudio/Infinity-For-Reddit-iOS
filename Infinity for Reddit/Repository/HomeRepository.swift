@@ -32,17 +32,17 @@ class HomeRepository: HomeRepositoryProtocol {
     
     public init() {
         guard let resolvedSession = DependencyManager.shared.container.resolve(Session.self) else {
-            fatalError("Failed to resolve Session in UserDetailsRepository")
+            fatalError("Failed to resolve Session in HomeRepository")
         }
         guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
-            fatalError("Failed to resolve DatabasePool in UserDetailsRepository")
+            fatalError("Failed to resolve DatabasePool in HomeRepository")
         }
         self.session = resolvedSession
     }
     
     func fetchInboxCount() async throws -> Int {
         let data = try await self.session.request(
-            RedditAPI.getUserData(username: AccountViewModel.shared.account.username)
+            RedditOAuthAPI.getUserData(username: AccountViewModel.shared.account.username)
         )
         .validate()
         .serializingData()

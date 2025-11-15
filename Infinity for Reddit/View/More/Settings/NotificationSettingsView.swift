@@ -12,22 +12,16 @@ import GRDB
 
 struct NotificationSettingsView: View {
     @AppStorage(NotificationUserDefaultsUtils.enableNotificationKey, store: .notification) private var enableNotification: Bool = true
-    @AppStorage(NotificationUserDefaultsUtils.notificationIntervalKey, store: .video) private var notificationInterval: Int = 60
-    
-    @State private var enableNotificationMirror: Bool
+    @AppStorage(NotificationUserDefaultsUtils.notificationIntervalKey, store: .notification) private var notificationInterval: Int = 60
     
     private let notificationSettingsViewModel = NotificationSettingsViewModel()
-    
-    init() {
-        enableNotificationMirror = NotificationUserDefaultsUtils.enableNotification
-    }
     
     var body: some View {
         List {
             TogglePreference(isEnabled: $enableNotification, title: "Enable Notification")
                 .listPlainItemNoInsets()
             
-            if enableNotificationMirror {
+            if enableNotification {
                 BarebonePickerPreference(
                     selected: $notificationInterval,
                     items: NotificationUserDefaultsUtils.notificationIntervalOptions,
@@ -36,15 +30,13 @@ struct NotificationSettingsView: View {
                     NotificationUserDefaultsUtils.notificationIntervalOptionsText[NotificationUserDefaultsUtils.notificationIntervalOptions.firstIndex(of: interval) ?? 2]
                 }
                 .listPlainItemNoInsets()
+                .animation(.easeInOut, value: enableNotification)
             }
         }
         .themedList()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Notification")
         .onChange(of: enableNotification) { _, newValue in
-            withAnimation {
-                enableNotificationMirror = newValue
-            }
             notificationSettingsViewModel.enableNotification(enable: newValue)
         }
         .onChange(of: notificationInterval) { _, newValue in

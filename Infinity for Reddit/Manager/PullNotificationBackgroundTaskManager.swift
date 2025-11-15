@@ -18,7 +18,7 @@ class PullNotificationBackgroundTaskManager {
     private let accountDao: AccountDao
     private let inboxListingRepository: InboxListingRepositoryProtocol
     
-    private init () {
+    private init() {
         guard let resolvedDatabasePool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
             fatalError("Failed to resolve DatabasePool")
         }
@@ -76,14 +76,12 @@ class PullNotificationBackgroundTaskManager {
             return nil
         }
     }
-    
-    @discardableResult
+
     func pullNotificationsForAllAccounts() async -> Bool {
         guard let accounts = await getAllAccounts(), !accounts.isEmpty else {
             return false
         }
         
-        let userNotificationCenter = UNUserNotificationCenter.current()
         var successful = true
         
         let lastTime = UserDefaults.notification.integer(forKey: UserDefaultsUtils.PULL_NOTIFICATION_TIME_KEY)

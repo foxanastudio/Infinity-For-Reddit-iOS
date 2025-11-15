@@ -20,7 +20,6 @@ class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
         }
     }
     
-    @discardableResult
     func postNotification(
         notificationId: String,
         threadId: String,
@@ -45,7 +44,6 @@ class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        
         completionHandler([.banner, .sound, .list, .badge])
     }
     
