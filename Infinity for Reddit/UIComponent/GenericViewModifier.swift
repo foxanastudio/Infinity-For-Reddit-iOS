@@ -244,3 +244,41 @@ struct AuthorFlairTextViewModifier: ViewModifier {
             .font(.system(size: 12))
     }
 }
+
+struct VisiblePercentageModifier: ViewModifier {
+    let onChange: (CGFloat) -> Void
+    let space: CoordinateSpace
+
+    func body(content: Content) -> some View {
+        content
+            .overlay(
+                GeometryReader { proxy in
+                    Color.clear.preference(
+                        key: VisiblePercentageKey.self,
+                        value: calculate(proxy: proxy)
+                    )
+                }
+            )
+            .onPreferenceChange(VisiblePercentageKey.self, perform: onChange)
+    }
+
+    private func calculate(proxy: GeometryProxy) -> CGFloat {
+        let frame = proxy.frame(in: space)
+        let containerHeight = UIScreen.main.bounds.height
+
+        let visibleTop = max(frame.minY, 0)
+        let visibleBottom = min(frame.maxY, containerHeight)
+
+        let visibleHeight = max(0, visibleBottom - visibleTop)
+        let percent = visibleHeight / frame.height
+
+        return min(max(percent, 0), 1)
+    }
+}
+
+struct VisiblePercentageKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
