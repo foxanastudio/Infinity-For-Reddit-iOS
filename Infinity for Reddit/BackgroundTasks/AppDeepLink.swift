@@ -47,10 +47,10 @@ struct AppDeepLink {
     
     static func getAppDeepLinkType(_ url: URL) -> AppDeepLinkType? {
         guard url.scheme == scheme else {
-            return .url(url)
+            return nil
         }
         guard let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
-            return .url(url)
+            return nil
         }
         
         func query(_ name: String) -> String? {
@@ -78,14 +78,13 @@ struct AppDeepLink {
                 fullname: query(fullnameKey)
             )
         default:
-            return .url(url)
+            break
         }
         return nil
     }
 }
 
 enum AppDeepLinkType {
-    case url(URL)
     case inbox(account: String, viewMessage: Bool, fullname: String?)
     case context(account: String, context: String, fullname: String?)
 }

@@ -61,11 +61,6 @@ struct Infinity: App {
                         return
                     }
                     switch appDeepLinkType {
-                    case .url(let url):
-                        let userInfo: [String: Any] = [
-                            AppDeepLink.urlKey: url
-                        ]
-                        NotificationCenter.default.post(name: .contextDeepLink, object: nil, userInfo: userInfo)
                     case .inbox(let account, let viewMessage, let fullname):
                         var userInfo: [String: Any] = [
                             AppDeepLink.accountNameKey: account,
