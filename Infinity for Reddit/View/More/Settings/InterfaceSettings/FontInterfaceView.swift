@@ -12,12 +12,12 @@ import GRDB
 struct FontInterfaceView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
     
-    @AppStorage(InterfaceFontUserDefaultsUtils.fontFamilyKey, store: .interfacePost) private var fontFamily: Int = 0
-    @AppStorage(InterfaceFontUserDefaultsUtils.fontSizeKey, store: .interfacePost) private var fontSize: Int = 2
-    @AppStorage(InterfaceFontUserDefaultsUtils.titleFontFamilyKey, store: .interfacePost) private var titleFontFamily: Int = 0
-    @AppStorage(InterfaceFontUserDefaultsUtils.titleFontSizeKey, store: .interfacePost) private var titleFontSize: Int = 2
-    @AppStorage(InterfaceFontUserDefaultsUtils.contentFontFamilyKey, store: .interfacePost) private var contentFontFamily: Int = 0
-    @AppStorage(InterfaceFontUserDefaultsUtils.contentFontSizeKey, store: .interfacePost) private var contentFontSize: Int = 2
+    @AppStorage(InterfaceFontUserDefaultsUtils.fontFamilyKey, store: .interfaceFont) private var fontFamily: Int = 0
+    @AppStorage(InterfaceFontUserDefaultsUtils.fontSizeKey, store: .interfaceFont) private var fontSize: Int = 2
+    @AppStorage(InterfaceFontUserDefaultsUtils.postTitleFontFamilyKey, store: .interfaceFont) private var postTitleFontFamily: Int = 0
+    @AppStorage(InterfaceFontUserDefaultsUtils.postTitleFontSizeKey, store: .interfaceFont) private var postTitleFontSize: Int = 2
+    @AppStorage(InterfaceFontUserDefaultsUtils.contentFontFamilyKey, store: .interfaceFont) private var contentFontFamily: Int = 0
+    @AppStorage(InterfaceFontUserDefaultsUtils.contentFontSizeKey, store: .interfaceFont) private var contentFontSize: Int = 2
     
     
     var body: some View {
@@ -51,7 +51,7 @@ struct FontInterfaceView: View {
             
             CustomListSection("Title") {
                 BarebonePickerPreference(
-                    selected: $titleFontFamily,
+                    selected: $postTitleFontFamily,
                     items: InterfaceFontUserDefaultsUtils.fontFamilies,
                     title: "Title Font Family"
                 ) { family in
@@ -60,7 +60,7 @@ struct FontInterfaceView: View {
                 .listPlainItemNoInsets()
                 
                 BarebonePickerPreference(
-                    selected: $titleFontSize,
+                    selected: $postTitleFontSize,
                     items: InterfaceFontUserDefaultsUtils.fontSizes,
                     title: "Title Font Size"
                 ) { size in

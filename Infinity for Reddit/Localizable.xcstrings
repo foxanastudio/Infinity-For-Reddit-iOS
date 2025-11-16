@@ -114,6 +114,9 @@
     "Comments will be filtered out if they contain the following keywords." : {
 
     },
+    "Content Font: This is a comment example text." : {
+
+    },
     "Continue Thread" : {
 
     },
@@ -151,6 +154,9 @@
 
     },
     "Followed" : {
+
+    },
+    "Font: This is a sample label" : {
 
     },
     "Fully collapse" : {
@@ -250,6 +256,9 @@
 
     },
     "Please select a subreddit first" : {
+
+    },
+    "Post Title Font: Sample Post Title Here" : {
 
     },
     "Posts" : {
