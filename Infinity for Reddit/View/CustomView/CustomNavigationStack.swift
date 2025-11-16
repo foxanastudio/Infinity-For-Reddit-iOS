@@ -10,14 +10,15 @@ import SwiftUI
 struct CustomNavigationStack<Content: View>: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
     
-    @StateObject private var navigationManager: NavigationManager
+    @ObservedObject private var navigationManager: NavigationManager
+    
     @StateObject var commentSubmissionShareableViewModel: CommentSubmissionShareableViewModel = CommentSubmissionShareableViewModel()
     @StateObject var postEditingShareableViewModel: PostEditingShareableViewModel = PostEditingShareableViewModel()
     
     let content: () -> Content
     
-    init(fullScreenMediaViewModel: FullScreenMediaViewModel, @ViewBuilder content: @escaping () -> Content) {
-        _navigationManager = StateObject(wrappedValue: NavigationManager(fullScreenMediaViewModel: fullScreenMediaViewModel))
+    init(navigationManager: NavigationManager, @ViewBuilder content: @escaping () -> Content) {
+        self.navigationManager = navigationManager
         self.content = content
     }
     

@@ -12,17 +12,17 @@ import GiphyUISDK
 
 @main
 struct Infinity: App {
-    let container: Container = {
-        let container = Container()
-        return container
-    }()
+    @Environment(\.scenePhase) private var scenePhase
     
     @StateObject var accountViewModel: AccountViewModel
     @StateObject var customThemeViewModel: CustomThemeViewModel
     @StateObject var fullScreenMediaViewModel: FullScreenMediaViewModel
     @StateObject var networkManager: NetworkManager = NetworkManager()
     
-    @Environment(\.scenePhase) private var scenePhase
+    let container: Container = {
+        let container = Container()
+        return container
+    }()
     
     init() {
         guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
@@ -48,7 +48,7 @@ struct Infinity: App {
 
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            HomeView(fullScreenMediaViewModel: fullScreenMediaViewModel)
                 .id(accountViewModel.account.username)
                 .environment(\.dependencyManager, DependencyManager.shared.container)
                 .environmentObject(accountViewModel)
@@ -62,22 +62,28 @@ struct Infinity: App {
                     }
                     switch appDeepLinkType {
                     case .url(let url):
-                        // TODO handle link
-                        break
+                        let userInfo: [String: Any] = [
+                            AppDeepLink.urlKey: url
+                        ]
+                        NotificationCenter.default.post(name: .contextDeepLink, object: nil, userInfo: userInfo)
                     case .inbox(let account, let viewMessage, let fullname):
-                        var info: [String: Any] = [
+                        var userInfo: [String: Any] = [
                             AppDeepLink.accountNameKey: account,
                             AppDeepLink.viewMessageKey: viewMessage
                         ]
                         if let fullname {
-                            info[AppDeepLink.fullnameKey] = fullname
+                            userInfo[AppDeepLink.fullnameKey] = fullname
                         }
-                        NotificationCenter.default.post(name: .inboxDeepLink, object: nil, userInfo: info)
+                        NotificationCenter.default.post(name: .inboxDeepLink, object: nil, userInfo: userInfo)
                     case .context(let account, let context, let fullname):
-                        Task {
-                            await accountViewModel.switchToAccountIfNeeded(account)
-                            LinkHandler.shared.handle(link: context)
+                        var userInfo: [String: Any] = [
+                            AppDeepLink.accountNameKey: account,
+                            AppDeepLink.contextKey: context
+                        ]
+                        if let fullname {
+                            userInfo[AppDeepLink.fullnameKey] = fullname
                         }
+                        NotificationCenter.default.post(name: .contextDeepLink, object: nil, userInfo: userInfo)
                     }
                 }
                 .onAppear {

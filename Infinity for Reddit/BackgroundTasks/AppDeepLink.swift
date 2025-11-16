@@ -15,6 +15,7 @@ struct AppDeepLink {
     static let contextKey = "context"
     static let kindKey = "kind"
     static let viewMessageKey = "viewMessage"
+    static let urlKey = "url"
     
     static func getInboxURL(account: String, viewMessage: Bool, fullname: String?) -> URL? {
         var components = URLComponents()
@@ -46,10 +47,10 @@ struct AppDeepLink {
     
     static func getAppDeepLinkType(_ url: URL) -> AppDeepLinkType? {
         guard url.scheme == scheme else {
-            return nil
+            return .url(url)
         }
         guard let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
-            return nil
+            return .url(url)
         }
         
         func query(_ name: String) -> String? {
