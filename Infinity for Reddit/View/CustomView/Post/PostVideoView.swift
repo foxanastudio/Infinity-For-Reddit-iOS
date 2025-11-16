@@ -17,6 +17,8 @@ struct PostVideoView: View {
     @AppStorage(VideoUserDefaultsUtils.muteAutoplayingVideoKey, store: .video) private var muteAutoplayingVideo: Bool = true
     @AppStorage(InterfacePostUserDefaultsUtils.limitMediaHeightKey, store: .interfacePost) private var limitMediaHeight: Bool = false
     
+    @State private var canPlay: Bool = false
+    
     let post: Post
     let videoUrlString: String
     var inPostListing: Bool = false
@@ -27,9 +29,9 @@ struct PostVideoView: View {
             if VideoUserDefaultsUtils.canAutoplayVideo(videoAutoplay: videoAutoplay, isWifiConnected: networkManager.isWifiConnected)
                 && ((post.over18 && autoplaySensitiveVideo) || !post.over18) {
                 if let preview = post.preview, preview.images.count > 0, !(limitMediaHeight && inPostListing) {
-                    InlineVideoPlayer(videoURL: URL(string: videoUrlString)!, aspectRatio: preview.images[0].source.aspectRatio, muteVideo: muteAutoplayingVideo)
+                    InlineVideoPlayer(videoURL: URL(string: videoUrlString)!, aspectRatio: preview.images[0].source.aspectRatio, muteVideo: muteAutoplayingVideo, canPlay: canPlay)
                 } else {
-                    InlineVideoPlayer(videoURL: URL(string: videoUrlString)!, aspectRatio: nil, muteVideo: muteAutoplayingVideo)
+                    InlineVideoPlayer(videoURL: URL(string: videoUrlString)!, aspectRatio: nil, muteVideo: muteAutoplayingVideo, canPlay: canPlay)
                         .frame(height: 200)
                 }
             } else {
@@ -77,6 +79,7 @@ struct PostVideoView: View {
             }
         }
         .onVisiblePercentageChange { percent in
+            canPlay = percent > 0.5
         }
     }
 }
