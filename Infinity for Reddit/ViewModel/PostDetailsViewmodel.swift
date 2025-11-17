@@ -40,6 +40,7 @@ public class PostDetailsViewModel: ObservableObject {
     private var refreshPostsContinuation: CheckedContinuation<Void, Never>?
     
     private var cancellables = Set<AnyCancellable>()
+    private var toggleSensitiveTask: Task<Void, Never>?
     
     enum PostDetailsViewModelError: LocalizedError {
         case postFetchError
@@ -705,6 +706,32 @@ public class PostDetailsViewModel: ObservableObject {
                 post.hidden = !post.hidden
                 onFinish()
             }
+        }
+    }
+    
+    @MainActor
+    func toggleSensitive() {
+        guard let post else {
+            self.error = PostDetailsViewModelError.postNotLoadedError
+            return
+        }
+        
+        guard !account.isAnonymous() else {
+            return
+        }
+        
+        
+        toggleSensitiveTask?.cancel()
+        toggleSensitiveTask = Task {
+            do {
+                try await postDetailsRepository.toggleSensitive(post)
+                self.post?.over18.toggle()
+            } catch {
+                self.error = error
+                print(error)
+            }
+            
+            toggleSensitiveTask = nil
         }
     }
 }

@@ -268,4 +268,18 @@ public class PostDetailsRepository: PostDetailsRepositoryProtocol {
             }
         }
     }
+    
+    public func toggleSensitive(_ post: Post) async throws {
+        guard let name = post.name else {
+            throw PostDetailsRepositoryError.postIdNotFound
+        }
+        let params = ["id": name]
+        
+        try Task.checkCancellation()
+        
+        _ = await self.session.request(post.over18 ? RedditOAuthAPI.unmarkSensitive(params: params) : RedditOAuthAPI.markSensitive(params: params))
+            .validate()
+            .serializingData(automaticallyCancelling: true)
+            .response
+    }
 }

@@ -313,6 +313,18 @@ struct PostDetailsView: View {
                         withAnimation(.linear(duration: 0.2)) {
                             activeAlert = .deletePost
                         }
+                    },
+                    
+                    NavigationBarMenuItem(title: postDetailsViewModel.post?.over18 ?? false ? "Unmark Sensitive" : "Mark Sensitive") {
+                        postDetailsViewModel.toggleSensitive()
+                    },
+                    
+                    NavigationBarMenuItem(title: postDetailsViewModel.post?.spoiler ?? false ? "Unmark Spoiler" : "Mark Spoiler") {
+                        
+                    },
+                    
+                    NavigationBarMenuItem(title: "Edit Flair") {
+                        
                     }
                 ]
             } else {

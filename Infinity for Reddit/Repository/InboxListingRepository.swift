@@ -84,7 +84,7 @@ public class InboxListingRepository: InboxListingRepositoryProtocol {
             interceptor: interceptor
         )
             .validate()
-            .serializingData()
+            .serializingData(automaticallyCancelling: true)
             .response
     }
 }

@@ -100,7 +100,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
     var numComments : Int!
     var numCrossposts : Int!
     var numReports : Int!
-    var over18 : Bool!
+    @Published var over18 : Bool!
     var permalink : String!
     var pinned : Bool!
     var preview : Preview!
