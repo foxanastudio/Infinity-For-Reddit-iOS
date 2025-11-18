@@ -193,7 +193,7 @@ struct SubredditDetailsView: View {
             SelectUserFlairSheet(userFlairs: subredditDetailsViewModel.userFlairs, onUserFlairSelected: { userFlair in
                 subredditDetailsViewModel.selectUserFlair(userFlair)
             }, onClearUserFlair: {
-                
+                subredditDetailsViewModel.cleaarUserFlair()
             })
         }
     }

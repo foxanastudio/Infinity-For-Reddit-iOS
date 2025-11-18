@@ -125,8 +125,13 @@ public class SubredditDetailsRepository: SubredditDetailsRepositoryProtocol {
         return result
     }
     
-    public func selectUserFlair(subredditName: String, userFlair: UserFlair) async throws {
-        let params = ["api_type": "json", "flair_template_id": userFlair.id, "name": AccountViewModel.shared.account.username, "text": userFlair.text]
+    public func selectUserFlair(subredditName: String, userFlair: UserFlair?) async throws {
+        let params: [String: String]
+        if let userFlair {
+            params = ["api_type": "json", "flair_template_id": userFlair.id, "name": AccountViewModel.shared.account.username, "text": userFlair.text]
+        } else {
+            params = ["api_type": "json", "name": AccountViewModel.shared.account.username]
+        }
         
         _ = await self.session.request(RedditOAuthAPI.selectUserFlair(subredditName: subredditName, params: params))
             .validate()

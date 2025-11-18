@@ -92,4 +92,15 @@ class SubredditDetailsViewModel: ObservableObject {
             }
         }
     }
+    
+    func cleaarUserFlair() {
+        Task {
+            do {
+                try await subredditDetailsRepository.selectUserFlair(subredditName: subredditName, userFlair: nil)
+            } catch {
+                self.error = error
+                print(error)
+            }
+        }
+    }
 }
