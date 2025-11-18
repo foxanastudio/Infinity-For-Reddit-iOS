@@ -61,22 +61,12 @@ struct CrosspostView: View {
                         )
                         .padding(16)
                         
-//                            switch crosspostViewModel.postToBeCrossposted.postType {
-//                            case .noPreviewLink:
-//                                if let url = URL(string: crosspostViewModel.postToBeCrossposted.url), let domain = url.host {
-//                                    NoPreviewLinkView(domain: domain) {
-//                                        navigationManager.openLink(url)
-//                                    }
-//                                } else if let crosspost = crosspostViewModel.postToBeCrossposted.crosspostParent, let url = URL(string: crosspost.url), let domain = url.host {
-//                                    NoPreviewLinkView(domain: domain) {
-//                                        navigationManager.openLink(url)
-//                                    }
-//                                }
-//                            default:
-//                                EmptyView()
-//                            }
-                        
-                        if let galleryData = crosspostViewModel.postToBeCrossposted.galleryData,
+                        if crosspostViewModel.postToBeCrossposted.postType == .noPreviewLink || crosspostViewModel.postToBeCrossposted.postType == .link {
+                            RowText(crosspostViewModel.postToBeCrossposted.url)
+                                .secondaryText()
+                                .padding(.horizontal, 16)
+                                .padding(.bottom, 16)
+                        } else if let galleryData = crosspostViewModel.postToBeCrossposted.galleryData,
                                   !galleryData.items.isEmpty,
                                   let mediaMetadata = crosspostViewModel.postToBeCrossposted.mediaMetadata,
                                   let preview = mediaMetadata[galleryData.items[0].mediaId] {
