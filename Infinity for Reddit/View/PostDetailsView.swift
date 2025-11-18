@@ -290,7 +290,7 @@ struct PostDetailsView: View {
             navigationBarMenuManager.pop(key: key)
         }
         
-        let menuItems: [NavigationBarMenuItem]
+        var menuItems: [NavigationBarMenuItem]
         if AccountViewModel.shared.account.username == postDetailsViewModel.post?.author {
             if postDetailsViewModel.post?.canEditBody == true {
                 menuItems = [
@@ -337,13 +337,6 @@ struct PostDetailsView: View {
                     NavigationBarMenuItem(title: "Edit Flair") {
                         postDetailsViewModel.fetchFlairs()
                         showSelectFlairSheet = true
-                    },
-                    
-                    NavigationBarMenuItem(title: "Crosspost") {
-                        guard let post = postDetailsViewModel.post else {
-                            return
-                        }
-                        navigationManager.append(AppNavigation.crosspost(postToBeCrossposted: post))
                     }
                 ]
             } else {
@@ -387,13 +380,6 @@ struct PostDetailsView: View {
                     NavigationBarMenuItem(title: "Edit Flair") {
                         postDetailsViewModel.fetchFlairs()
                         showSelectFlairSheet = true
-                    },
-                    
-                    NavigationBarMenuItem(title: "Crosspost") {
-                        guard let post = postDetailsViewModel.post else {
-                            return
-                        }
-                        navigationManager.append(AppNavigation.crosspost(postToBeCrossposted: post))
                     }
                 ]
             }
@@ -415,15 +401,19 @@ struct PostDetailsView: View {
                     postDetailsViewModel.toggleHidePost {
                         setUpMenu()
                     }
-                },
-                
+                }
+            ]
+        }
+        
+        if postDetailsViewModel.post?.isCrosspostable ?? false {
+            menuItems.append(
                 NavigationBarMenuItem(title: "Crosspost") {
                     guard let post = postDetailsViewModel.post else {
                         return
                     }
                     navigationManager.append(AppNavigation.crosspost(postToBeCrossposted: post))
                 }
-            ]
+            )
         }
         
         navigationBarMenuKey = navigationBarMenuManager.push(menuItems)

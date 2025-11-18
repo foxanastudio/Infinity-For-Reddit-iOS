@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 class CrosspostViewModel: ObservableObject {
     @Published var title: String = ""
     @Published var selectedAccount: Account
