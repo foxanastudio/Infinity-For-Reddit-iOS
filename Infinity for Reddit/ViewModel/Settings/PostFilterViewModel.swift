@@ -13,6 +13,7 @@ class PostFilterViewModel: ObservableObject {
     // MARK: - Properties
     @Published var postFilters: [PostFilter] = []
     
+    let postToBeAdded: Post?
     private let postFilterRepository: PostFilterRepositoryProtocol
     private let postFilterDao: PostFilterDao
     private let dbPool: DatabasePool
@@ -20,10 +21,11 @@ class PostFilterViewModel: ObservableObject {
     private var listener: AnyDatabaseCancellable?
     
     // MARK: - Initializer
-    init(postFilterRepository: PostFilterRepositoryProtocol) {
+    init(postToBeAdded: Post?, postFilterRepository: PostFilterRepositoryProtocol) {
         guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
             fatalError("Failed to resolve DatabasePool")
         }
+        self.postToBeAdded = postToBeAdded
         self.postFilterRepository = postFilterRepository
         self.postFilterDao = PostFilterDao(dbPool: resolvedDBPool)
         self.dbPool = resolvedDBPool

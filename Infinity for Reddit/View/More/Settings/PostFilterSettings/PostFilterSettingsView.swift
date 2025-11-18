@@ -17,12 +17,13 @@ struct PostFilterSettingsView: View {
     @StateObject var postFilterViewModel: PostFilterViewModel
     @State private var selectedPostFilter: PostFilter?
     @State private var navigationBarMenuKey: UUID?
-    
     @State private var showPostFilterOptionSheet: Bool = false
+    @State private var showSelectFieldToAddToPostFitlerSheet: Bool = false
     
-    init() {
+    init(postToBeAdded: Post?) {
         _postFilterViewModel = StateObject(
             wrappedValue: PostFilterViewModel(
+                postToBeAdded: postToBeAdded,
                 postFilterRepository: PostFilterRepository()
             )
         )
@@ -51,7 +52,11 @@ struct PostFilterSettingsView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        navigationManager.append(SettingsViewNavigation.createOrEditPostFilter())
+                        if postFilterViewModel.postToBeAdded == nil {
+                            navigationManager.append(SettingsViewNavigation.createOrEditPostFilter())
+                        } else {
+                            showSelectFieldToAddToPostFitlerSheet = true
+                        }
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -86,14 +91,22 @@ struct PostFilterSettingsView: View {
         .addTitleToInlineNavigationBar("Post Filter")
         .toolbar {
             Button("", systemImage: "plus") {
-                navigationManager.append(SettingsViewNavigation.createOrEditPostFilter())
+                if postFilterViewModel.postToBeAdded == nil {
+                    navigationManager.append(SettingsViewNavigation.createOrEditPostFilter())
+                } else {
+                    showSelectFieldToAddToPostFitlerSheet = true
+                }
             }
         }
         .wrapContentSheet(isPresented: $showPostFilterOptionSheet) {
             PostOrCommentFilterOptionSheet(
                 onEditSelected: {
                     if let postFilter = selectedPostFilter {
-                        navigationManager.append(SettingsViewNavigation.createOrEditPostFilter(postFilter: postFilter))
+                        if postFilterViewModel.postToBeAdded == nil {
+                            navigationManager.append(SettingsViewNavigation.createOrEditPostFilter(postFilter: postFilter))
+                        } else {
+                            showSelectFieldToAddToPostFitlerSheet = true
+                        }
                     }
                 }, onApplyToSelected: {
                     if let postFilter = selectedPostFilter, let id = postFilter.id {
@@ -105,6 +118,13 @@ struct PostFilterSettingsView: View {
                     }
                 }
             )
+        }
+        .wrapContentSheet(isPresented: $showSelectFieldToAddToPostFitlerSheet) {
+            if let postToBeAdded = postFilterViewModel.postToBeAdded {
+                SelectFieldToAddToPostFilterSheet(post: postToBeAdded) { selectedFieldsToAddToPostFilter in
+                    
+                }
+            }
         }
     }
 }

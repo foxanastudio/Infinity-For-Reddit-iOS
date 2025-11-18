@@ -416,6 +416,15 @@ struct PostDetailsView: View {
             )
         }
         
+        menuItems.append(
+            NavigationBarMenuItem(title: "Add to Post Filter") {
+                guard let post = postDetailsViewModel.post else {
+                    return
+                }
+                navigationManager.append(SettingsViewNavigation.postFilter(postToBeAdded: post))
+            }
+        )
+        
         navigationBarMenuKey = navigationBarMenuManager.push(menuItems)
     }
     

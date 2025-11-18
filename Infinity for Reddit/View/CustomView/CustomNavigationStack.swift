@@ -194,8 +194,8 @@ struct CustomNavigationStack<Content: View>: View {
                     case .contentSensitivityFilter:
                         ContentSensitivityFilterSettingsView()
                             .environmentObject(navigationManager)
-                    case .postFilter:
-                        PostFilterSettingsView()
+                    case .postFilter(let postToBeAdded):
+                        PostFilterSettingsView(postToBeAdded: postToBeAdded)
                             .environmentObject(navigationManager)
                     case .createOrEditPostFilter(let postFilter):
                         CustomizePostFilterView(postFilter)
