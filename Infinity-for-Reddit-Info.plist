@@ -21,7 +21,21 @@
 	</array>
 	<key>UIAppFonts</key>
 	<array>
+		<string>AtkinsonHyperlegible-Regular.ttf</string>
+		<string>AtkinsonHyperlegible-Bold.ttf</string>
 		<string>BalsamiqSans-Regular.ttf</string>
+		<string>BalsamiqSans-Bold.ttf</string>
+		<string>HarmoniaSansW01-Regular.ttf</string>
+		<string>HarmoniaSansW01-Bold.ttf</string>
+		<string>Inter18pt-Regular.ttf</string>
+		<string>Inter18pt-Bold.ttf</string>
+		<string>Manrope-Regular.ttf</string>
+		<string>Manrope-Bold.ttf</string>
+		<string>NotoSans-Regular.ttf</string>
+		<string>NotoSans-Bold.ttf</string>
+		<string>RobotoCondensed-Regular.ttf</string>
+		<string>RobotoCondensed-Bold.ttf</string>
+		<string>Sriracha-Regular.ttf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>

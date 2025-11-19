@@ -2,7 +2,7 @@
 //  FontSize.swift
 //  Infinity for Reddit
 //
-//  Created by Joeylr on 2025-11-15.
+//  Created by joeylr2042 on 2025-11-15.
 //
 
 import Foundation
