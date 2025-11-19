@@ -11,10 +11,7 @@ import SwiftyJSON
 class InboxListingRootClass: NSObject {
     var kind: String!
     var data: InboxListing!
-    
-    /**
-     * Instantiate the instance using the passed json values to set the properties values
-     */
+
     init(fromJson json: JSON!, messageWhere: MessageWhere) throws {
         if json.isEmpty {
             throw JSONError.invalidData

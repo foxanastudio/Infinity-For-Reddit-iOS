@@ -8,8 +8,11 @@
 import SwiftUI
 
 struct SendChatMessageView: View {
+    @Environment(\.dismiss) private var dismiss
+    
     @EnvironmentObject private var accountViewModel: AccountViewModel
     @EnvironmentObject private var navigationManager: NavigationManager
+    @EnvironmentObject private var snackbarManager: SnackbarManager
     
     @StateObject private var sendChatMessageViewModel: SendChatMessageViewModel
     
@@ -42,15 +45,25 @@ struct SendChatMessageView: View {
                         .padding(.horizontal, 16)
                         .padding(.top, 16)
                         
-                        MarkdownTextField(hint: "Subject", text: $sendChatMessageViewModel.subject, selectedRange: $subjectSelectedRange, canFocus: $subjectCanFocus)
-                            .contentShape(Rectangle())
-                            .padding(16)
+                        MarkdownTextField(
+                            hint: "Subject",
+                            text: $sendChatMessageViewModel.subject,
+                            selectedRange: $subjectSelectedRange,
+                            canFocus: $subjectCanFocus
+                        )
+                        .contentShape(Rectangle())
+                        .padding(16)
                         
                         Divider()
                         
-                        MarkdownTextField(hint: "Message", text: $sendChatMessageViewModel.message, selectedRange: $messageSelectedRange, canFocus: $messageCanFocus)
-                            .contentShape(Rectangle())
-                            .padding(16)
+                        MarkdownTextField(
+                            hint: "Message",
+                            text: $sendChatMessageViewModel.message,
+                            selectedRange: $messageSelectedRange,
+                            canFocus: $messageCanFocus
+                        )
+                        .contentShape(Rectangle())
+                        .padding(16)
                     }
                 }
                 
@@ -64,6 +77,38 @@ struct SendChatMessageView: View {
         .id(accountViewModel.account.username)
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Send Chat Message")
+        .toolbar {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                Button(action: {
+                    sendChatMessageViewModel.sendChatMessage()
+                }) {
+                    SwiftUI.Image(systemName: "paperplane.fill")
+                        .navigationBarImage()
+                }
+                
+                NavigationBarMenu()
+            }
+        }
+        .onChange(of: sendChatMessageViewModel.sendChatMessageTask) { _, newValue in
+            if newValue != nil {
+                snackbarManager.showSnackbar(
+                    text: "Sending. Please wait...",
+                    autoDismiss: false,
+                    canDismissByGesture: false
+                )
+            }
+        }
+        .onChange(of: sendChatMessageViewModel.chatMessageSentFlag) { _, newValue in
+            if newValue {
+                snackbarManager.showSnackbar(text: "Sent")
+                dismiss()
+            }
+        }
+        .onReceive(sendChatMessageViewModel.$error) { newValue in
+            if let error = newValue {
+                snackbarManager.showSnackbar(text: error.localizedDescription)
+            }
+        }
     }
     
     private enum FieldType: Hashable {

@@ -29,7 +29,7 @@ class InboxConversationViewModel: ObservableObject {
         if inbox.author == AccountViewModel.shared.account.username {
             var fullNameTemp: String?
             var recepientTemp: String?
-            if let inboxes = inbox.replies.data.inboxes {
+            if let inboxes = inbox.replies?.data.inboxes {
                 for i in (0..<inboxes.count).reversed() {
                     if inboxes[i].author != AccountViewModel.shared.account.username {
                         fullNameTemp = inboxes[i].name
@@ -65,7 +65,7 @@ class InboxConversationViewModel: ObservableObject {
             let newInbox = try await inboxConversationRepository.sendMessage(message: message, fullNameToReplyTo: fullNameToReplyTo)
             
             await MainActor.run {
-                inbox.replies.data.inboxes = (inbox.replies.data.inboxes ?? []) + [newInbox]
+                inbox.replies?.data.inboxes = (inbox.replies?.data?.inboxes ?? []) + [newInbox]
                 listScrollTarget = newInbox.id
             }
         } catch {

@@ -16,7 +16,7 @@ class SubmitTextPostViewModel: ObservableObject {
     @Published var content: String = ""
     @Published var selectedAccount: Account
     @Published var embeddedImages: [UploadedImage] = []
-    @Published var submitPostTask: Task<Void, Error>?
+    @Published var submitPostTask: Task<Void, Never>?
     @Published var submittedPostId: String?
     @Published var error: Error? = nil
     
