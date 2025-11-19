@@ -12,7 +12,8 @@ import Alamofire
 
 struct SubscriptionsView: View {
     @EnvironmentObject private var accountViewModel: AccountViewModel
-    @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
+    @EnvironmentObject private var navigationBarMenuManager: NavigationBarMenuManager
+    @EnvironmentObject private var navigationManager: NavigationManager
     
     @StateObject var subscriptionListingViewModel: SubscriptionListingViewModel
 
@@ -69,6 +70,10 @@ struct SubscriptionsView: View {
             navigationBarMenuKey = navigationBarMenuManager.push([
                 NavigationBarMenuItem(title: "Refresh") {
                     subscriptionListingViewModel.refreshSubscriptions()
+                },
+                
+                NavigationBarMenuItem(title: "Create Custom Feed") {
+                    navigationManager.append(AppNavigation.createCustomFeed)
                 }
             ])
         }
