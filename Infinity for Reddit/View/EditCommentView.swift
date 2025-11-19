@@ -50,7 +50,6 @@ struct EditCommentView: View {
                             if let bodyProcessedMarkdown = editCommentViewModel.commentToBeEdited.bodyProcessedMarkdown {
                                 Markdown(bodyProcessedMarkdown)
                                     .markdownImageProvider(WebImageProvider(mediaMetadata: editCommentViewModel.commentToBeEdited.mediaMetadata))
-                                    .font(.system(size: 24))
                                     .padding(16)
                                     .themedPostCommentMarkdown()
                                     .markdownLinkHandler { url in
@@ -59,7 +58,6 @@ struct EditCommentView: View {
                             } else if let body = editCommentViewModel.commentToBeEdited.body, !body.isEmpty {
                                 Markdown(body)
                                     .markdownImageProvider(WebImageProvider(mediaMetadata: editCommentViewModel.commentToBeEdited.mediaMetadata))
-                                    .font(.system(size: 24))
                                     .padding(16)
                                     .themedPostCommentMarkdown()
                                     .markdownLinkHandler { url in

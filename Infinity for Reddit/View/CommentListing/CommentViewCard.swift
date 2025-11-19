@@ -117,7 +117,6 @@ struct CommentViewCard: View {
                         if let processedMarkdown = commentViewModel.comment.bodyProcessedMarkdown {
                             Markdown(processedMarkdown)
                                 .markdownImageProvider(WebImageProvider(mediaMetadata: commentViewModel.comment.mediaMetadata))
-                                .font(.system(size: 24))
                                 .padding(.horizontal, 16)
                                 .padding(.bottom, 12)
                                 .themedCommentMarkdown()
@@ -127,7 +126,6 @@ struct CommentViewCard: View {
                         } else {
                             Markdown(commentViewModel.comment.body)
                                 .markdownImageProvider(WebImageProvider(mediaMetadata: commentViewModel.comment.mediaMetadata))
-                                .font(.system(size: 24))
                                 .padding(.horizontal, 16)
                                 .padding(.bottom, 12)
                                 .themedCommentMarkdown()

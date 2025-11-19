@@ -48,7 +48,6 @@ struct EditPostView: View {
                             if let bodyProcessedMarkdown = editPostViewModel.postToBeEdited.selftextProcessedMarkdown {
                                 Markdown(bodyProcessedMarkdown)
                                     .markdownImageProvider(WebImageProvider(mediaMetadata: editPostViewModel.postToBeEdited.mediaMetadata))
-                                    .font(.system(size: 24))
                                     .padding(16)
                                     .themedPostCommentMarkdown()
                                     .markdownLinkHandler { url in
@@ -57,7 +56,6 @@ struct EditPostView: View {
                             } else if let selftext = editPostViewModel.postToBeEdited.selftext, !selftext.isEmpty {
                                 Markdown(selftext)
                                     .markdownImageProvider(WebImageProvider(mediaMetadata: editPostViewModel.postToBeEdited.mediaMetadata))
-                                    .font(.system(size: 24))
                                     .padding(16)
                                     .themedPostCommentMarkdown()
                                     .markdownLinkHandler { url in

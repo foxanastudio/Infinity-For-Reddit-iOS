@@ -113,7 +113,6 @@ struct PostViewCard: View {
             .padding(.bottom, 16)
             
             Text(postViewModel.post.title)
-                .font(.system(size: 24))
                 .padding(.horizontal, 16)
                 .padding(.bottom, 8)
                 .postTitle()

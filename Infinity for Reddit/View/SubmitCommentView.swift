@@ -61,7 +61,6 @@ struct SubmitCommentView: View {
                             if let bodyProcessedMarkdown = submitCommentViewModel.commentParent.bodyProcessedMarkdown {
                                 Markdown(bodyProcessedMarkdown)
                                     .markdownImageProvider(WebImageProvider(mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata))
-                                    .font(.system(size: 24))
                                     .padding(.horizontal, 16)
                                     .padding(.top, 8)
                                     .padding(.bottom, 16)
@@ -72,7 +71,6 @@ struct SubmitCommentView: View {
                             } else if let body = submitCommentViewModel.commentParent.body, !body.isEmpty {
                                 Markdown(body)
                                     .markdownImageProvider(WebImageProvider(mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata))
-                                    .font(.system(size: 24))
                                     .padding(.horizontal, 16)
                                     .padding(.top, 8)
                                     .padding(.bottom, 16)

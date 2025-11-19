@@ -103,7 +103,6 @@ struct PostViewCompact: View {
             HStack (alignment: .center, spacing: 12) {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(postViewModel.post.title)
-                        .font(.system(size: 18))
                         .padding(.bottom, 8)
                         .postTitle()
                     

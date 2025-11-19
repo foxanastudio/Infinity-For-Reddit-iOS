@@ -13,7 +13,7 @@ struct PrimaryTextViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .fixedSize(horizontal: false, vertical: true)
-            //.font()
+            .customFont()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor))
     }
 }
@@ -24,7 +24,7 @@ struct SecondaryTextViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .fixedSize(horizontal: false, vertical: true)
-            //.font()
+            .customFont()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.secondaryTextColor))
     }
 }
@@ -35,7 +35,7 @@ struct ButtonTextViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .fixedSize(horizontal: false, vertical: true)
-            //.font()
+            .customFont()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.buttonTextColor))
     }
 }
@@ -45,7 +45,7 @@ struct NavigationBarPrimaryTextViewModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            //.font()
+            .customFont()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.toolbarPrimaryTextAndIconColor))
             .navigationBarTitleDisplayMode(.inline)
     }
@@ -57,7 +57,7 @@ struct PostInfoTextViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .fixedSize(horizontal: false, vertical: true)
-            //.font()
+            .customFont()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.postIconAndInfoColor))
     }
 }
@@ -68,7 +68,7 @@ struct CommentInfoTextViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .fixedSize(horizontal: false, vertical: true)
-            //.font()
+            .customFont()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.commentIconAndInfoColor))
     }
 }
@@ -79,6 +79,7 @@ struct UsernameTextViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .fixedSize(horizontal: false, vertical: true)
+            .customFont()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.username))
     }
 }
@@ -98,7 +99,7 @@ struct UsernameOnPostTextViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .fixedSize(horizontal: false, vertical: true)
-            //.font()
+            .customFont()
             .foregroundColor(usernameColor)
     }
 }
@@ -109,7 +110,7 @@ struct SubredditTextViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .fixedSize(horizontal: false, vertical: true)
-            //.font()
+            .customFont()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.subreddit))
     }
 }
@@ -120,7 +121,7 @@ struct PostTitleTextViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .fixedSize(horizontal: false, vertical: true)
-            //.font()
+            .customPostTitleFont()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.postTitleColor))
     }
 }
@@ -131,7 +132,7 @@ struct PostContentTextViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .fixedSize(horizontal: false, vertical: true)
-            //.font()
+            .customContentFont()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.postContentColor))
     }
 }
@@ -142,7 +143,7 @@ struct CommentTextViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .fixedSize(horizontal: false, vertical: true)
-            //.font()
+            .customContentFont()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.commentColor))
     }
 }
@@ -152,7 +153,7 @@ struct ListSectionHeaderViewModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            //.font()
+            .customFont()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.colorAccent))
     }
 }
@@ -162,7 +163,7 @@ struct GalleryIndexIndicatorViewModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            //.font()
+            .customFont()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.mediaIndicatorIconColor))
             .background(Color(hex: themeViewModel.currentCustomTheme.mediaIndicatorBackgroundColor))
     }
@@ -173,7 +174,7 @@ struct ColorAccentTextViewModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            //.font()
+            .customFont()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.colorAccent))
     }
 }
@@ -183,7 +184,7 @@ struct PositiveTextButtonViewModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            //.font()
+            .customFont()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.colorPrimaryLightTheme))
     }
 }
@@ -193,7 +194,7 @@ struct WarningTextButtonViewModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            //.font()
+            .customFont()
             //.foregroundColor(Color(hex: themeViewModel.currentCustomTheme.colorPrimaryLightTheme))
             .foregroundColor(.red)
     }
@@ -204,7 +205,7 @@ struct NeutralTextButtonViewModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            //.font()
+            .customFont()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor))
     }
 }

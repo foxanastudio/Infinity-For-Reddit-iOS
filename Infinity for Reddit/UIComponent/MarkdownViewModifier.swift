@@ -10,10 +10,18 @@ import MarkdownUI
 
 struct MarkdownViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
-    
+    @AppStorage(InterfaceFontUserDefaultsUtils.fontFamilyKey, store: .interfaceFont) private var fontFamily: Int = 0
+    @AppStorage(InterfaceFontUserDefaultsUtils.fontSizeKey, store: .interfaceFont) private var fontSize: Int = 2
+
     func body(content: Content) -> some View {
-        content
-            //.font()
+        let family = FontFamily(rawValue: fontFamily) ?? .system
+        let size = InterfaceFontSize(rawValue: fontSize) ?? .normal
+
+        return content
+            .markdownTextStyle {
+                MarkdownUI.FontFamily(family.markdownFontFamily)
+                FontSize(size.size)
+            }
             .markdownTheme(.gitHub.link {
                 ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.colorAccent))
             }.text {
@@ -25,10 +33,18 @@ struct MarkdownViewModifier: ViewModifier {
 
 struct PostContentMarkdownViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
-    
+    @AppStorage(InterfaceFontUserDefaultsUtils.contentFontFamilyKey, store: .interfaceFont) private var contentFontFamily: Int = 0
+    @AppStorage(InterfaceFontUserDefaultsUtils.contentFontSizeKey, store: .interfaceFont) private var contentFontSize: Int = 2
+
     func body(content: Content) -> some View {
-        content
-            //.font()
+        let family = FontFamily(rawValue: contentFontFamily) ?? .system
+        let size = InterfaceContentFontSize(rawValue: contentFontSize) ?? .normal
+
+        return content
+            .markdownTextStyle {
+                MarkdownUI.FontFamily(family.markdownFontFamily)
+                FontSize(size.contentSize)
+            }
             .markdownTheme(.gitHub.link {
                 ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.colorAccent))
             }.text {
@@ -40,10 +56,18 @@ struct PostContentMarkdownViewModifier: ViewModifier {
 
 struct CommentMarkdownViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
-    
+    @AppStorage(InterfaceFontUserDefaultsUtils.contentFontFamilyKey, store: .interfaceFont) private var contentFontFamily: Int = 0
+    @AppStorage(InterfaceFontUserDefaultsUtils.contentFontSizeKey, store: .interfaceFont) private var contentFontSize: Int = 2
+
     func body(content: Content) -> some View {
-        content
-            //.font()
+        let family = FontFamily(rawValue: contentFontFamily) ?? .system
+        let size = InterfaceContentFontSize(rawValue: contentFontSize) ?? .normal
+
+        return content
+            .markdownTextStyle {
+                MarkdownUI.FontFamily(family.markdownFontFamily)
+                FontSize(size.contentSize)
+            }
             .markdownTheme(.gitHub.link {
                 ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.colorAccent))
             }.text {

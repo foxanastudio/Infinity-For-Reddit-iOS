@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import MarkdownUI
 
 enum FontFamily: Int {
     case system = 0
@@ -27,6 +28,15 @@ enum FontFamily: Int {
             return .system(size: size)
         case .balsamiqSans:
             return .custom("BalsamiqSans-Regular", size: size)
+        }
+    }
+
+    var markdownFontFamily: MarkdownUI.FontProperties.Family {
+        switch self {
+        case .system:
+            return .system()
+        case .balsamiqSans:
+            return .custom("BalsamiqSans-Regular")
         }
     }
 }

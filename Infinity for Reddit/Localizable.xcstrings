@@ -51,6 +51,9 @@
     "Back" : {
 
     },
+    "ButtonTextViewModifier" : {
+
+    },
     "Cake day: %@" : {
 
     },
@@ -99,6 +102,15 @@
     "Collapse Subscribed Subreddits Section" : {
 
     },
+    "ColorAccentTextViewModifier" : {
+
+    },
+    "CommentInfoTextViewModifier (time, score, etc.)" : {
+
+    },
+    "CommentMarkdownViewModifier (for markdown in comments)" : {
+
+    },
     "Comments" : {
 
     },
@@ -114,7 +126,10 @@
     "Comments will be filtered out if they contain the following keywords." : {
 
     },
-    "Content Font: This is a comment example text." : {
+    "CommentTextViewModifier - Comment text (uses Content Font)" : {
+
+    },
+    "CONTENT FONT MODIFIERS" : {
 
     },
     "Continue Thread" : {
@@ -156,10 +171,13 @@
     "Followed" : {
 
     },
-    "Font: This is a sample label" : {
+    "Font Modifier Test" : {
 
     },
     "Fully collapse" : {
+
+    },
+    "GalleryIndexIndicatorViewModifier" : {
 
     },
     "Gesture & Buttons" : {
@@ -183,6 +201,9 @@
     "Inbox" : {
 
     },
+    "INTERFACE FONT MODIFIERS" : {
+
+    },
     "Karma: %lld" : {
 
     },
@@ -198,6 +219,9 @@
     "Link posts that have the following urls will be filtered out." : {
 
     },
+    "ListSectionHeaderViewModifier" : {
+
+    },
     "Load more comments" : {
 
     },
@@ -207,6 +231,9 @@
     "Manage Subscription" : {
 
     },
+    "MarkdownViewModifier (general)" : {
+
+    },
     "Miscellaneous" : {
 
     },
@@ -214,6 +241,15 @@
 
     },
     "Navigation Drawer" : {
+
+    },
+    "NavigationBarButtonViewModifier" : {
+
+    },
+    "NavigationBarPrimaryTextViewModifier" : {
+
+    },
+    "NeutralTextButtonViewModifier" : {
 
     },
     "New Post" : {
@@ -258,7 +294,19 @@
     "Please select a subreddit first" : {
 
     },
-    "Post Title Font: Sample Post Title Here" : {
+    "PositiveTextButtonViewModifier" : {
+
+    },
+    "POST TITLE FONT MODIFIER" : {
+
+    },
+    "PostContentMarkdownViewModifier (for markdown in posts)" : {
+
+    },
+    "PostContentTextViewModifier - This is the post body text content that users write when creating a text post." : {
+
+    },
+    "PostInfoTextViewModifier (time, score, etc.)" : {
 
     },
     "Posts" : {
@@ -300,6 +348,12 @@
     "Posts will be filtered out if they do not contain the following keywords in their title." : {
 
     },
+    "PostTitleTextViewModifier - This is a Sample Post Title" : {
+
+    },
+    "PrimaryTextViewModifier" : {
+
+    },
     "r/%@" : {
 
     },
@@ -328,6 +382,9 @@
 
     },
     "Search in" : {
+
+    },
+    "SecondaryTextViewModifier" : {
 
     },
     "Security" : {
@@ -376,6 +433,9 @@
 
     },
     "Start by creating a post filter" : {
+
+    },
+    "SubredditTextViewModifier (r/subreddit - uses Interface Font)" : {
 
     },
     "Subscriptions" : {
@@ -2139,7 +2199,16 @@
     "Unsubscribe" : {
 
     },
+    "UsernameOnPostTextViewModifier (requires Post)" : {
+
+    },
+    "UsernameTextViewModifier" : {
+
+    },
     "Video downloaded" : {
+
+    },
+    "WarningTextButtonViewModifier" : {
 
     }
   },

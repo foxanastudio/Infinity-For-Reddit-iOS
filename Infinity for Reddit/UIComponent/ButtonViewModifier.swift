@@ -12,7 +12,7 @@ struct NavigationBarButtonViewModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            //.font()
+            .customFont()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.toolbarPrimaryTextAndIconColor))
     }
 }
