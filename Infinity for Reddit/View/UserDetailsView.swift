@@ -226,6 +226,10 @@ struct UserDetailsView: View {
             navigationBarMenuKey = navigationBarMenuManager.push([
                 NavigationBarMenuItem(title: "Add to Post Filter") {
                     navigationManager.append(SettingsViewNavigation.postFilter(userToBeAdded: userDetailsViewModel.userData?.name ?? userDetailsViewModel.username))
+                },
+                
+                NavigationBarMenuItem(title: "Send Message") {
+                    navigationManager.append(AppNavigation.sendChatMessage(username: userDetailsViewModel.userData?.name ?? userDetailsViewModel.username))
                 }
             ])
         }
