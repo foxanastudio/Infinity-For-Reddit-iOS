@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct SelectFieldToAddToPostFilterSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    
     @State var selectedFieldsToAddToPostFilter: [SelectedFieldToAddToPostFilter] = []
     @State private var selections: Set<SelectedFieldToAddToPostFilter> = Set()
     
@@ -19,6 +21,10 @@ struct SelectFieldToAddToPostFilterSheet: View {
             VStack(spacing: 0) {
                 Spacer()
                     .frame(height: 20)
+                
+                RowText("Select fields to add to post filter")
+                    .fontWeight(.bold)
+                    .padding(16)
                 
                 ForEach(SelectedFieldToAddToPostFilter.allCases, id: \.self) { field in
                     TouchRipple {
@@ -47,7 +53,17 @@ struct SelectFieldToAddToPostFilterSheet: View {
                     }
                 }
                 
-                
+                Button {
+                    onConfirm(Array(selections))
+                    dismiss()
+                } label: {
+                    HStack {
+                        Text("Done")
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                .padding(16)
+                .filledButton()
             }
         }
     }

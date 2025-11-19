@@ -197,7 +197,7 @@ struct CustomNavigationStack<Content: View>: View {
                     case .postFilter(let postToBeAdded):
                         PostFilterSettingsView(postToBeAdded: postToBeAdded)
                             .environmentObject(navigationManager)
-                    case .createOrEditPostFilter(let postFilter):
+                    case .createOrEditPostFilter(let postFilter, let postToBeAdded, let selectedFieldsToAddToPostFilter):
                         CustomizePostFilterView(postFilter)
                             .environmentObject(navigationManager)
                     case .postFilterUsageListing(let postFilterId):

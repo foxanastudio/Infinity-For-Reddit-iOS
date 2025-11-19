@@ -122,7 +122,11 @@ struct PostFilterSettingsView: View {
         .wrapContentSheet(isPresented: $showSelectFieldToAddToPostFitlerSheet) {
             if let postToBeAdded = postFilterViewModel.postToBeAdded {
                 SelectFieldToAddToPostFilterSheet(post: postToBeAdded) { selectedFieldsToAddToPostFilter in
-                    
+                    navigationManager.append(
+                        SettingsViewNavigation.createOrEditPostFilter(
+                            postFilter: selectedPostFilter, postToBeAdded: postToBeAdded, selectedFieldsToAddToPostFilter: selectedFieldsToAddToPostFilter
+                        )
+                    )
                 }
             }
         }

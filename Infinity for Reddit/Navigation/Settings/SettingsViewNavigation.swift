@@ -17,7 +17,7 @@ enum SettingsViewNavigation: Hashable {
     case postHistory
     case contentSensitivityFilter
     case postFilter(postToBeAdded: Post? = nil)
-    case createOrEditPostFilter(postFilter: PostFilter? = nil)
+    case createOrEditPostFilter(postFilter: PostFilter? = nil, postToBeAdded: Post? = nil, selectedFieldsToAddToPostFilter: [SelectedFieldToAddToPostFilter]? = nil)
     case postFilterUsageListing(postFilterId: Int)
     case commentFilter
     case createOrEditCommentFilter(commentFilter: CommentFilter? = nil)
