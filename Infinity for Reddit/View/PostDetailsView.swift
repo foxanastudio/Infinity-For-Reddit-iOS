@@ -142,6 +142,9 @@ struct PostDetailsView: View {
                                 },
                                 onDelete: {
                                     postDetailsViewModel.deleteComment(comment)
+                                },
+                                onAddToCommentFilter: {
+                                    navigationManager.append(SettingsViewNavigation.commentFilter(commentToBeAdded: comment))
                                 }
                             )
                             .listPlainItemNoInsets()

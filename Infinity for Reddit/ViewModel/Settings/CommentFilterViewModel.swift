@@ -13,6 +13,7 @@ class CommentFilterViewModel: ObservableObject {
     // MARK: - Properties
     @Published var commentFilters: [CommentFilter] = []
     
+    let commentToBeAdded: Comment?
     private let commentFilterRepository: CommentFilterRepositoryProtocol
     private let commentFilterDao: CommentFilterDao
     
@@ -20,10 +21,11 @@ class CommentFilterViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Initializer
-    init(commentFilterRepository: CommentFilterRepositoryProtocol) {
+    init(commentToBeAdded: Comment?, commentFilterRepository: CommentFilterRepositoryProtocol) {
         guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
             fatalError("Failed to resolve DatabasePool")
         }
+        self.commentToBeAdded = commentToBeAdded
         self.commentFilterRepository = commentFilterRepository
         self.commentFilterDao = CommentFilterDao(dbPool: resolvedDBPool)
         self.commentFilterUsagesPublisher = commentFilterDao.getAllCommentFiltersLiveData()

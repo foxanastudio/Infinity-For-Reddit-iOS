@@ -17,10 +17,12 @@ struct CustomizeCommentFilterView: View {
     
     @FocusState private var focusedField: FieldType?
     
-    init(_ commentFilter: CommentFilter?) {
+    init(_ commentFilter: CommentFilter?, commentToBeAdded: Comment? = nil, selectedFieldsToAddToCommentFilter: [SelectedFieldToAddToCommentFilter]? = nil) {
         _customizeCommentFilterViewModel = StateObject(
             wrappedValue: CustomizeCommentFilterViewModel(
                 commentFilter: commentFilter,
+                commentToBeAdded: commentToBeAdded,
+                selectedFieldsToAddToCommentFilter: selectedFieldsToAddToCommentFilter,
                 customizeCommentFilterRepository: CustomizeCommentFilterRepository()
             )
         )

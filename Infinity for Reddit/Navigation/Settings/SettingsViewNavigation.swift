@@ -19,8 +19,8 @@ enum SettingsViewNavigation: Hashable {
     case postFilter(postToBeAdded: Post? = nil, subredditToBeAdded: String? = nil, userToBeAdded: String? = nil)
     case createOrEditPostFilter(postFilter: PostFilter? = nil, postToBeAdded: Post? = nil, subredditToBeAdded: String? = nil, userToBeAdded: String? = nil, selectedFieldsToAddToPostFilter: [SelectedFieldToAddToPostFilter]? = nil)
     case postFilterUsageListing(postFilterId: Int)
-    case commentFilter
-    case createOrEditCommentFilter(commentFilter: CommentFilter? = nil)
+    case commentFilter(commentToBeAdded: Comment? = nil)
+    case createOrEditCommentFilter(commentFilter: CommentFilter? = nil, commentToBeAdded: Comment? = nil, selectedFieldsToAddToCommentFilter: [SelectedFieldToAddToCommentFilter]? = nil)
     case commentFilterUsageListing(commentFilterId: Int)
     case sortType
     case miscellaneous

@@ -203,11 +203,11 @@ struct CustomNavigationStack<Content: View>: View {
                     case .postFilterUsageListing(let postFilterId):
                         PostFilterUsageListingView(postFilterId: postFilterId)
                             .environmentObject(navigationManager)
-                    case .commentFilter:
-                        CommentFilterSettingsView()
+                    case .commentFilter(let commentToBeAdded):
+                        CommentFilterSettingsView(commentToBeAdded: commentToBeAdded)
                             .environmentObject(navigationManager)
-                    case .createOrEditCommentFilter(let commentFilter):
-                        CustomizeCommentFilterView(commentFilter)
+                    case .createOrEditCommentFilter(let commentFilter, let commentToBeAdded, let selectedFieldsToAddToCommentFilter):
+                        CustomizeCommentFilterView(commentFilter, commentToBeAdded: commentToBeAdded, selectedFieldsToAddToCommentFilter: selectedFieldsToAddToCommentFilter)
                             .environmentObject(navigationManager)
                     case .commentFilterUsageListing(let commentFilterId):
                         CommentFilterUsageListingView(commentFilterId: commentFilterId)

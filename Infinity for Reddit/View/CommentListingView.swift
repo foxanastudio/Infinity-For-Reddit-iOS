@@ -64,6 +64,9 @@ struct CommentListingView: View {
                                 },
                                 onDelete: {
                                     commentListingViewModel.deleteComment(comment)
+                                },
+                                onAddToCommentFilter: {
+                                    navigationManager.append(SettingsViewNavigation.commentFilter(commentToBeAdded: comment))
                                 }
                             )
                         }
