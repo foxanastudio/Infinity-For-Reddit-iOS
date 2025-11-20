@@ -28,7 +28,6 @@ class InterfaceFontUserDefaultsUtils {
     static let contentFontFamilyKey = "content_font_family"
     static let contentFontSizeKey = "content_font_size"
 
-    // Custom Font
     static let customFontPostScriptNameKey = "custom_font_postscript_name"
     static var customFontPostScriptName: String? {
         return UserDefaults.interfaceFont.string(forKey: customFontPostScriptNameKey)

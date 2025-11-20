@@ -11,20 +11,20 @@ import MarkdownUI
 
 enum FontFamily: Int {
     case system = 0
-    case atkinsonHyperlegibleBold = 1
-    case atkinsonHyperlegibleRegular = 2
-    case balsamiqSansBold = 3
-    case balsamiqSansRegular = 4
-    case harmoniaSansBold = 5
-    case harmoniaSansRegular = 6
-    case interBold = 7
-    case interRegular = 8
-    case manropeBold = 9
-    case manropeRegular = 10
-    case notoSansBold = 11
-    case notoSansRegular = 12
-    case robotoCondensedBold = 13
-    case robotoCondensedRegular = 14
+    case atkinsonHyperlegibleRegular = 1
+    case atkinsonHyperlegibleBold = 2
+    case balsamiqSansRegular = 3
+    case balsamiqSansBold = 4
+    case harmoniaSansRegular = 5
+    case harmoniaSansBold = 6
+    case interRegular = 7
+    case interBold = 8
+    case manropeRegular = 9
+    case manropeBold = 10
+    case notoSansRegular = 11
+    case notoSansBold = 12
+    case robotoCondensedRegular = 13
+    case robotoCondensedBold = 14
     case srirachaRegular = 15
     case customFontFamily = 16
 
@@ -32,34 +32,34 @@ enum FontFamily: Int {
         switch self {
         case .system:
             return "Default"
-        case .atkinsonHyperlegibleBold:
-            return "Atkinson Hyperlegible Bold"
         case .atkinsonHyperlegibleRegular:
             return "Atkinson Hyperlegible Regular"
-        case .balsamiqSansBold:
-            return "Balsamiq Sans Bold"
+        case .atkinsonHyperlegibleBold:
+            return "Atkinson Hyperlegible Bold"
         case .balsamiqSansRegular:
             return "Balsamiq Sans Regular"
-        case .harmoniaSansBold:
-            return "Harmonia Sans Bold"
+        case .balsamiqSansBold:
+            return "Balsamiq Sans Bold"
         case .harmoniaSansRegular:
             return "Harmonia Sans Regular"
-        case .interBold:
-            return "Inter Bold"
+        case .harmoniaSansBold:
+            return "Harmonia Sans Bold"
         case .interRegular:
             return "Inter Regular"
-        case .manropeBold:
-            return "Manrope Bold"
+        case .interBold:
+            return "Inter Bold"
         case .manropeRegular:
             return "Manrope Regular"
-        case .notoSansBold:
-            return "Noto Sans Bold"
+        case .manropeBold:
+            return "Manrope Bold"
         case .notoSansRegular:
             return "Noto Sans Regular"
-        case .robotoCondensedBold:
-            return "Roboto Condensed Bold"
+        case .notoSansBold:
+            return "Noto Sans Bold"
         case .robotoCondensedRegular:
             return "Roboto Condensed Regular"
+        case .robotoCondensedBold:
+            return "Roboto Condensed Bold"
         case .srirachaRegular:
             return "Sriracha"
         case .customFontFamily:
@@ -71,34 +71,34 @@ enum FontFamily: Int {
         switch self {
         case .system:
             return .system(size: size)
-        case .atkinsonHyperlegibleBold:
-            return .custom("AtkinsonHyperlegible-Bold", size: size)
         case .atkinsonHyperlegibleRegular:
             return .custom("AtkinsonHyperlegible-Regular", size: size)
-        case .balsamiqSansBold:
-            return .custom("BalsamiqSans-Bold", size: size)
+        case .atkinsonHyperlegibleBold:
+            return .custom("AtkinsonHyperlegible-Bold", size: size)
         case .balsamiqSansRegular:
             return .custom("BalsamiqSans-Regular", size: size)
-        case .harmoniaSansBold:
-            return .custom("HarmoniaSansW01-Bold", size: size)
+        case .balsamiqSansBold:
+            return .custom("BalsamiqSans-Bold", size: size)
         case .harmoniaSansRegular:
             return .custom("HarmoniaSansW01-Regular", size: size)
-        case .interBold:
-            return .custom("Inter18pt-Bold", size: size)
+        case .harmoniaSansBold:
+            return .custom("HarmoniaSansW01-Bold", size: size)
         case .interRegular:
             return .custom("Inter18pt-Regular", size: size)
-        case .manropeBold:
-            return .custom("Manrope-Bold", size: size)
+        case .interBold:
+            return .custom("Inter18pt-Bold", size: size)
         case .manropeRegular:
             return .custom("Manrope-Regular", size: size)
-        case .notoSansBold:
-            return .custom("NotoSans-Bold", size: size)
+        case .manropeBold:
+            return .custom("Manrope-Bold", size: size)
         case .notoSansRegular:
             return .custom("NotoSans-Regular", size: size)
-        case .robotoCondensedBold:
-            return .custom("RobotoCondensed-Bold", size: size)
+        case .notoSansBold:
+            return .custom("NotoSans-Bold", size: size)
         case .robotoCondensedRegular:
             return .custom("RobotoCondensed-Regular", size: size)
+        case .robotoCondensedBold:
+            return .custom("RobotoCondensed-Bold", size: size)
         case .srirachaRegular:
             return .custom("Sriracha-Regular", size: size)
         case .customFontFamily:
@@ -113,34 +113,34 @@ enum FontFamily: Int {
         switch self {
         case .system:
             return .system()
-        case .atkinsonHyperlegibleBold:
-            return .custom("AtkinsonHyperlegible-Bold")
         case .atkinsonHyperlegibleRegular:
             return .custom("AtkinsonHyperlegible-Regular")
-        case .balsamiqSansBold:
-            return .custom("BalsamiqSans-Bold")
+        case .atkinsonHyperlegibleBold:
+            return .custom("AtkinsonHyperlegible-Bold")
         case .balsamiqSansRegular:
             return .custom("BalsamiqSans-Regular")
-        case .harmoniaSansBold:
-            return .custom("HarmoniaSansW01-Bold")
+        case .balsamiqSansBold:
+            return .custom("BalsamiqSans-Bold")
         case .harmoniaSansRegular:
             return .custom("HarmoniaSansW01-Regular")
-        case .interBold:
-            return .custom("Inter18pt-Bold")
+        case .harmoniaSansBold:
+            return .custom("HarmoniaSansW01-Bold")
         case .interRegular:
             return .custom("Inter18pt-Regular")
-        case .manropeBold:
-            return .custom("Manrope-Bold")
+        case .interBold:
+            return .custom("Inter18pt-Bold")
         case .manropeRegular:
             return .custom("Manrope-Regular")
-        case .notoSansBold:
-            return .custom("NotoSans-Bold")
+        case .manropeBold:
+            return .custom("Manrope-Bold")
         case .notoSansRegular:
             return .custom("NotoSans-Regular")
-        case .robotoCondensedBold:
-            return .custom("RobotoCondensed-Bold")
+        case .notoSansBold:
+            return .custom("NotoSans-Bold")
         case .robotoCondensedRegular:
             return .custom("RobotoCondensed-Regular")
+        case .robotoCondensedBold:
+            return .custom("RobotoCondensed-Bold")
         case .srirachaRegular:
             return .custom("Sriracha-Regular")
         case .customFontFamily:

@@ -20,8 +20,8 @@ struct FontInterfaceView: View {
     @AppStorage(InterfaceFontUserDefaultsUtils.contentFontFamilyKey, store: .interfaceFont) private var contentFontFamily: Int = 0
     @AppStorage(InterfaceFontUserDefaultsUtils.contentFontSizeKey, store: .interfaceFont) private var contentFontSize: Int = 2
 
-    @State private var showingFontPicker = false
-    @State private var showingUploadError = false
+    @State private var showFontPicker = false
+    @State private var showUploadError = false
     @State private var uploadErrorMessage = ""
     @State private var customFontDisplayName: String?
     
@@ -50,7 +50,7 @@ struct FontInterfaceView: View {
                         title: "Custom Font Family",
                         subtitle: InterfaceFontUserDefaultsUtils.hasCustomFont ? (customFontDisplayName ?? "Font Uploaded") : "Tap to upload font"
                     ) {
-                        showingFontPicker = true
+                        showFontPicker = true
                     }
                     .listPlainItemNoInsets()
                 }
@@ -80,7 +80,7 @@ struct FontInterfaceView: View {
                         title: "Custom Font Family",
                         subtitle: InterfaceFontUserDefaultsUtils.hasCustomFont ? (customFontDisplayName ?? "Font Uploaded") : "Tap to upload font"
                     ) {
-                        showingFontPicker = true
+                        showFontPicker = true
                     }
                     .listPlainItemNoInsets()
                 }
@@ -110,7 +110,7 @@ struct FontInterfaceView: View {
                         title: "Custom Font Family",
                         subtitle: InterfaceFontUserDefaultsUtils.hasCustomFont ? (customFontDisplayName ?? "Font Uploaded") : "Tap to upload font"
                     ) {
-                        showingFontPicker = true
+                        showFontPicker = true
                     }
                     .listPlainItemNoInsets()
                 }
@@ -127,7 +127,7 @@ struct FontInterfaceView: View {
         }
         .id(customFontDisplayName)
         .fileImporter(
-            isPresented: $showingFontPicker,
+            isPresented: $showFontPicker,
             allowedContentTypes: [UTType(filenameExtension: "ttf")!, UTType(filenameExtension: "otf")!],
             allowsMultipleSelection: false
         ) { result in
@@ -137,7 +137,7 @@ struct FontInterfaceView: View {
 
                 guard url.startAccessingSecurityScopedResource() else {
                     uploadErrorMessage = "Failed to access the font file"
-                    showingUploadError = true
+                    showUploadError = true
                     return
                 }
 
@@ -147,15 +147,15 @@ struct FontInterfaceView: View {
                     customFontDisplayName = InterfaceFontUserDefaultsUtils.customFontDisplayName
                 } else {
                     uploadErrorMessage = "Failed to upload font. Please make sure it's a valid TTF or OTF file."
-                    showingUploadError = true
+                    showUploadError = true
                 }
 
             case .failure(let error):
                 uploadErrorMessage = "Failed to select font: \(error.localizedDescription)"
-                showingUploadError = true
+                showUploadError = true
             }
         }
-        .alert("Upload Error", isPresented: $showingUploadError) {
+        .alert("Custom font family upload error.", isPresented: $showUploadError) {
             Button("OK", role: .cancel) { }
         } message: {
             Text(uploadErrorMessage)
