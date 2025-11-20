@@ -49,34 +49,40 @@ struct AnonymousSubscriptionsView: View {
                 }
                 
                 TabView(selection: $selectedOption) {
-                    switch anonymousSubscriptionListingViewModel.subscriptionSelectionMode {
-                    case .noSelection:
-                        AnonymousSubscribedSubredditListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
+                    Group {
+                        switch anonymousSubscriptionListingViewModel.subscriptionSelectionMode {
+                        case .noSelection:
+                            AnonymousSubscribedSubredditListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
+                                .tag(0)
+                            
+                            AnonymousSubscribedUserListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
+                                .tag(1)
+                            
+                            AnonymousCustomFeedView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
+                                .tag(2)
+                        case .searchInThing(let onSelectSearchInThing):
+                            AnonymousSubscribedSubredditListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel) { subscribedSubredditData in
+                                onSelectSearchInThing(SearchInThing.subreddit(subscribedSubredditData))
+                            }
                             .tag(0)
-                        
-                        AnonymousSubscribedUserListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
+                            
+                            AnonymousSubscribedUserListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel) { subscribedUserData in
+                                onSelectSearchInThing(SearchInThing.user(subscribedUserData))
+                            }
                             .tag(1)
-                        
-                        AnonymousCustomFeedView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
-                            .tag(2)
-                    case .searchInThing(let onSelectSearchInThing):
-                        AnonymousSubscribedSubredditListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel) { subscribedSubredditData in
-                            onSelectSearchInThing(SearchInThing.subreddit(subscribedSubredditData))
+                            
+                            AnonymousCustomFeedView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
+                                .tag(2)
+                        case .subredditAndUserInCustomFeed:
+                            AnonymousSubscribedSubredditListingMultiSelectionView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
+                                .tag(0)
+                            
+                            AnonymousSubscribedUserListingMultiSelectionView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
+                                .tag(1)
                         }
-                        .tag(0)
-                        
-                        AnonymousSubscribedUserListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel) { subscribedUserData in
-                            onSelectSearchInThing(SearchInThing.user(subscribedUserData))
-                        }
-                        .tag(1)
-                        
-                        AnonymousCustomFeedView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
-                            .tag(2)
-                    case .subredditAndUserInCustomFeed:
-                        EmptyView()
                     }
+                    .toolbar(.hidden, for: .tabBar)
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
                 
                 if case .subredditAndUserInCustomFeed(_, let onSelectMultipleSubscriptions) = anonymousSubscriptionListingViewModel.subscriptionSelectionMode {
                     Button {

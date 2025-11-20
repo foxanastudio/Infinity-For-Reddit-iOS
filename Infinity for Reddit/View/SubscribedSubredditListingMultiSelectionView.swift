@@ -11,13 +11,7 @@ struct SubscribedSubredditListingMultiSelectionView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     
     @ObservedObject var subscriptionListingViewModel: SubscriptionListingViewModel
-    
-    init(
-        subscriptionListingViewModel: SubscriptionListingViewModel
-    ) {
-        self.subscriptionListingViewModel = subscriptionListingViewModel
-    }
-    
+
     var body: some View {
         Group {
             if subscriptionListingViewModel.subredditSubscriptions.isEmpty {
