@@ -26,6 +26,7 @@ enum FontFamily: Int {
     case robotoCondensedBold = 13
     case robotoCondensedRegular = 14
     case srirachaRegular = 15
+    case customFontFamily = 16
 
     var displayName: String {
         switch self {
@@ -61,6 +62,8 @@ enum FontFamily: Int {
             return "Roboto Condensed Regular"
         case .srirachaRegular:
             return "Sriracha"
+        case .customFontFamily:
+            return "Custom Font Family"
         }
     }
 
@@ -98,6 +101,11 @@ enum FontFamily: Int {
             return .custom("RobotoCondensed-Regular", size: size)
         case .srirachaRegular:
             return .custom("Sriracha-Regular", size: size)
+        case .customFontFamily:
+            if let postScriptName = InterfaceFontUserDefaultsUtils.customFontPostScriptName {
+                return .custom(postScriptName, size: size)
+            }
+            return .system(size: size)
         }
     }
 
@@ -135,6 +143,11 @@ enum FontFamily: Int {
             return .custom("RobotoCondensed-Regular")
         case .srirachaRegular:
             return .custom("Sriracha-Regular")
+        case .customFontFamily:
+            if let postScriptName = InterfaceFontUserDefaultsUtils.customFontPostScriptName {
+                return .custom(postScriptName)
+            }
+            return .system()
         }
     }
 }

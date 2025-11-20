@@ -8,16 +8,22 @@
 import SwiftUI
 import Swinject
 import GRDB
+import UniformTypeIdentifiers
 
 struct FontInterfaceView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
-    
+
     @AppStorage(InterfaceFontUserDefaultsUtils.fontFamilyKey, store: .interfaceFont) private var fontFamily: Int = 0
     @AppStorage(InterfaceFontUserDefaultsUtils.fontSizeKey, store: .interfaceFont) private var fontSize: Int = 2
     @AppStorage(InterfaceFontUserDefaultsUtils.postTitleFontFamilyKey, store: .interfaceFont) private var postTitleFontFamily: Int = 0
     @AppStorage(InterfaceFontUserDefaultsUtils.postTitleFontSizeKey, store: .interfaceFont) private var postTitleFontSize: Int = 2
     @AppStorage(InterfaceFontUserDefaultsUtils.contentFontFamilyKey, store: .interfaceFont) private var contentFontFamily: Int = 0
     @AppStorage(InterfaceFontUserDefaultsUtils.contentFontSizeKey, store: .interfaceFont) private var contentFontSize: Int = 2
+
+    @State private var showingFontPicker = false
+    @State private var showingUploadError = false
+    @State private var uploadErrorMessage = ""
+    @State private var customFontDisplayName: String?
     
     
     var body: some View {
@@ -38,7 +44,17 @@ struct FontInterfaceView: View {
                     InterfaceFontUserDefaultsUtils.fontFamiliesText[family]
                 }
                 .listPlainItemNoInsets()
-                
+
+                if fontFamily == 16 {
+                    PreferenceEntry(
+                        title: "Custom Font Family",
+                        subtitle: InterfaceFontUserDefaultsUtils.hasCustomFont ? (customFontDisplayName ?? "Font Uploaded") : "Tap to upload font"
+                    ) {
+                        showingFontPicker = true
+                    }
+                    .listPlainItemNoInsets()
+                }
+
                 BarebonePickerPreference(
                     selected: $fontSize,
                     items: InterfaceFontUserDefaultsUtils.fontSizes,
@@ -58,7 +74,17 @@ struct FontInterfaceView: View {
                     InterfaceFontUserDefaultsUtils.fontFamiliesText[family]
                 }
                 .listPlainItemNoInsets()
-                
+
+                if postTitleFontFamily == 16 {
+                    PreferenceEntry(
+                        title: "Custom Font Family",
+                        subtitle: InterfaceFontUserDefaultsUtils.hasCustomFont ? (customFontDisplayName ?? "Font Uploaded") : "Tap to upload font"
+                    ) {
+                        showingFontPicker = true
+                    }
+                    .listPlainItemNoInsets()
+                }
+
                 BarebonePickerPreference(
                     selected: $postTitleFontSize,
                     items: InterfaceFontUserDefaultsUtils.fontSizes,
@@ -78,7 +104,17 @@ struct FontInterfaceView: View {
                     InterfaceFontUserDefaultsUtils.fontFamiliesText[family]
                 }
                 .listPlainItemNoInsets()
-                
+
+                if contentFontFamily == 16 {
+                    PreferenceEntry(
+                        title: "Custom Font Family",
+                        subtitle: InterfaceFontUserDefaultsUtils.hasCustomFont ? (customFontDisplayName ?? "Font Uploaded") : "Tap to upload font"
+                    ) {
+                        showingFontPicker = true
+                    }
+                    .listPlainItemNoInsets()
+                }
+
                 BarebonePickerPreference(
                     selected: $contentFontSize,
                     items: InterfaceFontUserDefaultsUtils.contentFontSizes,
@@ -88,6 +124,44 @@ struct FontInterfaceView: View {
                 }
                 .listPlainItemNoInsets()
             }
+        }
+        .id(customFontDisplayName)
+        .fileImporter(
+            isPresented: $showingFontPicker,
+            allowedContentTypes: [UTType(filenameExtension: "ttf")!, UTType(filenameExtension: "otf")!],
+            allowsMultipleSelection: false
+        ) { result in
+            switch result {
+            case .success(let urls):
+                guard let url = urls.first else { return }
+
+                guard url.startAccessingSecurityScopedResource() else {
+                    uploadErrorMessage = "Failed to access the font file"
+                    showingUploadError = true
+                    return
+                }
+
+                defer { url.stopAccessingSecurityScopedResource() }
+
+                if FontUtils.uploadCustomFontFamily(from: url) {
+                    customFontDisplayName = InterfaceFontUserDefaultsUtils.customFontDisplayName
+                } else {
+                    uploadErrorMessage = "Failed to upload font. Please make sure it's a valid TTF or OTF file."
+                    showingUploadError = true
+                }
+
+            case .failure(let error):
+                uploadErrorMessage = "Failed to select font: \(error.localizedDescription)"
+                showingUploadError = true
+            }
+        }
+        .alert("Upload Error", isPresented: $showingUploadError) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(uploadErrorMessage)
+        }
+        .onAppear {
+            customFontDisplayName = InterfaceFontUserDefaultsUtils.customFontDisplayName
         }
         .themedList()
         .themedNavigationBar()

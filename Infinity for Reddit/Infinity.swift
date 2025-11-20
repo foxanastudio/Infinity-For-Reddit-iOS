@@ -44,6 +44,8 @@ struct Infinity: App {
         
         NotificationDelegate.shared.configure()
         PullNotificationBackgroundTaskManager.shared.registerAndScheduleBackgroundTask()
+
+        FontUtils.registerCustomFonts()
     }
 
     var body: some Scene {
