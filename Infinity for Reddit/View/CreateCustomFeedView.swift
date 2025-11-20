@@ -116,9 +116,14 @@ struct CreateCustomFeedView: View {
             }
         }
         .sheet(isPresented: $showSubredditAndUserMultiSelectionSheet) {
-            SubredditAndUserMultiSelectionSheet(subscriptionSelectionMode: .subredditAndUserInCustomFeed(onSelectMultipleSubscriptions: { subredditsAndUsersInCustomFeed in
-                createCustomFeedViewModel.addSubredditsAndUsersInCustomFeed(subredditsAndUsersInCustomFeed)
-            }))
+            SubredditAndUserMultiSelectionSheet(
+                subscriptionSelectionMode: .subredditAndUserInCustomFeed(
+                    selectedSubredditsAndUsersInCustomFeed: createCustomFeedViewModel.subredditsAndUsersInCustomFeed,
+                    onSelectMultipleSubscriptions: { subredditsAndUsersInCustomFeed in
+                        createCustomFeedViewModel.addSubredditsAndUsersInCustomFeed(subredditsAndUsersInCustomFeed)
+                    }
+                )
+            )
         }
     }
     

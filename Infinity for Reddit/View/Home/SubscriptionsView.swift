@@ -21,13 +21,11 @@ struct SubscriptionsView: View {
 
     @State private var selectedOption = 0
     @State private var navigationBarMenuKey: UUID?
-
-    private let subscriptionSelectionMode: SubscriptionSelectionMode
     
     init(subscriptionSelectionMode: SubscriptionSelectionMode = .noSelection) {
-        self.subscriptionSelectionMode = subscriptionSelectionMode
         _subscriptionListingViewModel = StateObject(
             wrappedValue: SubscriptionListingViewModel(
+                subscriptionSelectionMode: subscriptionSelectionMode,
                 subscriptionListingRepository: SubscriptionListingRepository()
             )
         )
@@ -36,7 +34,7 @@ struct SubscriptionsView: View {
     var body: some View {
         RootView {
             VStack(spacing: 0) {
-                switch subscriptionSelectionMode {
+                switch subscriptionListingViewModel.subscriptionSelectionMode {
                 case .subredditAndUserInCustomFeed:
                     SegmentedPicker(
                         selectedValue: $selectedOption,
@@ -53,7 +51,7 @@ struct SubscriptionsView: View {
                 
                 TabView(selection: $selectedOption) {
                     Group {
-                        switch subscriptionSelectionMode {
+                        switch subscriptionListingViewModel.subscriptionSelectionMode {
                         case .noSelection:
                             SubscribedSubredditListingView(subscriptionListingViewModel: subscriptionListingViewModel)
                                 .tag(0)
@@ -87,7 +85,7 @@ struct SubscriptionsView: View {
                     .toolbar(.hidden, for: .tabBar)
                 }
                 
-                if case .subredditAndUserInCustomFeed(let onSelectMultipleSubscriptions) = subscriptionSelectionMode {
+                if case .subredditAndUserInCustomFeed(_, let onSelectMultipleSubscriptions) = subscriptionListingViewModel.subscriptionSelectionMode {
                     Button {
                         onSelectMultipleSubscriptions(subscriptionListingViewModel.getSelectedSubredditsAndUsersInCustomFeed())
                         dismiss()

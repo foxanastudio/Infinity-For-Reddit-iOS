@@ -43,10 +43,35 @@ public class SubscriptionListingViewModel: ObservableObject {
     private let favoriteUserSubscriptionsPublisher: AnyPublisher<[SubscribedUserData], Error>
     private let favoriteMyCustomFeedSubscriptionsPublisher: AnyPublisher<[MyCustomFeed], Error>
     
+    let subscriptionSelectionMode: SubscriptionSelectionMode
     private let subscriptionListingRepository: SubscriptionListingRepositoryProtocol
     
     // MARK: - Initializer
-    init(subscriptionListingRepository: SubscriptionListingRepositoryProtocol) {
+    init(subscriptionSelectionMode: SubscriptionSelectionMode, subscriptionListingRepository: SubscriptionListingRepositoryProtocol) {
+        self.subscriptionSelectionMode = subscriptionSelectionMode
+        switch subscriptionSelectionMode {
+        case .subredditAndUserInCustomFeed(let selectedSubredditsAndUsersInCustomFeed, _):
+            var selectedSubscribedSubreddits = IdentifiedArrayOf<SubscribedSubredditData>()
+            var selectedSubscribedUsers = IdentifiedArrayOf<SubscribedUserData>()
+            
+            for item in selectedSubredditsAndUsersInCustomFeed {
+                switch item {
+                case .subscribedSubreddit(let subscribedSubredditData):
+                    selectedSubscribedSubreddits.append(subscribedSubredditData)
+                case .subreddit(_):
+                    break
+                case .subscribedUser(let subscribedUserData):
+                    selectedSubscribedUsers.append(subscribedUserData)
+                case .user(_):
+                    break
+                }
+            }
+            
+            self.selectedSubscribedSubreddits = selectedSubscribedSubreddits
+            self.selectedSubscribedUsers = selectedSubscribedUsers
+        default:
+            break
+        }
         self.subscriptionListingRepository = subscriptionListingRepository
         guard let resolvedOperationQueue = DependencyManager.shared.container.resolve(OperationQueue.self) else {
             fatalError("Could not resolve OperationQueue")

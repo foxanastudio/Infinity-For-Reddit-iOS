@@ -25,6 +25,8 @@ struct SubredditSelectionSheet: View {
         self.showCurrentAccountSubreddit = showCurrentAccountSubreddit
         _subscriptionListingViewModel = StateObject(
             wrappedValue: SubscriptionListingViewModel(
+                // We don't care about the selection mode here cuz we are not using SubscriptionsView
+                subscriptionSelectionMode: .noSelection,
                 subscriptionListingRepository: SubscriptionListingRepository()
             )
         )
