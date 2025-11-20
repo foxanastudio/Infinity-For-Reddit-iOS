@@ -53,7 +53,7 @@ struct SubscribedSubredditListingView: View {
                         CustomListSection("Favorite") {
                             ForEach(subscriptionListingViewModel.favoriteSubredditSubscriptions, id: \.identityInView) { subscription in
                                 SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
-                                    if let onSelectCustomAction = onSelectCustomAction {
+                                    if let onSelectCustomAction {
                                         onSelectCustomAction(subscription)
                                     } else {
                                         navigationManager.append(AppNavigation.subredditDetails(subredditName: subscription.name))
@@ -85,7 +85,7 @@ struct SubscribedSubredditListingView: View {
                     CustomListSection("All") {
                         ForEach(subscriptionListingViewModel.subredditSubscriptions, id: \.identityInView) { subscription in
                             SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
-                                if let onSelectCustomAction = onSelectCustomAction {
+                                if let onSelectCustomAction {
                                     onSelectCustomAction(subscription)
                                 } else {
                                     navigationManager.append(AppNavigation.subredditDetails(subredditName: subscription.name))

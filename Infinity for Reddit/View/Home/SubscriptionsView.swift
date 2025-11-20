@@ -67,9 +67,9 @@ struct SubscriptionsView: View {
                             }
                             .tag(0)
                             
-                            SubscribedUserListingView(subscriptionListingViewModel: subscriptionListingViewModel, onSelectCustomAction: { subscribedUserData in
+                            SubscribedUserListingView(subscriptionListingViewModel: subscriptionListingViewModel) { subscribedUserData in
                                 onSelectSearchInThing(SearchInThing.user(subscribedUserData))
-                            })
+                            }
                             .tag(1)
                             
                             CustomFeedView(subscriptionListingViewModel: subscriptionListingViewModel, customOnTapForSearchInThing: onSelectSearchInThing)

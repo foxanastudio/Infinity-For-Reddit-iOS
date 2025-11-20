@@ -52,8 +52,6 @@ class CreateCustomFeedRepository: CreateCustomFeedRepositoryProtocol {
         let model = try JSONEncoder().encode(payload)
 
         if let modelString = String(data: model, encoding: .utf8) {
-            print(modelString)
-            
             let multipathName: String
             if let spaceIndex = name.firstIndex(of: " ") {
                 multipathName = String(name[..<spaceIndex])
@@ -65,8 +63,6 @@ class CreateCustomFeedRepository: CreateCustomFeedRepositoryProtocol {
                 "multipath": "/user/\(AccountViewModel.shared.account.username)/m/\(multipathName)",
                 "model": String(format: modelString)
             ]
-            
-            print(params)
             
             let response = await self.session.request(RedditOAuthAPI.createCustomFeed(params: params))
                 .serializingData(automaticallyCancelling: true)

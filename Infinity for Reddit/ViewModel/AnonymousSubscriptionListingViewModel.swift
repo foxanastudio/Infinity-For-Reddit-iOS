@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 import GRDB
+import IdentifiedCollections
 
 public class AnonymousSubscriptionListingViewModel: ObservableObject {
     // MARK: - Properties
@@ -18,6 +19,10 @@ public class AnonymousSubscriptionListingViewModel: ObservableObject {
     @Published var myCustomFeeds: [MyCustomFeed] = []
     @Published var favoriteMyCustomFeeds: [MyCustomFeed] = []
     
+    @Published var selectedSubscribedSubreddits: IdentifiedArrayOf<SubscribedSubredditData> = []
+    @Published var selectedSubscribedUsers: IdentifiedArrayOf<SubscribedUserData> = []
+    
+    let subscriptionSelectionMode: SubscriptionSelectionMode
     private let anonymousSubscriptionListingRepository: AnonymousSubscriptionListingRepositoryProtocol
     
     private var cancellables = Set<AnyCancellable>()
@@ -33,7 +38,7 @@ public class AnonymousSubscriptionListingViewModel: ObservableObject {
     private let favoriteMyCustomFeedSubscriptionsPublisher: AnyPublisher<[MyCustomFeed], Error>
     
     // MARK: - Initializer
-    init(anonymousSubscriptionListingRepository: AnonymousSubscriptionListingRepositoryProtocol) {
+    init(subscriptionSelectionMode: SubscriptionSelectionMode, anonymousSubscriptionListingRepository: AnonymousSubscriptionListingRepositoryProtocol) {
         guard let resolvedOperationQueue = DependencyManager.shared.container.resolve(OperationQueue.self) else {
             fatalError("Could not resolve OperationQueue")
         }
@@ -42,6 +47,30 @@ public class AnonymousSubscriptionListingViewModel: ObservableObject {
             fatalError("Could not resolve DatabasePool")
         }
         
+        self.subscriptionSelectionMode = subscriptionSelectionMode
+        switch subscriptionSelectionMode {
+        case .subredditAndUserInCustomFeed(let selectedSubredditsAndUsersInCustomFeed, _):
+            var selectedSubscribedSubreddits = IdentifiedArrayOf<SubscribedSubredditData>()
+            var selectedSubscribedUsers = IdentifiedArrayOf<SubscribedUserData>()
+            
+            for item in selectedSubredditsAndUsersInCustomFeed {
+                switch item {
+                case .subscribedSubreddit(let subscribedSubredditData):
+                    selectedSubscribedSubreddits.append(subscribedSubredditData)
+                case .subreddit(_):
+                    break
+                case .subscribedUser(let subscribedUserData):
+                    selectedSubscribedUsers.append(subscribedUserData)
+                case .user(_):
+                    break
+                }
+            }
+            
+            self.selectedSubscribedSubreddits = selectedSubscribedSubreddits
+            self.selectedSubscribedUsers = selectedSubscribedUsers
+        default:
+            break
+        }
         self.anonymousSubscriptionListingRepository = anonymousSubscriptionListingRepository
         self.operationqueue = resolvedOperationQueue
         self.dbPool = resolvedDatabasePool
