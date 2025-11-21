@@ -52,9 +52,7 @@ class SubredditDetailsViewModel: ObservableObject {
         subscribeSubredditTask = Task {
             let action = subredditData.isSubscribed ? "unsub" : "sub"
             do {
-                if !AccountViewModel.shared.account.isAnonymous() {
-                    try await subredditDetailsRepository.subsribeSubreddit(subredditData: subredditData, action: action)
-                }
+                try await subredditDetailsRepository.subsribeSubreddit(subredditData: subredditData, action: action)
                 
                 try Task.checkCancellation()
                 

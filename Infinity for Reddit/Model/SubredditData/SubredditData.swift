@@ -60,4 +60,14 @@ public struct SubredditData: Codable, FetchableRecord, PersistableRecord {
     }
     
     public static let databaseSelection: [SQLSelectable] = CodingKeys.allCases.map { $0 }
+    
+    func toSubscribedSubredditData() -> SubscribedSubredditData {
+        return SubscribedSubredditData(
+            fullName: fullName,
+            name: name,
+            iconUrl: iconUrl,
+            username: AccountViewModel.shared.account.username,
+            isFavorite: false
+        )
+    }
 }

@@ -89,14 +89,15 @@ public class SubredditDetailsRepository: SubredditDetailsRepositoryProtocol {
         if action == "unsub" {
             try? subscribedSubredditDao.deleteSubscribedSubreddit(subredditName: subredditData.name, accountName: AccountViewModel.shared.account.username)
         } else {
-            let subscribedSubredditData = SubscribedSubredditData(
-                fullName: subredditData.fullName,
-                name: subredditData.name,
-                iconUrl: subredditData.iconUrl,
-                username: AccountViewModel.shared.account.username,
-                isFavorite: false
-            )
-            try? subscribedSubredditDao.insert(subscribedSubredditData: subscribedSubredditData)
+            try? subscribedSubredditDao.insert(subscribedSubredditData: subredditData.toSubscribedSubredditData())
+        }
+    }
+    
+    private func anonymousSubscribeSubreddit(subredditData: SubredditData) async throws {
+        if subredditData.isSubscribed {
+            try subscribedSubredditDao.deleteSubscribedSubreddit(subredditName: subredditData.name, accountName: Account.ANONYMOUS_ACCOUNT.username)
+        } else {
+            try subscribedSubredditDao.insert(subscribedSubredditData: subredditData.toSubscribedSubredditData())
         }
     }
     
