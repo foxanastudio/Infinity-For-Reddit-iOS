@@ -19,12 +19,12 @@ struct SelectSearchInThingSheet: View {
     var body: some View {
         ZStack {
             if accountViewModel.account.isAnonymous() {
-                AnonymousSubscriptionsView(subscriptionSelectionMode: .searchInThing(onSelectSearchInThing: { thing in
+                AnonymousSubscriptionsView(subscriptionSelectionMode: .thingSelection(onSelectThing: { thing in
                     onSelectThing(thing)
                     dismiss()
                 }))
             } else {
-                SubscriptionsView(subscriptionSelectionMode: .searchInThing(onSelectSearchInThing: { thing in
+                SubscriptionsView(subscriptionSelectionMode: .thingSelection(onSelectThing: { thing in
                     onSelectThing(thing)
                     dismiss()
                 }))

@@ -43,18 +43,18 @@ public class SubscriptionListingViewModel: ObservableObject {
     private let favoriteUserSubscriptionsPublisher: AnyPublisher<[SubscribedUserData], Error>
     private let favoriteMyCustomFeedSubscriptionsPublisher: AnyPublisher<[MyCustomFeed], Error>
     
-    let subscriptionSelectionMode: SubscriptionSelectionMode
+    let subscriptionSelectionMode: ThingSelectionMode
     private let subscriptionListingRepository: SubscriptionListingRepositoryProtocol
     
     // MARK: - Initializer
-    init(subscriptionSelectionMode: SubscriptionSelectionMode, subscriptionListingRepository: SubscriptionListingRepositoryProtocol) {
+    init(subscriptionSelectionMode: ThingSelectionMode, subscriptionListingRepository: SubscriptionListingRepositoryProtocol) {
         self.subscriptionSelectionMode = subscriptionSelectionMode
         switch subscriptionSelectionMode {
-        case .subredditAndUserInCustomFeed(let selectedSubredditsAndUsersInCustomFeed, _):
+        case .subredditAndUserMultiSelection(let selectedSubredditsAndUsers, _):
             var selectedSubscribedSubreddits = IdentifiedArrayOf<SubscribedSubredditData>()
             var selectedSubscribedUsers = IdentifiedArrayOf<SubscribedUserData>()
             
-            for item in selectedSubredditsAndUsersInCustomFeed {
+            for item in selectedSubredditsAndUsers {
                 switch item {
                 case .subscribedSubreddit(let subscribedSubredditData):
                     selectedSubscribedSubreddits.append(subscribedSubredditData)
@@ -594,7 +594,7 @@ public class SubscriptionListingViewModel: ObservableObject {
         }
     }
     
-    func getSelectedSubredditsAndUsersInCustomFeed() -> [Thing] {
+    func getSelectedSubredditsAndUsers() -> [Thing] {
         var result: [Thing] = []
         
         for subscribedSubredditData in selectedSubscribedSubreddits {

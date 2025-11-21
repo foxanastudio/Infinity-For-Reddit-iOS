@@ -14,7 +14,7 @@ struct SubredditAndUserMultiSelectionSheet: View {
     
     @State private var showSearchSubredditsAndUsersView: Bool = false
     
-    var subscriptionSelectionMode: SubscriptionSelectionMode
+    var subscriptionSelectionMode: ThingSelectionMode
     
     var body: some View {
         ZStack {

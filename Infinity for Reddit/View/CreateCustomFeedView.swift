@@ -136,9 +136,9 @@ struct CreateCustomFeedView: View {
         .sheet(isPresented: $showSubredditAndUserMultiSelectionSheet) {
             NavigationStack {
                 SubredditAndUserMultiSelectionSheet(
-                    subscriptionSelectionMode: .subredditAndUserInCustomFeed(
-                        selectedSubredditsAndUsersInCustomFeed: createCustomFeedViewModel.subredditsAndUsersInCustomFeed,
-                        onSelectMultipleSubscriptions: { subredditsAndUsersInCustomFeed in
+                    subscriptionSelectionMode: .subredditAndUserMultiSelection(
+                        selectedSubredditsAndUsers: createCustomFeedViewModel.subredditsAndUsersInCustomFeed,
+                        onConfirmSelection: { subredditsAndUsersInCustomFeed in
                             createCustomFeedViewModel.addSubredditsAndUsersInCustomFeed(subredditsAndUsersInCustomFeed)
                         }
                     )

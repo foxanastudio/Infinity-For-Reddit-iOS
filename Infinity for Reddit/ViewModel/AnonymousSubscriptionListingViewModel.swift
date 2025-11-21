@@ -24,7 +24,7 @@ public class AnonymousSubscriptionListingViewModel: ObservableObject {
     
     @Published var error: Error?
     
-    let subscriptionSelectionMode: SubscriptionSelectionMode
+    let subscriptionSelectionMode: ThingSelectionMode
     private let anonymousSubscriptionListingRepository: AnonymousSubscriptionListingRepositoryProtocol
     
     private var cancellables = Set<AnyCancellable>()
@@ -40,7 +40,7 @@ public class AnonymousSubscriptionListingViewModel: ObservableObject {
     private let favoriteMyCustomFeedSubscriptionsPublisher: AnyPublisher<[MyCustomFeed], Error>
     
     // MARK: - Initializer
-    init(subscriptionSelectionMode: SubscriptionSelectionMode, anonymousSubscriptionListingRepository: AnonymousSubscriptionListingRepositoryProtocol) {
+    init(subscriptionSelectionMode: ThingSelectionMode, anonymousSubscriptionListingRepository: AnonymousSubscriptionListingRepositoryProtocol) {
         guard let resolvedOperationQueue = DependencyManager.shared.container.resolve(OperationQueue.self) else {
             fatalError("Could not resolve OperationQueue")
         }
@@ -51,11 +51,11 @@ public class AnonymousSubscriptionListingViewModel: ObservableObject {
         
         self.subscriptionSelectionMode = subscriptionSelectionMode
         switch subscriptionSelectionMode {
-        case .subredditAndUserInCustomFeed(let selectedSubredditsAndUsersInCustomFeed, _):
+        case .subredditAndUserMultiSelection(let selectedSubredditsAndUsers, _):
             var selectedSubscribedSubreddits = IdentifiedArrayOf<SubscribedSubredditData>()
             var selectedSubscribedUsers = IdentifiedArrayOf<SubscribedUserData>()
             
-            for item in selectedSubredditsAndUsersInCustomFeed {
+            for item in selectedSubredditsAndUsers {
                 switch item {
                 case .subscribedSubreddit(let subscribedSubredditData):
                     selectedSubscribedSubreddits.append(subscribedSubredditData)
@@ -274,7 +274,7 @@ public class AnonymousSubscriptionListingViewModel: ObservableObject {
         }
     }
     
-    func getSelectedSubredditsAndUsersInCustomFeed() -> [Thing] {
+    func getSelectedSubredditsAndUsers() -> [Thing] {
         var result: [Thing] = []
         
         for subscribedSubredditData in selectedSubscribedSubreddits {

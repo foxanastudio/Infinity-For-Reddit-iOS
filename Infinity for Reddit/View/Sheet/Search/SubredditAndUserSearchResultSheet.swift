@@ -56,6 +56,18 @@ struct SubredditAndUserSearchResultSheet: View {
                 .tag(1)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
+            
+            Button {
+                //onSelectMultipleSubscriptions(anonymousSubscriptionListingViewModel.getSelectedSubredditsAndUsersInCustomFeed())
+                dismiss()
+            } label: {
+                HStack {
+                    Text("Done")
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .padding(16)
+            .filledButton()
         }
         .id(accountViewModel.account.username)
         .themedNavigationBar()

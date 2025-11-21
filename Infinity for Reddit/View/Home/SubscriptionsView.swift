@@ -22,7 +22,7 @@ struct SubscriptionsView: View {
     @State private var selectedOption = 0
     @State private var navigationBarMenuKey: UUID?
     
-    init(subscriptionSelectionMode: SubscriptionSelectionMode = .noSelection) {
+    init(subscriptionSelectionMode: ThingSelectionMode = .noSelection) {
         _subscriptionListingViewModel = StateObject(
             wrappedValue: SubscriptionListingViewModel(
                 subscriptionSelectionMode: subscriptionSelectionMode,
@@ -35,7 +35,7 @@ struct SubscriptionsView: View {
         RootView {
             VStack(spacing: 0) {
                 switch subscriptionListingViewModel.subscriptionSelectionMode {
-                case .subredditAndUserInCustomFeed:
+                case .subredditAndUserMultiSelection:
                     SegmentedPicker(
                         selectedValue: $selectedOption,
                         values: ["Subreddits", "Users"]
@@ -61,20 +61,20 @@ struct SubscriptionsView: View {
                             
                             CustomFeedView(subscriptionListingViewModel: subscriptionListingViewModel, customOnTapForSearchInThing: nil)
                                 .tag(2)
-                        case .searchInThing(let onSelectSearchInThing):
+                        case .thingSelection(let onSelectThing):
                             SubscribedSubredditListingView(subscriptionListingViewModel: subscriptionListingViewModel) { subscribedSubredditData in
-                                onSelectSearchInThing(Thing.subscribedSubreddit(subscribedSubredditData))
+                                onSelectThing(Thing.subscribedSubreddit(subscribedSubredditData))
                             }
                             .tag(0)
                             
                             SubscribedUserListingView(subscriptionListingViewModel: subscriptionListingViewModel) { subscribedUserData in
-                                onSelectSearchInThing(Thing.subscribedUser(subscribedUserData))
+                                onSelectThing(Thing.subscribedUser(subscribedUserData))
                             }
                             .tag(1)
                             
-                            CustomFeedView(subscriptionListingViewModel: subscriptionListingViewModel, customOnTapForSearchInThing: onSelectSearchInThing)
+                            CustomFeedView(subscriptionListingViewModel: subscriptionListingViewModel, customOnTapForSearchInThing: onSelectThing)
                                 .tag(2)
-                        case .subredditAndUserInCustomFeed:
+                        case .subredditAndUserMultiSelection:
                             SubscribedSubredditListingMultiSelectionView(subscriptionListingViewModel: subscriptionListingViewModel)
                                 .tag(0)
                             
@@ -85,9 +85,9 @@ struct SubscriptionsView: View {
                     .toolbar(.hidden, for: .tabBar)
                 }
                 
-                if case .subredditAndUserInCustomFeed(_, let onSelectMultipleSubscriptions) = subscriptionListingViewModel.subscriptionSelectionMode {
+                if case .subredditAndUserMultiSelection(_, let onSelectMultipleSubscriptions) = subscriptionListingViewModel.subscriptionSelectionMode {
                     Button {
-                        onSelectMultipleSubscriptions(subscriptionListingViewModel.getSelectedSubredditsAndUsersInCustomFeed())
+                        onSelectMultipleSubscriptions(subscriptionListingViewModel.getSelectedSubredditsAndUsers())
                         dismiss()
                     } label: {
                         HStack {

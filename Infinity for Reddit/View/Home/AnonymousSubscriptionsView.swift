@@ -21,7 +21,7 @@ struct AnonymousSubscriptionsView: View {
     @State private var selectedOption = 0
     @State private var navigationBarMenuKey: UUID?
     
-    init(subscriptionSelectionMode: SubscriptionSelectionMode = .noSelection) {
+    init(subscriptionSelectionMode: ThingSelectionMode = .noSelection) {
         _anonymousSubscriptionListingViewModel = StateObject(
             wrappedValue: AnonymousSubscriptionListingViewModel(
                 subscriptionSelectionMode: subscriptionSelectionMode,
@@ -34,7 +34,7 @@ struct AnonymousSubscriptionsView: View {
         RootView {
             VStack(spacing: 0) {
                 switch anonymousSubscriptionListingViewModel.subscriptionSelectionMode {
-                case .subredditAndUserInCustomFeed:
+                case .subredditAndUserMultiSelection:
                     SegmentedPicker(
                         selectedValue: $selectedOption,
                         values: ["Subreddits", "Users"]
@@ -60,20 +60,20 @@ struct AnonymousSubscriptionsView: View {
                             
                             AnonymousCustomFeedView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
                                 .tag(2)
-                        case .searchInThing(let onSelectSearchInThing):
+                        case .thingSelection(let onSelectThing):
                             AnonymousSubscribedSubredditListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel) { subscribedSubredditData in
-                                onSelectSearchInThing(Thing.subscribedSubreddit(subscribedSubredditData))
+                                onSelectThing(Thing.subscribedSubreddit(subscribedSubredditData))
                             }
                             .tag(0)
                             
                             AnonymousSubscribedUserListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel) { subscribedUserData in
-                                onSelectSearchInThing(Thing.subscribedUser(subscribedUserData))
+                                onSelectThing(Thing.subscribedUser(subscribedUserData))
                             }
                             .tag(1)
                             
                             AnonymousCustomFeedView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
                                 .tag(2)
-                        case .subredditAndUserInCustomFeed:
+                        case .subredditAndUserMultiSelection:
                             AnonymousSubscribedSubredditListingMultiSelectionView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
                                 .tag(0)
                             
@@ -84,9 +84,9 @@ struct AnonymousSubscriptionsView: View {
                     .toolbar(.hidden, for: .tabBar)
                 }
                 
-                if case .subredditAndUserInCustomFeed(_, let onSelectMultipleSubscriptions) = anonymousSubscriptionListingViewModel.subscriptionSelectionMode {
+                if case .subredditAndUserMultiSelection(_, let onConfirmSelection) = anonymousSubscriptionListingViewModel.subscriptionSelectionMode {
                     Button {
-                        onSelectMultipleSubscriptions(anonymousSubscriptionListingViewModel.getSelectedSubredditsAndUsersInCustomFeed())
+                        onConfirmSelection(anonymousSubscriptionListingViewModel.getSelectedSubredditsAndUsers())
                         dismiss()
                     } label: {
                         HStack {
