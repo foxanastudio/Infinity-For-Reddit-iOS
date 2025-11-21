@@ -205,8 +205,8 @@ public class PostDetailsRepository: PostDetailsRepositoryProtocol {
             throw PostDetailsRepositoryError.JSONDecodingError(error.localizedDescription)
         }
         
-        await MainActor.run {
-            post.subredditOrUserIconInPostDetails = UserDetailRootClass(fromJson: json).toUserData().iconUrl ?? ""
+        try await MainActor.run {
+            post.subredditOrUserIconInPostDetails = try UserDetailRootClass(fromJson: json).toUserData().iconUrl ?? ""
         }
     }
     

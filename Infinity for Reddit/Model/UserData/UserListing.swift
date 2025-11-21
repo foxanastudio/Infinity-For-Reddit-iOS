@@ -40,7 +40,12 @@ public class UserListing : NSObject {
         for childJSON in childrenArray {
             let dataJson = childJSON["data"]
             if !dataJson.isEmpty {
-                users.append(User(fromJson: dataJson))
+                do {
+                    users.append(try User(fromJson: dataJson))
+                } catch {
+                    // Ignore
+                    print(error)
+                }
             }
         }
         after = json["after"].stringValue

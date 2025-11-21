@@ -40,9 +40,9 @@ public class User: NSObject, Identifiable {
         return iconImg.isEmpty ? subreddit?.iconImg ?? "" : iconImg
     }
 
-    init(fromJson json: JSON!) {
-        if json.isEmpty{
-            return
+    init(fromJson json: JSON!) throws {
+        if json.isEmpty {
+            throw JSONError.invalidData
         }
         acceptFollowers = json["accept_followers"].boolValue
         awardeeKarma = json["awardee_karma"].intValue

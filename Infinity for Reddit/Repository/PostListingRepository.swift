@@ -237,8 +237,8 @@ public class PostListingRepository: PostListingRepositoryProtocol {
             throw PostListingRepositoryError.JSONDecodingError(error.localizedDescription)
         }
         
-        await MainActor.run {
-            post.subredditOrUserIcon = UserDetailRootClass(fromJson: json).toUserData().iconUrl ?? ""
+        try await MainActor.run {
+            post.subredditOrUserIcon = try UserDetailRootClass(fromJson: json).toUserData().iconUrl ?? ""
             subredditOrUserIcons[post.author] = post.subredditOrUserIcon
         }
     }

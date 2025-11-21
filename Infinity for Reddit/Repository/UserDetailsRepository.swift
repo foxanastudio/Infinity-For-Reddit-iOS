@@ -62,7 +62,7 @@ public class UserDetailsRepository: UserDetailsRepositoryProtocol {
                 throw UserDetailsRepositoryError.JSONDecodingError(error.localizedDescription)
             }
             
-            userData = UserDetailRootClass(fromJson: json).toUserData()
+            userData = try UserDetailRootClass(fromJson: json).toUserData()
             
             try? userDao.insert(userData: userData!)
         }

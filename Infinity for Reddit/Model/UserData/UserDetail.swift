@@ -13,13 +13,17 @@ class UserDetailRootClass: NSObject {
     var data : User!
     var kind : String!
     
-    init(fromJson json: JSON!) {
+    init(fromJson json: JSON!) throws {
         if json.isEmpty {
-            return
+            throw JSONError.invalidData
         }
         let dataJson = json["data"]
         if !dataJson.isEmpty {
-            data = User(fromJson: dataJson)
+            do {
+                data = try User(fromJson: dataJson)
+            } catch {
+                throw JSONError.invalidData
+            }
         }
         kind = json["kind"].stringValue
     }
