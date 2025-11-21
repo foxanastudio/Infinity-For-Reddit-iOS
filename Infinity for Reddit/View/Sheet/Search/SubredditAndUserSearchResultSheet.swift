@@ -13,6 +13,7 @@ struct SubredditAndUserSearchResultSheet: View {
     @Environment(\.dismiss) var dismiss
     
     @StateObject private var subredditListingViewModel: SubredditListingViewModel
+    @StateObject private var userListingViewModel: UserListingViewModel
     
     @State private var selectedOption = 0
     
@@ -26,6 +27,12 @@ struct SubredditAndUserSearchResultSheet: View {
             wrappedValue: SubredditListingViewModel(
                 query: query,
                 subredditListingRepository: SubredditListingRepository()
+            )
+        )
+        _userListingViewModel = StateObject(
+            wrappedValue: UserListingViewModel(
+                query: query,
+                userListingRepository: UserListingRepository()
             )
         )
     }
@@ -42,7 +49,7 @@ struct SubredditAndUserSearchResultSheet: View {
                 }
                 .tag(0)
                 
-                UserListingView(account: accountViewModel.account, query: query) { user in
+                UserListingView(account: accountViewModel.account, userListingViewModel: userListingViewModel) { user in
                     onSearchInThingSelected(Thing.subscribedUser(SubscribedUserData.fromUser(user, username: accountViewModel.account.username)))
                     dismiss()
                 }

@@ -12,23 +12,17 @@ struct UserListingView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     
-    @StateObject var userListingViewModel: UserListingViewModel
+    @ObservedObject private var userListingViewModel: UserListingViewModel
     @State private var showSortTypeKindSheet: Bool = false
     @State private var navigationBarMenuKey: UUID?
     private let account: Account
     private let iconSize: CGFloat = 28
     private var onSelect: ((User) -> Void)?
     
-    init(account: Account, query: String, onSelect: ((User) -> Void)? = nil) {
+    init(account: Account, userListingViewModel: UserListingViewModel, onSelect: ((User) -> Void)? = nil) {
         self.account = account
+        self.userListingViewModel = userListingViewModel
         self.onSelect = onSelect
-        
-        _userListingViewModel = StateObject(
-            wrappedValue: UserListingViewModel(
-                query: query,
-                userListingRepository: UserListingRepository()
-            )
-        )
     }
     
     var body: some View {

@@ -9,8 +9,11 @@ import SwiftUI
 
 struct SearchResultsView: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
+    
     @StateObject private var searchResultsViewModel: SearchResultsViewModel
     @StateObject private var subredditListingViewModel: SubredditListingViewModel
+    @StateObject private var userListingViewModel: UserListingViewModel
+    
     @State private var selectedOption: Int
     
     init(query: String,
@@ -25,6 +28,12 @@ struct SearchResultsView: View {
             wrappedValue: SubredditListingViewModel(
                 query: query,
                 subredditListingRepository: SubredditListingRepository()
+            )
+        )
+        _userListingViewModel = StateObject(
+            wrappedValue: UserListingViewModel(
+                query: query,
+                userListingRepository: UserListingRepository()
             )
         )
     }
@@ -51,7 +60,7 @@ struct SearchResultsView: View {
                 SubredditListingView(account: accountViewModel.account, subredditListingViewModel: subredditListingViewModel)
                     .tag(1)
                 
-                UserListingView(account: accountViewModel.account, query: searchResultsViewModel.query)
+                UserListingView(account: accountViewModel.account, userListingViewModel: userListingViewModel)
                     .tag(2)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
