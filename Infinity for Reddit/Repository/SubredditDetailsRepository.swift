@@ -79,6 +79,11 @@ public class SubredditDetailsRepository: SubredditDetailsRepositoryProtocol {
     }
     
     public func subsribeSubreddit(subredditData: SubredditData, action: String) async throws {
+        guard !AccountViewModel.shared.account.isAnonymous() else {
+            try await anonymousSubscribeSubreddit(subredditData: subredditData)
+            return
+        }
+        
         let params = ["action": action, "sr_name": "\(subredditData.name)"]
         
         _ = try await self.session.request(RedditOAuthAPI.subsrcribeToSubreddit(params: params))

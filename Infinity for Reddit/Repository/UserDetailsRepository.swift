@@ -79,6 +79,11 @@ public class UserDetailsRepository: UserDetailsRepositoryProtocol {
     }
     
     public func followUser(userData: UserData, action: String) async throws {
+        guard !AccountViewModel.shared.account.isAnonymous() else {
+            try await anonymoustFollowUser(userData: userData)
+            return
+        }
+        
         let params = ["action": action, "sr_name": "u_\(userData.name)"]
         
         _ = try await self.session.request(RedditOAuthAPI.subsrcribeToSubreddit(params: params))
@@ -89,13 +94,16 @@ public class UserDetailsRepository: UserDetailsRepositoryProtocol {
         if action == "unsub" {
             try? subscribedUserDao.deleteSubscribedUser(name: userData.name, accountName: AccountViewModel.shared.account.username)
         } else {
-            let subscribedUserData = SubscribedUserData(
-                name: userData.name,
-                iconUrl: userData.iconUrl,
-                username: AccountViewModel.shared.account.username,
-                isFavorite: false
-            )
+            let subscribedUserData = userData.toSubscribedUserData()
             try? subscribedUserDao.insert(subscribedUserData: subscribedUserData)
+        }
+    }
+    
+    private func anonymoustFollowUser(userData: UserData) async throws {
+        if userData.isSubscribed {
+            try subscribedUserDao.deleteSubscribedUser(name: userData.name, accountName: AccountViewModel.shared.account.username)
+        } else {
+            try subscribedUserDao.insert(subscribedUserData: userData.toSubscribedUserData())
         }
     }
 }
