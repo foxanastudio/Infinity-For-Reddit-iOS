@@ -9,6 +9,7 @@ enum Thing: Identifiable {
     case subscribedSubreddit(SubscribedSubredditData)
     case subreddit(SubredditData)
     case subredditInCustomFeed(SubredditInCustomFeed)
+    case subredditInAnonymousCustomFeed(AnonymousCustomFeedSubreddit)
     case subscribedUser(SubscribedUserData)
     case user(UserData)
     case myCustomFeed(MyCustomFeed)
@@ -21,6 +22,8 @@ enum Thing: Identifiable {
             return subredditData.name
         case .subredditInCustomFeed(let subredditInCustomFeed):
             return subredditInCustomFeed.name
+        case .subredditInAnonymousCustomFeed(let anonymousCustomFeedSubreddit):
+            return anonymousCustomFeedSubreddit.subredditName
         case .subscribedUser(let subscribedUserData):
             return subscribedUserData.name
         case .user(let userData):
@@ -38,6 +41,8 @@ enum Thing: Identifiable {
             return subredditData.name
         case .subredditInCustomFeed(let subredditInCustomFeed):
             return subredditInCustomFeed.name
+        case .subredditInAnonymousCustomFeed(let anonymousCustomFeedSubreddit):
+            return anonymousCustomFeedSubreddit.subredditName
         case .subscribedUser(let subscribedUserData):
             return "u_\(subscribedUserData.name)"
         case .user(let userData):
@@ -55,6 +60,8 @@ enum Thing: Identifiable {
             return subredditData.iconUrl
         case .subredditInCustomFeed:
             return nil
+        case .subredditInAnonymousCustomFeed(let anonymousCustomFeedSubreddit):
+            return anonymousCustomFeedSubreddit.iconUrlString
         case .subscribedUser(let subscribedUserData):
             return subscribedUserData.iconUrl
         case .user(let userData):
@@ -72,6 +79,8 @@ enum Thing: Identifiable {
             return "r/\(subredditData.name)"
         case .subredditInCustomFeed(let subredditInCustomFeed):
             return "r/\(subredditInCustomFeed.name)"
+        case .subredditInAnonymousCustomFeed(let anonymousCustomFeedSubreddit):
+            return "r/\(anonymousCustomFeedSubreddit.subredditName)"
         case .subscribedUser(let subscribedUserData):
             return "u/\(subscribedUserData.name)"
         case .user(let userData):
@@ -89,6 +98,8 @@ enum Thing: Identifiable {
             return subredditData.name
         case .subredditInCustomFeed(let subredditInCustomFeed):
             return subredditInCustomFeed.name
+        case .subredditInAnonymousCustomFeed(let anonymousCustomFeedSubreddit):
+            return anonymousCustomFeedSubreddit.subredditName
         case .subscribedUser(let subscribedUserData):
             return subscribedUserData.name
         case .user(let userData):
@@ -114,6 +125,8 @@ enum Thing: Identifiable {
         case .subreddit:
             return SearchInThingType.subreddit
         case .subredditInCustomFeed:
+            return SearchInThingType.subreddit
+        case .subredditInAnonymousCustomFeed:
             return SearchInThingType.subreddit
         case .subscribedUser:
             return SearchInThingType.user

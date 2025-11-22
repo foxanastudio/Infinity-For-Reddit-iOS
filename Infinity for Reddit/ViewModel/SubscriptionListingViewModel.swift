@@ -64,6 +64,8 @@ public class SubscriptionListingViewModel: ObservableObject {
                     break
                 case .subredditInCustomFeed(let subredditInCustomFeed):
                     selectedSubredditsInCustomFeed.append(subredditInCustomFeed)
+                case .subredditInAnonymousCustomFeed(let anonymousCustomFeedSubreddit):
+                    selectedSubredditsInCustomFeed.append(SubredditInCustomFeed(name: anonymousCustomFeedSubreddit.subredditName))
                 case .subscribedUser(let subscribedUserData):
                     selectedSubscribedUsers.append(subscribedUserData)
                 case .user(_):

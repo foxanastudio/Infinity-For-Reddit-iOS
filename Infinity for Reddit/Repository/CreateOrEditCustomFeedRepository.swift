@@ -175,4 +175,8 @@ class CreateOrEditCustomFeedRepository: CreateOrEditCustomFeedRepositoryProtocol
         
         return try CustomFeed(fromJson: json["data"])
     }
+    
+    func fetchAnonymousCustomFeedSubreddits(path: String) async throws -> [AnonymousCustomFeedSubreddit] {
+        return try anonymousCustomFeedSubredditDao.getAllAnonymousMultiRedditSubreddits(path: path)
+    }
 }

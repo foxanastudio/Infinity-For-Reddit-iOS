@@ -10,4 +10,5 @@ import IdentifiedCollections
 protocol CreateOrEditCustomFeedRepositoryProtocol {
     func createOrCustomFeed(path: String, name: String, description: String, isPrivate: Bool, subredditsAndUsersInCustomFeed: IdentifiedArrayOf<Thing>, isUpdate: Bool) async throws -> MyCustomFeed
     func fetchCustomFeedDetails(path: String) async throws -> CustomFeed
+    func fetchAnonymousCustomFeedSubreddits(path: String) async throws -> [AnonymousCustomFeedSubreddit]
 }

@@ -106,6 +106,11 @@ class CreateOrEditCustomFeedViewModel: ObservableObject {
         guard myCustomFeedToEditLoadState.canLoad else {
             return
         }
+        
+        guard !AccountViewModel.shared.account.isAnonymous() else {
+            await fetchCustomFeedDetailsToEditAnonymous()
+            return
+        }
 
         myCustomFeedToEditLoadState = .loading
         
@@ -117,6 +122,29 @@ class CreateOrEditCustomFeedViewModel: ObservableObject {
             isPrivate = customFeed.visibility == "private"
             for thingInCustomFeed in customFeed.subredditsInCustomFeed {
                 subredditsAndUsersInCustomFeed.append(.subredditInCustomFeed(thingInCustomFeed))
+            }
+            
+            myCustomFeedToEditLoadState = .loaded
+        } catch {
+            myCustomFeedToEditLoadState = .failed(error)
+        }
+    }
+    
+    func fetchCustomFeedDetailsToEditAnonymous() async {
+        guard let myCustomFeedToEdit = myCustomFeedToEdit else {
+            return
+        }
+        
+        myCustomFeedToEditLoadState = .loading
+        
+        do {
+            let anonymousCustomFeedSubreddits = try await createCustomFeedRepository.fetchAnonymousCustomFeedSubreddits(path: myCustomFeedToEdit.path)
+            
+            name = myCustomFeedToEdit.name
+            description = myCustomFeedToEdit.description ?? ""
+            isPrivate = myCustomFeedToEdit.visibility == "private"
+            for anonymousCustomFeedSubreddit in anonymousCustomFeedSubreddits {
+                subredditsAndUsersInCustomFeed.append(.subredditInAnonymousCustomFeed(anonymousCustomFeedSubreddit))
             }
             
             myCustomFeedToEditLoadState = .loaded

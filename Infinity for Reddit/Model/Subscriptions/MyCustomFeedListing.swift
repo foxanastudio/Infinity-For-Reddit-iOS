@@ -102,7 +102,7 @@ class CustomFeed : NSObject {
 }
 
 class SubredditInCustomFeed : NSObject, Identifiable {
-    var name : String!
+    var name : String
     
     var id: String {
         name
@@ -113,5 +113,9 @@ class SubredditInCustomFeed : NSObject, Identifiable {
             throw JSONError.invalidData
         }
         name = json["name"].stringValue
+    }
+    
+    init(name: String) {
+        self.name = name
     }
 }
