@@ -140,10 +140,9 @@ struct HomeView: View {
                     } else {
                         ZStack {
                             CustomNavigationStack(fullScreenMediaViewModel: fullScreenMediaViewModel) {
-//                                SearchView()
-//                                    .setUpHomeTabViewChildNavigationBar()
-//                                    .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
-                                TestView()
+                                SearchView()
+                                    .setUpHomeTabViewChildNavigationBar()
+                                    .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
                             }
                             
                             Snackbar()
