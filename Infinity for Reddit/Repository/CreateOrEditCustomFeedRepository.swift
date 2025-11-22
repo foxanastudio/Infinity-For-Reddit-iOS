@@ -12,13 +12,16 @@ import Foundation
 import GRDB
 
 class CreateOrEditCustomFeedRepository: CreateOrEditCustomFeedRepositoryProtocol {
-    enum CreateCustomFeedRepositoryError: LocalizedError {
+    enum CreateOrEditCustomFeedRepositoryError: LocalizedError {
         case failedToCreateOrUpdateCustomFeedModel
+        case duplicateAnonymousCustomFeed
         
         var errorDescription: String? {
             switch self {
             case .failedToCreateOrUpdateCustomFeedModel:
-                return "Failed to create a model of the custom feed"
+                return "Failed to create a model of the custom feed."
+            case .duplicateAnonymousCustomFeed:
+                return "A custom feed with the same name already exists."
             }
         }
     }
@@ -84,7 +87,7 @@ class CreateOrEditCustomFeedRepository: CreateOrEditCustomFeedRepositoryProtocol
                 }
             }
         } else {
-            throw CreateCustomFeedRepositoryError.failedToCreateOrUpdateCustomFeedModel
+            throw CreateOrEditCustomFeedRepositoryError.failedToCreateOrUpdateCustomFeedModel
         }
     }
     
@@ -101,6 +104,12 @@ class CreateOrEditCustomFeedRepository: CreateOrEditCustomFeedRepositoryProtocol
             isSubscriber: false,
             isFavorite: false
         )
+        if !isUpdate {
+            guard try myCustomFeedDao.getMyCustomFeed(path: myCustomFeed.path, username: Account.ANONYMOUS_ACCOUNT.username) == nil else {
+                throw CreateOrEditCustomFeedRepositoryError.duplicateAnonymousCustomFeed
+            }
+        }
+        
         try myCustomFeedDao.insert(myCustomFeed: myCustomFeed)
         
         let anonymousCustomFeedSubreddits: [AnonymousCustomFeedSubreddit] = subredditsAndUsersInCustomFeed.map {
