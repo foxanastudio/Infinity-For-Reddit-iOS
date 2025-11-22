@@ -263,6 +263,7 @@ struct RedditGRDBDatabase {
                 t.column("username", .text).notNull()
                     .references(Account.databaseTableName, column: "username", onDelete: .cascade)
                 t.column("path", .text).notNull()
+                    .references(MyCustomFeed.databaseTableName, column: "path", onDelete: .cascade)
                 t.column("subreddit_name", .text).notNull()
                 t.column("icon_url_string", .text).notNull()
 

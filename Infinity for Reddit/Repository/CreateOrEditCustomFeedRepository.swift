@@ -39,9 +39,9 @@ class CreateOrEditCustomFeedRepository: CreateOrEditCustomFeedRepositoryProtocol
         self.anonymousCustomFeedSubredditDao = AnonymousCustomFeedSubredditDao(dbPool: resolvedDBPool)
     }
     
-    func createOrCustomFeed(path: String, name: String, description: String, isPrivate: Bool, subredditsAndUsersInCustomFeed: IdentifiedArrayOf<Thing>, isUpdate: Bool) async throws -> MyCustomFeed {
+    func createOrUpdateCustomFeed(path: String, name: String, description: String, isPrivate: Bool, subredditsAndUsersInCustomFeed: IdentifiedArrayOf<Thing>, isUpdate: Bool) async throws -> MyCustomFeed {
         guard !AccountViewModel.shared.account.isAnonymous() else {
-            return try await createCustomFeedAnonymous(name: name, description: description, subredditsAndUsersInCustomFeed: subredditsAndUsersInCustomFeed)
+            return try await createOrUpdateCustomFeedAnonymous(path: path, name: name, description: description, subredditsAndUsersInCustomFeed: subredditsAndUsersInCustomFeed, isUpdate: isUpdate)
         }
         
         let payload = CustomFeedModelPayload(
@@ -52,7 +52,6 @@ class CreateOrEditCustomFeedRepository: CreateOrEditCustomFeedRepositoryProtocol
         let model = try JSONEncoder().encode(payload)
 
         if let modelString = String(data: model, encoding: .utf8) {
-            
             let params: [String: String] = [
                 "multipath": path,
                 "model": String(format: modelString)
@@ -89,9 +88,9 @@ class CreateOrEditCustomFeedRepository: CreateOrEditCustomFeedRepositoryProtocol
         }
     }
     
-    func createCustomFeedAnonymous(name: String, description: String, subredditsAndUsersInCustomFeed: IdentifiedArrayOf<Thing>) async throws -> MyCustomFeed {
+    private func createOrUpdateCustomFeedAnonymous(path: String, name: String, description: String, subredditsAndUsersInCustomFeed: IdentifiedArrayOf<Thing>, isUpdate: Bool) async throws -> MyCustomFeed {
         let myCustomFeed = MyCustomFeed(
-            path: "/user/-/m/\(name)",
+            path: isUpdate ? path : "/user/-/m/\(name)",
             displayName: name,
             name: name,
             description: description,
@@ -117,7 +116,11 @@ class CreateOrEditCustomFeedRepository: CreateOrEditCustomFeedRepositoryProtocol
         } catch {
             // Ugly
             print(error)
-            try myCustomFeedDao.anonymousDeleteMyCustomFeed(path: myCustomFeed.path)
+            if !isUpdate {
+                try myCustomFeedDao.anonymousDeleteMyCustomFeed(path: myCustomFeed.path)
+            } else {
+                throw error
+            }
         }
         
         return myCustomFeed

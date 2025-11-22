@@ -81,7 +81,7 @@ class CreateOrEditCustomFeedViewModel: ObservableObject {
                     multipathName = name
                 }
                 
-                self.createdOrUpdatedMyCustomFeed = try await createCustomFeedRepository.createOrCustomFeed(
+                self.createdOrUpdatedMyCustomFeed = try await createCustomFeedRepository.createOrUpdateCustomFeed(
                     path: "/user/\(AccountViewModel.shared.account.username)/m/\(multipathName)",
                     name: name,
                     description: description,
@@ -170,7 +170,7 @@ class CreateOrEditCustomFeedViewModel: ObservableObject {
         
         createOrUpdateCustomFeedTask = Task {
             do {
-                self.createdOrUpdatedMyCustomFeed = try await createCustomFeedRepository.createOrCustomFeed(
+                self.createdOrUpdatedMyCustomFeed = try await createCustomFeedRepository.createOrUpdateCustomFeed(
                     path: myCustomFeedToEdit.path,
                     name: name,
                     description: description,
