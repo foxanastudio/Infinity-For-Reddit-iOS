@@ -1,4 +1,3 @@
-
 //
 // SubredditSelectionSheet.swift
 // Infinity for Reddit
@@ -20,16 +19,18 @@ struct SubredditSelectionSheet: View {
     @State private var showSearchSubredditsSheet: Bool = false
     
     let showCurrentAccountSubreddit: Bool
-    let onSubscribedSubredditSelected: (SubscribedSubredditData) -> Void
+    let onThingSelected: (Thing) -> Void
     
-    init(showCurrentAccountSubreddit: Bool = false, onSubscribedSubredditSelected: @escaping (SubscribedSubredditData) -> Void) {
+    init(showCurrentAccountSubreddit: Bool = false, onThingSelected: @escaping (Thing) -> Void) {
         self.showCurrentAccountSubreddit = showCurrentAccountSubreddit
         _subscriptionListingViewModel = StateObject(
             wrappedValue: SubscriptionListingViewModel(
+                // We don't care about the selection mode here cuz we are not using SubscriptionsView
+                subscriptionSelectionMode: .noSelection,
                 subscriptionListingRepository: SubscriptionListingRepository()
             )
         )
-        self.onSubscribedSubredditSelected = onSubscribedSubredditSelected
+        self.onThingSelected = onThingSelected
     }
 
     var body: some View {
@@ -37,7 +38,7 @@ struct SubredditSelectionSheet: View {
             showCurrentAccountSubreddit: showCurrentAccountSubreddit,
             subscriptionListingViewModel: subscriptionListingViewModel
         ) { subscribedSubredditData in
-            onSubscribedSubredditSelected(subscribedSubredditData)
+            onThingSelected(.subscribedSubreddit(subscribedSubredditData))
             dismiss()
         }
         .themedNavigationBar()
@@ -57,8 +58,8 @@ struct SubredditSelectionSheet: View {
         }
         .sheet(isPresented: $showSearchSubredditsSheet) {
             NavigationStack {
-                SearchSubredditsSheet { subscribedSubredditData in
-                    onSubscribedSubredditSelected(subscribedSubredditData)
+                SearchSubredditsSheet { thing in
+                    onThingSelected(thing)
                     dismiss()
                 }
             }

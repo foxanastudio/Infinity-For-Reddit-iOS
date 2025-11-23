@@ -16,7 +16,14 @@ struct HomeView: View {
     @Environment(\.scenePhase) var scenePhase
     @EnvironmentObject var accountViewModel: AccountViewModel
     @EnvironmentObject var customThemeViewModel: CustomThemeViewModel
-    @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
+    
+    @ObservedObject var fullScreenMediaViewModel: FullScreenMediaViewModel
+    
+    @StateObject private var tab1NavigationManager: NavigationManager
+    @StateObject private var tab2NavigationManager: NavigationManager
+    @StateObject private var tab3NavigationManager: NavigationManager
+    @StateObject private var tab4NavigationManager: NavigationManager
+    @StateObject private var tab5NavigationManager: NavigationManager
     
     @StateObject private var tab1NavigationBarMenuManager: NavigationBarMenuManager = NavigationBarMenuManager()
     @StateObject private var tab2NavigationBarMenuManager: NavigationBarMenuManager = NavigationBarMenuManager()
@@ -39,12 +46,21 @@ struct HomeView: View {
     
     @Namespace private var animation
     
+    init(fullScreenMediaViewModel: FullScreenMediaViewModel) {
+        self.fullScreenMediaViewModel = fullScreenMediaViewModel
+        _tab1NavigationManager = StateObject(wrappedValue: NavigationManager(fullScreenMediaViewModel: fullScreenMediaViewModel))
+        _tab2NavigationManager = StateObject(wrappedValue: NavigationManager(fullScreenMediaViewModel: fullScreenMediaViewModel))
+        _tab3NavigationManager = StateObject(wrappedValue: NavigationManager(fullScreenMediaViewModel: fullScreenMediaViewModel))
+        _tab4NavigationManager = StateObject(wrappedValue: NavigationManager(fullScreenMediaViewModel: fullScreenMediaViewModel))
+        _tab5NavigationManager = StateObject(wrappedValue: NavigationManager(fullScreenMediaViewModel: fullScreenMediaViewModel))
+    }
+    
     var body: some View {
         ZStack {
             TabView(selection: $selectedTab) {
                 Group {
                     ZStack {
-                        CustomNavigationStack(fullScreenMediaViewModel: fullScreenMediaViewModel) {
+                        CustomNavigationStack(navigationManager: tab1NavigationManager) {
                             PostListingView(
                                 postListingMetadata: PostListingMetadata(
                                     // Anonymous subscriptions will be fetched later in PostListingViewModel
@@ -71,7 +87,7 @@ struct HomeView: View {
                     .environmentObject(tab1SnackbarManager)
                     
                     ZStack {
-                        CustomNavigationStack(fullScreenMediaViewModel: fullScreenMediaViewModel) {
+                        CustomNavigationStack(navigationManager: tab2NavigationManager) {
                             Group {
                                 if accountViewModel.account.isAnonymous() {
                                     AnonymousSubscriptionsView()
@@ -98,7 +114,7 @@ struct HomeView: View {
                     
                     if !accountViewModel.account.isAnonymous() {
                         ZStack {
-                            CustomNavigationStack(fullScreenMediaViewModel: fullScreenMediaViewModel) {
+                            CustomNavigationStack(navigationManager: tab3NavigationManager) {
                                 NewPostTypeChooserView()
                                     .setUpHomeTabViewChildNavigationBar()
                                     .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
@@ -117,7 +133,7 @@ struct HomeView: View {
                         .environmentObject(tab3SnackbarManager)
                         
                         ZStack {
-                            CustomNavigationStack(fullScreenMediaViewModel: fullScreenMediaViewModel) {
+                            CustomNavigationStack(navigationManager: tab4NavigationManager) {
                                 InboxView(
                                     account: accountViewModel.account
                                 )
@@ -139,7 +155,7 @@ struct HomeView: View {
                         .environmentObject(tab4SnackbarManager)
                     } else {
                         ZStack {
-                            CustomNavigationStack(fullScreenMediaViewModel: fullScreenMediaViewModel) {
+                            CustomNavigationStack(navigationManager: tab4NavigationManager) {
                                 SearchView()
                                     .setUpHomeTabViewChildNavigationBar()
                                     .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
@@ -158,7 +174,7 @@ struct HomeView: View {
                     }
                     
                     ZStack {
-                        CustomNavigationStack(fullScreenMediaViewModel: fullScreenMediaViewModel) {
+                        CustomNavigationStack(navigationManager: tab5NavigationManager) {
                             MoreView()
                                 .setUpHomeTabViewChildNavigationBar()
                                 .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
@@ -255,17 +271,42 @@ struct HomeView: View {
         }, onAppEntersBackground: {
             homeViewModel.stopInboxCountPolling()
         })
+        .onReceive(NotificationCenter.default.publisher(for: .urlDeepLink)) { note in
+            if let url = (note.userInfo?[AppDeepLink.urlKey] as? URL) {
+                Task {
+                    await MainActor.run {
+                        currentNavigationManager.openLink(url)
+                    }
+                }
+            }
+        }
         .onReceive(NotificationCenter.default.publisher(for: .inboxDeepLink)) { note in
-            let accountName = (note.userInfo?["accountName"] as? String) ?? ""
-            let viewMessage = (note.userInfo?["viewMessage"] as? Bool) ?? false
+            let accountName = (note.userInfo?[AppDeepLink.accountNameKey] as? String) ?? ""
+            let viewMessage = (note.userInfo?[AppDeepLink.viewMessageKey] as? Bool) ?? false
             
-            Task { @MainActor in
+            Task {
                 if !accountName.isEmpty {
                     await accountViewModel.switchToAccountIfNeeded(accountName)
                 }
-                selectedTab = .inbox
-                Task { @MainActor in
+                
+                await MainActor.run {
                     homeViewModel.inboxNavigationTarget = .init(viewMessage: viewMessage)
+                    selectedTab = .inbox
+                }
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .contextDeepLink)) { note in
+            let accountName = (note.userInfo?[AppDeepLink.accountNameKey] as? String) ?? ""
+            
+            Task {
+                if !accountName.isEmpty {
+                    await accountViewModel.switchToAccountIfNeeded(accountName)
+                }
+                
+                if let context = (note.userInfo?[AppDeepLink.contextKey] as? String) {
+                    await MainActor.run {
+                        currentNavigationManager.openLink(context)
+                    }
                 }
             }
         }
@@ -288,13 +329,36 @@ struct HomeView: View {
         
         var navigationTitle: String {
             switch self {
-            case .home: return "Home"
-            case .subscriptions: return "Subscriptions"
-            case .newPost: return "New Post"
-            case .inbox: return "Inbox"
-            case .search: return "Search"
-            case .more: return "More"
+            case .home:
+                return "Home"
+            case .subscriptions:
+                return "Subscriptions"
+            case .newPost:
+                return "New Post"
+            case .inbox:
+                return "Inbox"
+            case .search:
+                return "Search"
+            case .more:
+                return "More"
             }
+        }
+    }
+    
+    private var currentNavigationManager: NavigationManager {
+        switch selectedTab {
+        case .home:
+            return tab1NavigationManager
+        case .subscriptions:
+            return tab2NavigationManager
+        case .newPost:
+            return tab3NavigationManager
+        case .inbox:
+            return tab4NavigationManager
+        case .search:
+            return tab4NavigationManager
+        case .more:
+            return tab5NavigationManager
         }
     }
 }

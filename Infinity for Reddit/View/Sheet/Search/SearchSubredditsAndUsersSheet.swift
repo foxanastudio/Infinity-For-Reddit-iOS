@@ -14,7 +14,7 @@ struct SearchSubredditsAndUsersSheet: View {
     
     @State private var queryItem: Item?
     
-    let onThingSelected: (SearchInThing) -> Void
+    var thingSelectionMode: ThingSelectionMode
     
     var body: some View {
         SearchView { query in
@@ -24,10 +24,24 @@ struct SearchSubredditsAndUsersSheet: View {
         .addTitleToInlineNavigationBar("Search Subreddits and Users")
         .sheet(item: $queryItem) { queryItem in
             NavigationStack {
-                SubredditAndUserSearchResultSheet(query: queryItem.query) { searchInThing in
-                    onThingSelected(searchInThing)
+                SubredditAndUserSearchResultSheet(query: queryItem.query, thingSelectionMode: modifiedThingSelectionMode)
+            }
+        }
+        
+        var modifiedThingSelectionMode: ThingSelectionMode {
+            switch thingSelectionMode {
+            case .noSelection:
+                return thingSelectionMode
+            case .thingSelection(onSelectThing: let onSelectThing):
+                return .thingSelection(onSelectThing: { thing in
+                    onSelectThing(thing)
                     dismiss()
-                }
+                })
+            case .subredditAndUserMultiSelection(selectedSubredditsAndUsers: let selectedSubredditsAndUsers, onConfirmSelection: let onConfirmSelection):
+                return .subredditAndUserMultiSelection(selectedSubredditsAndUsers: selectedSubredditsAndUsers, onConfirmSelection: { things in
+                    onConfirmSelection(things)
+                    dismiss()
+                })
             }
         }
     }

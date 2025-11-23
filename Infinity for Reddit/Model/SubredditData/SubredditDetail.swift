@@ -25,20 +25,9 @@ class SubredditDetailRootClass : NSObject {
         kind = json["kind"].stringValue
     }
     
+    // Helper method
     public func toSubredditData() -> SubredditData {
-        return SubredditData(
-            id: data.id,
-            name: data.displayName,
-            fullName: data.name,
-            iconUrl: data.iconUrl,
-            bannerUrl: data.bannerBackgroundImage,
-            description: data.descriptionField,
-            sidebarDescription: data.publicDescription,
-            nSubscribers: data.subscribers,
-            createdUTC: data.createdUtc,
-            suggestedCommentSort: data.suggestedCommentSort,
-            isNSFW: data.over18
-        )
+        return data.toSubredditData()
     }
 }
 

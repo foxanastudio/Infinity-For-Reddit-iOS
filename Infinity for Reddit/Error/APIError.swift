@@ -10,6 +10,7 @@ import Foundation
 enum APIError: LocalizedError {
     case networkError(String)
     case jsonDecodingError(String)
+    case invalidResponse(String)
     
     var errorDescription: String? {
         switch self {
@@ -17,6 +18,8 @@ enum APIError: LocalizedError {
             return "Network Error: \(message)"
         case .jsonDecodingError(let message):
             return "Failed to decode the response: \(message)"
+        case .invalidResponse(let message):
+            return message
         }
     }
 }

@@ -20,6 +20,10 @@ public class SubscriptionListingViewModel: ObservableObject {
     @Published var myCustomFeeds: [MyCustomFeed] = []
     @Published var favoriteMyCustomFeeds: [MyCustomFeed] = []
     
+    @Published var selectedSubscribedSubreddits: IdentifiedArrayOf<SubscribedSubredditData> = []
+    @Published var selectedSubredditsInCustomFeed: IdentifiedArrayOf<SubredditInCustomFeed> = []
+    @Published var selectedSubscribedUsers: IdentifiedArrayOf<SubscribedUserData> = []
+    
     @Published var subscriptionAndCustomFeedLoadingTaskFlag: Bool = false
     @Published var isLoadingSubscriptions: Bool = false
     @Published var isLoadingMyCustomFeeds: Bool = false
@@ -40,10 +44,43 @@ public class SubscriptionListingViewModel: ObservableObject {
     private let favoriteUserSubscriptionsPublisher: AnyPublisher<[SubscribedUserData], Error>
     private let favoriteMyCustomFeedSubscriptionsPublisher: AnyPublisher<[MyCustomFeed], Error>
     
+    let subscriptionSelectionMode: ThingSelectionMode
     private let subscriptionListingRepository: SubscriptionListingRepositoryProtocol
     
     // MARK: - Initializer
-    init(subscriptionListingRepository: SubscriptionListingRepositoryProtocol) {
+    init(subscriptionSelectionMode: ThingSelectionMode, subscriptionListingRepository: SubscriptionListingRepositoryProtocol) {
+        self.subscriptionSelectionMode = subscriptionSelectionMode
+        switch subscriptionSelectionMode {
+        case .subredditAndUserMultiSelection(let selectedSubredditsAndUsers, _):
+            var selectedSubscribedSubreddits = IdentifiedArrayOf<SubscribedSubredditData>()
+            var selectedSubredditsInCustomFeed = IdentifiedArrayOf<SubredditInCustomFeed>()
+            var selectedSubscribedUsers = IdentifiedArrayOf<SubscribedUserData>()
+            
+            for item in selectedSubredditsAndUsers {
+                switch item {
+                case .subscribedSubreddit(let subscribedSubredditData):
+                    selectedSubscribedSubreddits.append(subscribedSubredditData)
+                case .subreddit(_):
+                    break
+                case .subredditInCustomFeed(let subredditInCustomFeed):
+                    selectedSubredditsInCustomFeed.append(subredditInCustomFeed)
+                case .subredditInAnonymousCustomFeed(let anonymousCustomFeedSubreddit):
+                    selectedSubredditsInCustomFeed.append(SubredditInCustomFeed(name: anonymousCustomFeedSubreddit.subredditName))
+                case .subscribedUser(let subscribedUserData):
+                    selectedSubscribedUsers.append(subscribedUserData)
+                case .user(_):
+                    break
+                case .myCustomFeed(_):
+                    break
+                }
+            }
+            
+            self.selectedSubscribedSubreddits = selectedSubscribedSubreddits
+            self.selectedSubredditsInCustomFeed = selectedSubredditsInCustomFeed
+            self.selectedSubscribedUsers = selectedSubscribedUsers
+        default:
+            break
+        }
         self.subscriptionListingRepository = subscriptionListingRepository
         guard let resolvedOperationQueue = DependencyManager.shared.container.resolve(OperationQueue.self) else {
             fatalError("Could not resolve OperationQueue")
@@ -342,21 +379,7 @@ public class SubscriptionListingViewModel: ObservableObject {
             myCustomFeedListing.customFeeds.sort { $0.displayName < $1.displayName }
             
             let myCustomFeedsTemp = myCustomFeedListing.customFeeds.map {
-                MyCustomFeed(
-                    path: $0.path,
-                    displayName: $0.displayName,
-                    name: $0.name,
-                    description: $0.descriptionMd,
-                    copiedFrom: $0.copiedFrom,
-                    iconUrl: $0.iconUrl,
-                    visibility: $0.visibility,
-                    owner: $0.owner,
-                    nSubscribers: $0.numSubscribers,
-                    createdUTC: Int64($0.createdUtc),
-                    over18: $0.over18,
-                    isSubscriber: $0.isSubscriber,
-                    isFavorite: $0.isFavorited
-                )
+                $0.toMyCustomFeed()
             }
             
             try Task.checkCancellation()
@@ -576,5 +599,18 @@ public class SubscriptionListingViewModel: ObservableObject {
                 self.error = error
             }
         }
+    }
+    
+    func getSelectedSubredditsAndUsers() -> [Thing] {
+        var result: [Thing] = []
+        
+        for subscribedSubredditData in selectedSubscribedSubreddits {
+            result.append(.subscribedSubreddit(subscribedSubredditData))
+        }
+        for subscribedUserData in selectedSubscribedUsers {
+            result.append(.subscribedUser(subscribedUserData))
+        }
+        
+        return result
     }
 }

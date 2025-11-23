@@ -79,6 +79,11 @@ public class SubredditDetailsRepository: SubredditDetailsRepositoryProtocol {
     }
     
     public func subsribeSubreddit(subredditData: SubredditData, action: String) async throws {
+        guard !AccountViewModel.shared.account.isAnonymous() else {
+            try await anonymousSubscribeSubreddit(subredditData: subredditData)
+            return
+        }
+        
         let params = ["action": action, "sr_name": "\(subredditData.name)"]
         
         _ = try await self.session.request(RedditOAuthAPI.subsrcribeToSubreddit(params: params))
@@ -89,14 +94,54 @@ public class SubredditDetailsRepository: SubredditDetailsRepositoryProtocol {
         if action == "unsub" {
             try? subscribedSubredditDao.deleteSubscribedSubreddit(subredditName: subredditData.name, accountName: AccountViewModel.shared.account.username)
         } else {
-            let subscribedSubredditData = SubscribedSubredditData(
-                fullName: subredditData.fullName,
-                name: subredditData.name,
-                iconUrl: subredditData.iconUrl,
-                username: AccountViewModel.shared.account.username,
-                isFavorite: false
-            )
-            try? subscribedSubredditDao.insert(subscribedSubredditData: subscribedSubredditData)
+            try? subscribedSubredditDao.insert(subscribedSubredditData: subredditData.toSubscribedSubredditData())
         }
+    }
+    
+    private func anonymousSubscribeSubreddit(subredditData: SubredditData) async throws {
+        if subredditData.isSubscribed {
+            try subscribedSubredditDao.deleteSubscribedSubreddit(subredditName: subredditData.name, accountName: Account.ANONYMOUS_ACCOUNT.username)
+        } else {
+            try subscribedSubredditDao.insert(subscribedSubredditData: subredditData.toSubscribedSubredditData())
+        }
+    }
+    
+    public func fetchUserFlairs(subredditName: String) async throws -> [UserFlair] {
+        let data = try await self.session.request(RedditOAuthAPI.getUserFlairs(subredditName: subredditName))
+            .validate()
+            .serializingData(automaticallyCancelling: true)
+            .value
+        
+        try Task.checkCancellation()
+        
+        let json = JSON(data)
+        if let error = json.error {
+            throw SubredditDetailsRepositoryError.JSONDecodingError(error.localizedDescription)
+        }
+        
+        var result: [UserFlair] = []
+        for userFlairJson in json.arrayValue {
+            do {
+                let userFlair = try UserFlair(fromJson: userFlairJson)
+                result.append(userFlair)
+            } catch {
+                // Ignore
+            }
+        }
+        return result
+    }
+    
+    public func selectUserFlair(subredditName: String, userFlair: UserFlair?) async throws {
+        let params: [String: String]
+        if let userFlair {
+            params = ["api_type": "json", "flair_template_id": userFlair.id, "name": AccountViewModel.shared.account.username, "text": userFlair.text]
+        } else {
+            params = ["api_type": "json", "name": AccountViewModel.shared.account.username]
+        }
+        
+        _ = await self.session.request(RedditOAuthAPI.selectUserFlair(subredditName: subredditName, params: params))
+            .validate()
+            .serializingData(automaticallyCancelling: true)
+            .response
     }
 }

@@ -11,50 +11,92 @@ import GRDB
 import Alamofire
 
 struct SubscriptionsView: View {
+    @Environment(\.dismiss) private var dismiss
+    
     @EnvironmentObject private var accountViewModel: AccountViewModel
-    @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
+    @EnvironmentObject private var navigationBarMenuManager: NavigationBarMenuManager
+    @EnvironmentObject private var navigationManager: NavigationManager
     
     @StateObject var subscriptionListingViewModel: SubscriptionListingViewModel
 
     @State private var selectedOption = 0
     @State private var navigationBarMenuKey: UUID?
     
-    private let customOnTapForSearchInThing: ((SearchInThing) -> Void)?
-    
-    init(customOnTapForSearchInThing: ((SearchInThing) -> Void)? = nil) {
+    init(subscriptionSelectionMode: ThingSelectionMode = .noSelection) {
         _subscriptionListingViewModel = StateObject(
             wrappedValue: SubscriptionListingViewModel(
+                subscriptionSelectionMode: subscriptionSelectionMode,
                 subscriptionListingRepository: SubscriptionListingRepository()
             )
         )
-        self.customOnTapForSearchInThing = customOnTapForSearchInThing
     }
 
     var body: some View {
         RootView {
             VStack(spacing: 0) {
-                SegmentedPicker(selectedValue: $selectedOption, values: ["Subreddits", "Users", "Custom Feed"])
+                switch subscriptionListingViewModel.subscriptionSelectionMode {
+                case .subredditAndUserMultiSelection:
+                    SegmentedPicker(
+                        selectedValue: $selectedOption,
+                        values: ["Subreddits", "Users"]
+                    )
                     .padding(4)
+                default:
+                    SegmentedPicker(
+                        selectedValue: $selectedOption,
+                        values: ["Subreddits", "Users", "Custom Feed"]
+                    )
+                    .padding(4)
+                }
                 
                 TabView(selection: $selectedOption) {
                     Group {
-                        if let customOnTapForSearchInThing = customOnTapForSearchInThing {
-                            SubscribedSubredditListingView(subscriptionListingViewModel: subscriptionListingViewModel) { subscribedSubredditData in
-                                customOnTapForSearchInThing(SearchInThing.subreddit(subscribedSubredditData))
-                            }
-                            .tag(0)
-                        } else {
+                        switch subscriptionListingViewModel.subscriptionSelectionMode {
+                        case .noSelection:
                             SubscribedSubredditListingView(subscriptionListingViewModel: subscriptionListingViewModel)
                                 .tag(0)
-                        }
-                        
-                        UsersView(subscriptionListingViewModel: subscriptionListingViewModel, customOnTapForSearchInThing: customOnTapForSearchInThing)
+                            
+                            SubscribedUserListingView(subscriptionListingViewModel: subscriptionListingViewModel, onSelectCustomAction: nil)
+                                .tag(1)
+                            
+                            CustomFeedView(subscriptionListingViewModel: subscriptionListingViewModel, customOnTapForSearchInThing: nil)
+                                .tag(2)
+                        case .thingSelection(let onSelectThing):
+                            SubscribedSubredditListingView(subscriptionListingViewModel: subscriptionListingViewModel) { subscribedSubredditData in
+                                onSelectThing(Thing.subscribedSubreddit(subscribedSubredditData))
+                            }
+                            .tag(0)
+                            
+                            SubscribedUserListingView(subscriptionListingViewModel: subscriptionListingViewModel) { subscribedUserData in
+                                onSelectThing(Thing.subscribedUser(subscribedUserData))
+                            }
                             .tag(1)
-                        
-                        CustomFeedView(subscriptionListingViewModel: subscriptionListingViewModel, customOnTapForSearchInThing: customOnTapForSearchInThing)
-                            .tag(2)
+                            
+                            CustomFeedView(subscriptionListingViewModel: subscriptionListingViewModel, customOnTapForSearchInThing: onSelectThing)
+                                .tag(2)
+                        case .subredditAndUserMultiSelection:
+                            SubscribedSubredditListingMultiSelectionView(subscriptionListingViewModel: subscriptionListingViewModel)
+                                .tag(0)
+                            
+                            SubscribedUserListingMultiSelectionView(subscriptionListingViewModel: subscriptionListingViewModel)
+                                .tag(1)
+                        }
                     }
                     .toolbar(.hidden, for: .tabBar)
+                }
+                
+                if case .subredditAndUserMultiSelection(_, let onSelectMultipleSubscriptions) = subscriptionListingViewModel.subscriptionSelectionMode {
+                    Button {
+                        onSelectMultipleSubscriptions(subscriptionListingViewModel.getSelectedSubredditsAndUsers())
+                        dismiss()
+                    } label: {
+                        HStack {
+                            Text("Done")
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .padding(16)
+                    .filledButton()
                 }
             }
         }
@@ -69,100 +111,18 @@ struct SubscriptionsView: View {
             navigationBarMenuKey = navigationBarMenuManager.push([
                 NavigationBarMenuItem(title: "Refresh") {
                     subscriptionListingViewModel.refreshSubscriptions()
+                },
+                
+                NavigationBarMenuItem(title: "Create Custom Feed") {
+                    navigationManager.append(AppNavigation.createCustomFeed)
                 }
             ])
         }
         .onDisappear {
-            guard let navigationBarMenuKey else { return }
-            navigationBarMenuManager.pop(key: navigationBarMenuKey)
-        }
-    }
-
-    struct UsersView: View {
-        @EnvironmentObject var navigationManager: NavigationManager
-        @ObservedObject var subscriptionListingViewModel: SubscriptionListingViewModel
-        
-        let customOnTapForSearchInThing: ((SearchInThing) -> Void)?
-        
-        var body: some View {
-            Group {
-                if subscriptionListingViewModel.userSubscriptions.isEmpty {
-                    if subscriptionListingViewModel.isLoadingSubscriptions {
-                        ProgressIndicator()
-                    } else {
-                        Text("No subscribed users")
-                            .primaryText()
-                    }
-                } else {
-                    List {
-                        if !subscriptionListingViewModel.favoriteUserSubscriptions.isEmpty {
-                            CustomListSection("Favorite") {
-                                ForEach(subscriptionListingViewModel.favoriteUserSubscriptions, id: \.identityInView) { subscription in
-                                    SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
-                                        if let customOnTapForSearchInThing = customOnTapForSearchInThing {
-                                            customOnTapForSearchInThing(SearchInThing.user(subscription))
-                                        } else {
-                                            navigationManager.append(AppNavigation.userDetails(username: subscription.name))
-                                        }
-                                    }) {
-                                        subscription.isFavorite.toggle()
-                                        Task {
-                                            await subscriptionListingViewModel.toggleFavoriteUser(subscription)
-                                        }
-                                    }
-                                    .listPlainItemNoInsets()
-                                    .applyIf(customOnTapForSearchInThing == nil) {
-                                        $0.swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                            Button(role: .destructive) {
-                                                Task {
-                                                    await subscriptionListingViewModel.unfollowUser(subscription)
-                                                }
-                                            } label: {
-                                                Text("Unfollow")
-                                                    .foregroundStyle(.white)
-                                            }
-                                            .tint(.red)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        
-                        CustomListSection("All") {
-                            ForEach(subscriptionListingViewModel.userSubscriptions, id: \.identityInView) { subscription in
-                                SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
-                                    if let customOnTapForSearchInThing = customOnTapForSearchInThing {
-                                        customOnTapForSearchInThing(SearchInThing.user(subscription))
-                                    } else {
-                                        navigationManager.append(AppNavigation.userDetails(username: subscription.name))
-                                    }
-                                }) {
-                                    subscription.isFavorite.toggle()
-                                    Task {
-                                        await subscriptionListingViewModel.toggleFavoriteUser(subscription)
-                                    }
-                                }
-                                .listPlainItemNoInsets()
-                                .applyIf(customOnTapForSearchInThing == nil) {
-                                    $0.swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                        Button(role: .destructive) {
-                                            Task {
-                                                await subscriptionListingViewModel.unfollowUser(subscription)
-                                            }
-                                        } label: {
-                                            Text("Unfollow")
-                                                .foregroundStyle(.white)
-                                        }
-                                        .tint(.red)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    .scrollBounceBehavior(.basedOnSize)
-                    .themedList()
-                }
+            guard let navigationBarMenuKey else {
+                return
             }
+            navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
     }
 
@@ -170,7 +130,7 @@ struct SubscriptionsView: View {
         @EnvironmentObject var navigationManager: NavigationManager
         @ObservedObject var subscriptionListingViewModel: SubscriptionListingViewModel
         
-        let customOnTapForSearchInThing: ((SearchInThing) -> Void)?
+        let customOnTapForSearchInThing: ((Thing) -> Void)?
         
         var body: some View {
             Group {
@@ -188,7 +148,7 @@ struct SubscriptionsView: View {
                                 ForEach(subscriptionListingViewModel.favoriteMyCustomFeeds, id: \.identityInView) { customFeed in
                                     SubscriptionItemView(text: customFeed.displayName, iconUrl: customFeed.iconUrl, isFavorite: customFeed.isFavorite, action: {
                                         if let customOnTapForSearchInThing = customOnTapForSearchInThing {
-                                            customOnTapForSearchInThing(SearchInThing.customFeed(customFeed))
+                                            customOnTapForSearchInThing(Thing.myCustomFeed(customFeed))
                                         } else {
                                             navigationManager.append(AppNavigation.customFeed(myCustomFeed: customFeed))
                                         }
@@ -220,7 +180,7 @@ struct SubscriptionsView: View {
                             ForEach(subscriptionListingViewModel.myCustomFeeds, id: \.identityInView) { customFeed in
                                 SubscriptionItemView(text: customFeed.displayName, iconUrl: customFeed.iconUrl, isFavorite: customFeed.isFavorite, action: {
                                     if let customOnTapForSearchInThing = customOnTapForSearchInThing {
-                                        customOnTapForSearchInThing(SearchInThing.customFeed(customFeed))
+                                        customOnTapForSearchInThing(Thing.myCustomFeed(customFeed))
                                     } else {
                                         navigationManager.append(AppNavigation.customFeed(myCustomFeed: customFeed))
                                     }

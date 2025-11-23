@@ -7,10 +7,10 @@
 
 import GRDB
 
-public struct SubredditData: Codable, FetchableRecord, PersistableRecord {
+public struct SubredditData: Codable, FetchableRecord, PersistableRecord, Identifiable {
     public static let databaseTableName = "subreddits"
     
-    var id: String
+    public var id: String
     var fullName: String
     var name: String
     var iconUrl: String?
@@ -60,4 +60,14 @@ public struct SubredditData: Codable, FetchableRecord, PersistableRecord {
     }
     
     public static let databaseSelection: [SQLSelectable] = CodingKeys.allCases.map { $0 }
+    
+    func toSubscribedSubredditData() -> SubscribedSubredditData {
+        return SubscribedSubredditData(
+            fullName: fullName,
+            name: name,
+            iconUrl: iconUrl,
+            username: AccountViewModel.shared.account.username,
+            isFavorite: false
+        )
+    }
 }

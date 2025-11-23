@@ -307,4 +307,11 @@ extension View {
             )
         )
     }
+    
+    func onVisiblePercentageChange(
+        in space: CoordinateSpace = .global,
+        _ action: @escaping (CGFloat) -> Void
+    ) -> some View {
+        modifier(VisiblePercentageModifier(onChange: action, space: space))
+    }
 }

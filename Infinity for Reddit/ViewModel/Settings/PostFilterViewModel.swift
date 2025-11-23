@@ -13,6 +13,9 @@ class PostFilterViewModel: ObservableObject {
     // MARK: - Properties
     @Published var postFilters: [PostFilter] = []
     
+    let postToBeAdded: Post?
+    let subredditToBeAdded: String?
+    let userToBeAdded: String?
     private let postFilterRepository: PostFilterRepositoryProtocol
     private let postFilterDao: PostFilterDao
     private let dbPool: DatabasePool
@@ -20,10 +23,13 @@ class PostFilterViewModel: ObservableObject {
     private var listener: AnyDatabaseCancellable?
     
     // MARK: - Initializer
-    init(postFilterRepository: PostFilterRepositoryProtocol) {
+    init(postToBeAdded: Post?, subredditToBeAdded: String?, userToBeAdded: String?, postFilterRepository: PostFilterRepositoryProtocol) {
         guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
             fatalError("Failed to resolve DatabasePool")
         }
+        self.postToBeAdded = postToBeAdded
+        self.subredditToBeAdded = subredditToBeAdded
+        self.userToBeAdded = userToBeAdded
         self.postFilterRepository = postFilterRepository
         self.postFilterDao = PostFilterDao(dbPool: resolvedDBPool)
         self.dbPool = resolvedDBPool

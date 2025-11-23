@@ -31,6 +31,21 @@ struct CustomizePostFilterView: View {
         )
     }
     
+    init(_ postFilter: PostFilter?, postToBeAdded: Post?, subredditToBeAdded: String?, userToBeAdded: String?, selectedFieldsToAddToPostFilter: [SelectedFieldToAddToPostFilter]?) {
+        self.showInSheet = false
+        self.onApplyPostFilter = nil
+        _customizePostFilterViewModel = StateObject(
+            wrappedValue: CustomizePostFilterViewModel(
+                postFilter: postFilter,
+                postToBeAdded: postToBeAdded,
+                subredditToBeAdded: subredditToBeAdded,
+                userToBeAdded: userToBeAdded,
+                selectedFieldsToAddToPostFilter: selectedFieldsToAddToPostFilter,
+                customizePostFilterRepository: CustomizePostFilterRepository()
+            )
+        )
+    }
+    
     var body: some View {
         RootView {
             VStack(spacing: 0) {

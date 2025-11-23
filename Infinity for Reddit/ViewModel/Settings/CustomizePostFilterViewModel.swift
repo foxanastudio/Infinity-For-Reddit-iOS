@@ -39,7 +39,20 @@ public class CustomizePostFilterViewModel: ObservableObject {
     
     private let customizePostFilterRepository: CustomizePostFilterRepositoryProtocol
     
-    init(postFilter: PostFilter?, customizePostFilterRepository: CustomizePostFilterRepositoryProtocol) {
+    init(postFilter: PostFilter?,
+         postToBeAdded: Post? = nil,
+         subredditToBeAdded: String? = nil,
+         userToBeAdded: String? = nil,
+         selectedFieldsToAddToPostFilter: [SelectedFieldToAddToPostFilter]? = nil,
+         customizePostFilterRepository: CustomizePostFilterRepositoryProtocol
+    ) {
+        var excludeSubreddits = ""
+        var excludeUsers = ""
+        var excludeFlairs = ""
+        var containFlairs = ""
+        var excludeDomains = ""
+        var containDomains = ""
+        
         if let postFilter = postFilter {
             id = postFilter.id
             name = postFilter.name
@@ -71,6 +84,87 @@ public class CustomizePostFilterViewModel: ObservableObject {
             maxCommentsString = String(postFilter.maxComments)
         }
         
+        if let selectedFieldsToAddToPostFilter, !selectedFieldsToAddToPostFilter.isEmpty {
+            if let postToBeAdded {
+                for selectedFieldToAddToPostFilter in selectedFieldsToAddToPostFilter {
+                    switch selectedFieldToAddToPostFilter {
+                    case .excludeSubreddit:
+                        if !excludeSubreddits.isEmpty {
+                            excludeSubreddits += ","
+                        }
+                        excludeSubreddits += postToBeAdded.subreddit
+                    case .containSubreddit:
+                        break
+                    case .excludeUser:
+                        if !excludeUsers.isEmpty {
+                            excludeUsers += ","
+                        }
+                        excludeUsers += postToBeAdded.author
+                    case .containUser:
+                        break
+                    case .excludeFlair:
+                        if !excludeFlairs.isEmpty {
+                            excludeFlairs += ","
+                        }
+                        excludeFlairs += postToBeAdded.linkFlairText
+                    case .containFlair:
+                        if !containFlairs.isEmpty {
+                            containFlairs += ","
+                        }
+                        containFlairs += postToBeAdded.linkFlairText
+                    case .excludeDomain:
+                        if let url = URL(string: postToBeAdded.url ?? ""), let domain = url.host {
+                            if !excludeDomains.isEmpty {
+                                excludeDomains += ","
+                            }
+                            excludeDomains += domain
+                        }
+                    case .containDomain:
+                        if let url = URL(string: postToBeAdded.url ?? ""), let domain = url.host {
+                            if !containDomains.isEmpty {
+                                containDomains += ","
+                            }
+                            containDomains += domain
+                        }
+                    }
+                }
+            } else if let subredditToBeAdded {
+                for selectedFieldToAddToPostFilter in selectedFieldsToAddToPostFilter {
+                    switch selectedFieldToAddToPostFilter {
+                    case .excludeSubreddit:
+                        if !excludeSubreddits.isEmpty {
+                            excludeSubreddits += ","
+                        }
+                        excludeSubreddits += subredditToBeAdded
+                    case .containSubreddit:
+                        break
+                    default:
+                        break
+                    }
+                }
+            } else if let userToBeAdded {
+                for selectedFieldToAddToPostFilter in selectedFieldsToAddToPostFilter {
+                    switch selectedFieldToAddToPostFilter {
+                    case .excludeUser:
+                        if !excludeUsers.isEmpty {
+                            excludeUsers += ","
+                        }
+                        excludeUsers += userToBeAdded
+                    case .containUser:
+                        break
+                    default:
+                        break
+                    }
+                }
+            }
+        }
+        
+        self.excludeSubreddits = excludeSubreddits
+        self.excludeUsers = excludeUsers
+        self.excludeFlairs = excludeFlairs
+        self.containFlairs = containFlairs
+        self.excludeDomains = excludeDomains
+        self.containDomains = containDomains
         self.customizePostFilterRepository = customizePostFilterRepository
     }
     

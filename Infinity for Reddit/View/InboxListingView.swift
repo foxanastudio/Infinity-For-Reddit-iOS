@@ -14,7 +14,10 @@ struct InboxListingView: View {
     @StateObject var inboxListingViewModel: InboxListingViewModel
     @State private var navigationBarMenuKey: UUID?
     
-    init(messageWhere: MessageWhere) {
+    @Binding private var hasReadAllMessages: Bool
+    
+    init(messageWhere: MessageWhere, hasReadAllMessages: Binding<Bool>) {
+        self._hasReadAllMessages = hasReadAllMessages
         _inboxListingViewModel = StateObject(
             wrappedValue: InboxListingViewModel(
                 messageWhere: messageWhere,
@@ -38,14 +41,14 @@ struct InboxListingView: View {
                 List {
                     ForEach(inboxListingViewModel.inboxes, id: \.id) { inbox in
                         if inboxListingViewModel.messageWhere == .messages {
-                            InboxMessageItemView(inbox: inbox) { inboxToMarkAsRead in
+                            InboxMessageItemView(inbox: inbox, hasReadAllMessages: hasReadAllMessages) { inboxToMarkAsRead in
                                 navigationManager.append(AppNavigation.inboxConversation(inbox: inbox))
                                 if let inboxToMarkAsRead {
                                     inboxListingViewModel.markAsRead(inbox: inboxToMarkAsRead)
                                 }
                             }
                         } else {
-                            InboxNotificationItemView(inbox: inbox) {
+                            InboxNotificationItemView(inbox: inbox, hasReadAllMessages: hasReadAllMessages) {
                                 navigationManager.openLink(inbox.context)
                                 inboxListingViewModel.markAsRead(inbox: inbox)
                             }
@@ -72,6 +75,7 @@ struct InboxListingView: View {
             }
             navigationBarMenuKey = navigationBarMenuManager.push([
                 NavigationBarMenuItem(title: "Refresh") {
+                    hasReadAllMessages = false
                     inboxListingViewModel.refreshInboxes()
                 }
             ])
@@ -90,11 +94,13 @@ struct InboxMessageItemView: View {
     @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
     
     @State var inbox: Inbox
+    private let hasReadAllMessages: Bool
     private let onTap: (Inbox?) -> Void
     private let account: Account
     
-    init(inbox: Inbox, onTap: @escaping (Inbox?) -> Void) {
+    init(inbox: Inbox, hasReadAllMessages: Bool, onTap: @escaping (Inbox?) -> Void) {
         self.inbox = inbox
+        self.hasReadAllMessages = hasReadAllMessages
         self.onTap = onTap
         self.account = AccountViewModel.shared.account
     }
@@ -124,7 +130,7 @@ struct InboxMessageItemView: View {
                 }
                 .contentShape(Rectangle())
                 .padding(16)
-                .background(isNew ? Color(hex: customThemeViewModel.currentCustomTheme.unreadMessageBackgroundColor) : .clear)
+                .background(isNew && !hasReadAllMessages ? Color(hex: customThemeViewModel.currentCustomTheme.unreadMessageBackgroundColor) : .clear)
             }
             
             Divider()
@@ -170,10 +176,12 @@ struct InboxNotificationItemView: View {
     @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
     
     @State var inbox: Inbox
+    private let hasReadAllMessages: Bool
     private let onTap: () -> Void
     
-    init(inbox: Inbox, onTap: @escaping () -> Void) {
+    init(inbox: Inbox, hasReadAllMessages: Bool, onTap: @escaping () -> Void) {
         self.inbox = inbox
+        self.hasReadAllMessages = hasReadAllMessages
         self.onTap = onTap
     }
     
@@ -209,7 +217,7 @@ struct InboxNotificationItemView: View {
                 }
                 .contentShape(Rectangle())
                 .padding(16)
-                .background(inbox.isNew ? Color(hex: customThemeViewModel.currentCustomTheme.unreadMessageBackgroundColor) : .clear)
+                .background(inbox.isNew && !hasReadAllMessages ? Color(hex: customThemeViewModel.currentCustomTheme.unreadMessageBackgroundColor) : .clear)
             }
             
             Divider()

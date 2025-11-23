@@ -46,4 +46,8 @@ class Utils {
         
         return dateFormatter.string(from: date)
     }
+    
+    static func getCurrentTimeEpoch() -> Int64 {
+        return Int64(Date().timeIntervalSince1970 * 1000)
+    }
 }

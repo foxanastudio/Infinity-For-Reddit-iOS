@@ -100,7 +100,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
     var numComments : Int!
     var numCrossposts : Int!
     var numReports : Int!
-    var over18 : Bool!
+    @Published var over18 : Bool!
     var permalink : String!
     var pinned : Bool!
     var preview : Preview!
@@ -127,7 +127,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
         return selftext
     }
     var sendReplies : Bool!
-    var spoiler : Bool!
+    @Published var spoiler : Bool!
     var stickied : Bool!
     var subreddit : String!
     var subredditId : String!
@@ -218,8 +218,13 @@ public class Post : NSObject, ObservableObject, Identifiable {
         archived = json["archived"].boolValue
         author = json["author"].stringValue
         let authorFlairRichtextArray = json["author_flair_richtext"].arrayValue
-        for authorFlairRichtextJson in authorFlairRichtextArray{
-            authorFlairRichtext.append(FlairRichtext(fromJson: authorFlairRichtextJson))
+        for authorFlairRichtextJson in authorFlairRichtextArray {
+            do {
+                let flairRichtext = try FlairRichtext(fromJson: authorFlairRichtextJson)
+                authorFlairRichtext.append(flairRichtext)
+            } catch {
+                //Ignore
+            }
         }
         authorFlairText = json["author_flair_text"].stringValue
         authorFlairType = json["author_flair_type"].stringValue
@@ -265,8 +270,13 @@ public class Post : NSObject, ObservableObject, Identifiable {
         let likes = json["likes"] == JSON.null ? 0 : json["likes"].boolValue == true ? 1 : -1
         self.likes = likes
         let linkFlairRichtextArray = json["link_flair_richtext"].arrayValue
-        for linkFlairRichtextJson in linkFlairRichtextArray{
-            linkFlairRichtext.append(FlairRichtext(fromJson: linkFlairRichtextJson))
+        for linkFlairRichtextJson in linkFlairRichtextArray {
+            do {
+                let richtext = try FlairRichtext(fromJson: linkFlairRichtextJson)
+                linkFlairRichtext.append(richtext)
+            } catch {
+                //Ignore
+            }
         }
         linkFlairText = json["link_flair_text"].stringValue
         linkFlairType = json["link_flair_type"].stringValue

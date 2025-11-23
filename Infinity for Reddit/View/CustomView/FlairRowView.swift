@@ -12,9 +12,14 @@ struct FlairRowView: View {
     
     var body: some View {
         if let flairRichtext = flair.richtext, !flairRichtext.isEmpty {
-            FlairRichTextView(flairRichtext: flairRichtext, usePrimaryTextColor: true)
-                .frame(maxWidth: .infinity)
-                .padding(16)
+            HStack {
+                FlairRichTextView(flairRichtext: flairRichtext, usePrimaryTextColor: true)
+                    .padding(16)
+                
+                Spacer()
+            }
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
         } else {
             HStack {
                 RowText(flair.text)
@@ -38,4 +43,3 @@ struct FlairRowView: View {
         }
     }
 }
-

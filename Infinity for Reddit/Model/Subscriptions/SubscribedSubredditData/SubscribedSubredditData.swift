@@ -8,8 +8,12 @@
 import GRDB
 import Foundation
 
-class SubscribedSubredditData: Codable, FetchableRecord, PersistableRecord {
+class SubscribedSubredditData: Codable, FetchableRecord, PersistableRecord, Identifiable {
     static let databaseTableName = "subscribed_subreddits"
+    
+    var id: String {
+        return fullName
+    }
     
     var fullName: String
     var name: String

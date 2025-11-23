@@ -14,11 +14,12 @@ struct SubredditDetailsView: View {
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     @EnvironmentObject private var navigationManager: NavigationManager
     
+    @StateObject var subredditDetailsViewModel : SubredditDetailsViewModel
+    
     @State private var navigationBarMenuKey: UUID?
     @State private var showSubredditAboutSheet: Bool = false
     @State private var isSubredditInfoVisible: Bool = true
-    
-    @StateObject var subredditDetailsViewModel : SubredditDetailsViewModel
+    @State private var showUserFlairSheet: Bool = false
     
     private let subredditIconSize: CGFloat = 80
     private let bannerMaxHeight: CGFloat = 150
@@ -168,8 +169,40 @@ struct SubredditDetailsView: View {
             }
         }
         .id(accountViewModel.account.username)
+        .onAppear {
+            if let key = navigationBarMenuKey {
+                navigationBarMenuManager.pop(key: key)
+            }
+            navigationBarMenuKey = navigationBarMenuManager.push([
+                NavigationBarMenuItem(title: "Select User Flair") {
+                    subredditDetailsViewModel.fetchUserFlairs()
+                    showUserFlairSheet = true
+                },
+                
+                NavigationBarMenuItem(title: "Add to Post Filter") {
+                    navigationManager.append(SettingsViewNavigation.postFilter(subredditToBeAdded: subredditDetailsViewModel.subredditData?.name ?? subredditDetailsViewModel.subredditName))
+                },
+                
+                NavigationBarMenuItem(title: "Contact Mods") {
+                    navigationManager.append(AppNavigation.sendChatMessage(recipient: "r/\(subredditDetailsViewModel.subredditData?.name ?? subredditDetailsViewModel.subredditName)"))
+                }
+            ])
+        }
+        .onDisappear {
+            guard let navigationBarMenuKey else {
+                return
+            }
+            navigationBarMenuManager.pop(key: navigationBarMenuKey)
+        }
         .wrapContentSheet(isPresented: $showSubredditAboutSheet) {
             SubredditAboutSheet(subredditData: subredditDetailsViewModel.subredditData)
+        }
+        .wrapContentSheet(isPresented: $showUserFlairSheet) {
+            SelectUserFlairSheet(userFlairs: subredditDetailsViewModel.userFlairs, onUserFlairSelected: { userFlair in
+                subredditDetailsViewModel.selectUserFlair(userFlair)
+            }, onClearUserFlair: {
+                subredditDetailsViewModel.cleaarUserFlair()
+            })
         }
     }
 }

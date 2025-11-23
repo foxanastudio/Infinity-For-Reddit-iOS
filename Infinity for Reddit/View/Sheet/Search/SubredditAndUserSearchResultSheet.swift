@@ -12,10 +12,32 @@ struct SubredditAndUserSearchResultSheet: View {
     
     @Environment(\.dismiss) var dismiss
     
+    @StateObject private var subredditListingViewModel: SubredditListingViewModel
+    @StateObject private var userListingViewModel: UserListingViewModel
+    
     @State private var selectedOption = 0
     
     let query: String
-    let onSearchInThingSelected: (SearchInThing) -> Void
+    let thingSelectionMode: ThingSelectionMode
+    
+    init(query: String, thingSelectionMode: ThingSelectionMode) {
+        self.query = query
+        self.thingSelectionMode = thingSelectionMode
+        _subredditListingViewModel = StateObject(
+            wrappedValue: SubredditListingViewModel(
+                query: query,
+                thingSelectionMode: thingSelectionMode,
+                subredditListingRepository: SubredditListingRepository()
+            )
+        )
+        _userListingViewModel = StateObject(
+            wrappedValue: UserListingViewModel(
+                query: query,
+                thingSelectionMode: thingSelectionMode,
+                userListingRepository: UserListingRepository()
+            )
+        )
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -23,19 +45,35 @@ struct SubredditAndUserSearchResultSheet: View {
                 .padding(4)
             
             TabView(selection: $selectedOption) {
-                SubredditListingView(account: accountViewModel.account, query: query) { subreddit in
-                    onSearchInThingSelected(SearchInThing.subreddit(SubscribedSubredditData.fromSubreddit(subreddit, username: accountViewModel.account.username)))
-                    dismiss()
-                }
-                .tag(0)
+                SubredditListingView(account: accountViewModel.account, subredditListingViewModel: subredditListingViewModel)
+                    .tag(0)
                 
-                UserListingView(account: accountViewModel.account, query: query) { user in
-                    onSearchInThingSelected(SearchInThing.user(SubscribedUserData.fromUser(user, username: accountViewModel.account.username)))
-                    dismiss()
-                }
-                .tag(1)
+                UserListingView(account: accountViewModel.account, userListingViewModel: userListingViewModel)
+                    .tag(1)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
+            
+            if case .subredditAndUserMultiSelection(_, let onSelectMultipleSubscriptions) = thingSelectionMode {
+                Button {
+                    var selectedThings: [Thing] = []
+                    for subreddit in subredditListingViewModel.selectedSubreddits {
+                        selectedThings.append(.subreddit(subreddit.toSubredditData()))
+                    }
+                    for user in userListingViewModel.selectedUsers {
+                        selectedThings.append(.user(user.toUserData()))
+                    }
+                    
+                    onSelectMultipleSubscriptions(selectedThings)
+                    dismiss()
+                } label: {
+                    HStack {
+                        Text("Done")
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                .padding(16)
+                .filledButton()
+            }
         }
         .id(accountViewModel.account.username)
         .themedNavigationBar()

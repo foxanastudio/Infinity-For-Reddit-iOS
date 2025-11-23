@@ -21,6 +21,7 @@ struct PostDetailsView: View {
     @StateObject var postDetailsViewModel: PostDetailsViewModel
     
     @State private var showSortTypeSheet: Bool = false
+    @State private var showSelectFlairSheet: Bool = false
     @State private var navigationBarMenuKey: UUID?
     @State private var sentCommentParent: CommentParent? = nil
     @State private var commentToBeEdited: Comment? = nil
@@ -44,6 +45,7 @@ struct PostDetailsView: View {
                 postDetailsInput: postDetailsInput,
                 postDetailsRepository: PostDetailsRepository(),
                 historyPostsRepository: HistoryPostsRepository(),
+                flairRepository: FlairRepository(),
                 isContinueThread: isContinueThread
             )
         )
@@ -140,6 +142,9 @@ struct PostDetailsView: View {
                                 },
                                 onDelete: {
                                     postDetailsViewModel.deleteComment(comment)
+                                },
+                                onAddToCommentFilter: {
+                                    navigationManager.append(SettingsViewNavigation.commentFilter(commentToBeAdded: comment))
                                 }
                             )
                             .listPlainItemNoInsets()
@@ -256,6 +261,11 @@ struct PostDetailsView: View {
                 postDetailsViewModel.changeSortTypeKind(sortTypeKind: sortTypeKind)
             }
         }
+        .wrapContentSheet(isPresented: $showSelectFlairSheet) {
+            SelectPostFlairSheet(flairs: postDetailsViewModel.flairs) { flair in
+                postDetailsViewModel.selectFlair(flair)
+            }
+        }
         .overlay(
             CustomAlert(title: activeAlert?.title ?? "",
                         confirmButtonText: activeAlert?.confirmButtonText ?? "",
@@ -283,7 +293,7 @@ struct PostDetailsView: View {
             navigationBarMenuManager.pop(key: key)
         }
         
-        let menuItems: [NavigationBarMenuItem]
+        var menuItems: [NavigationBarMenuItem]
         if AccountViewModel.shared.account.username == postDetailsViewModel.post?.author {
             if postDetailsViewModel.post?.canEditBody == true {
                 menuItems = [
@@ -313,6 +323,23 @@ struct PostDetailsView: View {
                         withAnimation(.linear(duration: 0.2)) {
                             activeAlert = .deletePost
                         }
+                    },
+                    
+                    NavigationBarMenuItem(title: postDetailsViewModel.post?.over18 ?? false ? "Unmark Sensitive" : "Mark Sensitive") {
+                        postDetailsViewModel.toggleSensitive {
+                            setUpMenu()
+                        }
+                    },
+                    
+                    NavigationBarMenuItem(title: postDetailsViewModel.post?.spoiler ?? false ? "Unmark Spoiler" : "Mark Spoiler") {
+                        postDetailsViewModel.toggleSpoiler {
+                            setUpMenu()
+                        }
+                    },
+                    
+                    NavigationBarMenuItem(title: "Edit Flair") {
+                        postDetailsViewModel.fetchFlairs()
+                        showSelectFlairSheet = true
                     }
                 ]
             } else {
@@ -339,6 +366,23 @@ struct PostDetailsView: View {
                         withAnimation(.linear(duration: 0.2)) {
                             activeAlert = .deletePost
                         }
+                    },
+                    
+                    NavigationBarMenuItem(title: postDetailsViewModel.post?.over18 ?? false ? "Unmark Sensitive" : "Mark Sensitive") {
+                        postDetailsViewModel.toggleSensitive {
+                            setUpMenu()
+                        }
+                    },
+                    
+                    NavigationBarMenuItem(title: postDetailsViewModel.post?.spoiler ?? false ? "Unmark Spoiler" : "Mark Spoiler") {
+                        postDetailsViewModel.toggleSpoiler {
+                            setUpMenu()
+                        }
+                    },
+                    
+                    NavigationBarMenuItem(title: "Edit Flair") {
+                        postDetailsViewModel.fetchFlairs()
+                        showSelectFlairSheet = true
                     }
                 ]
             }
@@ -363,6 +407,26 @@ struct PostDetailsView: View {
                 }
             ]
         }
+        
+        if postDetailsViewModel.post?.isCrosspostable ?? false {
+            menuItems.append(
+                NavigationBarMenuItem(title: "Crosspost") {
+                    guard let post = postDetailsViewModel.post else {
+                        return
+                    }
+                    navigationManager.append(AppNavigation.crosspost(postToBeCrossposted: post))
+                }
+            )
+        }
+        
+        menuItems.append(
+            NavigationBarMenuItem(title: "Add to Post Filter") {
+                guard let post = postDetailsViewModel.post else {
+                    return
+                }
+                navigationManager.append(SettingsViewNavigation.postFilter(postToBeAdded: post))
+            }
+        )
         
         navigationBarMenuKey = navigationBarMenuManager.push(menuItems)
     }

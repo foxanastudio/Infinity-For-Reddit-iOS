@@ -13,7 +13,7 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
     @Published private var isLoading: Bool = false
     @Published private var isLoaded: Bool = false
     private var timer: Timer?
-
+    
     private var currentItemObserver: NSKeyValueObservation?
     private var statusObserver: NSKeyValueObservation?
     private var audioTrackObserver: NSKeyValueObservation?
@@ -27,6 +27,11 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
     @Published var isDragging = false
     @Published var hasAudio: Bool = false
     @Published var isMuted: Bool = false
+    var canPlay: Bool
+    
+    init(canPlay: Bool = true) {
+        self.canPlay = canPlay
+    }
     
     func loadAndPlay(url: URL, muteVideo: Bool) async {
         guard !isLoaded, !isLoading else {
@@ -45,9 +50,9 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
                 isLoaded = true
                 isLoading = false
                 
-                player.isMuted = muteVideo
+                self.player.isMuted = muteVideo
                 self.isMuted = muteVideo
-                player.play()
+                self.play()
                 
                 observeCurrentItem()
                 observeTime()
@@ -57,7 +62,7 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
                                                        object: player.currentItem,
                                                        queue: .main) { _ in
                     self.player.seek(to: .zero)
-                    self.player.play()
+                    self.play()
                 }
             }
         } catch {
@@ -136,11 +141,22 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
     }
     
     func play() {
-        player.play()
+        if canPlay {
+            player.play()
+        }
     }
     
     func pause() {
         player.pause()
+    }
+    
+    func setCanPlay(_ value: Bool) {
+        self.canPlay = value
+        if value {
+            player.play()
+        } else {
+            player.pause()
+        }
     }
     
     func toggleMute() -> Bool {

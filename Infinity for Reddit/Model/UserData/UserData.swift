@@ -7,10 +7,10 @@
 
 import GRDB
 
-public struct UserData: Codable, FetchableRecord, PersistableRecord {
+public struct UserData: Codable, FetchableRecord, PersistableRecord, Identifiable {
     public static let databaseTableName: String = "users"
     
-    var id: String
+    public var id: String
     var name: String
     var iconUrl: String?
     var banner: String?
@@ -64,5 +64,14 @@ public struct UserData: Codable, FetchableRecord, PersistableRecord {
         case description = "description"
         case title = "title"
         case isSelected = "is_selected"
+    }
+    
+    func toSubscribedUserData() -> SubscribedUserData {
+        return SubscribedUserData(
+            name: name,
+            iconUrl: iconUrl,
+            username: AccountViewModel.shared.account.username,
+            isFavorite: false
+        )
     }
 }

@@ -14,20 +14,20 @@ struct SelectSearchInThingSheet: View {
     
     @State private var showSearchSubredditsAndUsersView: Bool = false
     
-    let onSelectThing: (SearchInThing) -> Void
+    let onSelectThing: (Thing) -> Void
     
     var body: some View {
         ZStack {
             if accountViewModel.account.isAnonymous() {
-                AnonymousSubscriptionsView() { searchInThing in
-                    onSelectThing(searchInThing)
+                AnonymousSubscriptionsView(subscriptionSelectionMode: .thingSelection(onSelectThing: { thing in
+                    onSelectThing(thing)
                     dismiss()
-                }
+                }))
             } else {
-                SubscriptionsView()  { searchInThing in
-                    onSelectThing(searchInThing)
+                SubscriptionsView(subscriptionSelectionMode: .thingSelection(onSelectThing: { thing in
+                    onSelectThing(thing)
                     dismiss()
-                }
+                }))
             }
         }
         .themedNavigationBar()
@@ -52,10 +52,10 @@ struct SelectSearchInThingSheet: View {
         }
         .sheet(isPresented: $showSearchSubredditsAndUsersView) {
             NavigationStack {
-                SearchSubredditsAndUsersSheet { searchInThing in
-                    onSelectThing(searchInThing)
+                SearchSubredditsAndUsersSheet(thingSelectionMode: .thingSelection(onSelectThing: { thing in
+                    onSelectThing(thing)
                     dismiss()
-                }
+                }))
             }
         }
     }

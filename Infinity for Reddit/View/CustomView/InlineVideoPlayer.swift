@@ -15,18 +15,20 @@ struct InlineVideoPlayer: View {
     let player: AVPlayer
     private let aspectRatio: CGSize?
     private let muteVideo: Bool
+    private let canPlay: Bool
     
-    init(videoURL: URL, aspectRatio: CGSize?, muteVideo: Bool = false) {
+    init(videoURL: URL, aspectRatio: CGSize?, muteVideo: Bool = false, canPlay: Bool = true) {
         self.videoURL = videoURL
         self.player = AVPlayer(url: videoURL)
         self.aspectRatio = aspectRatio
         self.muteVideo = muteVideo
+        self.canPlay = canPlay
     }
 
     var body: some View {
         ZStack {
             if showPlayer {
-                InlineVideoPlayerWithControls(url: videoURL, aspectRatio: aspectRatio, muteVideo: muteVideo)
+                InlineVideoPlayerWithControls(url: videoURL, aspectRatio: aspectRatio, muteVideo: muteVideo, canPlay: canPlay)
             } else {
                 // For future video autoplay setting
 //                VStack {
@@ -76,15 +78,18 @@ private struct InlineVideoPlayerWithControls: View {
     
     @StateObject private var manager: VideoPlayerViewModel
     
+    let canPlay: Bool
+    
     private let url: URL
     private let aspectRatio: CGSize?
     private let muteVideo: Bool
 
-    init(url: URL, aspectRatio: CGSize?, muteVideo: Bool = false) {
-        _manager = StateObject(wrappedValue: VideoPlayerViewModel())
+    init(url: URL, aspectRatio: CGSize?, muteVideo: Bool = false, canPlay: Bool) {
+        _manager = StateObject(wrappedValue: VideoPlayerViewModel(canPlay: canPlay))
         self.url = url
         self.aspectRatio = aspectRatio
         self.muteVideo = muteVideo
+        self.canPlay = canPlay
     }
 
     var body: some View {
@@ -169,6 +174,9 @@ private struct InlineVideoPlayerWithControls: View {
         .appForegroundBackgroundListener(onAppEntersBackground: {
             manager.pause()
         })
+        .onChange(of: canPlay) { _, newValue in
+            manager.setCanPlay(newValue)
+        }
     }
 
     private func formatTime(_ seconds: Double) -> String {

@@ -8,8 +8,8 @@
 import GRDB
 import Foundation
 
-class MyCustomFeed: Codable, FetchableRecord, PersistableRecord, Equatable, Hashable {
-    static let databaseTableName = "custom_feeds"
+public class MyCustomFeed: Codable, FetchableRecord, PersistableRecord, Equatable, Hashable {
+    public static let databaseTableName = "custom_feeds"
     
     var path: String
     var displayName: String
@@ -67,12 +67,12 @@ class MyCustomFeed: Codable, FetchableRecord, PersistableRecord, Equatable, Hash
     public static let databaseSelection: [SQLSelectable] = CodingKeys.allCases.map { $0 }
     
     // Equatable conformance
-    static func == (lhs: MyCustomFeed, rhs: MyCustomFeed) -> Bool {
+    public static func == (lhs: MyCustomFeed, rhs: MyCustomFeed) -> Bool {
         return lhs.path == rhs.path && lhs.owner == rhs.owner
     }
     
     // Hashable conformance
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         hasher.combine(path)
         hasher.combine(owner)
     }

@@ -10,14 +10,15 @@ import SwiftUI
 struct CustomNavigationStack<Content: View>: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
     
-    @StateObject private var navigationManager: NavigationManager
+    @ObservedObject private var navigationManager: NavigationManager
+    
     @StateObject var commentSubmissionShareableViewModel: CommentSubmissionShareableViewModel = CommentSubmissionShareableViewModel()
     @StateObject var postEditingShareableViewModel: PostEditingShareableViewModel = PostEditingShareableViewModel()
     
     let content: () -> Content
     
-    init(fullScreenMediaViewModel: FullScreenMediaViewModel, @ViewBuilder content: @escaping () -> Content) {
-        _navigationManager = StateObject(wrappedValue: NavigationManager(fullScreenMediaViewModel: fullScreenMediaViewModel))
+    init(navigationManager: NavigationManager, @ViewBuilder content: @escaping () -> Content) {
+        self.navigationManager = navigationManager
         self.content = content
     }
     
@@ -126,6 +127,18 @@ struct CustomNavigationStack<Content: View>: View {
                         EditPostView(postToBeEdited: post)
                             .environmentObject(navigationManager)
                             .environmentObject(postEditingShareableViewModel)
+                    case .crosspost(let postToBeCrossposted):
+                        CrosspostView(postToBeCrossposted: postToBeCrossposted)
+                            .environmentObject(navigationManager)
+                    case .sendChatMessage(let recipient):
+                        SendChatMessageView(recipient: recipient)
+                            .environmentObject(navigationManager)
+                    case .createCustomFeed:
+                        CreateOrEditCustomFeedView()
+                            .environmentObject(navigationManager)
+                    case .editCustomFeed(let myCustomFeed):
+                        CreateOrEditCustomFeedView(myCustomFeedToEdit: myCustomFeed)
+                            .environmentObject(navigationManager)
                     }
                 }
                 .navigationDestination(for: MoreViewNavigation.self) { destination in
@@ -190,20 +203,20 @@ struct CustomNavigationStack<Content: View>: View {
                     case .contentSensitivityFilter:
                         ContentSensitivityFilterSettingsView()
                             .environmentObject(navigationManager)
-                    case .postFilter:
-                        PostFilterSettingsView()
+                    case .postFilter(let postToBeAdded, let subredditToBeAdded, let userToBeAdded):
+                        PostFilterSettingsView(postToBeAdded: postToBeAdded, subredditToBeAdded: subredditToBeAdded, userToBeAdded: userToBeAdded)
                             .environmentObject(navigationManager)
-                    case .createOrEditPostFilter(let postFilter):
-                        CustomizePostFilterView(postFilter)
+                    case .createOrEditPostFilter(let postFilter, let postToBeAdded, let subredditToBeAdded, let userToBeAdded, let selectedFieldsToAddToPostFilter):
+                        CustomizePostFilterView(postFilter, postToBeAdded: postToBeAdded, subredditToBeAdded: subredditToBeAdded, userToBeAdded: userToBeAdded, selectedFieldsToAddToPostFilter: selectedFieldsToAddToPostFilter)
                             .environmentObject(navigationManager)
                     case .postFilterUsageListing(let postFilterId):
                         PostFilterUsageListingView(postFilterId: postFilterId)
                             .environmentObject(navigationManager)
-                    case .commentFilter:
-                        CommentFilterSettingsView()
+                    case .commentFilter(let commentToBeAdded):
+                        CommentFilterSettingsView(commentToBeAdded: commentToBeAdded)
                             .environmentObject(navigationManager)
-                    case .createOrEditCommentFilter(let commentFilter):
-                        CustomizeCommentFilterView(commentFilter)
+                    case .createOrEditCommentFilter(let commentFilter, let commentToBeAdded, let selectedFieldsToAddToCommentFilter):
+                        CustomizeCommentFilterView(commentFilter, commentToBeAdded: commentToBeAdded, selectedFieldsToAddToCommentFilter: selectedFieldsToAddToCommentFilter)
                             .environmentObject(navigationManager)
                     case .commentFilterUsageListing(let commentFilterId):
                         CommentFilterUsageListingView(commentFilterId: commentFilterId)

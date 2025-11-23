@@ -97,9 +97,9 @@ struct MyCustomFeedDao {
             try db.execute(
                 sql: """
                     DELETE FROM custom_feeds 
-                    WHERE path = ?
+                    WHERE path = ? AND username = 
                     """,
-                arguments: [path]
+                arguments: [path, Account.ANONYMOUS_ACCOUNT.username]
             )
         }
     }

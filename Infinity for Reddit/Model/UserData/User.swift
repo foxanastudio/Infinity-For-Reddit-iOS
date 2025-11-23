@@ -8,7 +8,7 @@
 import Foundation
 import SwiftyJSON
 
-public class User : NSObject {
+public class User: NSObject, Identifiable {
     var acceptChats: Bool!
     var acceptFollowers : Bool!
     var acceptPms : Bool!
@@ -21,7 +21,7 @@ public class User : NSObject {
     var hasVerifiedEmail : Bool!
     var hideFromRobots : Bool!
     var iconImg : String!
-    var id : String!
+    public var id : String!
     var isBlocked : Bool!
     var isEmployee : Bool!
     var isFriend : Bool!
@@ -40,9 +40,9 @@ public class User : NSObject {
         return iconImg.isEmpty ? subreddit?.iconImg ?? "" : iconImg
     }
 
-    init(fromJson json: JSON!) {
-        if json.isEmpty{
-            return
+    init(fromJson json: JSON!) throws {
+        if json.isEmpty {
+            throw JSONError.invalidData
         }
         acceptFollowers = json["accept_followers"].boolValue
         awardeeKarma = json["awardee_karma"].intValue
@@ -71,6 +71,26 @@ public class User : NSObject {
         }
         totalKarma = json["total_karma"].intValue
         verified = json["verified"].boolValue
+    }
+    
+    public func toUserData() -> UserData {
+        return UserData(
+            id: id,
+            name: name,
+            iconUrl: iconImg,
+            banner: subreddit?.bannerImg,
+            commentKarma: commentKarma,
+            linkKarma: linkKarma,
+            awarderKarma: awarderKarma,
+            awardeeKarma: awardeeKarma,
+            totalKarma : totalKarma,
+            cakeday : createdUtc,
+            isGold : isGold,
+            canBeFollowed : acceptFollowers,
+            isNSFW : subreddit?.over18,
+            description : subreddit?.publicDescription,
+            title : subreddit?.title
+        )
     }
 }
 

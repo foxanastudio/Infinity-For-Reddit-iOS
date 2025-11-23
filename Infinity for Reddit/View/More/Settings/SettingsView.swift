@@ -68,12 +68,12 @@ struct SettingsView: View {
                 .listPlainItemNoInsets()
                 
                 PreferenceEntryWithBackground(title: "Post Filter", icon: "line.3.horizontal.decrease.circle") {
-                    navigationManager.append(SettingsViewNavigation.postFilter)
+                    navigationManager.append(SettingsViewNavigation.postFilter())
                 }
                 .listPlainItemNoInsets()
                 
                 PreferenceEntryWithBackground(title: "Comment Filter", icon: "line.3.horizontal.decrease.circle", bottom: true) {
-                    navigationManager.append(SettingsViewNavigation.commentFilter)
+                    navigationManager.append(SettingsViewNavigation.commentFilter())
                 }
                 .listPlainItemNoInsets()
                 

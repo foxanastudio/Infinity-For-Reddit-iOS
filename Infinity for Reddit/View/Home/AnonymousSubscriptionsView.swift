@@ -11,148 +11,106 @@ import GRDB
 import Alamofire
 
 struct AnonymousSubscriptionsView: View {
-    @Environment(\.colorScheme) var colorScheme
-    @Environment(\.dependencyManager) private var dependencyManager: Container
+    @Environment(\.dismiss) private var dismiss
+    
+    @EnvironmentObject private var navigationBarMenuManager: NavigationBarMenuManager
+    @EnvironmentObject private var navigationManager: NavigationManager
     
     @StateObject var anonymousSubscriptionListingViewModel: AnonymousSubscriptionListingViewModel
 
     @State private var selectedOption = 0
+    @State private var navigationBarMenuKey: UUID?
     
-    private let customOnTapForSearchInThing: ((SearchInThing) -> Void)?
-    
-    init(customOnTapForSearchInThing: ((SearchInThing) -> Void)? = nil) {
+    init(subscriptionSelectionMode: ThingSelectionMode = .noSelection) {
         _anonymousSubscriptionListingViewModel = StateObject(
-            wrappedValue: AnonymousSubscriptionListingViewModel(anonymousSubscriptionListingRepository: AnonymousSubscriptionListingRepository())
+            wrappedValue: AnonymousSubscriptionListingViewModel(
+                subscriptionSelectionMode: subscriptionSelectionMode,
+                anonymousSubscriptionListingRepository: AnonymousSubscriptionListingRepository()
+            )
         )
-        self.customOnTapForSearchInThing = customOnTapForSearchInThing
     }
 
     var body: some View {
         RootView {
             VStack(spacing: 0) {
-                SegmentedPicker(selectedValue: $selectedOption, values: ["Subreddits", "Users", "Custom Feed"])
+                switch anonymousSubscriptionListingViewModel.subscriptionSelectionMode {
+                case .noSelection:
+                    SegmentedPicker(
+                        selectedValue: $selectedOption,
+                        values: ["Subreddits", "Users", "Custom Feed"]
+                    )
                     .padding(4)
+                default:
+                    SegmentedPicker(
+                        selectedValue: $selectedOption,
+                        values: ["Subreddits", "Users"]
+                    )
+                    .padding(4)
+                }
                 
                 TabView(selection: $selectedOption) {
-                    AnonymousSubredditsView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel, customOnTapForSearchInThing: customOnTapForSearchInThing)
-                        .tag(0)
-                    
-                    AnonymousUsersView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel, customOnTapForSearchInThing: customOnTapForSearchInThing)
-                        .tag(1)
-                    
-                    AnonymousCustomFeedView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
-                        .tag(2)
-                }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-            }
-        }
-    }
-    
-    struct AnonymousSubredditsView: View {
-        @EnvironmentObject var navigationManager: NavigationManager
-        @ObservedObject var anonymousSubscriptionListingViewModel: AnonymousSubscriptionListingViewModel
-        
-        let customOnTapForSearchInThing: ((SearchInThing) -> Void)?
-        
-        var body: some View {
-            Group {
-                if anonymousSubscriptionListingViewModel.subredditSubscriptions.isEmpty {
-                    Text("No subscribed subreddits")
-                        .primaryText()
-                } else {
-                    List {
-                        if !anonymousSubscriptionListingViewModel.favoriteSubredditSubscriptions.isEmpty {
-                            CustomListSection("Favorite") {
-                                ForEach(anonymousSubscriptionListingViewModel.favoriteSubredditSubscriptions, id: \.identityInView) { subscription in
-                                    SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
-                                        if let customOnTapForSearchInThing = customOnTapForSearchInThing {
-                                            customOnTapForSearchInThing(SearchInThing.subreddit(subscription))
-                                        } else {
-                                            navigationManager.append(AppNavigation.subredditDetails(subredditName: subscription.name))
-                                        }
-                                    }) {
-                                        subscription.isFavorite.toggle()
-                                        anonymousSubscriptionListingViewModel.toggleFavoriteSubreddit(subscription)
-                                    }
-                                    .listPlainItemNoInsets()
-                                }
+                    Group {
+                        switch anonymousSubscriptionListingViewModel.subscriptionSelectionMode {
+                        case .noSelection:
+                            AnonymousSubscribedSubredditListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
+                                .tag(0)
+                            
+                            AnonymousSubscribedUserListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
+                                .tag(1)
+                            
+                            AnonymousCustomFeedView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
+                                .tag(2)
+                        case .thingSelection(let onSelectThing):
+                            AnonymousSubscribedSubredditListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel) { subscribedSubredditData in
+                                onSelectThing(Thing.subscribedSubreddit(subscribedSubredditData))
                             }
-                        }
-                        
-                        CustomListSection("All") {
-                            ForEach(anonymousSubscriptionListingViewModel.subredditSubscriptions, id: \.identityInView) { subscription in
-                                SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
-                                    if let customOnTapForSearchInThing = customOnTapForSearchInThing {
-                                        customOnTapForSearchInThing(SearchInThing.subreddit(subscription))
-                                    } else {
-                                        navigationManager.append(AppNavigation.subredditDetails(subredditName: subscription.name))
-                                    }
-                                }) {
-                                    subscription.isFavorite.toggle()
-                                    anonymousSubscriptionListingViewModel.toggleFavoriteSubreddit(subscription)
-                                }
-                                .listPlainItemNoInsets()
+                            .tag(0)
+                            
+                            AnonymousSubscribedUserListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel) { subscribedUserData in
+                                onSelectThing(Thing.subscribedUser(subscribedUserData))
                             }
+                            .tag(1)
+                        case .subredditAndUserMultiSelection:
+                            AnonymousSubscribedSubredditListingMultiSelectionView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
+                                .tag(0)
+                            
+                            AnonymousSubscribedUserListingMultiSelectionView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
+                                .tag(1)
                         }
                     }
-                    .scrollBounceBehavior(.basedOnSize)
-                    .themedList()
+                    .toolbar(.hidden, for: .tabBar)
+                }
+                
+                if case .subredditAndUserMultiSelection(_, let onConfirmSelection) = anonymousSubscriptionListingViewModel.subscriptionSelectionMode {
+                    Button {
+                        onConfirmSelection(anonymousSubscriptionListingViewModel.getSelectedSubredditsAndUsers())
+                        dismiss()
+                    } label: {
+                        HStack {
+                            Text("Done")
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .padding(16)
+                    .filledButton()
                 }
             }
         }
-    }
-
-    struct AnonymousUsersView: View {
-        @EnvironmentObject var navigationManager: NavigationManager
-        @ObservedObject var anonymousSubscriptionListingViewModel: AnonymousSubscriptionListingViewModel
-        
-        let customOnTapForSearchInThing: ((SearchInThing) -> Void)?
-        
-        var body: some View {
-            Group {
-                if anonymousSubscriptionListingViewModel.userSubscriptions.isEmpty {
-                    Text("No subscribed users")
-                        .primaryText()
-                } else {
-                    List {
-                        if !anonymousSubscriptionListingViewModel.favoriteUserSubscriptions.isEmpty {
-                            CustomListSection("Favorite") {
-                                ForEach(anonymousSubscriptionListingViewModel.favoriteUserSubscriptions, id: \.identityInView) { subscription in
-                                    SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
-                                        if let customOnTapForSearchInThing = customOnTapForSearchInThing {
-                                            customOnTapForSearchInThing(SearchInThing.user(subscription))
-                                        } else {
-                                            navigationManager.append(AppNavigation.userDetails(username: subscription.name))
-                                        }
-                                    }) {
-                                        subscription.isFavorite.toggle()
-                                        anonymousSubscriptionListingViewModel.toggleFavoriteUser(subscription)
-                                    }
-                                    .listPlainItemNoInsets()
-                                }
-                            }
-                        }
-                        
-                        CustomListSection("All") {
-                            ForEach(anonymousSubscriptionListingViewModel.userSubscriptions, id: \.identityInView) { subscription in
-                                SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
-                                    if let customOnTapForSearchInThing = customOnTapForSearchInThing {
-                                        customOnTapForSearchInThing(SearchInThing.user(subscription))
-                                    } else {
-                                        navigationManager.append(AppNavigation.userDetails(username: subscription.name))
-                                    }
-                                }) {
-                                    subscription.isFavorite.toggle()
-                                    anonymousSubscriptionListingViewModel.toggleFavoriteUser(subscription)
-                                }
-                                .listPlainItemNoInsets()
-                            }
-                        }
-                    }
-                    .scrollBounceBehavior(.basedOnSize)
-                    .themedList()
-                }
+        .onAppear {
+            if let key = navigationBarMenuKey {
+                navigationBarMenuManager.pop(key: key)
             }
+            navigationBarMenuKey = navigationBarMenuManager.push([
+                NavigationBarMenuItem(title: "Create Custom Feed") {
+                    navigationManager.append(AppNavigation.createCustomFeed)
+                }
+            ])
+        }
+        .onDisappear {
+            guard let navigationBarMenuKey else {
+                return
+            }
+            navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
     }
 
@@ -177,6 +135,17 @@ struct AnonymousSubscriptionsView: View {
                                         anonymousSubscriptionListingViewModel.toggleFavoriteCustomFeed(customFeed)
                                     }
                                     .listPlainItemNoInsets()
+                                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                        Button(role: .destructive) {
+                                            Task {
+                                                await anonymousSubscriptionListingViewModel.deleteCustomFeed(customFeed)
+                                            }
+                                        } label: {
+                                            Text("Delete")
+                                                .foregroundStyle(.white)
+                                        }
+                                        .tint(.red)
+                                    }
                                 }
                             }
                         }
@@ -190,6 +159,17 @@ struct AnonymousSubscriptionsView: View {
                                     anonymousSubscriptionListingViewModel.toggleFavoriteCustomFeed(customFeed)
                                 }
                                 .listPlainItemNoInsets()
+                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                    Button(role: .destructive) {
+                                        Task {
+                                            await anonymousSubscriptionListingViewModel.deleteCustomFeed(customFeed)
+                                        }
+                                    } label: {
+                                        Text("Delete")
+                                            .foregroundStyle(.white)
+                                    }
+                                    .tint(.red)
+                                }
                             }
                         }
                     }

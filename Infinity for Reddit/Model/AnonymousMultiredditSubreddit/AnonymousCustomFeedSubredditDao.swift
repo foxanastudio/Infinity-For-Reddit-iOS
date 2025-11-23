@@ -7,20 +7,20 @@
 
 import GRDB
 
-struct AnonymousMultiredditSubredditDao {
+struct AnonymousCustomFeedSubredditDao {
     private let dbPool: DatabasePool
     
     init(dbPool: DatabasePool) {
         self.dbPool = dbPool
     }
     
-    func insert(anonymousMultiredditSubreddit: AnonymousMultiredditSubreddit) throws {
+    func insert(anonymousMultiredditSubreddit: AnonymousCustomFeedSubreddit) throws {
         try dbPool.write { db in
             try anonymousMultiredditSubreddit.insert(db, onConflict: .replace)
         }
     }
     
-    func insertAll(anonymousMultiredditSubreddits: [AnonymousMultiredditSubreddit]) throws {
+    func insertAll(anonymousMultiredditSubreddits: [AnonymousCustomFeedSubreddit]) throws {
         try dbPool.write { db in
             for subreddit in anonymousMultiredditSubreddits {
                 try subreddit.insert(db, onConflict: .replace)
@@ -28,17 +28,17 @@ struct AnonymousMultiredditSubredditDao {
         }
     }
     
-    func getAllAnonymousMultiRedditSubreddits(path: String) throws -> [AnonymousMultiredditSubreddit] {
+    func getAllAnonymousMultiRedditSubreddits(path: String) throws -> [AnonymousCustomFeedSubreddit] {
         try dbPool.read { db in
-            try AnonymousMultiredditSubreddit.fetchAll(
-                db, sql: "SELECT * FROM anonymous_multireddit_subreddits WHERE path = ? ORDER BY subreddit_name COLLATE NOCASE ASC", arguments: [path]
+            try AnonymousCustomFeedSubreddit.fetchAll(
+                db, sql: "SELECT * FROM anonymous_custom_feed_subreddits WHERE path = ? ORDER BY subreddit_name COLLATE NOCASE ASC", arguments: [path]
             )
         }
     }
     
-    func getAllSubreddits() throws -> [AnonymousMultiredditSubreddit] {
+    func getAllSubreddits() throws -> [AnonymousCustomFeedSubreddit] {
         try dbPool.read { db in
-            try AnonymousMultiredditSubreddit.fetchAll(db)
+            try AnonymousCustomFeedSubreddit.fetchAll(db)
         }
     }
 }

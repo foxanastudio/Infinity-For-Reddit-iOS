@@ -45,6 +45,7 @@ public enum PostListingType: Codable, Hashable {
     case search(query: String, searchInSubredditOrUserName: String?, searchInMultiReddit: String?, searchInThingType: SearchInThingType)
     case customFeed(path: String)
     case anonymousFrontPage(concatenatedSubscriptions: String?)
+    case anonymousCustomFeed(myCustomFeed: MyCustomFeed, concatenatedSubscriptions: String?)
 }
 
 public enum UserWhere: String, Codable {

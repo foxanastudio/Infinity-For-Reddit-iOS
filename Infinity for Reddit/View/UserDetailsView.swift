@@ -13,8 +13,11 @@ struct UserDetailsView: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
     @EnvironmentObject private var navigationManager: NavigationManager
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
+    @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     
     @StateObject var userDetailsViewModel : UserDetailsViewModel
+    
+    @State private var navigationBarMenuKey: UUID?
     @State private var tabBarVisibility: Visibility = .hidden
     @State private var selectedTab = 0
     @State private var isCurrentUserProfile: Bool = true
@@ -216,5 +219,25 @@ struct UserDetailsView: View {
             }
         }
         .toolbarBackground(.hidden, for: .navigationBar)
+        .onAppear {
+            if let key = navigationBarMenuKey {
+                navigationBarMenuManager.pop(key: key)
+            }
+            navigationBarMenuKey = navigationBarMenuManager.push([
+                NavigationBarMenuItem(title: "Add to Post Filter") {
+                    navigationManager.append(SettingsViewNavigation.postFilter(userToBeAdded: userDetailsViewModel.userData?.name ?? userDetailsViewModel.username))
+                },
+                
+                NavigationBarMenuItem(title: "Send Message") {
+                    navigationManager.append(AppNavigation.sendChatMessage(recipient: userDetailsViewModel.userData?.name ?? userDetailsViewModel.username))
+                }
+            ])
+        }
+        .onDisappear {
+            guard let navigationBarMenuKey else {
+                return
+            }
+            navigationBarMenuManager.pop(key: navigationBarMenuKey)
+        }
     }
 }

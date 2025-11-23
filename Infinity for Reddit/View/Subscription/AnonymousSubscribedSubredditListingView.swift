@@ -1,75 +1,52 @@
 //
-//  SubscribedSubredditListingView.swift
+//  AnonymousSubscribedSubredditListingView.swift
 //  Infinity for Reddit
 //
-//  Created by Docile Alligator on 2025-09-17.
+//  Created by Docile Alligator on 2025-11-20.
 //
 
 import SwiftUI
 
-struct SubscribedSubredditListingView: View {
+struct AnonymousSubscribedSubredditListingView: View {
     @EnvironmentObject var navigationManager: NavigationManager
-    @EnvironmentObject var accountViewModel: AccountViewModel
+    @ObservedObject var anonymousSubscriptionListingViewModel: AnonymousSubscriptionListingViewModel
     
-    @ObservedObject var subscriptionListingViewModel: SubscriptionListingViewModel
-    
-    let showCurrentAccountSubreddit: Bool
     let onSelectCustomAction: ((SubscribedSubredditData) -> Void)?
     
     init(
-        showCurrentAccountSubreddit: Bool = false,
-        subscriptionListingViewModel: SubscriptionListingViewModel,
+        anonymousSubscriptionListingViewModel: AnonymousSubscriptionListingViewModel,
         onSelectCustomAction: ((SubscribedSubredditData) -> Void)? = nil
     ) {
-        self.showCurrentAccountSubreddit = showCurrentAccountSubreddit
-        self.subscriptionListingViewModel = subscriptionListingViewModel
+        self.anonymousSubscriptionListingViewModel = anonymousSubscriptionListingViewModel
         self.onSelectCustomAction = onSelectCustomAction
     }
     
     var body: some View {
         Group {
-            if subscriptionListingViewModel.subredditSubscriptions.isEmpty {
-                if subscriptionListingViewModel.isLoadingSubscriptions {
-                    ProgressIndicator()
-                } else {
-                    Text("No subscribed subreddits")
-                        .primaryText()
-                }
+            if anonymousSubscriptionListingViewModel.subredditSubscriptions.isEmpty {
+                Text("No subscribed subreddits")
+                    .primaryText()
             } else {
                 List {
-                    if showCurrentAccountSubreddit && !accountViewModel.account.isAnonymous() {
-                        let account = accountViewModel.account
-                        SubscriptionItemView(text: account.username, iconUrl: account.profileImageUrl, action: {
-                            // This view will only appear when selecting a subreddit for post submission so we only care about onSelectCustomAction
-                            if let onSelectCustomAction = onSelectCustomAction {
-                                // We only care about the icon url subreddit name and username
-                                onSelectCustomAction(SubscribedSubredditData(name: "u_\(account.username)", iconUrl: account.profileImageUrl, username: account.username))
-                            }
-                        })
-                        .listPlainItemNoInsets()
-                    }
-                    
-                    if !subscriptionListingViewModel.favoriteSubredditSubscriptions.isEmpty {
+                    if !anonymousSubscriptionListingViewModel.favoriteSubredditSubscriptions.isEmpty {
                         CustomListSection("Favorite") {
-                            ForEach(subscriptionListingViewModel.favoriteSubredditSubscriptions, id: \.identityInView) { subscription in
+                            ForEach(anonymousSubscriptionListingViewModel.favoriteSubredditSubscriptions, id: \.identityInView) { subscription in
                                 SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
-                                    if let onSelectCustomAction = onSelectCustomAction {
+                                    if let onSelectCustomAction {
                                         onSelectCustomAction(subscription)
                                     } else {
                                         navigationManager.append(AppNavigation.subredditDetails(subredditName: subscription.name))
                                     }
                                 }) {
                                     subscription.isFavorite.toggle()
-                                    Task {
-                                        await subscriptionListingViewModel.toggleFavoriteSubreddit(subscription)
-                                    }
+                                    anonymousSubscriptionListingViewModel.toggleFavoriteSubreddit(subscription)
                                 }
                                 .listPlainItemNoInsets()
                                 .applyIf(onSelectCustomAction == nil) {
                                     $0.swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                         Button(role: .destructive) {
                                             Task {
-                                                await subscriptionListingViewModel.unsubscribeFromSubreddit(subscription)
+                                                await anonymousSubscriptionListingViewModel.unsubscribeFromSubreddit(subscription)
                                             }
                                         } label: {
                                             Text("Unsubscribe")
@@ -83,25 +60,23 @@ struct SubscribedSubredditListingView: View {
                     }
                     
                     CustomListSection("All") {
-                        ForEach(subscriptionListingViewModel.subredditSubscriptions, id: \.identityInView) { subscription in
+                        ForEach(anonymousSubscriptionListingViewModel.subredditSubscriptions, id: \.identityInView) { subscription in
                             SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
-                                if let onSelectCustomAction = onSelectCustomAction {
+                                if let onSelectCustomAction {
                                     onSelectCustomAction(subscription)
                                 } else {
                                     navigationManager.append(AppNavigation.subredditDetails(subredditName: subscription.name))
                                 }
                             }) {
                                 subscription.isFavorite.toggle()
-                                Task {
-                                    await subscriptionListingViewModel.toggleFavoriteSubreddit(subscription)
-                                }
+                                anonymousSubscriptionListingViewModel.toggleFavoriteSubreddit(subscription)
                             }
                             .listPlainItemNoInsets()
                             .applyIf(onSelectCustomAction == nil) {
                                 $0.swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                     Button(role: .destructive) {
                                         Task {
-                                            await subscriptionListingViewModel.unsubscribeFromSubreddit(subscription)
+                                            await anonymousSubscriptionListingViewModel.unsubscribeFromSubreddit(subscription)
                                         }
                                     } label: {
                                         Text("Unsubscribe")

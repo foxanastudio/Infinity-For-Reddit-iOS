@@ -18,6 +18,7 @@ struct CustomTextField<FieldType: Hashable>: View {
     private let keyboardType: UIKeyboardType
     private let autocapitalization: TextInputAutocapitalization?
     private let showBorder: Bool
+    private let showBackground: Bool
     private let fieldType: FieldType
     
     init(_ placeholder: String = "",
@@ -26,6 +27,7 @@ struct CustomTextField<FieldType: Hashable>: View {
          keyboardType: UIKeyboardType = .default,
          autocapitalization: TextInputAutocapitalization? = nil,
          showBorder: Bool = false,
+         showBackground: Bool = true,
          fieldType: FieldType,
          focusedField: FocusState<FieldType?>.Binding
     ) {
@@ -35,6 +37,7 @@ struct CustomTextField<FieldType: Hashable>: View {
         self.keyboardType = keyboardType
         self.autocapitalization = autocapitalization
         self.showBorder = showBorder
+        self.showBackground = showBackground
         self.fieldType = fieldType
         self._focusedField = focusedField
     }
@@ -59,11 +62,12 @@ struct CustomTextField<FieldType: Hashable>: View {
                         .stroke(Color(hex: customThemeViewModel.currentCustomTheme.primaryTextColor), lineWidth: 1)
                 )
         }
-        .background(Color(.systemGray5))
-        .padding(.vertical, 16)
-        .padding(.horizontal, 16)
-        .background(Color(.systemGray5))
-        .cornerRadius(10)
+        .applyIf(showBackground) {
+            $0.padding(.vertical, 16)
+                .padding(.horizontal, 16)
+                .background(Color(.systemGray5))
+                .cornerRadius(10)
+        }
         .focused($focusedField, equals: fieldType)
     }
 }

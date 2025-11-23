@@ -16,6 +16,7 @@ import SwiftyJSON
 class SubredditDetailsViewModel: ObservableObject {
     @Published var subredditName: String
     @Published var subredditData: SubredditData?
+    @Published var userFlairs: [UserFlair]?
     @Published var error: Error?
     
     private let subredditDetailsRepository: SubredditDetailsRepositoryProtocol
@@ -24,7 +25,6 @@ class SubredditDetailsViewModel: ObservableObject {
     init(subredditName: String, subredditDetailsRepository: SubredditDetailsRepositoryProtocol) {
         self.subredditName = subredditName
         self.subredditDetailsRepository = subredditDetailsRepository
-        
     }
     
     func fetchSubredditDetails() async {
@@ -52,9 +52,7 @@ class SubredditDetailsViewModel: ObservableObject {
         subscribeSubredditTask = Task {
             let action = subredditData.isSubscribed ? "unsub" : "sub"
             do {
-                if !AccountViewModel.shared.account.isAnonymous() {
-                    try await subredditDetailsRepository.subsribeSubreddit(subredditData: subredditData, action: action)
-                }
+                try await subredditDetailsRepository.subsribeSubreddit(subredditData: subredditData, action: action)
                 
                 try Task.checkCancellation()
                 
@@ -63,6 +61,43 @@ class SubredditDetailsViewModel: ObservableObject {
                 self.error = error
                 
                 print("Error \(action == "sub" ? "subscribing to" : "unsubscribing from") \(subredditName): \(error)")
+            }
+        }
+    }
+    
+    func fetchUserFlairs() {
+        guard userFlairs == nil else {
+            return
+        }
+        
+        Task {
+            do {
+                self.userFlairs = try await subredditDetailsRepository.fetchUserFlairs(subredditName: subredditName)
+            } catch {
+                self.error = error
+                print(error)
+            }
+        }
+    }
+    
+    func selectUserFlair(_ userFlair: UserFlair) {
+        Task {
+            do {
+                try await subredditDetailsRepository.selectUserFlair(subredditName: subredditName, userFlair: userFlair)
+            } catch {
+                self.error = error
+                print(error)
+            }
+        }
+    }
+    
+    func cleaarUserFlair() {
+        Task {
+            do {
+                try await subredditDetailsRepository.selectUserFlair(subredditName: subredditName, userFlair: nil)
+            } catch {
+                self.error = error
+                print(error)
             }
         }
     }

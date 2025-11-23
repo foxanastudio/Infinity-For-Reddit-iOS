@@ -80,8 +80,15 @@ struct PostSubmissionSubredditChooserView: View {
         }
         .sheet(isPresented: $showSubredditSelectionSheet) {
             NavigationStack {
-                SubredditSelectionSheet(showCurrentAccountSubreddit: true) { subscribedSubreddit in
-                    onSubredditSelected(subscribedSubreddit)
+                SubredditSelectionSheet(showCurrentAccountSubreddit: true) { thing in
+                    switch thing {
+                    case .subscribedSubreddit(let subscribedSubredditData):
+                        onSubredditSelected(subscribedSubredditData)
+                    case .subreddit(let subredditData):
+                        onSubredditSelected(subredditData.toSubscribedSubredditData())
+                    default:
+                        break
+                    }
                 }
             }
         }

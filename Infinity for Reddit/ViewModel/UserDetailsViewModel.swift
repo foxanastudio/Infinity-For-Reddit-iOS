@@ -49,9 +49,7 @@ class UserDetailsViewModel: ObservableObject {
         followUserTask = Task {
             let action = userData.isSubscribed ? "unsub" : "sub"
             do {
-                if !AccountViewModel.shared.account.isAnonymous() {
-                    try await userDetailsRepository.followUser(userData: userData, action: action)
-                }
+                try await userDetailsRepository.followUser(userData: userData, action: action)
                 
                 try Task.checkCancellation()
                 

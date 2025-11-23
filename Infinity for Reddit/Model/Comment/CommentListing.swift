@@ -180,8 +180,13 @@ public class Comment : NSObject, Validatable, Identifiable, ObservableObject {
         authorFlairBackgroundColor = json["author_flair_background_color"].stringValue
         authorFlairCssClass = json["author_flair_css_class"].stringValue
         let authorFlairRichtextArray = json["author_flair_richtext"].arrayValue
-        for authorFlairRichtextJson in authorFlairRichtextArray{
-            authorFlairRichtext.append(FlairRichtext(fromJson: authorFlairRichtextJson))
+        for authorFlairRichtextJson in authorFlairRichtextArray {
+            do {
+                let flairRichtext = try FlairRichtext(fromJson: authorFlairRichtextJson)
+                authorFlairRichtext.append(flairRichtext)
+            } catch {
+                // Ignore
+            }
         }
         authorFlairTemplateId = json["author_flair_template_id"].stringValue
         authorFlairText = json["author_flair_text"].stringValue

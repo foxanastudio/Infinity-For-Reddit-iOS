@@ -34,53 +34,102 @@ struct ImgurFullScreenView: View {
     }
     
     var body: some View {
-        ZStack {
-            Color.black
-                .opacity(opacityForBackground())
-                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-                .edgesIgnoringSafeArea(.all)
-                .ignoresSafeArea()
+        Group {
             if let imgurMedia = imgurFullScreenViewModel.imgurMedia {
-                TabView(selection: $selectedTab) {
-                    ForEach(Array(imgurMedia.images.enumerated()), id: \.offset) { index, item in
-                        if item.mediaType != .video {
-                            ImgurImageView(
-                                imgurMediaItem: item,
-                                imgurMedia: imgurMedia,
-                                post: post,
-                                onShowDescription: {
-                                    sheetImgurMediaItem = item
+                ZStack {
+                    Color.black
+                        .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+                        .edgesIgnoringSafeArea(.all)
+                        .ignoresSafeArea()
+                    
+                    TabView(selection: $selectedTab) {
+                        ForEach(Array(imgurMedia.images.enumerated()), id: \.offset) { index, item in
+                            if item.mediaType != .video {
+                                ImgurImageView(
+                                    imgurMediaItem: item,
+                                    imgurMedia: imgurMedia,
+                                    post: post,
+                                    onShowDescription: {
+                                        sheetImgurMediaItem = item
+                                    }
+                                ) {
+                                    tabViewDismissalViewModel.isDismissed = true
+                                    onDismiss()
                                 }
-                            ) {
-                                tabViewDismissalViewModel.isDismissed = true
-                                onDismiss()
-                            }
-                            .containerRelativeFrame(.horizontal, count: 1, span: 1, spacing: 0, alignment: .center)
-                            .tag(index)
-                        } else {
-                            TabVideoView(
-                                urlString: item.link,
-                                imgurMedia: imgurMedia,
-                                post: nil,
-                                videoType: .direct,
-                                downloadMediaType: item.toDownloadMediaType(post: post),
-                                isSelected: selectedTab == index,
-                                tabViewDismissalViewModel: tabViewDismissalViewModel,
-                                hasDescription: !item.title.isEmpty || !item.description.isEmpty,
-                                onShowDescription: {
-                                    sheetImgurMediaItem = item
+                                .containerRelativeFrame(.horizontal, count: 1, span: 1, spacing: 0, alignment: .center)
+                                .tag(index)
+                            } else {
+                                TabVideoView(
+                                    urlString: item.link,
+                                    imgurMedia: imgurMedia,
+                                    post: nil,
+                                    videoType: .direct,
+                                    downloadMediaType: item.toDownloadMediaType(post: post),
+                                    isSelected: selectedTab == index,
+                                    tabViewDismissalViewModel: tabViewDismissalViewModel,
+                                    hasDescription: !item.title.isEmpty || !item.description.isEmpty,
+                                    onShowDescription: {
+                                        sheetImgurMediaItem = item
+                                    }
+                                ) {
+                                    tabViewDismissalViewModel.isDismissed = true
+                                    onDismiss()
                                 }
-                            ) {
-                                tabViewDismissalViewModel.isDismissed = true
-                                onDismiss()
+                                .tag(index)
                             }
-                            .tag(index)
                         }
                     }
+                    .tabViewStyle(.page(indexDisplayMode: .never))
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
             } else {
-                ProgressIndicator()
+                ZStack {
+                    Color.black
+                        .opacity(opacityForBackground)
+                        .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+                        .edgesIgnoringSafeArea(.all)
+                        .ignoresSafeArea()
+                    
+                    ProgressIndicator()
+                        .offset(y: currentDragOffset)
+                }
+                .gesture(
+                    DragGesture()
+                        .updating($dragOffset) { value, state, _ in
+                            // Only allow vertical drag to trigger dismiss
+                            if !hasStartedDragging && abs(value.translation.width) < 4 {
+                                hasStartedDragging = true
+                            }
+                            if hasStartedDragging {
+                                state = value.translation
+                            }
+                        }
+                        .onChanged { value in
+                            // Adjust the scale based on the drag distance
+                            if hasStartedDragging {
+                                currentDragOffset = value.translation.height
+                            }
+                        }
+                        .onEnded { value in
+                            if hasStartedDragging && abs(value.translation.height) > 100 {
+                                withAnimation(.linear(duration: 0.25)) {
+                                    if value.translation.height < 0 {
+                                        // Dragged up
+                                        currentDragOffset = -UIScreen.main.bounds.height
+                                    } else {
+                                        // Dragged down
+                                        currentDragOffset = UIScreen.main.bounds.height
+                                    }
+                                } completion: {
+                                    onDismiss()
+                                }
+                            } else {
+                                withAnimation {
+                                    currentDragOffset = 0.0
+                                }
+                            }
+                            hasStartedDragging = false
+                        }
+                )
             }
         }
         .task {
@@ -92,7 +141,7 @@ struct ImgurFullScreenView: View {
         }
     }
     
-    private func opacityForBackground() -> Double {
+    private var opacityForBackground: Double {
         let maxOffset: CGFloat = UIScreen.main.bounds.height
         let offset = min(abs(currentDragOffset), maxOffset)
         return Double(1 - (offset / maxOffset))

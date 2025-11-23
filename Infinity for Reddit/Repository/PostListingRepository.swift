@@ -30,6 +30,7 @@ public class PostListingRepository: PostListingRepositoryProtocol {
     private let subredditDao: SubredditDao
     private let postFilterDao: PostFilterDao
     private let subscribedSubredditDao: SubscribedSubredditDao
+    private let anonymousCustomFeedSubredditDao: AnonymousCustomFeedSubredditDao
     private var subredditOrUserIcons: [String: String] = [:]
     
     public init() {
@@ -43,6 +44,7 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         self.subredditDao = SubredditDao(dbPool: resolvedDBPool)
         self.postFilterDao = PostFilterDao(dbPool: resolvedDBPool)
         self.subscribedSubredditDao = SubscribedSubredditDao(dbPool: resolvedDBPool)
+        self.anonymousCustomFeedSubredditDao = AnonymousCustomFeedSubredditDao(dbPool: resolvedDBPool)
     }
     
     public func fetchPosts(
@@ -86,6 +88,8 @@ public class PostListingRepository: PostListingRepositoryProtocol {
             apiRequest = RedditOAuthAPI.getCustomFeedPosts(pathComponents: pathComponents!, queries: queries!)
         case .anonymousFrontPage:
             apiRequest = RedditOAuthAPI.getSubredditConcatPosts(pathComponents: pathComponents!, queries: queries!)
+        case .anonymousCustomFeed:
+            apiRequest = RedditOAuthAPI.getSubredditConcatPosts(pathComponents: pathComponents!, queries: queries!)
         }
         
         try Task.checkCancellation()
@@ -110,6 +114,17 @@ public class PostListingRepository: PostListingRepositoryProtocol {
             let subscribedSubreddits = try subscribedSubredditDao.getAllSubscribedSubredditsList(accountName: Account.ANONYMOUS_ACCOUNT.username)
             return subscribedSubreddits.map {
                 $0.name
+            }.joined(separator: "+")
+        } catch {
+            return ""
+        }
+    }
+    
+    public func getAnonymousCustomThemeSubredditsConcatenated(myCustomFeed: MyCustomFeed) -> String {
+        do {
+            let subscribedSubreddits = try anonymousCustomFeedSubredditDao.getAllAnonymousMultiRedditSubreddits(path: myCustomFeed.path)
+            return subscribedSubreddits.map {
+                $0.subredditName
             }.joined(separator: "+")
         } catch {
             return ""
@@ -222,8 +237,8 @@ public class PostListingRepository: PostListingRepositoryProtocol {
             throw PostListingRepositoryError.JSONDecodingError(error.localizedDescription)
         }
         
-        await MainActor.run {
-            post.subredditOrUserIcon = UserDetailRootClass(fromJson: json).toUserData().iconUrl ?? ""
+        try await MainActor.run {
+            post.subredditOrUserIcon = try UserDetailRootClass(fromJson: json).toUserData().iconUrl ?? ""
             subredditOrUserIcons[post.author] = post.subredditOrUserIcon
         }
     }

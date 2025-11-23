@@ -163,8 +163,8 @@ struct SearchView: View {
         .addTitleToInlineNavigationBar("Search")
         .sheet(isPresented: $showSelectSearchInThingSheet) {
             NavigationStack {
-                SelectSearchInThingSheet { searchInThing in
-                    searchViewModel.searchInThing = searchInThing
+                SelectSearchInThingSheet { thing in
+                    searchViewModel.searchInThing = thing
                 }
             }
         }

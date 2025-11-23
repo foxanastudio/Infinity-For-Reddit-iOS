@@ -1,32 +1,28 @@
 //
-// SubmitTextPostViewModel.swift
-// Infinity for Reddit
+//  CrosspostViewModel.swift
+//  Infinity for Reddit
 //
-// Created by joeylr2042 on 2025-08-21
+//  Created by Docile Alligator on 2025-11-18.
+//
 
 import Foundation
-import MarkdownUI
-import SwiftyJSON
-import UIKit
-import SwiftUI
 
 @MainActor
-class SubmitTextPostViewModel: ObservableObject {
-    @Published var title: String = ""  
-    @Published var content: String = ""
+class CrosspostViewModel: ObservableObject {
+    @Published var title: String = ""
     @Published var selectedAccount: Account
-    @Published var embeddedImages: [UploadedImage] = []
     @Published var submitPostTask: Task<Void, Error>?
     @Published var submittedPostId: String?
     @Published var error: Error? = nil
     
+    let postToBeCrossposted: Post
     private let submitPostRepository: SubmitPostRepositoryProtocol
-    private let mediaUploadRepository: MediaUploadRepositoryProtocol
     
-    init(submitPostRepository: SubmitPostRepositoryProtocol, mediaUploadRepository: MediaUploadRepositoryProtocol) {
+    init(postToBeCrossposted: Post, submitPostRepository: SubmitPostRepositoryProtocol) {
         self.selectedAccount = AccountViewModel.shared.account
+        self.postToBeCrossposted = postToBeCrossposted
+        self.title = postToBeCrossposted.title
         self.submitPostRepository = submitPostRepository
-        self.mediaUploadRepository = mediaUploadRepository
     }
     
     func submitPost(
@@ -36,9 +32,6 @@ class SubmitTextPostViewModel: ObservableObject {
         isSensitive: Bool,
         receivePostReplyNotifications: Bool
     ) {
-        let richtext = RichtextJSONConverter().constructRichtextJSON(markdownString: content)
-        print(richtext)
-        
         guard submitPostTask == nil else {
             return
         }
@@ -57,16 +50,15 @@ class SubmitTextPostViewModel: ObservableObject {
         
         submitPostTask = Task {
             do {
-                submittedPostId = try await submitPostRepository.submitTextPost(
+                submittedPostId = try await submitPostRepository.crosspost(
                     account: selectedAccount,
                     subredditName: subreddit.name,
                     title: title,
-                    content: content,
+                    crosspostFullname: postToBeCrossposted.name,
                     flair: flair,
                     isSpoiler: isSpoiler,
                     isSensitive: isSensitive,
-                    receivePostReplyNotifications: receivePostReplyNotifications,
-                    embeddedImages: embeddedImages
+                    receivePostReplyNotifications: receivePostReplyNotifications
                 )
             } catch {
                 self.error = error
@@ -75,13 +67,5 @@ class SubmitTextPostViewModel: ObservableObject {
             
             self.submitPostTask = nil
         }
-    }
-    
-    func addEmbeddedImage(_ image: UIImage) {
-        let embeddedImage = UploadedImage(image: image) {
-            try await self.mediaUploadRepository.uploadImage(account: self.selectedAccount, image: image, getImageId: true)
-        }
-        embeddedImage.upload()
-        embeddedImages.append(embeddedImage)
     }
 }

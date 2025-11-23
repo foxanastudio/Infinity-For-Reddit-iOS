@@ -8,27 +8,21 @@
 import SwiftUI
 
 struct UserListingView: View {
-    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.dismiss) private var dismiss
+    
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
+    @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
     
-    @StateObject var userListingViewModel: UserListingViewModel
+    @ObservedObject private var userListingViewModel: UserListingViewModel
     @State private var showSortTypeKindSheet: Bool = false
     @State private var navigationBarMenuKey: UUID?
     private let account: Account
     private let iconSize: CGFloat = 28
-    private var onSelect: ((User) -> Void)?
     
-    init(account: Account, query: String, onSelect: ((User) -> Void)? = nil) {
+    init(account: Account, userListingViewModel: UserListingViewModel) {
         self.account = account
-        self.onSelect = onSelect
-        
-        _userListingViewModel = StateObject(
-            wrappedValue: UserListingViewModel(
-                query: query,
-                userListingRepository: UserListingRepository()
-            )
-        )
+        self.userListingViewModel = userListingViewModel
     }
     
     var body: some View {
@@ -40,7 +34,7 @@ struct UserListingView: View {
             } else {
                 List {
                     ForEach(userListingViewModel.users, id: \.id) { user in
-                        HStack {
+                        HStack(spacing: 0) {
                             CustomWebImage(
                                 user.iconUrl,
                                 width: iconSize,
@@ -60,17 +54,29 @@ struct UserListingView: View {
                                 .primaryText()
                             
                             Spacer()
+                            
+                            if userListingViewModel.thingSelectionMode.isMultiSelection {
+                                SwiftUI.Image(systemName: isSelected(user) ? "checkmark.square" : "square")
+                                    .primaryIcon()
+                            }
                         }
+                        .listPlainItemNoInsets()
+                        .padding(16)
+                        .background(isSelected(user) ? Color(hex: customThemeViewModel.currentCustomTheme.filledCardViewBackgroundColor) : Color.clear)
                         .contentShape(Rectangle())
-                        .listPlainItem()
                         .onTapGesture {
-                            if let onSelect {
-                                onSelect(user)
-                            } else {
+                            switch userListingViewModel.thingSelectionMode {
+                            case .noSelection:
                                 navigationManager.append(AppNavigation.userDetails(username: user.name))
+                            case .thingSelection(let onSelectThing):
+                                onSelectThing(.user(user.toUserData()))
+                                dismiss()
+                            case .subredditAndUserMultiSelection:
+                                userListingViewModel.toggleSelection(user: user)
                             }
                         }
                     }
+                    
                     if userListingViewModel.hasMorePages {
                         ProgressIndicator()
                             .task {
@@ -82,9 +88,6 @@ struct UserListingView: View {
                 .scrollBounceBehavior(.basedOnSize)
                 .themedList()
             }
-        }
-        .onChange(of: colorScheme) {
-            //print(colorScheme == .dark)
         }
         .task(id: userListingViewModel.loadUsersTaskId) {
             await userListingViewModel.initialLoadUsers()
@@ -118,5 +121,9 @@ struct UserListingView: View {
                 userListingViewModel.changeSortTypeKind(sortTypeKind)
             }
         }
+    }
+    
+    func isSelected(_ user: User) -> Bool {
+        return userListingViewModel.selectedUsers.index(id: user.id) != nil
     }
 }

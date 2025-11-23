@@ -36,6 +36,9 @@
     "About" : {
 
     },
+    "Add to Comment Filter" : {
+
+    },
     "Advanced" : {
 
     },
@@ -160,6 +163,9 @@
 
     },
     "Expand" : {
+
+    },
+    "Failed to load custom feed. Tap to try again. Error: %@" : {
 
     },
     "Failed to load image — tap to retry." : {
@@ -288,6 +294,9 @@
     "No subscribed users" : {
 
     },
+    "No user flairs available" : {
+
+    },
     "No users" : {
 
     },
@@ -409,6 +418,9 @@
 
     },
     "Select Sort Type" : {
+
+    },
+    "Select Subreddit(s) and User(s)" : {
 
     },
     "Sensitive" : {

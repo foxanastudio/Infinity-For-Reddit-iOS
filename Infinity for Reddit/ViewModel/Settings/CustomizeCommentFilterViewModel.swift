@@ -20,7 +20,9 @@ public class CustomizeCommentFilterViewModel: ObservableObject {
     
     private let customizeCommentFilterRepository: CustomizeCommentFilterRepositoryProtocol
     
-    init(commentFilter: CommentFilter?, customizeCommentFilterRepository: CustomizeCommentFilterRepositoryProtocol) {
+    init(commentFilter: CommentFilter?, commentToBeAdded: Comment? = nil, selectedFieldsToAddToCommentFilter: [SelectedFieldToAddToCommentFilter]? = nil, customizeCommentFilterRepository: CustomizeCommentFilterRepositoryProtocol) {
+        var excludeUsers = ""
+        
         if let commentFilter = commentFilter {
             id = commentFilter.id
             name = commentFilter.name
@@ -33,6 +35,23 @@ public class CustomizeCommentFilterViewModel: ObservableObject {
             maxVoteString = String(commentFilter.maxVote)
         }
         
+        if let selectedFieldsToAddToCommentFilter = selectedFieldsToAddToCommentFilter {
+            if let commentToBeAdded {
+                for selectedFieldToAddToCommentFilter in selectedFieldsToAddToCommentFilter {
+                    switch selectedFieldToAddToCommentFilter {
+                    case .excludeUser:
+                        if !excludeUsers.isEmpty {
+                            excludeUsers += ","
+                        }
+                        excludeUsers += commentToBeAdded.author
+                    case .containUser:
+                        break
+                    }
+                }
+            }
+        }
+        
+        self.excludeUsers = excludeUsers
         self.customizeCommentFilterRepository = customizeCommentFilterRepository
     }
     

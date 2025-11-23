@@ -6,8 +6,8 @@
         
 import Foundation
 
-struct Flair: Codable, Identifiable, Hashable {
-    let id: String
+public struct Flair: Codable, Identifiable, Hashable {
+    public let id: String
     let text: String
     let type: String
     let isEditable: Bool

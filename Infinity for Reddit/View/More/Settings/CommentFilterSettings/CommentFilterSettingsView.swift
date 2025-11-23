@@ -19,10 +19,12 @@ struct CommentFilterSettingsView: View {
     @State private var navigationBarMenuKey: UUID?
     
     @State private var showCommentFilterOptionSheet: Bool = false
+    @State private var showSelectFieldToAddToCommentFitlerSheet: Bool = false
     
-    init() {
+    init(commentToBeAdded: Comment?) {
         _commentFilterViewModel = StateObject(
-            wrappedValue: .init(
+            wrappedValue: CommentFilterViewModel(
+                commentToBeAdded: commentToBeAdded,
                 commentFilterRepository: CommentFilterRepository()
             )
         )
@@ -50,7 +52,11 @@ struct CommentFilterSettingsView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        navigationManager.append(SettingsViewNavigation.createOrEditCommentFilter())
+                        if commentFilterViewModel.commentToBeAdded == nil {
+                            navigationManager.append(SettingsViewNavigation.createOrEditCommentFilter())
+                        } else {
+                            showSelectFieldToAddToCommentFitlerSheet = true
+                        }
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -85,14 +91,22 @@ struct CommentFilterSettingsView: View {
         .addTitleToInlineNavigationBar("Comment Filter")
         .toolbar {
             Button("", systemImage: "plus") {
-                navigationManager.append(SettingsViewNavigation.createOrEditCommentFilter())
+                if commentFilterViewModel.commentToBeAdded == nil {
+                    navigationManager.append(SettingsViewNavigation.createOrEditCommentFilter())
+                } else {
+                    showSelectFieldToAddToCommentFitlerSheet = true
+                }
             }
         }
         .wrapContentSheet(isPresented: $showCommentFilterOptionSheet) {
             PostOrCommentFilterOptionSheet(
                 onEditSelected: {
                     if let commentFilter = selectedCommentFilter {
-                        navigationManager.append(SettingsViewNavigation.createOrEditCommentFilter(commentFilter: commentFilter))
+                        if commentFilterViewModel.commentToBeAdded == nil {
+                            navigationManager.append(SettingsViewNavigation.createOrEditCommentFilter(commentFilter: commentFilter))
+                        } else {
+                            showSelectFieldToAddToCommentFitlerSheet = true
+                        }
                     }
                 }, onApplyToSelected: {
                     if let commentFilter = selectedCommentFilter, let id = commentFilter.id {
@@ -104,6 +118,17 @@ struct CommentFilterSettingsView: View {
                     }
                 }
             )
+        }
+        .wrapContentSheet(isPresented: $showSelectFieldToAddToCommentFitlerSheet) {
+            if let commentToBeAdded = commentFilterViewModel.commentToBeAdded {
+                SelectFieldToAddToCommentFilterSheet { selectedFieldsToAddToCommentFilter in
+                    navigationManager.append(
+                        SettingsViewNavigation.createOrEditCommentFilter(
+                            commentFilter: selectedCommentFilter, commentToBeAdded: commentToBeAdded, selectedFieldsToAddToCommentFilter: selectedFieldsToAddToCommentFilter
+                        )
+                    )
+                }
+            }
         }
     }
 }

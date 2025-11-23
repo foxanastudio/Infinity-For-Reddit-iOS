@@ -373,6 +373,8 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
         let payloadJSON = try JSONEncoder().encode(redditPollPayload)
         let payloadString = String(data: payloadJSON, encoding: .utf8)!
         
+        print(payloadString)
+        
         let interceptor = await TokenCenter.shared.getRedditPerAccountInterceptor(account: account)
         let data = try await self.session.request(RedditOAuthAPI.submitPollPost(body: payloadString), interceptor: interceptor)
             .validate()
@@ -391,6 +393,52 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
             throw SubmitPostRepositoryError.JSONDecodingError("Failed to get the url of the submitted post.")
         } else {
             return postUrl
+        }
+    }
+    
+    func crosspost(
+        account: Account,
+        subredditName: String,
+        title: String,
+        crosspostFullname: String,
+        flair: Flair?,
+        isSpoiler: Bool,
+        isSensitive: Bool,
+        receivePostReplyNotifications: Bool
+    ) async throws -> String {
+        var params = [
+            "api_type": "json",
+            "sr": subredditName,
+            "title": title,
+            "crosspost_fullname": crosspostFullname,
+            "kind": "crosspost",
+            "spoiler": String(isSpoiler),
+            "nsfw": String(isSensitive),
+            "sendreplies": String(receivePostReplyNotifications)
+        ]
+        if let flair {
+            params["flair_text"] = flair.text
+            params["flair_id"] = flair.id
+        }
+        
+        let interceptor = await TokenCenter.shared.getRedditPerAccountInterceptor(account: account)
+        let data = try await self.session.request(RedditOAuthAPI.submitPost(params: params), interceptor: interceptor)
+            .validate()
+            .serializingData(automaticallyCancelling: true)
+            .value
+        
+        let json = JSON(data)
+        if let error = json.error {
+            throw SubmitPostRepositoryError.JSONDecodingError(error.localizedDescription)
+        }
+        
+        try json.throwIfRedditError(defaultErrorMessage: "Failed to submit post.")
+        
+        let id = json["json"]["data"]["id"].stringValue
+        if id.isEmpty {
+            throw SubmitPostRepositoryError.JSONDecodingError("Failed to get the ID of the submitted post.")
+        } else {
+            return id
         }
     }
 }

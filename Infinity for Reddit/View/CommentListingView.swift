@@ -11,7 +11,6 @@ import GRDB
 import Alamofire
 
 struct CommentListingView: View {
-    @Environment(\.colorScheme) var colorScheme
     @Environment(\.dependencyManager) private var dependencyManager: Container
     @EnvironmentObject var accountViewModel: AccountViewModel
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
@@ -65,6 +64,9 @@ struct CommentListingView: View {
                                 },
                                 onDelete: {
                                     commentListingViewModel.deleteComment(comment)
+                                },
+                                onAddToCommentFilter: {
+                                    navigationManager.append(SettingsViewNavigation.commentFilter(commentToBeAdded: comment))
                                 }
                             )
                         }
@@ -88,9 +90,6 @@ struct CommentListingView: View {
                     }
                 }
             }
-        }
-        .onChange(of: colorScheme) {
-            //print(colorScheme == .dark)
         }
         .task(id: commentListingViewModel.loadCommentsTaskId) {
             await commentListingViewModel.initialLoadComments()
@@ -134,7 +133,9 @@ struct CommentListingView: View {
             navigationBarMenuKey = navigationBarMenuManager.push(menu)
         }
         .onDisappear {
-            guard let navigationBarMenuKey else { return }
+            guard let navigationBarMenuKey else {
+                return
+            }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
         .wrapContentSheet(isPresented: $showSortTypeKindSheet) {

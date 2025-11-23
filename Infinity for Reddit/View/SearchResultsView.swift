@@ -9,7 +9,11 @@ import SwiftUI
 
 struct SearchResultsView: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
+    
     @StateObject private var searchResultsViewModel: SearchResultsViewModel
+    @StateObject private var subredditListingViewModel: SubredditListingViewModel
+    @StateObject private var userListingViewModel: UserListingViewModel
+    
     @State private var selectedOption: Int
     
     init(query: String,
@@ -20,6 +24,20 @@ struct SearchResultsView: View {
     ) {
         self.selectedOption = searchResultTab
         _searchResultsViewModel = StateObject(wrappedValue: SearchResultsViewModel(query: query, searchInSubredditOrUserName: searchInSubredditOrUserName, searchInMultiReddit: searchInMultiReddit, searchInThingType: searchInThingType))
+        _subredditListingViewModel = StateObject(
+            wrappedValue: SubredditListingViewModel(
+                query: query,
+                thingSelectionMode: .noSelection,
+                subredditListingRepository: SubredditListingRepository()
+            )
+        )
+        _userListingViewModel = StateObject(
+            wrappedValue: UserListingViewModel(
+                query: query,
+                thingSelectionMode: .noSelection,
+                userListingRepository: UserListingRepository()
+            )
+        )
     }
     
     var body: some View {
@@ -41,10 +59,10 @@ struct SearchResultsView: View {
                 ), handleToolbarMenu: false)
                 .tag(0)
                 
-                SubredditListingView(account: accountViewModel.account, query: searchResultsViewModel.query)
+                SubredditListingView(account: accountViewModel.account, subredditListingViewModel: subredditListingViewModel)
                     .tag(1)
                 
-                UserListingView(account: accountViewModel.account, query: searchResultsViewModel.query)
+                UserListingView(account: accountViewModel.account, userListingViewModel: userListingViewModel)
                     .tag(2)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))

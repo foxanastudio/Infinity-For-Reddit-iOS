@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import IdentifiedCollections
 
 @MainActor
 public class UserListingViewModel: ObservableObject {
@@ -21,11 +22,15 @@ public class UserListingViewModel: ObservableObject {
     @Published var sortType: SortType.Kind
     @Published var loadUsersTaskId = UUID()
     
+    @Published var selectedUsers: IdentifiedArrayOf<User> = []
+    
     private var after: String? = nil
     private var lastLoadedSortType: SortType.Kind? = nil
     
     // UserDefaults
     private var sensitiveContent: Bool
+    
+    let thingSelectionMode: ThingSelectionMode
     
     public let userListingRepository: UserListingRepositoryProtocol
     
@@ -34,8 +39,9 @@ public class UserListingViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Initializer
-    init(query: String, userListingRepository: UserListingRepositoryProtocol) {
+    init(query: String, thingSelectionMode: ThingSelectionMode, userListingRepository: UserListingRepositoryProtocol) {
         self.query = query
+        self.thingSelectionMode = thingSelectionMode
         self.sortType = SortTypeUserDetailsUtils.userListing
         self.userListingRepository = userListingRepository
         
@@ -160,6 +166,14 @@ public class UserListingViewModel: ObservableObject {
         if sensitiveContent != self.sensitiveContent {
             self.sensitiveContent = sensitiveContent
             refreshUsers()
+        }
+    }
+    
+    func toggleSelection(user: User) {
+        if selectedUsers.index(id: user.id) != nil {
+            selectedUsers.remove(user)
+        } else {
+            selectedUsers.append(user)
         }
     }
 }

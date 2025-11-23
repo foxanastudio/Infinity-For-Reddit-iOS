@@ -96,4 +96,15 @@ protocol SubmitPostRepositoryProtocol {
         receivePostReplyNotifications: Bool,
         embeddedImages: [UploadedImage]
     ) async throws -> String
+    
+    func crosspost(
+        account: Account,
+        subredditName: String,
+        title: String,
+        crosspostFullname: String,
+        flair: Flair?,
+        isSpoiler: Bool,
+        isSensitive: Bool,
+        receivePostReplyNotifications: Bool
+    ) async throws -> String
 }

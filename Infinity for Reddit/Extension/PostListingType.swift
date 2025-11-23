@@ -22,6 +22,8 @@ extension PostListingType: SortTypeKindSource {
             return [.hot, .new, .rising, .top, .controversial]
         case .anonymousFrontPage:
             return [.hot, .new, .rising, .top, .controversial]
+        case .anonymousCustomFeed:
+            return [.hot, .new, .rising, .top, .controversial]
         }
     }
 }
@@ -76,6 +78,8 @@ extension PostListingType {
             return .customFeed
         case .anonymousFrontPage:
             return .home
+        case .anonymousCustomFeed:
+            return .customFeed
         }
     }
 }
@@ -95,6 +99,8 @@ extension PostListingType {
             return path
         case .anonymousFrontPage:
             return PostFilterUsage.NO_USAGE
+        case .anonymousCustomFeed(let myCustomFeed, _):
+            return myCustomFeed.path
         }
     }
 }
@@ -114,6 +120,8 @@ extension PostListingType {
             return SortTypeUserDetailsUtils.getCustomFeedPost(path: path)
         case .anonymousFrontPage:
             return SortTypeUserDetailsUtils.getSubredditPost(subredditName: Account.ANONYMOUS_ACCOUNT.username)
+        case .anonymousCustomFeed(let myCustomFeed, _):
+            return SortTypeUserDetailsUtils.getCustomFeedPost(path: myCustomFeed.path)
         }
     }
     
@@ -149,6 +157,11 @@ extension PostListingType {
             if let time = sortType.time {
                 UserDefaults.sortType?.set(time.rawValue, forKey: SortTypeUserDetailsUtils.subredditPostSortTimeBaseKey + Account.ANONYMOUS_ACCOUNT.username)
             }
+        case .anonymousCustomFeed(let myCustomFeed, _):
+            UserDefaults.sortType?.set(sortType.type.rawValue, forKey: SortTypeUserDetailsUtils.customFeedPostSortTypeBaseKey + myCustomFeed.path)
+            if let time = sortType.time {
+                UserDefaults.sortType?.set(time.rawValue, forKey: SortTypeUserDetailsUtils.customFeedPostSortTimeBaseKey + myCustomFeed.path)
+            }
         }
     }
 }
@@ -168,6 +181,8 @@ extension PostListingType {
             return PostLayoutUserDefaultsUtils.getCustomFeed(path)
         case .anonymousFrontPage:
             return PostLayoutUserDefaultsUtils.getSubreddit(Account.ANONYMOUS_ACCOUNT.username)
+        case .anonymousCustomFeed(let myCustomFeed, _):
+            return PostLayoutUserDefaultsUtils.getCustomFeed(myCustomFeed.path)
         }
     }
     
@@ -185,6 +200,8 @@ extension PostListingType {
             PostLayoutUserDefaultsUtils.saveCustomFeed(path, postLayout)
         case .anonymousFrontPage:
             PostLayoutUserDefaultsUtils.saveSubreddit(Account.ANONYMOUS_ACCOUNT.username, postLayout)
+        case .anonymousCustomFeed(let myCustomFeed, _):
+            PostLayoutUserDefaultsUtils.saveCustomFeed(myCustomFeed.path, postLayout)
         }
     }
 }

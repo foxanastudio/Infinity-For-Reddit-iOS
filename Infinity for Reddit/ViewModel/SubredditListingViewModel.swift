@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import IdentifiedCollections
 
 @MainActor
 public class SubredditListingViewModel: ObservableObject {
@@ -21,11 +22,15 @@ public class SubredditListingViewModel: ObservableObject {
     @Published var sortType: SortType.Kind
     @Published var loadSubredditsTaskId = UUID()
     
+    @Published var selectedSubreddits: IdentifiedArrayOf<Subreddit> = []
+    
     private var after: String? = nil
     private var lastLoadedSortType: SortType.Kind? = nil
     
     // UserDefaults
     private var sensitiveContent: Bool
+    
+    let thingSelectionMode: ThingSelectionMode
     
     public let subredditListingRepository: SubredditListingRepositoryProtocol
     
@@ -34,8 +39,9 @@ public class SubredditListingViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Initializer
-    init(query: String, subredditListingRepository: SubredditListingRepositoryProtocol) {
+    init(query: String, thingSelectionMode: ThingSelectionMode, subredditListingRepository: SubredditListingRepositoryProtocol) {
         self.query = query
+        self.thingSelectionMode = thingSelectionMode
         self.sortType = SortTypeUserDetailsUtils.subredditListing
         self.subredditListingRepository = subredditListingRepository
         
@@ -164,6 +170,14 @@ public class SubredditListingViewModel: ObservableObject {
         if sensitiveContent != self.sensitiveContent {
             self.sensitiveContent = sensitiveContent
             refreshSubreddits()
+        }
+    }
+    
+    func toggleSelection(subreddit: Subreddit) {
+        if selectedSubreddits.index(id: subreddit.id) != nil {
+            selectedSubreddits.remove(subreddit)
+        } else {
+            selectedSubreddits.append(subreddit)
         }
     }
 }

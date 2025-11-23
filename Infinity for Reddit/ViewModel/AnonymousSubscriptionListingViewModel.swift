@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 import GRDB
+import IdentifiedCollections
 
 public class AnonymousSubscriptionListingViewModel: ObservableObject {
     // MARK: - Properties
@@ -18,6 +19,13 @@ public class AnonymousSubscriptionListingViewModel: ObservableObject {
     @Published var myCustomFeeds: [MyCustomFeed] = []
     @Published var favoriteMyCustomFeeds: [MyCustomFeed] = []
     
+    @Published var selectedSubscribedSubreddits: IdentifiedArrayOf<SubscribedSubredditData> = []
+    @Published var selectedSubredditsInCustomFeed: IdentifiedArrayOf<SubredditInCustomFeed> = []
+    @Published var selectedSubscribedUsers: IdentifiedArrayOf<SubscribedUserData> = []
+    
+    @Published var error: Error?
+    
+    let subscriptionSelectionMode: ThingSelectionMode
     private let anonymousSubscriptionListingRepository: AnonymousSubscriptionListingRepositoryProtocol
     
     private var cancellables = Set<AnyCancellable>()
@@ -33,7 +41,7 @@ public class AnonymousSubscriptionListingViewModel: ObservableObject {
     private let favoriteMyCustomFeedSubscriptionsPublisher: AnyPublisher<[MyCustomFeed], Error>
     
     // MARK: - Initializer
-    init(anonymousSubscriptionListingRepository: AnonymousSubscriptionListingRepositoryProtocol) {
+    init(subscriptionSelectionMode: ThingSelectionMode, anonymousSubscriptionListingRepository: AnonymousSubscriptionListingRepositoryProtocol) {
         guard let resolvedOperationQueue = DependencyManager.shared.container.resolve(OperationQueue.self) else {
             fatalError("Could not resolve OperationQueue")
         }
@@ -42,6 +50,38 @@ public class AnonymousSubscriptionListingViewModel: ObservableObject {
             fatalError("Could not resolve DatabasePool")
         }
         
+        self.subscriptionSelectionMode = subscriptionSelectionMode
+        switch subscriptionSelectionMode {
+        case .subredditAndUserMultiSelection(let selectedSubredditsAndUsers, _):
+            var selectedSubscribedSubreddits = IdentifiedArrayOf<SubscribedSubredditData>()
+            var selectedSubredditsInCustomFeed = IdentifiedArrayOf<SubredditInCustomFeed>()
+            var selectedSubscribedUsers = IdentifiedArrayOf<SubscribedUserData>()
+            
+            for item in selectedSubredditsAndUsers {
+                switch item {
+                case .subscribedSubreddit(let subscribedSubredditData):
+                    selectedSubscribedSubreddits.append(subscribedSubredditData)
+                case .subreddit(_):
+                    break
+                case .subredditInCustomFeed(let subredditInCustomFeed):
+                    selectedSubredditsInCustomFeed.append(subredditInCustomFeed)
+                case .subredditInAnonymousCustomFeed(let anonymousCustomFeedSubreddit):
+                    selectedSubredditsInCustomFeed.append(SubredditInCustomFeed(name: anonymousCustomFeedSubreddit.subredditName))
+                case .subscribedUser(let subscribedUserData):
+                    selectedSubscribedUsers.append(subscribedUserData)
+                case .user(_):
+                    break
+                case .myCustomFeed(_):
+                    break
+                }
+            }
+            
+            self.selectedSubscribedSubreddits = selectedSubscribedSubreddits
+            self.selectedSubredditsInCustomFeed = selectedSubredditsInCustomFeed
+            self.selectedSubscribedUsers = selectedSubscribedUsers
+        default:
+            break
+        }
         self.anonymousSubscriptionListingRepository = anonymousSubscriptionListingRepository
         self.operationqueue = resolvedOperationQueue
         self.dbPool = resolvedDatabasePool
@@ -206,5 +246,51 @@ public class AnonymousSubscriptionListingViewModel: ObservableObject {
         if !anonymousSubscriptionListingRepository.toggleFavoriteCustomFeed(myCustomFeed) {
             // TODO handle error
         }
+    }
+    
+    func unsubscribeFromSubreddit(_ subscribedSubreddit: SubscribedSubredditData) async {
+        do {
+            try await anonymousSubscriptionListingRepository.unsubscribeFromSubreddit(subscribedSubreddit)
+        } catch {
+            print("Unsubscribe from subreddit error: \(error)")
+            await MainActor.run {
+                self.error = error
+            }
+        }
+    }
+    
+    func unfollowUser(_ subscribedUser: SubscribedUserData) async {
+        do {
+            try await anonymousSubscriptionListingRepository.unfollowUser(subscribedUser)
+        } catch {
+            print("Unfollow user error: \(error)")
+            await MainActor.run {
+                self.error = error
+            }
+        }
+    }
+    
+    func deleteCustomFeed(_ myCustomFeed: MyCustomFeed) async {
+        do {
+            try await anonymousSubscriptionListingRepository.deleteCustomFeed(myCustomFeed)
+        } catch {
+            print("Delete custom feed error: \(error)")
+            await MainActor.run {
+                self.error = error
+            }
+        }
+    }
+    
+    func getSelectedSubredditsAndUsers() -> [Thing] {
+        var result: [Thing] = []
+        
+        for subscribedSubredditData in selectedSubscribedSubreddits {
+            result.append(.subscribedSubreddit(subscribedSubredditData))
+        }
+        for subscribedUserData in selectedSubscribedUsers {
+            result.append(.subscribedUser(subscribedUserData))
+        }
+        
+        return result
     }
 }

@@ -31,7 +31,7 @@ public class Inbox: NSObject {
     var name : String!
     var numComments : Int!
     var parentId : String!
-    var replies : InboxListingRootClass!
+    var replies : InboxListingRootClass?
     var score : Int!
     var subject : String!
     var subreddit : String!

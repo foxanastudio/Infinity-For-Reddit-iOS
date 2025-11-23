@@ -124,7 +124,9 @@ public class PostListingViewModel: ObservableObject {
         guard index >= posts.count - 3 else { return }
         
         paginationTask = Task {
-            defer { paginationTask = nil }
+            defer {
+                paginationTask = nil
+            }
             await loadPosts()
         }
     }
@@ -166,6 +168,50 @@ public class PostListingViewModel: ObservableObject {
                     } else {
                         postListingMetadata.pathComponents = ["subreddit": fetchedSubscriptions]
                     }
+                }
+            } else if case .anonymousCustomFeed(let myCustomFeed, let concatenatedSubscriptions) = postListingMetadata.postListingType {
+                if let subscriptions = concatenatedSubscriptions {
+                    guard !subscriptions.isEmpty else {
+                        // No subreddits, abort
+                        await MainActor.run {
+                            hasMorePages = false
+                            self.after = nil
+                            
+                            if isRefreshWithContinuation {
+                                finishPullToRefresh()
+                            }
+                            
+                            isInitialLoading = false
+                            isLoadingMore = false
+                            
+                            self.lastLoadedSortType = self.sortType
+                        }
+                        return
+                    }
+                    
+                    postListingMetadata.pathComponents = ["subreddit": subscriptions]
+                } else {
+                    let fetchedSubscriptions = postListingRepository.getAnonymousCustomThemeSubredditsConcatenated(myCustomFeed: myCustomFeed)
+                    postListingMetadata.postListingType = .anonymousCustomFeed(myCustomFeed: myCustomFeed, concatenatedSubscriptions: fetchedSubscriptions)
+                    guard !fetchedSubscriptions.isEmpty else {
+                        // No subreddits, abort
+                        await MainActor.run {
+                            hasMorePages = false
+                            self.after = nil
+                            
+                            if isRefreshWithContinuation {
+                                finishPullToRefresh()
+                            }
+                            
+                            isInitialLoading = false
+                            isLoadingMore = false
+                            
+                            self.lastLoadedSortType = self.sortType
+                        }
+                        return
+                    }
+                    
+                    postListingMetadata.pathComponents = ["subreddit": fetchedSubscriptions]
                 }
             }
             

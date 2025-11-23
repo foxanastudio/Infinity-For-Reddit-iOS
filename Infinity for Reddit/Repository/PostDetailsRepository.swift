@@ -205,8 +205,8 @@ public class PostDetailsRepository: PostDetailsRepositoryProtocol {
             throw PostDetailsRepositoryError.JSONDecodingError(error.localizedDescription)
         }
         
-        await MainActor.run {
-            post.subredditOrUserIconInPostDetails = UserDetailRootClass(fromJson: json).toUserData().iconUrl ?? ""
+        try await MainActor.run {
+            post.subredditOrUserIconInPostDetails = try UserDetailRootClass(fromJson: json).toUserData().iconUrl ?? ""
         }
     }
     
@@ -267,5 +267,47 @@ public class PostDetailsRepository: PostDetailsRepositoryProtocol {
                 try await postHistoryDao.deletePostHistory(username: Account.ANONYMOUS_ACCOUNT.username, postId: post.id, postHistoryType: .hidden)
             }
         }
+    }
+    
+    public func toggleSensitive(_ post: Post) async throws {
+        guard let name = post.name else {
+            throw PostDetailsRepositoryError.postIdNotFound
+        }
+        let params = ["id": name]
+        
+        try Task.checkCancellation()
+        
+        _ = await self.session.request(post.over18 ? RedditOAuthAPI.unmarkSensitive(params: params) : RedditOAuthAPI.markSensitive(params: params))
+            .validate()
+            .serializingData(automaticallyCancelling: true)
+            .response
+    }
+    
+    public func toggleSpoiler(_ post: Post) async throws {
+        guard let name = post.name else {
+            throw PostDetailsRepositoryError.postIdNotFound
+        }
+        let params = ["id": name]
+        
+        try Task.checkCancellation()
+        
+        _ = await self.session.request(post.spoiler ? RedditOAuthAPI.unmarkSpoiler(params: params) : RedditOAuthAPI.markSpoiler(params: params))
+            .validate()
+            .serializingData(automaticallyCancelling: true)
+            .response
+    }
+    
+    public func selectFlair(post: Post, flair: Flair) async throws {
+        guard let name = post.name else {
+            throw PostDetailsRepositoryError.postIdNotFound
+        }
+        let params = ["api_type": "json", "flair_template_id": flair.id, "link": name, "text": flair.text]
+        
+        try Task.checkCancellation()
+        
+        _ = await self.session.request(RedditOAuthAPI.selectFlair(subredditName: post.subreddit, params: params))
+            .validate()
+            .serializingData(automaticallyCancelling: true)
+            .response
     }
 }

@@ -65,7 +65,6 @@ class RichtextJSONConverter {
     }
 
     func constructRichtextJSON(markdownString: String) -> String {
-        self
         let markdown = MarkdownContent(markdownString)
 
         visitBlockNodes(markdown.blocks)

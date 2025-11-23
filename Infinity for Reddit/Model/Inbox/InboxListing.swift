@@ -11,10 +11,7 @@ import SwiftyJSON
 class InboxListingRootClass: NSObject {
     var kind: String!
     var data: InboxListing!
-    
-    /**
-     * Instantiate the instance using the passed json values to set the properties values
-     */
+
     init(fromJson json: JSON!, messageWhere: MessageWhere) throws {
         if json.isEmpty {
             throw JSONError.invalidData
@@ -26,6 +23,12 @@ class InboxListingRootClass: NSObject {
             throw JSONError.invalidData
         }
         kind = json["kind"].stringValue
+    }
+    
+    init(inbox: Inbox) {
+        // I know it looks ugly
+        kind = "t4"
+        data = InboxListing(inbox: inbox)
     }
 }
 
@@ -55,5 +58,12 @@ public class InboxListing : NSObject {
         after = json["after"].stringValue
         before = json["before"].stringValue
         dist = json["dist"].intValue
+    }
+    
+    init(inbox: Inbox) {
+        inboxes = [inbox]
+        after = ""
+        before = ""
+        dist = 0
     }
 }

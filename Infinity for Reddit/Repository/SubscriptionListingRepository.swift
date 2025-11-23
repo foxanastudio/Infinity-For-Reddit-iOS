@@ -66,7 +66,7 @@ class SubscriptionListingRepository: SubscriptionListingRepositoryProtocol {
             throw SubscriptionListingRepositoryError.JSONDecodingError(error.localizedDescription)
         }
         
-        return MyCustomFeedListing(fromJson: json)
+        return try MyCustomFeedListing(fromJson: json)
     }
     
     func toggleFavoriteSubreddit(_ subscribedSubreddit: SubscribedSubredditData) async throws {

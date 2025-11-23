@@ -8,26 +8,21 @@
 import SwiftUI
 
 struct SubredditListingView: View {
+    @Environment(\.dismiss) private var dismiss
+    
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
+    @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
     
-    @StateObject var subredditListingViewModel: SubredditListingViewModel
+    @ObservedObject var subredditListingViewModel: SubredditListingViewModel
     @State private var showSortTypeKindSheet: Bool = false
     @State private var navigationBarMenuKey: UUID?
     private let account: Account
     private let iconSize: CGFloat = 28
-    private var onSelect: ((Subreddit) -> Void)?
     
-    init(account: Account, query: String, onSelect: ((Subreddit) -> Void)? = nil) {
+    init(account: Account, subredditListingViewModel: SubredditListingViewModel) {
         self.account = account
-        self.onSelect = onSelect
-        
-        _subredditListingViewModel = StateObject(
-            wrappedValue: SubredditListingViewModel(
-                query: query,
-                subredditListingRepository: SubredditListingRepository()
-            )
-        )
+        self.subredditListingViewModel = subredditListingViewModel
     }
     
     var body: some View {
@@ -39,7 +34,7 @@ struct SubredditListingView: View {
             } else {
                 List {
                     ForEach(subredditListingViewModel.subreddits, id: \.id) { subreddit in
-                        HStack {
+                        HStack(spacing: 0) {
                             CustomWebImage(
                                 subreddit.iconUrl,
                                 width: iconSize,
@@ -54,7 +49,7 @@ struct SubredditListingView: View {
                             Spacer()
                                 .frame(width: 24)
                             
-                            VStack {
+                            VStack(spacing: 0) {
                                 Text(subreddit.displayNamePrefixed)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .primaryText()
@@ -65,16 +60,27 @@ struct SubredditListingView: View {
                             }
                             
                             Spacer()
+                            
+                            if subredditListingViewModel.thingSelectionMode.isMultiSelection {
+                                SwiftUI.Image(systemName: isSelected(subreddit) ? "checkmark.square" : "square")
+                                    .primaryIcon()
+                            }
                         }
+                        .listPlainItemNoInsets()
+                        .padding(16)
+                        .background(isSelected(subreddit) ? Color(hex: customThemeViewModel.currentCustomTheme.filledCardViewBackgroundColor) : Color.clear)
                         .contentShape(Rectangle())
-                        .listPlainItem()
                         .onTapGesture {
-                            if let onSelect {
-                                onSelect(subreddit)
-                            } else {
+                            switch subredditListingViewModel.thingSelectionMode {
+                            case .noSelection:
                                 navigationManager.append(
                                     AppNavigation.subredditDetails(subredditName: subreddit.displayName)
                                 )
+                            case .thingSelection(let onSelectThing):
+                                onSelectThing(.subreddit(subreddit.toSubredditData()))
+                                dismiss()
+                            case .subredditAndUserMultiSelection:
+                                subredditListingViewModel.toggleSelection(subreddit: subreddit)
                             }
                         }
                     }
@@ -122,5 +128,9 @@ struct SubredditListingView: View {
                 subredditListingViewModel.changeSortTypeKind(sortTypeKind)
             }
         }
+    }
+    
+    func isSelected(_ subreddit: Subreddit) -> Bool {
+        return subredditListingViewModel.selectedSubreddits.index(id: subreddit.id) != nil
     }
 }

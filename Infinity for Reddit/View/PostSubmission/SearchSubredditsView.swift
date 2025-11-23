@@ -15,7 +15,7 @@ struct SearchSubredditsSheet: View {
     @State private var showSubredditSearchResultSheet: Bool = false
     @State private var queryItem: Item?
     
-    let onSubscribedSubredditSelected: (SubscribedSubredditData) -> Void
+    let onThingSelected: (Thing) -> Void
     
     var body: some View {
         SearchView { query in
@@ -27,8 +27,8 @@ struct SearchSubredditsSheet: View {
         .id(accountViewModel.account.username)
         .sheet(item: $queryItem) { queryItem in
             NavigationStack {
-                SubredditSearchResultSheet(query: queryItem.query) { subscribedSubreddit in
-                    onSubscribedSubredditSelected(subscribedSubreddit)
+                SubredditSearchResultSheet(query: queryItem.query) { thing in
+                    onThingSelected(thing)
                     dismiss()
                 }
             }

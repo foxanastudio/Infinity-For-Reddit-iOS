@@ -50,4 +50,16 @@ class AnonymousSubscriptionListingRepository: AnonymousSubscriptionListingReposi
             return false
         }
     }
+    
+    func unsubscribeFromSubreddit(_ subscribedSubreddit: SubscribedSubredditData) async throws {
+        try subscribedSubredditDao.deleteSubscribedSubreddit(subredditName: subscribedSubreddit.name, accountName: Account.ANONYMOUS_ACCOUNT.username)
+    }
+    
+    func unfollowUser(_ subscribedUser: SubscribedUserData) async throws {
+        try subscribedUserDao.deleteSubscribedUser(name: subscribedUser.name, accountName: Account.ANONYMOUS_ACCOUNT.username)
+    }
+    
+    func deleteCustomFeed(_ myCustomFeed: MyCustomFeed) async throws {
+        try myCustomFeedDao.deleteMyCustomFeed(path: myCustomFeed.path, username: Account.ANONYMOUS_ACCOUNT.username)
+    }
 }
