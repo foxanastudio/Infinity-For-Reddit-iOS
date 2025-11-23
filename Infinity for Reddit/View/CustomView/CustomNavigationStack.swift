@@ -142,6 +142,9 @@ struct CustomNavigationStack<Content: View>: View {
                     case .copyCustomFeed(let path):
                         CopyCustomFeedView(path: path)
                             .environmentObject(navigationManager)
+                    case .report(let subredditName, let thingFullname):
+                        ReportView(subredditName: subredditName, thingFullname: thingFullname)
+                            .environmentObject(navigationManager)
                     }
                 }
                 .navigationDestination(for: MoreViewNavigation.self) { destination in

@@ -33,4 +33,5 @@ enum AppNavigation: Hashable {
     case createCustomFeed
     case editCustomFeed(customFeedToEdit: CustomFeedWrapper)
     case copyCustomFeed(path: String)
+    case report(subredditName: String, thingFullname: String)
 }

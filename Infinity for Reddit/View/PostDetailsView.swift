@@ -419,14 +419,26 @@ struct PostDetailsView: View {
             )
         }
         
-        menuItems.append(
+        menuItems.append(contentsOf: [
             NavigationBarMenuItem(title: "Add to Post Filter") {
                 guard let post = postDetailsViewModel.post else {
                     return
                 }
                 navigationManager.append(SettingsViewNavigation.postFilter(postToBeAdded: post))
+            },
+            
+            NavigationBarMenuItem(title: "Report") {
+                guard let post = postDetailsViewModel.post else {
+                    return
+                }
+                
+                if AccountViewModel.shared.account.isAnonymous() {
+                    navigationManager.openLink("https://www.reddit.com/report")
+                } else {
+                    navigationManager.append(AppNavigation.report(subredditName: post.subreddit, thingFullname: post.name))
+                }
             }
-        )
+        ])
         
         navigationBarMenuKey = navigationBarMenuManager.push(menuItems)
     }
