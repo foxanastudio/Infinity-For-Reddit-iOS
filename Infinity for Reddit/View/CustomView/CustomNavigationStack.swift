@@ -194,7 +194,8 @@ struct CustomNavigationStack<Content: View>: View {
                         SecuritySettingsView()
                             .environmentObject(navigationManager)
                     case .dataSavingMode:
-                        EmptyView()
+                        DataSavingModeSettingsView()
+                            .environmentObject(navigationManager)
                     case .proxy:
                         EmptyView()
                     case .postHistory:

@@ -23,6 +23,7 @@ extension UserDefaults {
     static let token = UserDefaults(suiteName: "com.docilealligator.infinityforreddit.token")!
     static let postLayout = UserDefaults(suiteName: "com.docilealligator.infinityforreddit.post_layout")
     static let interfaceFont = UserDefaults.standard
+    static let dataSavingMode = UserDefaults.standard
 }
 
 extension UserDefaults {
