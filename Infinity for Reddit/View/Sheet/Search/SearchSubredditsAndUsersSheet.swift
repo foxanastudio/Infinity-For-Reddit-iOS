@@ -22,6 +22,16 @@ struct SearchSubredditsAndUsersSheet: View {
         }
         .id(accountViewModel.account.username)
         .addTitleToInlineNavigationBar("Search Subreddits and Users")
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    Text("Cancel")
+                        .navigationBarPrimaryText()
+                }
+            }
+        }
         .sheet(item: $queryItem) { queryItem in
             NavigationStack {
                 SubredditAndUserSearchResultSheet(query: queryItem.query, thingSelectionMode: modifiedThingSelectionMode)
