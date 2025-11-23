@@ -20,8 +20,10 @@ public class AnonymousSubscriptionListingViewModel: ObservableObject {
     @Published var favoriteMyCustomFeeds: [MyCustomFeed] = []
     
     @Published var selectedSubscribedSubreddits: IdentifiedArrayOf<SubscribedSubredditData> = []
+    @Published var selectedSubreddits: IdentifiedArrayOf<SubredditData> = []
     @Published var selectedSubredditsInCustomFeed: IdentifiedArrayOf<SubredditInCustomFeed> = []
     @Published var selectedSubscribedUsers: IdentifiedArrayOf<SubscribedUserData> = []
+    @Published var selectedUsers: IdentifiedArrayOf<UserData> = []
     
     @Published var error: Error?
     
@@ -54,31 +56,35 @@ public class AnonymousSubscriptionListingViewModel: ObservableObject {
         switch subscriptionSelectionMode {
         case .subredditAndUserMultiSelection(let selectedSubredditsAndUsers, _):
             var selectedSubscribedSubreddits = IdentifiedArrayOf<SubscribedSubredditData>()
+            var selectedSubreddits = IdentifiedArrayOf<SubredditData>()
             var selectedSubredditsInCustomFeed = IdentifiedArrayOf<SubredditInCustomFeed>()
             var selectedSubscribedUsers = IdentifiedArrayOf<SubscribedUserData>()
+            var selectedUsers = IdentifiedArrayOf<UserData>()
             
             for item in selectedSubredditsAndUsers {
                 switch item {
                 case .subscribedSubreddit(let subscribedSubredditData):
                     selectedSubscribedSubreddits.append(subscribedSubredditData)
-                case .subreddit(_):
-                    break
+                case .subreddit(let subredditData):
+                    selectedSubreddits.append(subredditData)
                 case .subredditInCustomFeed(let subredditInCustomFeed):
                     selectedSubredditsInCustomFeed.append(subredditInCustomFeed)
                 case .subredditInAnonymousCustomFeed(let anonymousCustomFeedSubreddit):
                     selectedSubredditsInCustomFeed.append(SubredditInCustomFeed(name: anonymousCustomFeedSubreddit.subredditName))
                 case .subscribedUser(let subscribedUserData):
                     selectedSubscribedUsers.append(subscribedUserData)
-                case .user(_):
-                    break
+                case .user(let userData):
+                    selectedUsers.append(userData)
                 case .myCustomFeed(_):
                     break
                 }
             }
             
             self.selectedSubscribedSubreddits = selectedSubscribedSubreddits
+            self.selectedSubreddits = selectedSubreddits
             self.selectedSubredditsInCustomFeed = selectedSubredditsInCustomFeed
             self.selectedSubscribedUsers = selectedSubscribedUsers
+            self.selectedUsers = selectedUsers
         default:
             break
         }
