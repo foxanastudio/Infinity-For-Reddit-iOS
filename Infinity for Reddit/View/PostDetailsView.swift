@@ -293,9 +293,12 @@ struct PostDetailsView: View {
                     .background(
                         Capsule()
                             .fill(Color(hex: customThemeViewModel.currentCustomTheme.colorAccent))
+                            .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 8)
                     )
                     .padding(.bottom, 32)
                     .contentShape(Capsule())
+                    .transition(.move(edge: .bottom))
+                    .zIndex(1)
                 }
             }
         }
