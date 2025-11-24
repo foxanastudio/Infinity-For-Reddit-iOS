@@ -27,6 +27,7 @@ public class PostDetailsViewModel: ObservableObject {
     @Published var postDetailsInput: PostDetailsInput
     @Published var singleThreadContext: Int = 8
     @Published var flairs: [Flair]?
+    @Published var searchQuery: String = ""
     private let account: Account
     private var commentMore: CommentMore?
     private var lastLoadedSortTypeKind: SortType.Kind? = nil
@@ -913,12 +914,6 @@ public class PostDetailsViewModel: ObservableObject {
     }
     
     func getPreviousParentComment() -> CommentItem? {
-//        for i in appearedComments.indices {
-//            if appearedComments[i].depth == 0 {
-//                return appearedComments[i]
-//            }
-//        }
-        
         if appearedComments.isEmpty {
             return nil
         } else {

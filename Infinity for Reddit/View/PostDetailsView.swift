@@ -20,6 +20,8 @@ struct PostDetailsView: View {
     @StateObject var playerManager = PlayerManager()
     @StateObject var postDetailsViewModel: PostDetailsViewModel
     
+    @FocusState private var focusedField: FieldType?
+    
     @State private var showSortTypeSheet: Bool = false
     @State private var showSelectFlairSheet: Bool = false
     @State private var navigationBarMenuKey: UUID?
@@ -27,7 +29,8 @@ struct PostDetailsView: View {
     @State private var commentToBeEdited: Comment? = nil
     @State private var activeAlert: ActiveAlert? = nil
     @State private var showActionBar: Bool = true
-    @State private var proxy: ScrollViewProxy?
+    @State private var showSearchBar: Bool = false
+    @State private var listProxy: ScrollViewProxy?
     
     @AppStorage(InterfaceCommentUserDefaultsUtils.fullyCollapseCommentKey, store: .interfaceComment)
     private var fullyCollapseComment: Bool = false
@@ -220,7 +223,7 @@ struct PostDetailsView: View {
                     .themedList()
                     .scrollBounceBehavior(.basedOnSize)
                     .onAppear {
-                        self.proxy = proxy
+                        self.listProxy = proxy
                     }
                     .refreshable {
                         await postDetailsViewModel.refreshPostAndCommentsWithContinuation()
@@ -241,7 +244,64 @@ struct PostDetailsView: View {
                     }
                 }
                 
-                if showActionBar {
+                if showSearchBar {
+                    HStack(spacing: 0) {
+                        CustomTextField(
+                            "Search",
+                            text: $postDetailsViewModel.searchQuery,
+                            singleLine: true,
+                            keyboardType: .default,
+                            showBorder: false,
+                            fieldType: .search,
+                            focusedField: $focusedField
+                        )
+                        
+                        SwiftUI.Image(systemName: "chevron.up")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 16)
+                            .padding(16)
+                            .fabIcon()
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                
+                            }
+                        
+                        SwiftUI.Image(systemName: "chevron.down")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 16)
+                            .padding(16)
+                            .fabIcon()
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                
+                            }
+                        
+                        SwiftUI.Image(systemName: "xmark")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 16)
+                            .padding(16)
+                            .fabIcon()
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                withAnimation {
+                                    showSearchBar = false
+                                }
+                            }
+                    }
+                    .padding(16)
+                    .background(
+                        Capsule()
+                            .fill(Color(hex: customThemeViewModel.currentCustomTheme.colorAccent))
+                            .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 8)
+                    )
+                    .padding(16)
+                    .contentShape(Capsule())
+                    .transition(.move(edge: .bottom))
+                    .zIndex(2)
+                } else if showActionBar {
                     HStack(spacing: 0) {
                         SwiftUI.Image(systemName: "chevron.up")
                             .resizable()
@@ -251,17 +311,33 @@ struct PostDetailsView: View {
                             .fabIcon()
                             .contentShape(Rectangle())
                             .onTapGesture {
-                                if let proxy {
+                                if let listProxy {
                                     if let commentItem = postDetailsViewModel.getPreviousParentComment() {
                                         switch commentItem {
                                         case .comment(let comment):
                                             withAnimation {
-                                                proxy.scrollTo(ObjectIdentifier(comment), anchor: .top)
+                                                listProxy.scrollTo(ObjectIdentifier(comment), anchor: .top)
                                             }
                                         case .more:
                                             break
                                         }
                                     }
+                                }
+                            }
+                        
+                        CustomDivider()
+                            .frame(width: 2, height: 32)
+                        
+                        SwiftUI.Image(systemName: "magnifyingglass")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 24)
+                            .padding(16)
+                            .fabIcon()
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                withAnimation {
+                                    showSearchBar = true
                                 }
                             }
                         
@@ -276,12 +352,12 @@ struct PostDetailsView: View {
                             .fabIcon()
                             .contentShape(Rectangle())
                             .onTapGesture {
-                                if let proxy {
+                                if let listProxy {
                                     if let commentItem = postDetailsViewModel.getNextParentComment() {
                                         switch commentItem {
                                         case .comment(let comment):
                                             withAnimation {
-                                                proxy.scrollTo(ObjectIdentifier(comment), anchor: .top)
+                                                listProxy.scrollTo(ObjectIdentifier(comment), anchor: .top)
                                             }
                                         case .more:
                                             break
@@ -575,5 +651,9 @@ struct PostDetailsView: View {
                 return .warning
             }
         }
+    }
+    
+    private enum FieldType: Hashable {
+        case search
     }
 }
