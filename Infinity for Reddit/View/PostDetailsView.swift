@@ -249,9 +249,12 @@ struct PostDetailsView: View {
                         CustomTextField(
                             "Search",
                             text: $postDetailsViewModel.searchQuery,
-                            singleLine: true,
+                            singleLine: false,
                             keyboardType: .default,
+                            autocapitalization: .never,
+                            customTextFieldScheme: .fab,
                             showBorder: false,
+                            showBackground: false,
                             fieldType: .search,
                             focusedField: $focusedField
                         )
@@ -291,14 +294,15 @@ struct PostDetailsView: View {
                                 }
                             }
                     }
-                    .padding(16)
+                    .padding(.vertical, 16)
+                    .padding(.leading, 16)
                     .background(
-                        Capsule()
+                        RoundedRectangle(cornerRadius: 12)
                             .fill(Color(hex: customThemeViewModel.currentCustomTheme.colorAccent))
                             .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 8)
                     )
                     .padding(16)
-                    .contentShape(Capsule())
+                    .contentShape(RoundedRectangle(cornerRadius: 12))
                     .transition(.move(edge: .bottom))
                     .zIndex(2)
                 } else if showActionBar {

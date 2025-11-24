@@ -17,6 +17,7 @@ struct CustomTextField<FieldType: Hashable>: View {
     private let singleLine: Bool
     private let keyboardType: UIKeyboardType
     private let autocapitalization: TextInputAutocapitalization?
+    private let customTextFieldScheme: CustomTextFieldScheme
     private let showBorder: Bool
     private let showBackground: Bool
     private let fieldType: FieldType
@@ -26,6 +27,7 @@ struct CustomTextField<FieldType: Hashable>: View {
          singleLine: Bool = false,
          keyboardType: UIKeyboardType = .default,
          autocapitalization: TextInputAutocapitalization? = nil,
+         customTextFieldScheme: CustomTextFieldScheme = .normal,
          showBorder: Bool = false,
          showBackground: Bool = true,
          fieldType: FieldType,
@@ -36,6 +38,7 @@ struct CustomTextField<FieldType: Hashable>: View {
         self.singleLine = singleLine
         self.keyboardType = keyboardType
         self.autocapitalization = autocapitalization
+        self.customTextFieldScheme = customTextFieldScheme
         self.showBorder = showBorder
         self.showBackground = showBackground
         self.fieldType = fieldType
@@ -47,13 +50,13 @@ struct CustomTextField<FieldType: Hashable>: View {
             "",
             text: $text,
             prompt: Text(placeholder)
-                .foregroundStyle(Color(hex: customThemeViewModel.currentCustomTheme.secondaryTextColor)),
+                .foregroundStyle(customTextFieldScheme.getHintColor(currentCustomTheme: customThemeViewModel.currentCustomTheme)),
             axis: singleLine ? .horizontal : .vertical
         )
-        .primaryText()
+        .foregroundStyle(customTextFieldScheme.getTextColor(currentCustomTheme: customThemeViewModel.currentCustomTheme))
         .keyboardType(keyboardType)
         .textInputAutocapitalization(autocapitalization)
-        .tint(Color(hex: customThemeViewModel.currentCustomTheme.colorPrimary))
+        .tint(customTextFieldScheme.getTintColor(currentCustomTheme: customThemeViewModel.currentCustomTheme))
         .applyIf(showBorder) {
             // TODO different border color for different focus state
             $0.padding(16)
@@ -69,5 +72,37 @@ struct CustomTextField<FieldType: Hashable>: View {
                 .cornerRadius(10)
         }
         .focused($focusedField, equals: fieldType)
+    }
+}
+
+enum CustomTextFieldScheme {
+    case normal
+    case fab
+    
+    func getHintColor(currentCustomTheme: CustomTheme) -> Color {
+        switch self {
+        case .normal:
+            return Color(hex: currentCustomTheme.secondaryTextColor)
+        case .fab:
+            return Color(hex: currentCustomTheme.fabIconColor, opacity: 0.8)
+        }
+    }
+    
+    func getTextColor(currentCustomTheme: CustomTheme) -> Color {
+        switch self {
+        case .normal:
+            return Color(hex: currentCustomTheme.primaryTextColor)
+        case .fab:
+            return Color(hex: currentCustomTheme.fabIconColor)
+        }
+    }
+    
+    func getTintColor(currentCustomTheme: CustomTheme) -> Color {
+        switch self {
+        case .normal:
+            return Color(hex: currentCustomTheme.colorPrimary)
+        case .fab:
+            return Color(hex: currentCustomTheme.fabIconColor)
+        }
     }
 }
