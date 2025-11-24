@@ -199,6 +199,14 @@ struct CommentViewCard: View {
                                     Button("Add to Comment Filter") {
                                         onAddToCommentFilter()
                                     }
+                                    
+                                    Button("Report") {
+                                        if accountViewModel.account.isAnonymous() {
+                                            navigationManager.openLink("https://www.reddit.com/report")
+                                        } else {
+                                            navigationManager.append(AppNavigation.report(subredditName: commentViewModel.comment.subreddit, thingFullname: commentViewModel.comment.name))
+                                        }
+                                    }
                                 } label: {
                                     SwiftUI.Image(systemName: "ellipsis.circle")
                                         .commentIconTemplateRendering()
@@ -285,6 +293,14 @@ struct CommentViewCard: View {
                                     
                                     Button("Add to Comment Filter") {
                                         onAddToCommentFilter()
+                                    }
+                                    
+                                    Button("Report") {
+                                        if accountViewModel.account.isAnonymous() {
+                                            navigationManager.openLink("https://www.reddit.com/report")
+                                        } else {
+                                            navigationManager.append(AppNavigation.report(subredditName: commentViewModel.comment.subreddit, thingFullname: commentViewModel.comment.name))
+                                        }
                                     }
                                 } label: {
                                     SwiftUI.Image(systemName: "ellipsis.circle")
