@@ -24,13 +24,13 @@ struct PostPreviewView: View {
     @AppStorage(DataSavingModeUserDefaultsUtils.onlyDisablePreviewInVideoAndGIFKey, store: .dataSavingMode) private var onlyDisablePreviewInVideoAndGIF: Bool = false
     
     var body: some View {
-        if let url = resolvedPreviewImageURL {
+        if let url = previewUrlString {
             ZStack(alignment: isInCompactLayout ? .center : .topLeading) {
                 CustomWebImage(
                     url,
                     width: isInCompactLayout ? 60 : nil,
                     height: limitMediaHeight && inPostListing && !isInCompactLayout ? 200 : (isInCompactLayout ? 60 : nil),
-                    aspectRatio: (limitMediaHeight && inPostListing) || isInCompactLayout ? nil : resolvedAspectRatio,
+                    aspectRatio: (limitMediaHeight && inPostListing) || isInCompactLayout ? nil : aspectRatio,
                     handleImageTapGesture: !(isInCompactLayout && post.postType == .gallery),
                     centerCrop: true,
                     matchedGeometryEffectId: UUID().uuidString,
@@ -45,9 +45,9 @@ struct PostPreviewView: View {
                             }
                     )
                 }
-                .applyIf(isInCompactLayout && inPostListing && post.postType == .gallery) {
+                .applyIf(isInCompactLayout && post.postType == .gallery) {
                     $0.onTapGesture {
-                        if let url = resolvedPreviewImageURL {
+                        if let url = previewUrlString {
                             fullScreenMediaViewModel.show(
                                 .gallery(
                                     currentUrlString: url,
@@ -90,7 +90,7 @@ struct PostPreviewView: View {
             }
             .frame(maxWidth: .infinity)
             .applyIf((!limitMediaHeight || !inPostListing) && !isInCompactLayout) {
-                $0.aspectRatio(resolvedAspectRatio ?? CGSize(width: 0, height: 0), contentMode: .fit)
+                $0.aspectRatio(aspectRatio ?? CGSize(width: 0, height: 0), contentMode: .fit)
             }
             .applyIf(limitMediaHeight && inPostListing && !isInCompactLayout) {
                 $0.frame(height: 200)
@@ -116,21 +116,11 @@ struct PostPreviewView: View {
         }
     }
     
-    private var resolvedPreviewImageURL: String? {
-        let isDataSavingModeActive = Utils.isDataSavingModeActive(dataSavingMode: dataSavingMode, isWifiConnected: networkManager.isWifiConnected)
+    private var previewUrlString: String? {
+        let isDataSavingModeActive = DataSavingModeUserDefaultsUtils.isDataSavingModeActive(dataSavingMode: dataSavingMode, isWifiConnected: networkManager.isWifiConnected)
 
-        if isDataSavingModeActive {
-            let isVideoOrGif: Bool
-            switch post.postType {
-            case .redditVideo, .video, .imgurVideo, .redgifs, .streamable, .gif:
-                isVideoOrGif = true
-            default:
-                isVideoOrGif = false
-            }
-            
-            if disableImagePreview || (onlyDisablePreviewInVideoAndGIF && isVideoOrGif) {
-                return nil
-            }
+        if isDataSavingModeActive && (disableImagePreview || (onlyDisablePreviewInVideoAndGIF && post.postType.isVideoOrGif)){
+            return nil
         }
 
         if isInCompactLayout || isDataSavingModeActive {
@@ -150,7 +140,7 @@ struct PostPreviewView: View {
         return nil
     }
     
-    private var resolvedAspectRatio: CGSize? {
+    private var aspectRatio: CGSize? {
         if isInCompactLayout {
             if let ratio = post.preview?.images.first?.resolutions.first?.aspectRatio {
                 return ratio

@@ -24,4 +24,8 @@ class DataSavingModeUserDefaultsUtils {
     static var onlyDisablePreviewInVideoAndGIF: Bool {
         return UserDefaults.dataSavingMode.bool(forKey: onlyDisablePreviewInVideoAndGIFKey)
     }
+    
+    static func isDataSavingModeActive(dataSavingMode: Int, isWifiConnected: Bool) -> Bool {
+        return dataSavingMode == 2 || (dataSavingMode == 1 && !isWifiConnected)
+    }
 }

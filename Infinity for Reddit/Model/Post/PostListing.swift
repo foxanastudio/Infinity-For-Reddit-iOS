@@ -189,6 +189,15 @@ public class Post : NSObject, ObservableObject, Identifiable {
             }
         }
         
+        var isVideoOrGif: Bool {
+            switch self {
+            case .redditVideo, .video, .imgurVideo, .redgifs, .streamable, .gif:
+                return true
+            default:
+                return false
+            }
+        }
+        
         var text: String {
             switch self {
             case .text:

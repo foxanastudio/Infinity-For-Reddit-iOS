@@ -23,6 +23,10 @@ struct GalleryCarousel: View {
     let items: [GalleryItem]
     let onImageTap: (() -> Void)?
     
+    private var isDataSavingModeActive: Bool {
+        return DataSavingModeUserDefaultsUtils.isDataSavingModeActive(dataSavingMode: dataSavingMode, isWifiConnected: networkManager.isWifiConnected)
+    }
+    
     init(post: Post, onImageTap: (() -> Void)? = nil) {
         self.post = post
         self.items = post.galleryData!.items
@@ -30,10 +34,7 @@ struct GalleryCarousel: View {
     }
     
     var body: some View {
-        let isDataSavingModeActive = Utils.isDataSavingModeActive(dataSavingMode: dataSavingMode, isWifiConnected: networkManager.isWifiConnected)
-        let shouldHideGalleryPreview = isDataSavingModeActive && disableImagePreview
-
-        if shouldHideGalleryPreview {
+        if isDataSavingModeActive && disableImagePreview {
             ZStack(alignment: .center) {
                 SwiftUI.Image(systemName: "square.stack")
                     .noPreviewPostTypeIndicator()
@@ -45,10 +46,8 @@ struct GalleryCarousel: View {
             ZStack(alignment: .topLeading) {
                 TabView(selection: $galleryScrollState.scrollId) {
                     ForEach(Array(items.enumerated()), id: \.offset) { index, item in
-                        let imageUrl = resolveImageUrl(for: item, isDataSavingModeActive: isDataSavingModeActive)
-
                         CustomWebImage(
-                            imageUrl,
+                            getImageUrl(item),
                             handleImageTapGesture: false,
                             centerCrop: true,
                             blur: (post.over18 && blurSensitiveImages) || (post.spoiler && blurSpoilerImages),
@@ -81,13 +80,14 @@ struct GalleryCarousel: View {
         }
     }
 
-    private func resolveImageUrl(for item: GalleryItem, isDataSavingModeActive: Bool) -> String {
+    private func getImageUrl(_ item: GalleryItem) -> String {
         guard isDataSavingModeActive,
               let mediaMetadata = post.mediaMetadata?[item.mediaId],
               !mediaMetadata.p.isEmpty,
               let previewUrl = mediaMetadata.p.first?.u else {
             return item.urlString
         }
+        
         return previewUrl
     }
 }

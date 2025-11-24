@@ -50,8 +50,4 @@ class Utils {
     static func getCurrentTimeEpoch() -> Int64 {
         return Int64(Date().timeIntervalSince1970 * 1000)
     }
-    
-    static func isDataSavingModeActive(dataSavingMode: Int, isWifiConnected: Bool) -> Bool {
-        return dataSavingMode == 2 || (dataSavingMode == 1 && !isWifiConnected)
-    }
 }
