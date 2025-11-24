@@ -132,6 +132,10 @@ extension View {
         self.modifier(SecondaryIconImageViewModifier())
     }
     
+    func fabIcon() -> some View {
+        self.modifier(FabIconImageViewModifier())
+    }
+    
     func themedPicker() -> some View {
         self.modifier(PickerCustomThemeViewModifier())
     }

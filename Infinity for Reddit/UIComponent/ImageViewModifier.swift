@@ -124,6 +124,16 @@ struct SecondaryIconImageViewModifier: ViewModifier {
     }
 }
 
+struct FabIconImageViewModifier: ViewModifier {
+    @EnvironmentObject var themeViewModel: CustomThemeViewModel
+    
+    func body(content: Content) -> some View {
+        content
+            .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.fabIconColor))
+            .colorMultiply(Color(hex: themeViewModel.currentCustomTheme.fabIconColor))
+    }
+}
+
 struct MediaIndicatorViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
     
