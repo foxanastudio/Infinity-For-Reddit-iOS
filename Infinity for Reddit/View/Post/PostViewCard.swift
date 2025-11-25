@@ -12,6 +12,7 @@ import Flow
 struct PostViewCard: View {
     @EnvironmentObject private var accountViewModel: AccountViewModel
     @EnvironmentObject private var themeViewModel: CustomThemeViewModel
+    @EnvironmentObject private var snackbarManager: SnackbarManager
 
     @AppStorage(InterfacePostUserDefaultsUtils.hidePostTypeKey, store: .interfacePost) private var hidePostType: Bool = false
     @AppStorage(InterfacePostUserDefaultsUtils.hidePostFlairKey, store: .interfacePost) private var hidePostFlair: Bool = false
@@ -253,11 +254,20 @@ struct PostViewCard: View {
             HStack(spacing: 0) {
                 HStack(spacing: 0) {
                     Button(action: {
-                        onVote(1)
+                        if postViewModel.post.archived {
+                            snackbarManager.showSnackbar(.info("This post has been archived. Vote unavailable."))
+                        } else {
+                            onVote(1)
+                        }
                     }) {
                         SwiftUI.Image(systemName: postViewModel.post.likes == 1 ? "arrowshape.up.fill" : "arrowshape.up")
                             .postIconTemplateRendering()
-                            .postUpvoteIcon(isUpvoted: postViewModel.post.likes == 1)
+                            .applyIf(postViewModel.post.archived) {
+                                $0.voteAndReplyUnavailbleIcon()
+                            }
+                            .applyIf(!postViewModel.post.archived) {
+                                $0.postUpvoteIcon(isUpvoted: postViewModel.post.likes == 1)
+                            }
                     }
                     .buttonStyle(.borderless)
                     .padding(8)
@@ -270,11 +280,20 @@ struct PostViewCard: View {
                         .onTapGesture {}
                     
                     Button(action: {
-                        onVote(-1)
+                        if postViewModel.post.archived {
+                            snackbarManager.showSnackbar(.info("This post has been archived. Vote unavailable."))
+                        } else {
+                            onVote(-1)
+                        }
                     }) {
                         SwiftUI.Image(systemName: postViewModel.post.likes == -1 ? "arrowshape.down.fill" : "arrowshape.down")
                             .postIconTemplateRendering()
-                            .postDownvoteIcon(isDownvoted: postViewModel.post.likes == -1)
+                            .applyIf(postViewModel.post.archived) {
+                                $0.voteAndReplyUnavailbleIcon()
+                            }
+                            .applyIf(!postViewModel.post.archived) {
+                                $0.postDownvoteIcon(isDownvoted: postViewModel.post.likes == -1)
+                            }
                     }
                     .buttonStyle(.borderless)
                     .padding(8)
