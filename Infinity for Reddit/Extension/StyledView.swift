@@ -76,6 +76,10 @@ extension View {
         self.modifier(PostInfoTextViewModifier())
     }
     
+    func voteAndReplyUnavailbleIcon() -> some View {
+        self.modifier(VoteAndReplyUnavailableIconViewModifier())
+    }
+    
     func commentIcon() -> some View {
         self.modifier(CommentIconImageViewModifier())
     }

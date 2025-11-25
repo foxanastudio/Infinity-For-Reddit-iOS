@@ -265,7 +265,12 @@ struct CommentViewCard: View {
                                     }) {
                                         SwiftUI.Image(systemName: "arrowshape.turn.up.left.fill")
                                             .commentIconTemplateRendering()
-                                            .commentIcon()
+                                            .applyIf(commentViewModel.comment.locked) {
+                                                $0.voteAndReplyUnavailbleIcon()
+                                            }
+                                            .applyIf(!commentViewModel.comment.locked) {
+                                                $0.commentIcon()
+                                            }
                                     }
                                     .buttonStyle(.borderless)
                                     .padding(8)

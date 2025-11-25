@@ -26,6 +26,16 @@ struct PostIconImageViewModifier: ViewModifier {
     }
 }
 
+struct VoteAndReplyUnavailableIconViewModifier: ViewModifier {
+    @EnvironmentObject var themeViewModel: CustomThemeViewModel
+    
+    func body(content: Content) -> some View {
+        content
+            .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.voteAndReplyUnavailableButtonColor))
+            .colorMultiply(Color(hex: themeViewModel.currentCustomTheme.voteAndReplyUnavailableButtonColor))
+    }
+}
+
 struct CommentIconImageViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
     
