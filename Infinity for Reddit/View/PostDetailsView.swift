@@ -52,6 +52,7 @@ struct PostDetailsView: View {
                 postDetailsRepository: PostDetailsRepository(),
                 historyPostsRepository: HistoryPostsRepository(),
                 flairRepository: FlairRepository(),
+                postModerationRepository: PostModerationRepository(),
                 isContinueThread: isContinueThread
             )
         )
@@ -436,52 +437,62 @@ struct PostDetailsView: View {
             }
         }
         .wrapContentSheet(isPresented: $showPostModerationSheet) {
-            PostModerationSheet(
-                onApprove: {
-                    
-                },
-                onRemove: {
-                    
-                },
-                onToggleSpam: {
-                    
-                },
-                onToggleStickyPost: {
-                    
-                },
-                onLock: {
-                    
-                },
-                onToggleSensitive: {
-                    
-                },
-                onToggleSpoiler: {
-                    
-                },
-                onToggleDistinguishAsModerator: {
-                    
-                }
-            )
+            if let post = postDetailsViewModel.post {
+                PostModerationSheet(
+                    post: post,
+                    onApprove: {
+                        postDetailsViewModel.approvePost()
+                    },
+                    onRemove: {
+                        postDetailsViewModel.removePost(isSpam: false)
+                    },
+                    onMarkAsSpam: {
+                        postDetailsViewModel.removePost(isSpam: true)
+                    },
+                    onToggleStickyPost: {
+                        postDetailsViewModel.toggleSticky()
+                    },
+                    onToggleLock: {
+                        postDetailsViewModel.toggleLock()
+                    },
+                    onToggleSensitive: {
+                        postDetailsViewModel.toggleSensitive {
+                            setUpMenu()
+                        }
+                    },
+                    onToggleSpoiler: {
+                        postDetailsViewModel.toggleSpoiler {
+                            setUpMenu()
+                        }
+                    },
+                    onToggleDistinguishAsModerator: {
+                        postDetailsViewModel.toggleDistinguishAsMod()
+                    }
+                )
+            } else {
+                EmptyView()
+            }
         }
         .overlay(
-            CustomAlert(title: activeAlert?.title ?? "",
-                        confirmButtonText: activeAlert?.confirmButtonText ?? "",
-                        buttonStyle: activeAlert?.buttonStyle ?? .info,
-                        isPresented: Binding(
-                            get: { activeAlert != nil },
-                            set: { newValue in
-                                if !newValue {
-                                    activeAlert = nil
-                                }
-                            }
-                        )) {} onConfirm: {
-                            if let alert = activeAlert {
-                                switch alert {
-                                case .deletePost:
-                                    postDetailsViewModel.deletePost()
-                                }
-                            }
+            CustomAlert(
+                title: activeAlert?.title ?? "",
+                confirmButtonText: activeAlert?.confirmButtonText ?? "",
+                buttonStyle: activeAlert?.buttonStyle ?? .info,
+                isPresented: Binding(
+                    get: { activeAlert != nil },
+                    set: { newValue in
+                        if !newValue {
+                            activeAlert = nil
                         }
+                    }
+                )) {} onConfirm: {
+                    if let alert = activeAlert {
+                        switch alert {
+                        case .deletePost:
+                            postDetailsViewModel.deletePost()
+                        }
+                    }
+                }
         )
     }
     
@@ -618,8 +629,8 @@ struct PostDetailsView: View {
         
         if postDetailsViewModel.post?.canModPost ?? false {
             menuItems.append(
-                NavigationBarMenuItem(title: "Moderation") {
-                    guard let post = postDetailsViewModel.post else {
+                NavigationBarMenuItem(title: "Moderate") {
+                    guard postDetailsViewModel.post != nil else {
                         return
                     }
                     

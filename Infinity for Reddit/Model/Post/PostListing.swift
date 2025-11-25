@@ -57,8 +57,9 @@ public class PostListing : NSObject {
 }
 
 public class Post : NSObject, ObservableObject, Identifiable {
-    var approvedAtUtc : String!
-    var approvedBy : String!
+    @Published var approved: Bool
+    @Published var approvedAtUtc : Int64
+    @Published var approvedBy : String
     var archived : Bool!
     @Published var author : String!
     var authorFlairRichtext : [FlairRichtext]! = [FlairRichtext]()
@@ -108,7 +109,8 @@ public class Post : NSObject, ObservableObject, Identifiable {
     var quarantine : Bool!
     // TODO Fix the type, may not be String
     var removalReason : String!
-    var removedBy : String!
+    var removed : Bool
+    @Published var removedBy : String
     var removedByCategory : String!
     var reportReasons : String!
     
@@ -127,6 +129,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
         return selftext
     }
     var sendReplies : Bool!
+    @Published var spam: Bool
     @Published var spoiler : Bool!
     var stickied : Bool!
     var subreddit : String!
@@ -150,7 +153,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
     @Published var isRead: Bool = false
     
     var fileNameWithoutExtension: String {
-        return "\(subreddit ?? "Unknown")-\(name ?? "id")"
+        return "\(subreddit ?? "Unknown")-\(name)"
     }
     
     var canEditBody: Bool {
@@ -226,7 +229,8 @@ public class Post : NSObject, ObservableObject, Identifiable {
         if json.isEmpty {
             throw JSONError.invalidData
         }
-        approvedAtUtc = json["approved_at_utc"].stringValue
+        approved = json["approved"].boolValue
+        approvedAtUtc = json["approved_at_utc"].int64Value
         approvedBy = json["approved_by"].stringValue
         archived = json["archived"].boolValue
         author = json["author"].stringValue
@@ -332,6 +336,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
         removalReason = json["removal_reason"].stringValue
         removedBy = json["removed_by"].stringValue
         removedByCategory = json["removed_by_category"].stringValue
+        removed = removedByCategory == "moderator"
         reportReasons = json["report_reasons"].stringValue
         saved = json["saved"].boolValue
         var score = json["score"].intValue
@@ -340,6 +345,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
         selftext = json["selftext"].stringValue
         selftextHtml = json["selftext_html"].stringValue
         sendReplies = json["send_replies"].boolValue
+        spam = json["spam"].boolValue
         spoiler = json["spoiler"].boolValue
         stickied = json["stickied"].boolValue
         subreddit = json["subreddit"].stringValue

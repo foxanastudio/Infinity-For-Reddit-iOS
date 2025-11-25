@@ -10,11 +10,13 @@ import SwiftUI
 struct PostModerationSheet: View {
     @Environment(\.dismiss) var dismiss
     
+    let post: Post
+    
     let onApprove: () -> Void
     let onRemove: () -> Void
-    let onToggleSpam: () -> Void
+    let onMarkAsSpam: () -> Void
     let onToggleStickyPost: () -> Void
-    let onLock: () -> Void
+    let onToggleLock: () -> Void
     let onToggleSensitive: () -> Void
     let onToggleSpoiler: () -> Void
     let onToggleDistinguishAsModerator: () -> Void
@@ -22,48 +24,52 @@ struct PostModerationSheet: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
-                Text("Moderation")
+                Text("Moderate")
                     .primaryText()
                 
                 Spacer()
                     .frame(height: 16)
                 
-                IconTextButton(startIconUrl: "checkmark.shield.fill", text: "Approve") {
-                    onApprove()
-                    dismiss()
+                if !post.approved {
+                    IconTextButton(startIconUrl: "checkmark.shield.fill", text: "Approve") {
+                        onApprove()
+                        dismiss()
+                    }
                 }
                 
-                IconTextButton(startIconUrl: "xmark", text: "Remove") {
-                    onRemove()
-                    dismiss()
+                if !post.removed {
+                    IconTextButton(startIconUrl: "xmark", text: "Remove") {
+                        onRemove()
+                        dismiss()
+                    }
+                    
+                    IconTextButton(startIconUrl: "trash", text: "Mark as spam") {
+                        onMarkAsSpam()
+                        dismiss()
+                    }
                 }
                 
-                IconTextButton(startIconUrl: "trash", text: "Mark as spam") {
-                    onToggleSpam()
-                    dismiss()
-                }
-                
-                IconTextButton(startIconUrl: "pin", text: "Sticky post") {
+                IconTextButton(startIconUrl: post.stickied ? "pin.slash" : "pin", text: "\(post.stickied ? "Unstick" : "Stick") post") {
                     onToggleStickyPost()
                     dismiss()
                 }
                 
-                IconTextButton(startIconUrl: "lock.fill", text: "Lock") {
-                    onLock()
+                IconTextButton(startIconUrl: post.locked ? "lock.open.fill" : "lock.fill", text: post.locked ? "Unlock" : "Lock") {
+                    onToggleLock()
                     dismiss()
                 }
                 
-                IconTextButton(startIconUrl: "eye.trianglebadge.exclamationmark", text: "Mark sensitive") {
+                IconTextButton(startIconUrl: "eye.trianglebadge.exclamationmark", text: "\(post.over18 ? "Unmark" : "Mark") sensitive") {
                     onToggleSensitive()
                     dismiss()
                 }
                 
-                IconTextButton(startIconUrl: "exclamationmark.triangle.fill", text: "Mark spoiler") {
+                IconTextButton(startIconUrl: "exclamationmark.triangle.fill", text: "\(post.spoiler ? "Unmark" : "Mark") spoiler") {
                     onToggleSpoiler()
                     dismiss()
                 }
                 
-                IconTextButton(startIconUrl: "shield", text: "Distinguish as moderator") {
+                IconTextButton(startIconUrl: post.isModerator ? "shield.slash" : "shield", text: "\(post.isModerator ? "Undistinguish" : "Distinguish") as moderator") {
                     onToggleDistinguishAsModerator()
                     dismiss()
                 }

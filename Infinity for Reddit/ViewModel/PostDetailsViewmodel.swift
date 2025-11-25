@@ -42,6 +42,7 @@ public class PostDetailsViewModel: ObservableObject {
     private let postDetailsRepository: PostDetailsRepositoryProtocol
     private let historyPostsRepository: HistoryPostsRepositoryProtocol
     private let flairRepository: FlairRepositoryProtocol
+    private let postModerationRepository: PostModerationRepositoryProtocol
     
     private var refreshPostsContinuation: CheckedContinuation<Void, Never>?
     
@@ -71,6 +72,7 @@ public class PostDetailsViewModel: ObservableObject {
         postDetailsRepository: PostDetailsRepositoryProtocol,
         historyPostsRepository: HistoryPostsRepositoryProtocol,
         flairRepository: FlairRepositoryProtocol,
+        postModerationRepository: PostModerationRepositoryProtocol,
         isContinueThread: Bool = false
     ) {
         self.account = account
@@ -79,6 +81,7 @@ public class PostDetailsViewModel: ObservableObject {
         self.postDetailsRepository = postDetailsRepository
         self.historyPostsRepository = historyPostsRepository
         self.flairRepository = flairRepository
+        self.postModerationRepository = postModerationRepository
         self.showTopLevelCommentsFirst = InterfaceCommentUserDefaultsUtils.showTopLevelCommentsFirst
         if isContinueThread {
             self.singleThreadContext = 0
@@ -998,6 +1001,108 @@ public class PostDetailsViewModel: ObservableObject {
     private func setSearchedComment(_ comment: CommentItem) {
         withAnimation {
             searchedComment = comment
+        }
+    }
+    
+    @MainActor
+    func approvePost() {
+        guard let post else {
+            return
+        }
+        
+        Task {
+            do {
+                try await postModerationRepository.approvePost(post: post)
+                
+                self.post?.approved = true
+                self.post?.approvedBy = account.username
+                self.post?.approvedAtUtc = Utils.getCurrentTimeEpoch()
+                self.post?.removed = false
+                self.post?.removedBy = ""
+                self.post?.removedByCategory = ""
+                self.post?.spam = false
+            } catch {
+                self.error = error
+                print(error)
+            }
+        }
+    }
+    
+    @MainActor
+    func removePost(isSpam: Bool) {
+        guard let post else {
+            return
+        }
+        
+        Task {
+            do {
+                try await postModerationRepository.removePost(post: post, isSpam: isSpam)
+                
+                self.post?.approved = false
+                self.post?.approvedBy = ""
+                self.post?.approvedAtUtc = 0
+                self.post?.removed = true
+                self.post?.removedBy = account.username
+                self.post?.removedByCategory = "moderator"
+                self.post?.spam = isSpam
+            } catch {
+                self.error = error
+                print(error)
+            }
+        }
+    }
+    
+    @MainActor
+    func toggleSticky() {
+        guard let post else {
+            return
+        }
+        
+        Task {
+            do {
+                try await postModerationRepository.toggleSticky(post: post)
+                
+                self.post?.stickied = !(self.post?.stickied ?? false)
+            } catch {
+                self.error = error
+                print(error)
+            }
+        }
+    }
+    
+    @MainActor
+    func toggleLock() {
+        guard let post else {
+            return
+        }
+        
+        Task {
+            do {
+                try await postModerationRepository.toggleLock(post: post)
+                
+                self.post?.locked = !(self.post?.locked ?? false)
+            } catch {
+                self.error = error
+                print(error)
+            }
+        }
+    }
+    
+    @MainActor
+    func toggleDistinguishAsMod() {
+        guard let post else {
+            return
+        }
+        
+        Task {
+            do {
+                try await postModerationRepository.toggleDistinguishAsMod(post: post)
+                
+                self.post?.distinguished = (self.post?.distinguished ?? "") == "moderator" ? "" : "moderator"
+            } catch {
+                self.error = error
+                print(error)
+            }
         }
     }
 }
