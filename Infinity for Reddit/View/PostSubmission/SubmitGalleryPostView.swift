@@ -179,7 +179,7 @@ struct SubmitGalleryPostView: View {
         .onChange(of: submitGalleryPostViewModel.submitPostTask) { _, newValue in
             if newValue != nil {
                 snackbarManager.showSnackbar(
-                    text: "Submitting. Please wait...",
+                    .info("Submitting. Please wait..."),
                     autoDismiss: false,
                     canDismissByGesture: false
                 )
@@ -193,7 +193,7 @@ struct SubmitGalleryPostView: View {
         }
         .onReceive(submitGalleryPostViewModel.$error) { newValue in
             if let error = newValue {
-                snackbarManager.showSnackbar(text: error.localizedDescription)
+                snackbarManager.showSnackbar(.error(error))
             }
         }
         .fullScreenCover(isPresented: $showCamera) {

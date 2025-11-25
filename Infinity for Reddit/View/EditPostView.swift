@@ -189,7 +189,7 @@ struct EditPostView: View {
         .onChange(of: editPostViewModel.editPostTask) { _, newValue in
             if newValue != nil {
                 snackbarManager.showSnackbar(
-                    text: "Editing. Please wait...",
+                    .info("Editing. Please wait..."),
                     autoDismiss: false,
                     canDismissByGesture: false
                 )
@@ -206,14 +206,14 @@ struct EditPostView: View {
                     editPostViewModel.postToBeEdited.selftext = content
                     editPostViewModel.postToBeEdited.selftextProcessedMarkdown = MarkdownContent(content)
                     postEditingShareableViewModel.editedPost = editPostViewModel.postToBeEdited
-                    snackbarManager.showSnackbar(text: "Comment edited, but couldn’t fetch the update. Please refresh.")
+                    snackbarManager.showSnackbar(.info("Comment edited, but couldn’t fetch the update. Please refresh."))
                     dismiss()
                 }
             }
         }
         .onReceive(editPostViewModel.$error) { newValue in
             if let error = newValue {
-                snackbarManager.showSnackbar(text: error.localizedDescription)
+                snackbarManager.showSnackbar(.error(error))
             }
         }
     }

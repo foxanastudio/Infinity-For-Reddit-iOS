@@ -204,7 +204,7 @@ struct SubmitImagePostView: View {
         .onChange(of: submitImagePostViewModel.submitPostTask) { _, newValue in
             if newValue != nil {
                 snackbarManager.showSnackbar(
-                    text: "Submitting. Please wait...",
+                    .info("Submitting. Please wait..."),
                     autoDismiss: false,
                     canDismissByGesture: false
                 )
@@ -212,13 +212,13 @@ struct SubmitImagePostView: View {
         }
         .onChange(of: submitImagePostViewModel.postSubmittedFlag) { _, newValue in
             if newValue {
-                snackbarManager.showSnackbar(text: "Post submitted successfully. Your image is being processed.")
+                snackbarManager.showSnackbar(.info("Post submitted successfully. Your image is being processed."))
                 dismiss()
             }
         }
         .onReceive(submitImagePostViewModel.$error) { newValue in
             if let error = newValue {
-                snackbarManager.showSnackbar(text: error.localizedDescription)
+                snackbarManager.showSnackbar(.error(error))
             }
         }
     }

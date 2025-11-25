@@ -31,7 +31,7 @@ class SnackbarManager: ObservableObject {
     }
     
     func showSnackbar(
-        text: String,
+        _ snackbarMessage: SnackbarMessage,
         actionText: String? = nil,
         autoDismiss: Bool = true,
         canDismissByGesture: Bool = true,
@@ -39,7 +39,7 @@ class SnackbarManager: ObservableObject {
     ) {
         snackbarTask?.cancel()
         
-        self.text = text
+        self.text = snackbarMessage.text
         self.canDismissByGesture = canDismissByGesture
         self.actionText = actionText
         self.action = action

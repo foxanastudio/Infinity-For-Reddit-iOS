@@ -148,7 +148,7 @@ struct CreateOrEditCustomFeedView: View {
         .onChange(of: createOrEditCustomFeedViewModel.createOrUpdateCustomFeedTask) { _, newValue in
             if newValue != nil {
                 snackbarManager.showSnackbar(
-                    text: "Creating. Please wait...",
+                    .info("Creating. Please wait..."),
                     autoDismiss: false,
                     canDismissByGesture: false
                 )
@@ -162,7 +162,7 @@ struct CreateOrEditCustomFeedView: View {
         }
         .onReceive(createOrEditCustomFeedViewModel.$error) { newValue in
             if let error = newValue {
-                snackbarManager.showSnackbar(text: error.localizedDescription)
+                snackbarManager.showSnackbar(.error(error))
             }
         }
         .sheet(isPresented: $showSubredditAndUserMultiSelectionSheet) {

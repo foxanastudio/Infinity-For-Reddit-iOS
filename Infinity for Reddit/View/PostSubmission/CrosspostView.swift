@@ -121,7 +121,7 @@ struct CrosspostView: View {
         .onChange(of: crosspostViewModel.submitPostTask) { _, newValue in
             if newValue != nil {
                 snackbarManager.showSnackbar(
-                    text: "Submitting. Please wait...",
+                    .info("Submitting. Please wait..."),
                     autoDismiss: false,
                     canDismissByGesture: false
                 )
@@ -135,7 +135,7 @@ struct CrosspostView: View {
         }
         .onReceive(crosspostViewModel.$error) { newValue in
             if let error = newValue {
-                snackbarManager.showSnackbar(text: error.localizedDescription)
+                snackbarManager.showSnackbar(.error(error))
             }
         }
     }

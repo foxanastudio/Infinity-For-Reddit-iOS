@@ -13,6 +13,7 @@ struct CommentViewCard: View {
     @EnvironmentObject private var accountViewModel: AccountViewModel
     @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
     @EnvironmentObject private var navigationManager: NavigationManager
+    @EnvironmentObject private var snackbarManager: SnackbarManager
     
     @AppStorage(InterfaceCommentUserDefaultsUtils.showCommentDividerKey, store: .interfaceComment)
     private var showCommentDivider: Bool = false
@@ -256,7 +257,11 @@ struct CommentViewCard: View {
                                 
                                 if isInPostDetails {
                                     Button(action: {
-                                        onReply?()
+                                        if commentViewModel.comment.locked {
+                                            snackbarManager.showSnackbar(.info("This comment is locked."))
+                                        } else {
+                                            onReply?()
+                                        }
                                     }) {
                                         SwiftUI.Image(systemName: "arrowshape.turn.up.left.fill")
                                             .commentIconTemplateRendering()
@@ -287,7 +292,11 @@ struct CommentViewCard: View {
                                     
                                     if isInPostDetails {
                                         Button("Reply") {
-                                            onReply?()
+                                            if commentViewModel.comment.locked {
+                                                snackbarManager.showSnackbar(.info("This comment is locked."))
+                                            } else {
+                                                onReply?()
+                                            }
                                         }
                                     }
                                     

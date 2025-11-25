@@ -64,7 +64,7 @@ struct ReportView: View {
         .onChange(of: reportViewModel.reportTask) { _, newValue in
             if newValue != nil {
                 snackbarManager.showSnackbar(
-                    text: "Reporting. Please wait...",
+                    .info("Reporting. Please wait..."),
                     autoDismiss: false,
                     canDismissByGesture: false
                 )
@@ -72,13 +72,13 @@ struct ReportView: View {
         }
         .onChange(of: reportViewModel.reportSubmitted) { _, newValue in
             if newValue {
-                snackbarManager.showSnackbar(text: "Reported")
+                snackbarManager.showSnackbar(.info("Reported"))
                 dismiss()
             }
         }
         .onReceive(reportViewModel.$error) { newValue in
             if let error = newValue {
-                snackbarManager.showSnackbar(text: error.localizedDescription)
+                snackbarManager.showSnackbar(.error(error))
             }
         }
     }

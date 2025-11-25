@@ -92,7 +92,7 @@ struct SendChatMessageView: View {
         .onChange(of: sendChatMessageViewModel.sendChatMessageTask) { _, newValue in
             if newValue != nil {
                 snackbarManager.showSnackbar(
-                    text: "Sending. Please wait...",
+                    .info("Sending. Please wait..."),
                     autoDismiss: false,
                     canDismissByGesture: false
                 )
@@ -100,13 +100,13 @@ struct SendChatMessageView: View {
         }
         .onChange(of: sendChatMessageViewModel.chatMessageSentFlag) { _, newValue in
             if newValue {
-                snackbarManager.showSnackbar(text: "Sent")
+                snackbarManager.showSnackbar(.info("Sent"))
                 dismiss()
             }
         }
         .onReceive(sendChatMessageViewModel.$error) { newValue in
             if let error = newValue {
-                snackbarManager.showSnackbar(text: error.localizedDescription)
+                snackbarManager.showSnackbar(.error(error))
             }
         }
     }

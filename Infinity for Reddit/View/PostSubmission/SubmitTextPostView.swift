@@ -204,7 +204,7 @@ struct SubmitTextPostView: View {
         .onChange(of: submitTextPostViewModel.submitPostTask) { _, newValue in
             if newValue != nil {
                 snackbarManager.showSnackbar(
-                    text: "Submitting. Please wait...",
+                    .info("Submitting. Please wait..."),
                     autoDismiss: false,
                     canDismissByGesture: false
                 )
@@ -218,7 +218,7 @@ struct SubmitTextPostView: View {
         }
         .onReceive(submitTextPostViewModel.$error) { newValue in
             if let error = newValue {
-                snackbarManager.showSnackbar(text: error.localizedDescription)
+                snackbarManager.showSnackbar(.error(error))
             }
         }
     }

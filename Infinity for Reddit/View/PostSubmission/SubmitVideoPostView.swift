@@ -200,7 +200,7 @@ struct SubmitVideoPostView: View {
         .onChange(of: submitVideoPostViewModel.submitPostTask) { _, newValue in
             if newValue != nil {
                 snackbarManager.showSnackbar(
-                    text: "Submitting. Please wait...",
+                    .info("Submitting. Please wait..."),
                     autoDismiss: false,
                     canDismissByGesture: false
                 )
@@ -208,13 +208,13 @@ struct SubmitVideoPostView: View {
         }
         .onChange(of: submitVideoPostViewModel.postSubmittedFlag) { _, newValue in
             if newValue {
-                snackbarManager.showSnackbar(text: "Post submitted successfully. Your video is being processed.")
+                snackbarManager.showSnackbar(.info("Post submitted successfully. Your video is being processed."))
                 dismiss()
             }
         }
         .onReceive(submitVideoPostViewModel.$error) { newValue in
             if let error = newValue {
-                snackbarManager.showSnackbar(text: error.localizedDescription)
+                snackbarManager.showSnackbar(.error(error))
             }
         }
     }

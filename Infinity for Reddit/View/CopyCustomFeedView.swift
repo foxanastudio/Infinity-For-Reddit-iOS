@@ -117,7 +117,7 @@ struct CopyCustomFeedView: View {
         .onChange(of: copyCustomFeedViewModel.copyCustomFeedTask) { _, newValue in
             if newValue != nil {
                 snackbarManager.showSnackbar(
-                    text: "Copying. Please wait...",
+                    .info("Copying. Please wait..."),
                     autoDismiss: false,
                     canDismissByGesture: false
                 )
@@ -125,13 +125,13 @@ struct CopyCustomFeedView: View {
         }
         .onChange(of: copyCustomFeedViewModel.copiedMyCustomFeed) { _, newValue in
             if newValue != nil {
-                snackbarManager.showSnackbar(text: "Copied")
+                snackbarManager.showSnackbar(.info("Copied"))
                 dismiss()
             }
         }
         .onReceive(copyCustomFeedViewModel.$error) { newValue in
             if let error = newValue {
-                snackbarManager.showSnackbar(text: error.localizedDescription)
+                snackbarManager.showSnackbar(.error(error))
             }
         }
     }
