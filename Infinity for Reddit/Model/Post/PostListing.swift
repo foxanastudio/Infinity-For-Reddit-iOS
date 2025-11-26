@@ -453,6 +453,41 @@ public class Post : NSObject, ObservableObject, Identifiable {
     public func isAuthorDeleted() -> Bool {
         return author != nil && author! == "[deleted]"
     }
+    
+    func getDownloadMediaType(galleryIndex: Int = 0) -> DownloadMediaType? {
+        switch postType {
+        case .image:
+            return .image(downloadUrlString: url, fileName: "test.jpg")
+        case .imageWithUrlPreview(urlPreview: let urlPreview):
+            return .image(downloadUrlString: url, fileName: "\(fileNameWithoutExtension).jpg")
+        case .gif:
+            if let gif = preview.images.first?.gifVariant {
+                return .gif(downloadUrlString: gif.source.url, fileName: "\(fileNameWithoutExtension).gif")
+            } else {
+                return .gif(downloadUrlString: url, fileName: "\(fileNameWithoutExtension).gif")
+            }
+        case .redditVideo(videoUrlString: let videoUrlString, downloadUrlString: let downloadUrlString):
+            return .redditVideo(post: self)
+        case .video(_, let downloadUrlString):
+            return .video(downloadUrlString: downloadUrlString, fileName: "\(fileNameWithoutExtension).mp4")
+        case .gallery:
+            if let items = galleryData?.items {
+                if items.indices.contains(galleryIndex) {
+                    return items[galleryIndex].toDownloadMediaType(post: self)
+                }
+            }
+        case .imgurVideo(url: let url):
+            return .imgurVideo(downloadUrlString: url, fileName: "\(fileNameWithoutExtension).mp4")
+        case .redgifs(let redgifsId):
+            return .redgifs(redgifsId: redgifsId, downloadUrlString: nil)
+        case .streamable(let shortCode):
+            return .streamable(shortCode: shortCode, downloadUrlString: nil)
+        default:
+            return nil
+        }
+        
+        return nil
+    }
 }
 
 class Preview : NSObject {
