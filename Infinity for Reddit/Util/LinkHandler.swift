@@ -95,6 +95,9 @@ class LinkHandler {
     private func handleRedditPath(_ path: String, segments: [String], url: URL) -> LinkDestination {
         if path == "/report" {
             return LinkDestination.openInBrowser(url)
+        } else if segments.count == 4, segments[0] == "r", segments[2] == "wiki" {
+            // Wiki
+            return LinkDestination.navigation(AppNavigation.wiki(subredditName: segments[1], wikiPath: segments[3]))
         } else if segments.contains("comments"), let index = segments.lastIndex(of: "comments"), index + 1 < segments.count {
             let postId = segments[index + 1]
             if segments.count > index + 3 {

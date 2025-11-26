@@ -9,6 +9,8 @@ import SwiftUI
 import MarkdownUI
 
 struct WikiView: View {
+    @EnvironmentObject private var navigationManager: NavigationManager
+    
     @StateObject var wikiViewModel: WikiViewModel
     
     init(subredditName: String, wikiPath: String) {
@@ -32,6 +34,9 @@ struct WikiView: View {
                             Markdown(wiki)
                                 .themedMarkdown()
                                 .padding(16)
+                                .markdownLinkHandler { url in
+                                    navigationManager.openLink(url)
+                                }
                         }
                     }
                 } else {
