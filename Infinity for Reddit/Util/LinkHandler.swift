@@ -107,6 +107,9 @@ class LinkHandler {
                   let realURLString = query.first(where: { $0.name == "url" })?.value,
                   let realURL = URL(string: realURLString) {
             return LinkDestination.fullScreenMedia(FullScreenMediaType.image(urlString: realURL.absoluteString))
+        } else if segments.count == 4, segments[0] == "user", segments[2] == "m" {
+            // Custom Feed
+            return LinkDestination.navigation(AppNavigation.customFeed(customFeed: .path(path)))
         } else if let subredditMatch = path.range(of: "/r/[\\w-]+", options: .regularExpression) {
             let subreddit = String(path[subredditMatch]).components(separatedBy: "/")[2]
             return LinkDestination.navigation(AppNavigation.subredditDetails(subredditName: subreddit))
