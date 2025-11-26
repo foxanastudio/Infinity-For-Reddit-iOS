@@ -9,45 +9,42 @@ import SwiftUI
 
 struct CustomFontModifier: ViewModifier {
     @AppStorage(InterfaceFontUserDefaultsUtils.fontFamilyKey, store: .interfaceFont) private var fontFamily: Int = 0
-    @AppStorage(InterfaceFontUserDefaultsUtils.fontSizeKey, store: .interfaceFont) private var fontSize: Int = 2
+    @AppStorage(InterfaceFontUserDefaultsUtils.fontScaleKey, store: .interfaceFont) private var fontScale: Int = 2
 
+    let fontSize: AppFontSize
+    
     func body(content: Content) -> some View {
-        content.font(font)
-    }
-
-    private var font: Font {
-        let family = FontFamily(rawValue: fontFamily) ?? .system
-        let size = InterfaceFontSize(rawValue: fontSize) ?? .normal
-        return family.font(size: size.size)
+        content.font(
+            (FontFamily(rawValue: fontFamily) ?? .system)
+                .font(size: fontSize.scaledInterfaceFontSize(FontScale(rawValue: fontScale)))
+        )
     }
 }
 
 struct CustomPostTitleFontModifier: ViewModifier {
     @AppStorage(InterfaceFontUserDefaultsUtils.postTitleFontFamilyKey, store: .interfaceFont) private var postTitleFontFamily: Int = 0
-    @AppStorage(InterfaceFontUserDefaultsUtils.postTitleFontSizeKey, store: .interfaceFont) private var postTitleFontSize: Int = 2
+    @AppStorage(InterfaceFontUserDefaultsUtils.postTitleFontScaleKey, store: .interfaceFont) private var postTitleFontScale: Int = 2
 
+    let fontSize: AppFontSize
+    
     func body(content: Content) -> some View {
-        content.font(font)
-    }
-
-    private var font: Font {
-        let family = FontFamily(rawValue: postTitleFontFamily) ?? .system
-        let size = InterfaceFontSize(rawValue: postTitleFontSize) ?? .normal
-        return family.font(size: size.postTitleSize)
+        content.font(
+            (FontFamily(rawValue: postTitleFontFamily) ?? .system)
+                .font(size: fontSize.scaledPostTitleFontSize(FontScale(rawValue: postTitleFontScale)))
+        )
     }
 }
 
 struct CustomContentFontModifier: ViewModifier {
     @AppStorage(InterfaceFontUserDefaultsUtils.contentFontFamilyKey, store: .interfaceFont) private var contentFontFamily: Int = 0
-    @AppStorage(InterfaceFontUserDefaultsUtils.contentFontSizeKey, store: .interfaceFont) private var contentFontSize: Int = 2
+    @AppStorage(InterfaceFontUserDefaultsUtils.contentFontScaleKey, store: .interfaceFont) private var contentFontScale: Int = 2
 
+    let fontSize: AppFontSize
+    
     func body(content: Content) -> some View {
-        content.font(font)
-    }
-
-    private var font: Font {
-        let family = FontFamily(rawValue: contentFontFamily) ?? .system
-        let size = InterfaceContentFontSize(rawValue: contentFontSize) ?? .normal
-        return family.font(size: size.contentSize)
+        content.font(
+            (FontFamily(rawValue: contentFontFamily) ?? .system)
+                .font(size: fontSize.scaledContentFontSize(ContentFontScale(rawValue: contentFontScale)))
+        )
     }
 }

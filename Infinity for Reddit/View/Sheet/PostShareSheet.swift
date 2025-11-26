@@ -16,6 +16,10 @@ struct PostShareSheet: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
+                RowText(post.postUrlString)
+                    .secondaryText(.f13)
+                    .padding(16)
+                
                 ShareLinkEntry(urlString: post.postUrlString, text: "Share Post Link")
                 
                 IconTextButton(startIconUrl: "document.on.document", text: "Copy Post Link") {
@@ -32,6 +36,10 @@ struct PostShareSheet: View {
 //                }
                 
                 if let mediaShareUrlString = post.getMediaShareUrlString() {
+                    RowText(mediaShareUrlString)
+                        .secondaryText(.f13)
+                        .padding(16)
+                    
                     ShareLinkEntry(urlString: mediaShareUrlString, text: "Share Media Link")
                     
                     IconTextButton(startIconUrl: "document.on.document", text: "Copy Media Link") {

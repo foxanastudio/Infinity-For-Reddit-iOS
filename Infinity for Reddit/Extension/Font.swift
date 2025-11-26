@@ -8,15 +8,15 @@
 import SwiftUI
 
 extension View {
-    func customFont() -> some View {
-        modifier(CustomFontModifier())
+    func customFont(fontSize: AppFontSize = .f17) -> some View {
+        modifier(CustomFontModifier(fontSize: fontSize))
     }
 
-    func customPostTitleFont() -> some View {
-        modifier(CustomPostTitleFontModifier())
+    func customPostTitleFont(fontSize: AppFontSize = .f17) -> some View {
+        modifier(CustomPostTitleFontModifier(fontSize: fontSize))
     }
 
-    func customContentFont() -> some View {
-        modifier(CustomContentFontModifier())
+    func customContentFont(fontSize: AppFontSize = .f15) -> some View {
+        modifier(CustomContentFontModifier(fontSize: fontSize))
     }
 }

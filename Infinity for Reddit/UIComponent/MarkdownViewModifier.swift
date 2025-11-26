@@ -10,17 +10,16 @@ import MarkdownUI
 
 struct MarkdownViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
-    @AppStorage(InterfaceFontUserDefaultsUtils.fontFamilyKey, store: .interfaceFont) private var fontFamily: Int = 0
-    @AppStorage(InterfaceFontUserDefaultsUtils.fontSizeKey, store: .interfaceFont) private var fontSize: Int = 2
-
+    @AppStorage(InterfaceFontUserDefaultsUtils.contentFontFamilyKey, store: .interfaceFont) private var contentFontFamily: Int = 0
+    @AppStorage(InterfaceFontUserDefaultsUtils.contentFontScaleKey, store: .interfaceFont) private var contentFontScale: Int = 2
+    
+    let fontSize: AppFontSize
+    
     func body(content: Content) -> some View {
-        let family = FontFamily(rawValue: fontFamily) ?? .system
-        let size = InterfaceFontSize(rawValue: fontSize) ?? .normal
-
         return content
             .markdownTextStyle {
-                MarkdownUI.FontFamily(family.markdownFontFamily)
-                FontSize(size.size)
+                MarkdownUI.FontFamily((FontFamily(rawValue: contentFontFamily) ?? .system).markdownFontFamily)
+                FontSize(fontSize.scaledContentFontSize(ContentFontScale(rawValue: contentFontScale)))
             }
             .markdownTheme(.gitHub.link {
                 ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.colorAccent))
@@ -34,16 +33,15 @@ struct MarkdownViewModifier: ViewModifier {
 struct PostContentMarkdownViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
     @AppStorage(InterfaceFontUserDefaultsUtils.contentFontFamilyKey, store: .interfaceFont) private var contentFontFamily: Int = 0
-    @AppStorage(InterfaceFontUserDefaultsUtils.contentFontSizeKey, store: .interfaceFont) private var contentFontSize: Int = 2
+    @AppStorage(InterfaceFontUserDefaultsUtils.contentFontScaleKey, store: .interfaceFont) private var contentFontScale: Int = 2
 
+    let fontSize: AppFontSize
+    
     func body(content: Content) -> some View {
-        let family = FontFamily(rawValue: contentFontFamily) ?? .system
-        let size = InterfaceContentFontSize(rawValue: contentFontSize) ?? .normal
-
         return content
             .markdownTextStyle {
-                MarkdownUI.FontFamily(family.markdownFontFamily)
-                FontSize(size.contentSize)
+                MarkdownUI.FontFamily((FontFamily(rawValue: contentFontFamily) ?? .system).markdownFontFamily)
+                FontSize(fontSize.scaledContentFontSize(ContentFontScale(rawValue: contentFontScale)))
             }
             .markdownTheme(.gitHub.link {
                 ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.colorAccent))
@@ -57,16 +55,15 @@ struct PostContentMarkdownViewModifier: ViewModifier {
 struct CommentMarkdownViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
     @AppStorage(InterfaceFontUserDefaultsUtils.contentFontFamilyKey, store: .interfaceFont) private var contentFontFamily: Int = 0
-    @AppStorage(InterfaceFontUserDefaultsUtils.contentFontSizeKey, store: .interfaceFont) private var contentFontSize: Int = 2
+    @AppStorage(InterfaceFontUserDefaultsUtils.contentFontScaleKey, store: .interfaceFont) private var contentFontScale: Int = 2
 
+    let fontSize: AppFontSize
+    
     func body(content: Content) -> some View {
-        let family = FontFamily(rawValue: contentFontFamily) ?? .system
-        let size = InterfaceContentFontSize(rawValue: contentFontSize) ?? .normal
-
         return content
             .markdownTextStyle {
-                MarkdownUI.FontFamily(family.markdownFontFamily)
-                FontSize(size.contentSize)
+                MarkdownUI.FontFamily((FontFamily(rawValue: contentFontFamily) ?? .system).markdownFontFamily)
+                FontSize(fontSize.scaledContentFontSize(ContentFontScale(rawValue: contentFontScale)))
             }
             .markdownTheme(.gitHub.link {
                 ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.colorAccent))

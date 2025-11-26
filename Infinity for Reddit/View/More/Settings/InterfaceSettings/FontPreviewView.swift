@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FontPreviewView: View {
-    @AppStorage(InterfaceFontUserDefaultsUtils.fontSizeKey, store: .interfaceFont) private var fontSize: Int = 2
+    @AppStorage(InterfaceFontUserDefaultsUtils.fontScaleKey, store: .interfaceFont) private var fontScale: Int = 2
     
     var body: some View {
         List {
@@ -23,7 +23,7 @@ struct FontPreviewView: View {
 
                         VStack(spacing: 4) {
                             RowText(fontFamily.displayName)
-                                .font(fontFamily.font(size: InterfaceFontSize(rawValue:fontSize)?.size ?? 17))
+                                .font(fontFamily.font(size: AppFontSize.f17.scaledInterfaceFontSize(FontScale(rawValue: fontScale))))
                                 .primaryText()
                         }
                     }

@@ -14,11 +14,11 @@ struct FontInterfaceView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
 
     @AppStorage(InterfaceFontUserDefaultsUtils.fontFamilyKey, store: .interfaceFont) private var fontFamily: Int = 0
-    @AppStorage(InterfaceFontUserDefaultsUtils.fontSizeKey, store: .interfaceFont) private var fontSize: Int = 2
+    @AppStorage(InterfaceFontUserDefaultsUtils.fontScaleKey, store: .interfaceFont) private var fontSize: Int = 2
     @AppStorage(InterfaceFontUserDefaultsUtils.postTitleFontFamilyKey, store: .interfaceFont) private var postTitleFontFamily: Int = 0
-    @AppStorage(InterfaceFontUserDefaultsUtils.postTitleFontSizeKey, store: .interfaceFont) private var postTitleFontSize: Int = 2
+    @AppStorage(InterfaceFontUserDefaultsUtils.postTitleFontScaleKey, store: .interfaceFont) private var postTitleFontSize: Int = 2
     @AppStorage(InterfaceFontUserDefaultsUtils.contentFontFamilyKey, store: .interfaceFont) private var contentFontFamily: Int = 0
-    @AppStorage(InterfaceFontUserDefaultsUtils.contentFontSizeKey, store: .interfaceFont) private var contentFontSize: Int = 2
+    @AppStorage(InterfaceFontUserDefaultsUtils.contentFontScaleKey, store: .interfaceFont) private var contentFontSize: Int = 2
 
     @State private var showFontPicker = false
     @State private var showUploadError = false
@@ -57,10 +57,10 @@ struct FontInterfaceView: View {
 
                 BarebonePickerPreference(
                     selected: $fontSize,
-                    items: InterfaceFontUserDefaultsUtils.fontSizes,
+                    items: InterfaceFontUserDefaultsUtils.fontScales,
                     title: "Font Size"
                 ) { size in
-                    InterfaceFontUserDefaultsUtils.fontSizesText[size]
+                    InterfaceFontUserDefaultsUtils.fontScalesText[size]
                 }
                 .listPlainItemNoInsets()
             }
@@ -87,10 +87,10 @@ struct FontInterfaceView: View {
 
                 BarebonePickerPreference(
                     selected: $postTitleFontSize,
-                    items: InterfaceFontUserDefaultsUtils.fontSizes,
+                    items: InterfaceFontUserDefaultsUtils.fontScales,
                     title: "Title Font Size"
                 ) { size in
-                    InterfaceFontUserDefaultsUtils.fontSizesText[size]
+                    InterfaceFontUserDefaultsUtils.fontScalesText[size]
                 }
                 .listPlainItemNoInsets()
             }

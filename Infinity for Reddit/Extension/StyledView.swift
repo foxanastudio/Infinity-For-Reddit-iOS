@@ -24,8 +24,8 @@ extension View {
         self.modifier(PrimaryTextViewModifier())
     }
     
-    func secondaryText() -> some View {
-        self.modifier(SecondaryTextViewModifier())
+    func secondaryText(_ fontSize: AppFontSize = .f17) -> some View {
+        self.modifier(SecondaryTextViewModifier(fontSize: fontSize))
     }
     
     func buttonText() -> some View {
@@ -148,16 +148,16 @@ extension View {
         self.modifier(ToggleCustomThemeViewModifier())
     }
     
-    func themedMarkdown() -> some View {
-        self.modifier(MarkdownViewModifier())
+    func themedMarkdown(_ fontSize: AppFontSize = .f17) -> some View {
+        self.modifier(MarkdownViewModifier(fontSize: fontSize))
     }
     
-    func themedPostCommentMarkdown() -> some View {
-        self.modifier(PostContentMarkdownViewModifier())
+    func themedPostCommentMarkdown(_ fontSize: AppFontSize = .f15) -> some View {
+        self.modifier(PostContentMarkdownViewModifier(fontSize: fontSize))
     }
     
-    func themedCommentMarkdown() -> some View {
-        self.modifier(CommentMarkdownViewModifier())
+    func themedCommentMarkdown(_ fontSize: AppFontSize = .f15) -> some View {
+        self.modifier(CommentMarkdownViewModifier(fontSize: fontSize))
     }
     
     func galleryIndexIndicator() -> some View {
