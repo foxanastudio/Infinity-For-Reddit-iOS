@@ -24,6 +24,7 @@ struct PostListingView: View {
     @State private var navigationBarMenuKey: UUID?
     @State private var showLayoutTypeSheet: Bool = false
     @State private var showPostOptionsSheet: Bool = false
+    @State private var showPostShareSheet: Bool = false
     @State private var showPostModerationSheet: Bool = false
     @State private var postForPostOptionsSheet: Post?
     @State var lazyMode: Task<Void, Error>?
@@ -276,6 +277,9 @@ struct PostListingView: View {
                     onComment: {
                         navigationManager.append(AppNavigation.submitComment(commentParent: .post(parentPost: postForPostOptionsSheet)))
                     },
+                    onShare: {
+                        showPostShareSheet = true
+                    },
                     onAddToPostFilter: {
                         navigationManager.append(SettingsViewNavigation.postFilter(postToBeAdded: postForPostOptionsSheet))
                     },
@@ -335,6 +339,13 @@ struct PostListingView: View {
                         postListingViewModel.toggleDistinguishAsMod(postForPostOptionsSheet)
                     }
                 )
+            } else {
+                EmptyView()
+            }
+        }
+        .wrapContentSheet(isPresented: $showPostShareSheet) {
+            if let postForPostOptionsSheet {
+                PostShareSheet(post: postForPostOptionsSheet)
             } else {
                 EmptyView()
             }

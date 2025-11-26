@@ -28,6 +28,7 @@ struct PostDetailsView: View {
     @State private var showPostModerationSheet: Bool = false
     @State private var showCommentModerationSheet: Bool = false
     @State private var showPostOptionsSheet: Bool = false
+    @State private var showPostShareSheet: Bool = false
     @State private var navigationBarMenuKey: UUID?
     @State private var sentCommentParent: CommentParent? = nil
     @State private var commentToBeEdited: Comment? = nil
@@ -471,6 +472,9 @@ struct PostDetailsView: View {
                     onComment: {
                         navigationManager.append(AppNavigation.submitComment(commentParent: .post(parentPost: post)))
                     },
+                    onShare: {
+                        showPostShareSheet = true
+                    },
                     onAddToPostFilter: {
                         navigationManager.append(SettingsViewNavigation.postFilter(postToBeAdded: post))
                     },
@@ -557,6 +561,13 @@ struct PostDetailsView: View {
                         postDetailsViewModel.toggleLockComment(commentToBeModerated)
                     }
                 )
+            } else {
+                EmptyView()
+            }
+        }
+        .wrapContentSheet(isPresented: $showPostShareSheet) {
+            if let post = postDetailsViewModel.post {
+                PostShareSheet(post: post)
             } else {
                 EmptyView()
             }

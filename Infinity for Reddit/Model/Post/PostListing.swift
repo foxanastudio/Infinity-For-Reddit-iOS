@@ -147,7 +147,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
     var url : String!
     var userReports : [[Any]]! = [[Any]]()
     
-    var postType: PostType!
+    var postType: PostType
     @Published var subredditOrUserIcon: String?
     @Published var subredditOrUserIconInPostDetails: String?
     @Published var isRead: Bool = false
@@ -157,9 +157,6 @@ public class Post : NSObject, ObservableObject, Identifiable {
     }
     
     var canEditBody: Bool {
-        guard let postType else {
-            return false
-        }
         switch postType {
         case .text:
             return true
@@ -458,7 +455,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
         switch postType {
         case .image:
             return .image(downloadUrlString: url, fileName: "test.jpg")
-        case .imageWithUrlPreview(urlPreview: let urlPreview):
+        case .imageWithUrlPreview:
             return .image(downloadUrlString: url, fileName: "\(fileNameWithoutExtension).jpg")
         case .gif:
             if let gif = preview.images.first?.gifVariant {
@@ -466,7 +463,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
             } else {
                 return .gif(downloadUrlString: url, fileName: "\(fileNameWithoutExtension).gif")
             }
-        case .redditVideo(videoUrlString: let videoUrlString, downloadUrlString: let downloadUrlString):
+        case .redditVideo:
             return .redditVideo(post: self)
         case .video(_, let downloadUrlString):
             return .video(downloadUrlString: downloadUrlString, fileName: "\(fileNameWithoutExtension).mp4")
@@ -487,6 +484,17 @@ public class Post : NSObject, ObservableObject, Identifiable {
         }
         
         return nil
+    }
+    
+    func getMediaShareUrlString() -> String? {
+        switch postType {
+        case .image, .imageWithUrlPreview, .gif, .link, .noPreviewLink, .redgifs, .streamable, .imgurVideo:
+            return url
+        case .redditVideo(_, let downloadUrlString), .video(_, let downloadUrlString):
+            return downloadUrlString
+        default:
+            return nil
+        }
     }
 }
 

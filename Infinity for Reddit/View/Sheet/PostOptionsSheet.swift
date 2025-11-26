@@ -13,6 +13,7 @@ struct PostOptionsSheet: View {
     let post: Post
     
     var onComment: () -> Void
+    var onShare: () -> Void
     var onAddToPostFilter: () -> Void
     var onToggleHidePost: () -> Void
     var onCrosspost: () -> Void
@@ -29,27 +30,10 @@ struct PostOptionsSheet: View {
                     dismiss()
                 }
                 
-                ShareLink(item: post.postUrlString) {
-                    HStack(spacing: 0) {
-                        SwiftUI.Image(systemName: "square.and.arrow.up")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 24, height: 24)
-                            .primaryIcon()
-                        
-                        Spacer()
-                            .frame(width: 32)
-                        
-                        Text("Share")
-                            .primaryText()
-                        
-                        Spacer()
-                    }
-                    .contentShape(Rectangle())
-                    .padding(16)
+                IconTextButton(startIconUrl: "square.and.arrow.up", text: "Share") {
+                    onShare()
+                    dismiss()
                 }
-                .buttonStyle(.borderless)
-                .contentShape(Rectangle())
                 
                 IconTextButton(startIconUrl: "line.3.horizontal.decrease.circle", text: "Add to Post Filter") {
                     onAddToPostFilter()
