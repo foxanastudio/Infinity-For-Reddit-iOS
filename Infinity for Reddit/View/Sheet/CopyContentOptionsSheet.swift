@@ -29,11 +29,6 @@ struct CopyContentOptionsSheet: View {
                     dismiss()
                 }
                 
-                IconTextButton(startIconUrl: "document.on.document", text: "Copy All Plain Text") {
-                    Utils.copyText(plainText)
-                    dismiss()
-                }
-                
                 IconTextButton(startIconUrl: "document.on.document", text: "Copy Plain Text") {
                     onCopyPlainText()
                     dismiss()

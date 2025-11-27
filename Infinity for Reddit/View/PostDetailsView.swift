@@ -52,11 +52,6 @@ struct PostDetailsView: View {
     private let isFromSubredditPostListing: Bool
     private let thingModerationRepository: ThingModerationRepositoryProtocol
     
-    struct TextToBeSelectedAndCopiedItem: Identifiable {
-        var content: String
-        var id = UUID()
-    }
-    
     init(account: Account, postDetailsInput: PostDetailsInput, isFromSubredditPostListing: Bool, isContinueThread: Bool = false) {
         self.account = account
         self.isFromSubredditPostListing = isFromSubredditPostListing
@@ -192,6 +187,11 @@ struct PostDetailsView: View {
                                         onModerate: {
                                             commentToBeModerated = comment
                                             showCommentModerationSheet = true
+                                        },
+                                        onCopy: {
+                                            markdownToBeCopied = comment.body
+                                            plainTextToBeCopied = comment.bodyHtml
+                                            showCopyContentOptionsSheet = true
                                         }
                                     )
                                     .listPlainItemNoInsets()
@@ -601,8 +601,8 @@ struct PostDetailsView: View {
                 }
             )
         }
-        .sheet(item: $textToBeSelectedAndCopiedItem) { content in
-            CopyContentSheet(content: content.content)
+        .sheet(item: $textToBeSelectedAndCopiedItem) { item in
+            CopyContentSheet(content: item.content)
         }
         .overlay(
             CustomAlert(

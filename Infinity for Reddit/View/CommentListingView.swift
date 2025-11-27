@@ -21,6 +21,11 @@ struct CommentListingView: View {
     @State private var showSortTypeKindSheet: Bool = false
     @State private var showSortTypeTimeSheet: Bool = false
     @State private var showCommentModerationSheet: Bool = false
+    @State private var showCopyContentOptionsSheet: Bool = false
+    @State private var showCopyContentSheet: Bool = false
+    @State private var markdownToBeCopied: String = ""
+    @State private var plainTextToBeCopied: String = ""
+    @State private var textToBeSelectedAndCopiedItem: TextToBeSelectedAndCopiedItem?
     @State private var upcomingSortTypeKind: SortType.Kind?
     @State private var navigationBarMenuKey: UUID?
     @State private var commentToBeEdited: Comment? = nil
@@ -76,6 +81,11 @@ struct CommentListingView: View {
                                 onModerate: {
                                     commentToBeModerated = comment
                                     showCommentModerationSheet = true
+                                },
+                                onCopy: {
+                                    markdownToBeCopied = comment.body
+                                    plainTextToBeCopied = comment.bodyHtml
+                                    showCopyContentOptionsSheet = true
                                 }
                             )
                         }
@@ -190,6 +200,23 @@ struct CommentListingView: View {
             } else {
                 EmptyView()
             }
+        }
+        .wrapContentSheet(isPresented: $showCopyContentOptionsSheet) {
+            CopyContentOptionsSheet(
+                markdown: markdownToBeCopied,
+                plainText: plainTextToBeCopied,
+                onCopyMarkdown: {
+                    textToBeSelectedAndCopiedItem = TextToBeSelectedAndCopiedItem(content: markdownToBeCopied)
+                    showCopyContentSheet = true
+                },
+                onCopyPlainText: {
+                    textToBeSelectedAndCopiedItem = TextToBeSelectedAndCopiedItem(content: plainTextToBeCopied)
+                    showCopyContentSheet = true
+                }
+            )
+        }
+        .sheet(item: $textToBeSelectedAndCopiedItem) { item in
+            CopyContentSheet(content: item.content)
         }
     }
 }

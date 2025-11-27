@@ -44,6 +44,7 @@ struct CommentViewCard: View {
     let onDelete: () -> Void
     let onAddToCommentFilter: () -> Void
     let onModerate: () -> Void
+    let onCopy: () -> Void
     
     init(
         account: Account,
@@ -56,7 +57,8 @@ struct CommentViewCard: View {
         onEdit: @escaping () -> Void,
         onDelete: @escaping () -> Void,
         onAddToCommentFilter: @escaping () -> Void,
-        onModerate: @escaping () -> Void
+        onModerate: @escaping () -> Void,
+        onCopy: @escaping () -> Void
     ) {
         self.isInPostDetails = isInPostDetails
         self.highlightComment = highlightComment
@@ -66,6 +68,7 @@ struct CommentViewCard: View {
         self.onDelete = onDelete
         self.onAddToCommentFilter = onAddToCommentFilter
         self.onModerate = onModerate
+        self.onCopy = onCopy
         self.isToolbarHidden = isInPostDetails ? UserDefaults.interfaceComment.bool(forKey: InterfaceCommentUserDefaultsUtils.hideToolbarKey) : false
         _commentViewModel = StateObject(wrappedValue: CommentViewModel(account: account, comment: comment, commentRepository: CommentRepository(), thingModerationRepository: ThingModerationRepository()))
     }
@@ -191,6 +194,10 @@ struct CommentViewCard: View {
                                         Text("Share")
                                     }
                                     
+                                    Button("Copy") {
+                                        onCopy()
+                                    }
+                                    
                                     if accountViewModel.account.username == commentViewModel.comment.author {
                                         Button("Edit") {
                                             onEdit()
@@ -293,6 +300,10 @@ struct CommentViewCard: View {
                                     
                                     ShareLink(item: "https://reddit.com" + commentViewModel.comment.permalink) {
                                         Text("Share")
+                                    }
+                                    
+                                    Button("Copy") {
+                                        onCopy()
                                     }
                                     
                                     if isInPostDetails {
