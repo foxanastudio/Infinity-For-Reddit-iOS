@@ -23,10 +23,7 @@ struct PostShareSheet: View {
                 ShareLinkEntry(urlString: post.postUrlString, text: "Share Post Link")
                 
                 IconTextButton(startIconUrl: "document.on.document", text: "Copy Post Link") {
-                    UIPasteboard.general.setValue(
-                        post.postUrlString,
-                        forPasteboardType: UTType.plainText.identifier
-                    )
+                    Utils.copyText(post.postUrlString)
                     dismiss()
                 }
                 
@@ -43,10 +40,7 @@ struct PostShareSheet: View {
                     ShareLinkEntry(urlString: mediaShareUrlString, text: "Share Media Link")
                     
                     IconTextButton(startIconUrl: "document.on.document", text: "Copy Media Link") {
-                        UIPasteboard.general.setValue(
-                            mediaShareUrlString,
-                            forPasteboardType: UTType.plainText.identifier
-                        )
+                        Utils.copyText(mediaShareUrlString)
                         dismiss()
                     }
                 }

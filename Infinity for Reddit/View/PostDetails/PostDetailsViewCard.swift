@@ -33,6 +33,7 @@ struct PostDetailsViewCard: View {
     let isFromSubredditPostListing: Bool
     let onSendComment: () -> Void
     let onLongPress: () -> Void
+    let onLongPressOnContent: () -> Void
     
     private let iconSize: CGFloat = 24
     
@@ -41,11 +42,13 @@ struct PostDetailsViewCard: View {
         post: Post,
         isFromSubredditPostListing: Bool,
         onSendComment: @escaping () -> Void,
-        onLongPress: @escaping () -> Void
+        onLongPress: @escaping () -> Void,
+        onLongPressOnContent: @escaping () -> Void
     ) {
         self.isFromSubredditPostListing = isFromSubredditPostListing
         self.onSendComment = onSendComment
         self.onLongPress = onLongPress
+        self.onLongPressOnContent = onLongPressOnContent
         _postViewModel = StateObject(wrappedValue: PostViewModel(account: account, post: post, postRepository: PostRepository()))
     }
     
@@ -236,7 +239,7 @@ struct PostDetailsViewCard: View {
                     .highPriorityGesture(
                         LongPressGesture()
                             .onEnded { _ in
-                                
+                                onLongPressOnContent()
                             }
                     )
             }

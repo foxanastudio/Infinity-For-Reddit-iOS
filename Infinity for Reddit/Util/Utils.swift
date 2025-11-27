@@ -6,6 +6,7 @@
 //
 
 import AVFoundation
+import UIKit
 
 class Utils {
     static func randomString(length: Int = 6) -> String {
@@ -49,5 +50,12 @@ class Utils {
     
     static func getCurrentTimeEpoch() -> Int64 {
         return Int64(Date().timeIntervalSince1970 * 1000)
+    }
+    
+    static func copyText(_ text: String) {
+        UIPasteboard.general.setValue(
+            text,
+            forPasteboardType: UTType.plainText.identifier
+        )
     }
 }

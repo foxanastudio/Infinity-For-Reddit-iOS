@@ -29,6 +29,9 @@ struct PostDetailsView: View {
     @State private var showCommentModerationSheet: Bool = false
     @State private var showPostOptionsSheet: Bool = false
     @State private var showPostShareSheet: Bool = false
+    @State private var showCopyContentSheet: Bool = false
+    @State private var markdownToBeCopied: String = ""
+    @State private var plainTextToBeCopied: String = ""
     @State private var navigationBarMenuKey: UUID?
     @State private var sentCommentParent: CommentParent? = nil
     @State private var commentToBeEdited: Comment? = nil
@@ -81,6 +84,11 @@ struct PostDetailsView: View {
                                 },
                                 onLongPress: {
                                     showPostOptionsSheet = true
+                                },
+                                onLongPressOnContent: {
+                                    markdownToBeCopied = post.selftext
+                                    plainTextToBeCopied = post.selftextHtml
+                                    showCopyContentSheet = true
                                 }
                             )
                             .listPlainItemNoInsets()
@@ -571,6 +579,18 @@ struct PostDetailsView: View {
             } else {
                 EmptyView()
             }
+        }
+        .wrapContentSheet(isPresented: $showCopyContentSheet) {
+            CopyContentSheet(
+                markdown: markdownToBeCopied,
+                plainText: plainTextToBeCopied,
+                onCopyMarkdown: {
+                    
+                },
+                onCopyPlainText: {
+                    
+                }
+            )
         }
         .overlay(
             CustomAlert(
