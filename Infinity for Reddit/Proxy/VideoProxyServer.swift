@@ -22,10 +22,10 @@ enum VideoProxyFormat: String, CaseIterable {
 final class VideoProxyServer {
     private let service: VideoProxyService
     private let webServer: GCDWebServer
-    private let originURLKey = "__video_origin_url"
-    private let port: UInt = 9876
+    private let originURLKey = ProxyUtils.serverOriginURLKey
+    private let port: UInt = ProxyUtils.serverDefaultPort
     private var cancellables = Set<AnyCancellable>()
-    private let workerQueue = DispatchQueue(label: "com.infinity.VideoProxyServer.worker", qos: .userInteractive)
+    private let workerQueue = DispatchQueue(label: ProxyUtils.serverWorkerQueueLabel, qos: .userInteractive)
 
     init(service: VideoProxyService) {
         self.service = service
@@ -38,18 +38,42 @@ final class VideoProxyServer {
     }
 
     func start() {
-        guard !webServer.isRunning else {
-            print("VideoProxy: Server already running")
-            return
+        let startWork = { [weak self] in
+            guard let self else {
+                return
+            }
+            guard !self.webServer.isRunning else {
+                print("VideoProxy: Server already running")
+                return
+            }
+            self.webServer.start(withPort: self.port, bonjourName: nil)
+            print("VideoProxy: Server started on port \(self.port)")
         }
-        webServer.start(withPort: port, bonjourName: nil)
-        print("VideoProxy: Server started on port \(port)")
+
+        if Thread.isMainThread {
+            startWork()
+        } else {
+            DispatchQueue.main.sync(execute: startWork)
+        }
     }
 
     func stop() {
-        guard webServer.isRunning else { return }
-        webServer.stop()
-        print("VideoProxy: Server stopped")
+        let stopWork = { [weak self] in
+            guard let self else {
+                return
+            }
+            guard self.webServer.isRunning else {
+                return
+            }
+            self.webServer.stop()
+            print("VideoProxy: Server stopped")
+        }
+
+        if Thread.isMainThread {
+            stopWork()
+        } else {
+            DispatchQueue.main.sync(execute: stopWork)
+        }
     }
 
     var isRunning: Bool {
@@ -76,7 +100,7 @@ final class VideoProxyServer {
         }
 
         components.scheme = "http"
-        components.host = "127.0.0.1"
+        components.host = ProxyUtils.serverLoopbackHost
         components.port = Int(port)
 
         let originItem = URLQueryItem(name: originURLKey, value: originURL.absoluteString)
@@ -184,7 +208,9 @@ final class VideoProxyServer {
     }
 
     private func processPlaylistLine(_ line: String, originURL: URL) -> String {
-        guard !line.isEmpty else { return line }
+        guard !line.isEmpty else {
+            return line
+        }
 
         if line.hasPrefix("#") {
             return lineByReplacingURI(line: line, originURL: originURL)

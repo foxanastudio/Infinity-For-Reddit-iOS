@@ -6,28 +6,45 @@
 //
 
 import Foundation
+import GCDWebServer
 
 final class VideoProxyManager {
     static let shared = VideoProxyManager()
 
+    private let controlQueue = DispatchQueue(label: "com.infinity.VideoProxyManager.control", qos: .default)
     private var configuration: ProxyConfiguration?
     private var proxyServer: VideoProxyServer?
 
-    private init() {
-        if let configuration = ProxyConfiguration() {
-            self.configuration = configuration
-            configureProxyServer(with: configuration)
+    private static let ensureGCDWebServerInitialized: Void = {
+        let initialize = {
+            _ = GCDWebServer()
+        }
+
+        if Thread.isMainThread {
+            initialize()
         } else {
-            self.configuration = nil
-            print("VideoProxy: Proxy disabled or misconfigured")
+            DispatchQueue.main.sync(execute: initialize)
+        }
+    }()
+
+    private init() {
+        _ = VideoProxyManager.ensureGCDWebServerInitialized
+        controlQueue.sync {
+            if let configuration = ProxyConfiguration() {
+                self.configuration = configuration
+                configureProxyServer(with: configuration)
+            } else {
+                self.configuration = nil
+                print("VideoProxy: Proxy disabled or misconfigured")
+            }
         }
     }
 
     private func configureProxyServer(with configuration: ProxyConfiguration) {
         let sessionConfiguration = URLSessionConfiguration.default
         sessionConfiguration.connectionProxyDictionary = configuration.connectionProxyDictionary
-        sessionConfiguration.timeoutIntervalForRequest = 30
-        sessionConfiguration.timeoutIntervalForResource = 300
+        sessionConfiguration.timeoutIntervalForRequest = ProxyUtils.timeoutRequest
+        sessionConfiguration.timeoutIntervalForResource = ProxyUtils.timeoutResource
 
         print("VideoProxy: URLSession configured with proxy: \(configuration.host):\(configuration.port) (\(configuration.type.rawValueString))")
 
@@ -41,39 +58,61 @@ final class VideoProxyManager {
         proxyServer = VideoProxyServer(service: service)
     }
 
-    func start() {
-        guard configuration != nil else { return }
+    private func startLocked() {
+        guard configuration != nil else {
+            return
+        }
         proxyServer?.start()
     }
 
-    func stop() {
+    private func stopLocked() {
         proxyServer?.stop()
     }
 
-    func proxyURL(_ url: URL) -> URL {
-        guard configuration != nil,
-              let proxied = proxyServer?.reverseProxyURL(from: url) else {
-            return url
+    func start() {
+        controlQueue.async { [weak self] in
+            self?.startLocked()
         }
+    }
 
-        print("VideoProxy: Proxied URL:\n   Original: \(url.absoluteString)\n   Proxied:  \(proxied.absoluteString)")
+    func stop() {
+        controlQueue.async { [weak self] in
+            self?.stopLocked()
+        }
+    }
 
-        return proxied
+    func proxyURL(_ url: URL) -> URL {
+        return controlQueue.sync {
+            guard configuration != nil,
+                  let proxied = proxyServer?.reverseProxyURL(from: url) else {
+                return url
+            }
+
+            print("VideoProxy: Proxied URL:\n   Original: \(url.absoluteString)\n   Proxied:  \(proxied.absoluteString)")
+
+            return proxied
+        }
     }
 
     func reloadConfiguration() {
-        stop()
-        proxyServer = nil
+        controlQueue.async { [weak self] in
+            guard let self else {
+                return
+            }
 
-        guard let newConfiguration = ProxyConfiguration() else {
-            configuration = nil
-            print("VideoProxy: Proxy disabled or misconfigured")
-            return
+            self.stopLocked()
+            self.proxyServer = nil
+
+            guard let newConfiguration = ProxyConfiguration() else {
+                self.configuration = nil
+                print("VideoProxy: Proxy disabled or misconfigured")
+                return
+            }
+
+            self.configuration = newConfiguration
+            self.configureProxyServer(with: newConfiguration)
+            self.startLocked()
         }
-
-        configuration = newConfiguration
-        configureProxyServer(with: newConfiguration)
-        start()
     }
 }
 
