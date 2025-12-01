@@ -16,6 +16,8 @@ class SnackbarManager: ObservableObject {
     @Published var actionText: String? = nil
     @Published var action: (() -> Void)? = nil
     
+    var autoDismiss: Bool = true
+    
     var snackbarTask: Task<Void, Never>?
     
     func dismiss() {
@@ -40,6 +42,7 @@ class SnackbarManager: ObservableObject {
         snackbarTask?.cancel()
         
         self.text = snackbarMessage.text
+        self.autoDismiss = autoDismiss
         self.canDismissByGesture = canDismissByGesture
         self.actionText = actionText
         self.action = action
@@ -59,6 +62,12 @@ class SnackbarManager: ObservableObject {
                 }
                 snackbarTask = nil
             }
+        }
+    }
+    
+    func dismissIfIndefinite() {
+        if !autoDismiss {
+            dismiss()
         }
     }
 }

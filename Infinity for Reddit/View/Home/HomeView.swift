@@ -85,6 +85,9 @@ struct HomeView: View {
                     .tag(Tab.home)
                     .environmentObject(tab1NavigationBarMenuManager)
                     .environmentObject(tab1SnackbarManager)
+                    .onChange(of: tab1NavigationManager.path) {
+                        tab1SnackbarManager.dismissIfIndefinite()
+                    }
                     
                     ZStack {
                         CustomNavigationStack(navigationManager: tab2NavigationManager) {
@@ -111,6 +114,9 @@ struct HomeView: View {
                     .tag(Tab.subscriptions)
                     .environmentObject(tab2NavigationBarMenuManager)
                     .environmentObject(tab2SnackbarManager)
+                    .onChange(of: tab2NavigationManager.path) {
+                        tab2SnackbarManager.dismissIfIndefinite()
+                    }
                     
                     if !accountViewModel.account.isAnonymous() {
                         ZStack {
@@ -131,6 +137,9 @@ struct HomeView: View {
                         .environmentObject(tab3NavigationBarMenuManager)
                         .environmentObject(homeViewModel)
                         .environmentObject(tab3SnackbarManager)
+                        .onChange(of: tab3NavigationManager.path) {
+                            tab3SnackbarManager.dismissIfIndefinite()
+                        }
                         
                         ZStack {
                             CustomNavigationStack(navigationManager: tab4NavigationManager) {
@@ -153,6 +162,9 @@ struct HomeView: View {
                         .environmentObject(tab4NavigationBarMenuManager)
                         .environmentObject(homeViewModel)
                         .environmentObject(tab4SnackbarManager)
+                        .onChange(of: tab4NavigationManager.path) {
+                            tab4SnackbarManager.dismissIfIndefinite()
+                        }
                     } else {
                         ZStack {
                             CustomNavigationStack(navigationManager: tab4NavigationManager) {
@@ -171,6 +183,9 @@ struct HomeView: View {
                         .tag(Tab.search)
                         .environmentObject(tab4NavigationBarMenuManager)
                         .environmentObject(tab4SnackbarManager)
+                        .onChange(of: tab4NavigationManager.path) {
+                            tab4SnackbarManager.dismissIfIndefinite()
+                        }
                     }
                     
                     ZStack {
@@ -190,6 +205,9 @@ struct HomeView: View {
                     .tag(Tab.more)
                     .environmentObject(tab5NavigationBarMenuManager)
                     .environmentObject(tab5SnackbarManager)
+                    .onChange(of: tab5NavigationManager.path) {
+                        tab5SnackbarManager.dismissIfIndefinite()
+                    }
                 }
                 .themedTabViewGroup()
             }
