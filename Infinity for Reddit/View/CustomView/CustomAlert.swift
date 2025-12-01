@@ -136,6 +136,7 @@ struct CustomAlert<Content: View>: View {
                         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 4)
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 16))
+                .padding(.vertical, 16)
                 .onPreferenceChange(MaxHeightKey.self) { value in
                     buttonHStackMaxHeight = value
                 }

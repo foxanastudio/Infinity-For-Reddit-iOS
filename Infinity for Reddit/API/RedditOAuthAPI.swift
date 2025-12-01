@@ -70,6 +70,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
     case unlockThing(params: [String: String])
     case toggleDistinguishedThing(params: [String: String])
     case getWikiPage(subredditName: String, wikiPage: String)
+    case subredditAutoComplete(queries: [String: String])
     
     private var baseURL: String {
         return "https://oauth.reddit.com"
@@ -77,7 +78,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
     
     var method: HTTPMethod {
         switch self {
-        case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getSearchPostsInSpecificThing, .getCustomFeedPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getUserSavedComments, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox, .getRules, .getFlairs, .getInfo, .getUserFlairs, .getCustomFeedInfo, .getWikiPage:
+        case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getSearchPostsInSpecificThing, .getCustomFeedPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getUserSavedComments, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox, .getRules, .getFlairs, .getInfo, .getUserFlairs, .getCustomFeedInfo, .getWikiPage, .subredditAutoComplete:
             return .get
         case .vote, .subsrcribeToSubreddit, .saveThing, .unsaveThing, .getMoreCommentsForCommentMore, .sendCommentOrReplyToMessage, .favoriteThing, .favoriteCustomFeed, .submitPost, .uploadMediaMetadata, .submitGalleryPost, .submitPollPost, .editPostOrComment, .deletePostOrComment, .hidePost, .unhidePost, .readMessage, .readAllMessages, .markSensitive, .unmarkSensitive, .markSpoiler, .unmarkSpoiler, .selectFlair, .selectUserFlair, .composeMessage, .createCustomFeed, .copyCustomFeed, .report, .approveThing, .removeThing, .toggleStickyPost, .lockThing, .unlockThing, .toggleDistinguishedThing:
             return .post
@@ -212,6 +213,8 @@ enum RedditOAuthAPI: URLRequestConvertible {
             return "/api/distinguish"
         case .getWikiPage(let subredditName, let wikiPage):
             return "/r/\(subredditName)/wiki/\(wikiPage).json"
+        case .subredditAutoComplete:
+            return "/api/subreddit_autocomplete_v2"
         }
     }
     
@@ -288,6 +291,8 @@ enum RedditOAuthAPI: URLRequestConvertible {
             return queries
         case .getWikiPage:
             return ["raw_json": "1"]
+        case .subredditAutoComplete(let queries):
+            return ["typeahead_active": "true", "include_profiles": "false", "raw_json": "1"].merging(queries, uniquingKeysWith: { _, new in new })
         default:
             return nil
         }

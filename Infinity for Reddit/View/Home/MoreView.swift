@@ -43,6 +43,7 @@ struct MoreView: View {
                     
                     SimpleTouchItemRow(text: "Handle Link", icon: "link") {
                         withAnimation(.linear(duration: 0.2)) {
+                            handleLinkUrlString = ""
                             activeAlert = .handleLink
                         }
                     }
@@ -50,6 +51,7 @@ struct MoreView: View {
                     
                     SimpleTouchItemRow(text: "Go to Subreddit", icon: "bubble.left.and.text.bubble.right") {
                         withAnimation(.linear(duration: 0.2)) {
+                            subredditName = ""
                             activeAlert = .goToSubreddit
                         }
                     }
@@ -57,6 +59,7 @@ struct MoreView: View {
                     
                     SimpleTouchItemRow(text: "Go to User", icon: "person.crop.circle") {
                         withAnimation(.linear(duration: 0.2)) {
+                            username = ""
                             activeAlert = .goToUser
                         }
                     }
@@ -139,6 +142,12 @@ struct MoreView: View {
                         fieldType: .subredditName,
                         focusedField: $focusedField
                     )
+                    
+                    SubredditAutoCompleteView(query: $subredditName) {
+                        withAnimation {
+                            activeAlert = nil
+                        }
+                    }
                 case .goToUser:
                     CustomTextField(
                         "Username",
@@ -156,13 +165,10 @@ struct MoreView: View {
                     switch alert {
                     case .handleLink:
                         navigationManager.openLink(handleLinkUrlString)
-                        handleLinkUrlString = ""
                     case .goToSubreddit:
                         navigationManager.append(AppNavigation.subredditDetails(subredditName: subredditName))
-                        subredditName = ""
                     case .goToUser:
                         navigationManager.append(AppNavigation.userDetails(username: username))
-                        username = ""
                     }
                 }
             }
