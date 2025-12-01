@@ -10,10 +10,12 @@ import SwiftUI
 struct PrimaryTextViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
     
+    let fontSize: AppFontSize
+    
     func body(content: Content) -> some View {
         content
             .fixedSize(horizontal: false, vertical: true)
-            .customFont()
+            .customFont(fontSize: fontSize)
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor))
     }
 }

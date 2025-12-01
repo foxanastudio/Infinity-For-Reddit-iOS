@@ -155,10 +155,16 @@ struct FontInterfaceView: View {
                 showUploadError = true
             }
         }
-        .alert("Custom font family upload error.", isPresented: $showUploadError) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text(uploadErrorMessage)
+        .overlay {
+            CustomAlert(
+                title: "Failed to Set Custom Font",
+                confirmButtonText: "OK",
+                showDismissButton: false,
+                isPresented: $showUploadError
+            ) {
+                Text("uploadErrorMessage")
+                    .secondaryText(.f15)
+            }
         }
         .onAppear {
             customFontDisplayName = InterfaceFontUserDefaultsUtils.customFontDisplayName

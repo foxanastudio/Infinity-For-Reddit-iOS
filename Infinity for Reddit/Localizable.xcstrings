@@ -123,9 +123,6 @@
     "Copy" : {
 
     },
-    "Custom font family upload error." : {
-
-    },
     "Delete" : {
 
     },
@@ -262,9 +259,6 @@
 
     },
     "No wiki found" : {
-
-    },
-    "OK" : {
 
     },
     "Posts" : {
@@ -2149,6 +2143,9 @@
 
     },
     "Unsubscribe" : {
+
+    },
+    "uploadErrorMessage" : {
 
     },
     "Video downloaded" : {

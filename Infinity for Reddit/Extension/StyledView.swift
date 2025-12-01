@@ -20,8 +20,8 @@ extension View {
         self.modifier(ListPlainItemNoInsetsThemeViewModifier())
     }
     
-    func primaryText() -> some View {
-        self.modifier(PrimaryTextViewModifier())
+    func primaryText(_ fontSize: AppFontSize = .f17) -> some View {
+        self.modifier(PrimaryTextViewModifier(fontSize: fontSize))
     }
     
     func secondaryText(_ fontSize: AppFontSize = .f17) -> some View {
