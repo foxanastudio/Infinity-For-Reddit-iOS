@@ -89,7 +89,7 @@ struct SearchView: View {
                     }
                 }
                 
-                if searchViewModel.query.isEmpty {
+                if searchViewModel.query.isEmpty || onSearchCustomAction != nil {
                     // Recent Searches Header
                     if !searchViewModel.recentSearchQueries.isEmpty {
                         HStack {
@@ -163,13 +163,9 @@ struct SearchView: View {
                         if !accountViewModel.account.isAnonymous() {
                             searchViewModel.saveSearchQuery()
                         }
-                        if let onSearch = onSearchCustomAction {
-                            onSearch(searchViewModel.query)
-                        } else {
-                            navigationManager.append(
-                                AppNavigation.subredditDetails(subredditName: subreddit.displayName)
-                            )
-                        }
+                        navigationManager.append(
+                            AppNavigation.subredditDetails(subredditName: subreddit.displayName)
+                        )
                     }
                 }
                 
