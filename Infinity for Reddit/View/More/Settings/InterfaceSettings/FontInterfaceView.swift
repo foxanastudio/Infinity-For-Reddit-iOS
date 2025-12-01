@@ -162,7 +162,7 @@ struct FontInterfaceView: View {
                 showDismissButton: false,
                 isPresented: $showUploadError
             ) {
-                Text("uploadErrorMessage")
+                Text(uploadErrorMessage)
                     .secondaryText(.f15)
             }
         }
