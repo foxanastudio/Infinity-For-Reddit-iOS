@@ -18,6 +18,7 @@ struct CrosspostView: View {
     @FocusState private var focusedField: FieldType?
 
     @State private var titleSelectedRange: NSRange = NSRange(location: 0, length: 0)
+    @State private var showNoSubredditAlert: Bool = false
     
     init(postToBeCrossposted: Post) {
         _postSubmissionContextViewModel = StateObject(
@@ -42,6 +43,8 @@ struct CrosspostView: View {
                         
                         PostSubmissionSubredditChooserView(postSubmissionContextViewModel: postSubmissionContextViewModel) { subscribedSubredditData in
                             postSubmissionContextViewModel.selectedSubreddit = subscribedSubredditData
+                        } onShowNoSubredditAlert: {
+                            showNoSubredditAlert = true
                         }
                         
                         Divider()
@@ -138,6 +141,14 @@ struct CrosspostView: View {
                 snackbarManager.showSnackbar(.error(error))
             }
         }
+        .overlay(
+            CustomAlert<EmptyView>(
+                title: "No Subreddit Selected",
+                confirmButtonText: "OK",
+                showDismissButton: false,
+                isPresented: $showNoSubredditAlert
+            )
+        )
     }
     
     private enum FieldType: Hashable {

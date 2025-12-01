@@ -19,6 +19,7 @@ struct CustomAlert<Content: View>: View {
     var dismissButtonText: String
     var confirmButtonText: String
     var buttonStyle: AlertButtonStyle
+    var showDismissButton: Bool
     var onDismiss: (() -> Void)?
     var onConfirm: (() -> Void)?
     
@@ -28,6 +29,7 @@ struct CustomAlert<Content: View>: View {
         dismissButtonText: String = "Cancel",
         confirmButtonText: String = "Yes",
         buttonStyle: AlertButtonStyle = .info,
+        showDismissButton: Bool = true,
         isPresented: Binding<Bool>,
         @ViewBuilder content: () -> Content? = { nil },
         onDismiss: (() -> Void)? = nil,
@@ -38,6 +40,7 @@ struct CustomAlert<Content: View>: View {
         self.dismissButtonText = dismissButtonText
         self.confirmButtonText = confirmButtonText
         self.buttonStyle = buttonStyle
+        self.showDismissButton = showDismissButton
         self._isPresented = isPresented
         self.content = content()
         self.onDismiss = onDismiss
@@ -82,23 +85,25 @@ struct CustomAlert<Content: View>: View {
                     Divider()
                     
                     HStack(spacing: 0) {
-                        TouchRipple(action: {
-                            onDismiss?()
-                            withAnimation(.linear(duration: 0.2)) {
-                                isPresented = false
+                        if showDismissButton {
+                            TouchRipple(action: {
+                                onDismiss?()
+                                withAnimation(.linear(duration: 0.2)) {
+                                    isPresented = false
+                                }
+                            }) {
+                                Text(dismissButtonText)
+                                    .neutralTextButton()
+                                    .frame(maxWidth: .infinity)
+                                    .padding(16)
+                                    .contentShape(Rectangle())
                             }
-                        }) {
-                            Text(dismissButtonText)
-                                .neutralTextButton()
-                                .frame(maxWidth: .infinity)
-                                .padding(16)
-                                .contentShape(Rectangle())
+                            .background(GeometryReader { geo in
+                                Color.clear.preference(key: MaxHeightKey.self, value: geo.size.height)
+                            })
+                            
+                            Divider()
                         }
-                        .background(GeometryReader { geo in
-                            Color.clear.preference(key: MaxHeightKey.self, value: geo.size.height)
-                        })
-                        
-                        Divider()
                         
                         TouchRipple(action: {
                             onConfirm?()

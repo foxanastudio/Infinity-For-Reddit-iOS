@@ -23,6 +23,7 @@ struct SubmitLinkPostView: View {
     @State private var bodySelectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var showMarkdownPreview: Bool = false
     @State private var cursorPosition: CGPoint = .zero
+    @State private var showNoSubredditAlert: Bool = false
     
     init() {
         _postSubmissionContextViewModel = StateObject(
@@ -46,6 +47,8 @@ struct SubmitLinkPostView: View {
                                 
                                 PostSubmissionSubredditChooserView(postSubmissionContextViewModel: postSubmissionContextViewModel) { subscribedSubredditData in
                                     postSubmissionContextViewModel.selectedSubreddit = subscribedSubredditData
+                                } onShowNoSubredditAlert: {
+                                    showNoSubredditAlert = true
                                 }
                                 
                                 Divider()
@@ -158,6 +161,14 @@ struct SubmitLinkPostView: View {
                 snackbarManager.showSnackbar(.error(error))
             }
         }
+        .overlay(
+            CustomAlert<EmptyView>(
+                title: "No Subreddit Selected",
+                confirmButtonText: "OK",
+                showDismissButton: false,
+                isPresented: $showNoSubredditAlert
+            )
+        )
     }
     
     private enum FieldType: Hashable {

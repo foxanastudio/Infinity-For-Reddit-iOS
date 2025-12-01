@@ -29,6 +29,7 @@ struct SubmitVideoPostView: View {
     @State private var showCamera: Bool = false
     @State private var showVideoPicker: Bool = false
     @State private var selectedVideoItem: PhotosPickerItem? = nil
+    @State private var showNoSubredditAlert: Bool = false
     
     init() {
         _postSubmissionContextViewModel = StateObject(
@@ -55,6 +56,8 @@ struct SubmitVideoPostView: View {
                                 
                                 PostSubmissionSubredditChooserView(postSubmissionContextViewModel: postSubmissionContextViewModel) { subscribedSubredditData in
                                     postSubmissionContextViewModel.selectedSubreddit = subscribedSubredditData
+                                } onShowNoSubredditAlert: {
+                                    showNoSubredditAlert = true
                                 }
                                 
                                 Divider()
@@ -217,6 +220,14 @@ struct SubmitVideoPostView: View {
                 snackbarManager.showSnackbar(.error(error))
             }
         }
+        .overlay(
+            CustomAlert<EmptyView>(
+                title: "No Subreddit Selected",
+                confirmButtonText: "OK",
+                showDismissButton: false,
+                isPresented: $showNoSubredditAlert
+            )
+        )
     }
     
     private enum FieldType: Hashable {
