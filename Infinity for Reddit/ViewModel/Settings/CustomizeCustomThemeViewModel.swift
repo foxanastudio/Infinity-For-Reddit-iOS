@@ -8,8 +8,11 @@
 import Foundation
 import GRDB
 
+@MainActor
 class CustomizeCustomThemeViewModel: ObservableObject {
     @Published var customTheme: CustomTheme
+    @Published var error: Error?
+    
     var customThemeFields: [String] = []
     var customThemeFieldsBoolType: Set<String> = []
     var customThemeSettingsItems: [String: CustomThemeSettingsItem] = [:]
@@ -31,19 +34,21 @@ class CustomizeCustomThemeViewModel: ObservableObject {
     }
     
     func saveCustomTheme() {
-        do {
-            if customTheme.isLightTheme {
-                try customThemeDao.unsetLightTheme()
-            } else if customTheme.isDarkTheme {
-                try customThemeDao.unsetDarkTheme()
-            } else if customTheme.isAmoledTheme {
-                try customThemeDao.unsetAmoledTheme()
+        Task {
+            do {
+                if customTheme.isLightTheme {
+                    try await customThemeDao.unsetLightTheme()
+                } else if customTheme.isDarkTheme {
+                    try await customThemeDao.unsetDarkTheme()
+                } else if customTheme.isAmoledTheme {
+                    try await customThemeDao.unsetAmoledTheme()
+                }
+                
+                try await customThemeDao.insert(customTheme: customTheme)
+            } catch {
+                print(error.localizedDescription)
+                self.error = error
             }
-            
-            try customThemeDao.insert(customTheme: customTheme)
-        } catch {
-            // TODO handle error
-            print("fuck")
         }
     }
     
