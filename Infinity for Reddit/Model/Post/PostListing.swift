@@ -184,7 +184,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
         case link
         case noPreviewLink
         case poll
-        case imgurVideo(url: String)
+        case imgurVideo(urlString: String)
         case redgifs(redgifsId: String)
         case streamable(shortCode: String)
         
@@ -426,9 +426,9 @@ public class Post : NSObject, ObservableObject, Identifiable {
                     return PostType.gif
                 } else if host.contains("imgur.com") && (path.hasSuffix(".gifv") || path.hasSuffix(".mp4")) {
                     if url.hasSuffix("gifv") {
-                        return PostType.imgurVideo(url: String(url.dropLast(5)) + ".mp4")
+                        return PostType.imgurVideo(urlString: String(url.dropLast(5)) + ".mp4")
                     }
-                    return PostType.imgurVideo(url: url)
+                    return PostType.imgurVideo(urlString: url)
                 } else if path.hasSuffix(".mp4") {
                     return PostType.video(videoUrlString: url, downloadUrlString: url)
                 } else {
@@ -473,7 +473,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
                     return items[galleryIndex].toDownloadMediaType(post: self)
                 }
             }
-        case .imgurVideo(url: let url):
+        case .imgurVideo(let urlString):
             return .imgurVideo(downloadUrlString: url, fileName: "\(fileNameWithoutExtension).mp4")
         case .redgifs(let redgifsId):
             return .redgifs(redgifsId: redgifsId, downloadUrlString: nil)

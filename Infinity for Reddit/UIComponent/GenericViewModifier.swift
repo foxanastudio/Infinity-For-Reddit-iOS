@@ -42,44 +42,41 @@ struct MediaTapGestureHandlerViewModifer: ViewModifier {
                 TapGesture()
                     .onEnded {
                         withAnimation {
-                            switch post?.postType {
-                            case .image:
-                                fullScreenMediaViewModel.show(.image(urlString: post?.url ?? "", aspectRatio: aspectRatio, post: post, matchedGeometryEffectId: matchedGeometryEffectId))
-                            case .imageWithUrlPreview(let urlPreview):
-                                fullScreenMediaViewModel.show(.image(urlString: post?.url ?? "", aspectRatio: aspectRatio, post: post, matchedGeometryEffectId: matchedGeometryEffectId))
-                            case .gif:
-                                print("gif")
-                                if post?.preview.images.isEmpty == false {
-                                    if let previewImage = post?.preview.images.first {
-                                        if let mp4 = previewImage.mp4Variant {
-                                            fullScreenMediaViewModel.show(.video(urlString: mp4.source.url, post: post))
-                                        } else if let gif = previewImage.gifVariant {
-                                            fullScreenMediaViewModel.show(.gif(urlString: gif.source.url, post: post))
+                            if let post {
+                                switch post.postType {
+                                case .image:
+                                    fullScreenMediaViewModel.show(.image(urlString: post.url, aspectRatio: aspectRatio, post: post, matchedGeometryEffectId: matchedGeometryEffectId))
+                                case .imageWithUrlPreview(let urlPreview):
+                                    fullScreenMediaViewModel.show(.image(urlString: urlPreview, aspectRatio: aspectRatio, post: post, matchedGeometryEffectId: matchedGeometryEffectId))
+                                case .gif:
+                                    if post.preview.images.isEmpty == false {
+                                        if let previewImage = post.preview.images.first {
+                                            if let mp4 = previewImage.mp4Variant {
+                                                fullScreenMediaViewModel.show(.video(urlString: mp4.source.url, post: post))
+                                            } else if let gif = previewImage.gifVariant {
+                                                fullScreenMediaViewModel.show(.gif(urlString: gif.source.url, post: post))
+                                            }
+                                        } else {
+                                            fullScreenMediaViewModel.show(.gif(urlString: post.url, post: post))
                                         }
-                                    } else {
-                                        fullScreenMediaViewModel.show(.gif(urlString: post?.url ?? "", post: post))
                                     }
+                                case .redditVideo(let videoUrlString, _):
+                                    fullScreenMediaViewModel.show(.video(urlString: videoUrlString, post: post))
+                                case .video(let videoUrlString, _):
+                                    fullScreenMediaViewModel.show(.video(urlString: videoUrlString, post: post))
+                                case .gallery:
+                                    if let items = post.galleryData?.items, let firstGalleryItem = items.first {
+                                        fullScreenMediaViewModel.show(.gallery(currentUrlString: firstGalleryItem.urlString, post: post, items: items, galleryScrollState: GalleryScrollState(scrollId: 0)))
+                                    }
+                                case .imgurVideo(let urlString):
+                                    fullScreenMediaViewModel.show(.video(urlString: urlString, videoType: .direct))
+                                case .redgifs(let redgifsId):
+                                    fullScreenMediaViewModel.show(.video(urlString: post.url, videoType: .redgifs(id: redgifsId)))
+                                case .streamable(let shortCode):
+                                    fullScreenMediaViewModel.show(.video(urlString: post.url, videoType: .streamable(shortCode: shortCode)))
+                                default:
+                                    navigationManager.openLink(post.url)
                                 }
-                            case .redditVideo(let videoUrlString, let downloadUrlString):
-                                fullScreenMediaViewModel.show(.video(urlString: videoUrlString, post: post))
-                            case .video(let videoUrlString, let downloadUrlString):
-                                fullScreenMediaViewModel.show(.video(urlString: videoUrlString, post: post))
-                            case .link:
-                                if let urlString = post?.url, let url = URL(string: urlString) {
-                                    navigationManager.openLink(urlString)
-                                } else {
-                                    print("Invalid or empty URL")
-                                }
-                                print("link")
-                            case .imgurVideo(let url):
-                                print("gif")
-                            case .redgifs(let redgifsId):
-                                print("redgifs")
-                                fullScreenMediaViewModel.show(.video(urlString: post?.url ?? "", videoType: .redgifs(id: redgifsId)))
-                            case .streamable(let shortCode):
-                                print("streamable")
-                            default:
-                                print(post?.postType ?? "other types")
                             }
                         }
                     }
