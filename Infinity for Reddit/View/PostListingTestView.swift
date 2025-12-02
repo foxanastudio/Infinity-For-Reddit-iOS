@@ -123,7 +123,7 @@ struct PostListingTestView: View {
             //print(colorScheme == .dark)
         }
         .task(id: postListingViewModel.loadPostsTaskId) {
-            await postListingViewModel.initialLoadPosts()
+            await postListingViewModel.initialLoadPosts(saveLastSeenPostInFrontPage: false)
         }
         .onAppear {
             if let key = navigationBarMenuKey {

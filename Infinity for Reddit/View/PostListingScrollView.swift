@@ -111,7 +111,7 @@ struct PostListingScrollView: View {
             //print(colorScheme == .dark)
         }
         .task {
-            await postListingViewModel.initialLoadPosts()
+            await postListingViewModel.initialLoadPosts(saveLastSeenPostInFrontPage: false)
         }
         .onAppear {
             if let key = navigationBarMenuKey {

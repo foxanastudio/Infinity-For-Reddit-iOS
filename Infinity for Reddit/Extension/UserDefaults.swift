@@ -24,6 +24,7 @@ extension UserDefaults {
     static let postLayout = UserDefaults(suiteName: "com.docilealligator.infinityforreddit.post_layout")
     static let interfaceFont = UserDefaults.standard
     static let dataSavingMode = UserDefaults.standard
+    static let miscellaneous = UserDefaults.standard
 }
 
 extension UserDefaults {

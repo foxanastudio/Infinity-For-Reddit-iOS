@@ -58,6 +58,7 @@ public class PostListingViewModel: ObservableObject {
     private var lastLoadedSortType: SortType? = nil
     private var allPostIds = Set<String>()
     private var after: String? = nil
+    private var lastSeenFrontPagePost: Post? = nil
     
     // UserDefaults
     private var sensitiveContent: Bool
@@ -112,13 +113,17 @@ public class PostListingViewModel: ObservableObject {
     
     // MARK: - Methods
     
-    public func initialLoadPosts() async {
+    public func initialLoadPosts(saveLastSeenPostInFrontPage: Bool) async {
         if sortType != lastLoadedSortType {
             await resetPostLoadingState()
         }
         
         guard isInitialLoad else {
             return
+        }
+        
+        if saveLastSeenPostInFrontPage && postListingMetadata.postListingType.isFrontPage {
+            self.after = MiscellaneousUserDefaultsUtils.getLastSeenPostInFrontPage(account: AccountViewModel.shared.account)
         }
         
         await loadPosts(isRefreshWithContinuation: refreshPostsContinuation != nil)
@@ -483,7 +488,7 @@ public class PostListingViewModel: ObservableObject {
         }
     }
     
-    func insertIntoAppearedPosts(_ post: Post) {
+    func insertIntoAppearedPosts(_ post: Post, saveLastSeenPostInFrontPage: Bool) {
         self.appearedPosts.removeAll {
             $0.id == post.id
         }
@@ -507,6 +512,20 @@ public class PostListingViewModel: ObservableObject {
             }
         } else {
             appearedPosts.append(post)
+        }
+        
+        if saveLastSeenPostInFrontPage && postListingMetadata.postListingType.isFrontPage {
+            if let lastSeenPost = lastSeenFrontPagePost {
+                if let index = self.posts.index(id: lastSeenPost.id) {
+                    if index < self.posts.index(id: post.id) ?? self.posts.endIndex {
+                        self.lastSeenFrontPagePost = post
+                    }
+                } else {
+                    self.lastSeenFrontPagePost = post
+                }
+            } else {
+                self.lastSeenFrontPagePost = post
+            }
         }
     }
     
@@ -702,6 +721,12 @@ public class PostListingViewModel: ObservableObject {
             await MainActor.run {
                 self.error = error
             }
+        }
+    }
+    
+    func saveLastSeenFrontPagePost() {
+        if postListingMetadata.postListingType.isFrontPage, let lastSeenFrontPagePost {
+            MiscellaneousUserDefaultsUtils.saveLastSeenPostInFrontPage(post: lastSeenFrontPagePost, account: AccountViewModel.shared.account)
         }
     }
 }

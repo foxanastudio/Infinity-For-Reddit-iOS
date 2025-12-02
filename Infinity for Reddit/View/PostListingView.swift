@@ -38,6 +38,7 @@ struct PostListingView: View {
     @State var lazyModeState: LazyModeState = .stopped
     
     @AppStorage(InterfaceUserDefaultsUtils.lazyModeIntervalKey, store: .interface) private var lazyModeInterval: Double = 2.5
+    @AppStorage(MiscellaneousUserDefaultsUtils.saveLastSeenPostInFrontPageKey, store: .miscellaneous) private var saveLastSeenPostInFrontPage: Bool = false
     
     private let postListingMetadata: PostListingMetadata
     private var isSubredditPostListing: Bool = false
@@ -143,7 +144,7 @@ struct PostListingView: View {
                             .id(ObjectIdentifier(post))
                             .listPlainItemNoInsets()
                             .onAppear {
-                                postListingViewModel.insertIntoAppearedPosts(post)
+                                postListingViewModel.insertIntoAppearedPosts(post, saveLastSeenPostInFrontPage: saveLastSeenPostInFrontPage)
                                 
                                 if post.subredditOrUserIcon == nil {
                                     Task {
@@ -202,7 +203,7 @@ struct PostListingView: View {
             }
         }
         .task(id: postListingViewModel.loadPostsTaskId) {
-            await postListingViewModel.initialLoadPosts()
+            await postListingViewModel.initialLoadPosts(saveLastSeenPostInFrontPage: saveLastSeenPostInFrontPage)
         }
         .onAppear {
             if lazyModeState == .paused {
@@ -218,6 +219,10 @@ struct PostListingView: View {
             
             guard let navigationBarMenuKey else { return }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
+            
+            if saveLastSeenPostInFrontPage {
+                postListingViewModel.saveLastSeenFrontPagePost()
+            }
         }
         .appForegroundBackgroundListener(
             onAppEntersForeground: {
