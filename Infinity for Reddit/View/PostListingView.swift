@@ -147,7 +147,10 @@ struct PostListingView: View {
                                 postListingViewModel.insertIntoAppearedPosts(post, saveLastSeenPostInFrontPage: saveLastSeenPostInFrontPage)
                                 
                                 if post.subredditOrUserIcon == nil {
-                                    postListingViewModel.loadIcon(post: post, displaySubredditIcon: !isSubredditPostListing)
+                                    postListingViewModel.loadIcon(
+                                        post: post,
+                                        displaySubredditIcon: !isSubredditPostListing || (isSubredditPostListing && postListingMetadata.postListingType.isPopularOrAll)
+                                    )
                                 }
                             }
                             .onDisappear {

@@ -32,6 +32,9 @@ public class PostListingRepository: PostListingRepositoryProtocol {
     private let subscribedSubredditDao: SubscribedSubredditDao
     private let anonymousCustomFeedSubredditDao: AnonymousCustomFeedSubredditDao
     private let postHistoryDao: PostHistoryDao
+    private let partialUserDao: PartialUserDao
+    private let userDao: UserDao
+    private let subscribedUserDao: SubscribedUserDao
     private var subredditOrUserIcons: [String: String] = [:]
     
     public init() {
@@ -47,6 +50,9 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         self.subscribedSubredditDao = SubscribedSubredditDao(dbPool: resolvedDBPool)
         self.anonymousCustomFeedSubredditDao = AnonymousCustomFeedSubredditDao(dbPool: resolvedDBPool)
         self.postHistoryDao = PostHistoryDao(dbPool: resolvedDBPool)
+        self.partialUserDao = PartialUserDao(dbPool: resolvedDBPool)
+        self.userDao = UserDao(dbPool: resolvedDBPool)
+        self.subscribedUserDao = SubscribedUserDao(dbPool: resolvedDBPool)
     }
     
     public func fetchPosts(
@@ -175,17 +181,21 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         
         guard post.subredditOrUserIcon == nil else { return }
         
-        do {
-            let subredditData = try await subredditDao.getSubredditDataByName(subredditName: post.subreddit)
-            if let subredditData {
-                await MainActor.run {
-                    post.subredditOrUserIcon = subredditData.iconUrl ?? ""
-                    subredditOrUserIcons[post.subreddit] = post.subredditOrUserIcon
-                }
-                return
+        let subredditData = try? await subredditDao.getSubredditDataByName(subredditName: post.subreddit)
+        if let subredditData {
+            await MainActor.run {
+                post.subredditOrUserIcon = subredditData.iconUrl ?? ""
+                subredditOrUserIcons[post.subreddit] = post.subredditOrUserIcon
             }
-        } catch {
-            // Ignore
+            return
+        }
+        let subscribedSubredditData = try? await subscribedSubredditDao.getSubscribedSubreddit(subredditName: post.subreddit, accountName: AccountViewModel.shared.account.username)
+        if let subscribedSubredditData {
+            await MainActor.run {
+                post.subredditOrUserIcon = subscribedSubredditData.iconUrl ?? ""
+                subredditOrUserIcons[post.subreddit] = post.subredditOrUserIcon
+            }
+            return
         }
         
         let data = try await self.session.request(
@@ -201,9 +211,13 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         if let error = json.error {
             throw PostListingRepositoryError.JSONDecodingError(error.localizedDescription)
         }
+        let fetchedSubredditData = try? SubredditDetailRootClass(fromJson: json).toSubredditData()
+        if let fetchedSubredditData {
+            try? await subredditDao.insert(subredditData: fetchedSubredditData)
+        }
         
         await MainActor.run {
-            post.subredditOrUserIcon = try? SubredditDetailRootClass(fromJson: json).toSubredditData().iconUrl ?? ""
+            post.subredditOrUserIcon = fetchedSubredditData?.iconUrl ?? ""
             subredditOrUserIcons[post.subreddit] = post.subredditOrUserIcon
         }
     }
@@ -212,6 +226,31 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         try Task.checkCancellation()
         
         guard post.subredditOrUserIcon == nil else { return }
+        
+        let partialUserData = try? await partialUserDao.getPartialUserData(username: post.author)
+        if let partialUserData {
+            await MainActor.run {
+                post.subredditOrUserIcon = partialUserData.profileImageUrlString
+                subredditOrUserIcons[post.subreddit] = post.subredditOrUserIcon
+            }
+            return
+        }
+        let userData = try? await userDao.getUserData(username: post.author)
+        if let userData {
+            await MainActor.run {
+                post.subredditOrUserIcon = userData.iconUrl ?? ""
+                subredditOrUserIcons[post.subreddit] = post.subredditOrUserIcon
+            }
+            return
+        }
+        let subscribedUserData = try? await subscribedUserDao.getSubscribedUser(name: post.author, accountName: AccountViewModel.shared.account.username)
+        if let subscribedUserData {
+            await MainActor.run {
+                post.subredditOrUserIcon = subscribedUserData.iconUrl ?? ""
+                subredditOrUserIcons[post.subreddit] = post.subredditOrUserIcon
+            }
+            return
+        }
         
         let data = try await self.session.request(
             RedditAPI.getUserData(username: post.author)

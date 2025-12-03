@@ -57,6 +57,15 @@ public enum PostListingType: Codable, Hashable {
             return false
         }
     }
+    
+    var isPopularOrAll: Bool {
+        switch self {
+        case .subreddit(let subredditName):
+            return subredditName == "popular" || subredditName == "all"
+        default:
+            return false
+        }
+    }
 }
 
 public enum UserWhere: String, Codable {
