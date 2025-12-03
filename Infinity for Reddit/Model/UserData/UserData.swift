@@ -29,7 +29,6 @@ public struct UserData: Codable, FetchableRecord, PersistableRecord, Identifiabl
     var isNSFW: Bool?
     var description: String?
     var title: String?
-    var isSelected: Bool
     var isSubscribed: Bool = false
     
     init(id: String, name: String, iconUrl: String? = nil, banner: String? = nil, commentKarma: Int? = nil, linkKarma: Int? = nil, awarderKarma: Int? = nil, awardeeKarma: Int? = nil, totalKarma: Int? = nil, cakeday: Int64? = nil, isGold: Bool? = nil, canBeFollowed: Bool? = nil, isNSFW: Bool? = nil, description: String? = nil, title: String? = nil) {
@@ -48,7 +47,6 @@ public struct UserData: Codable, FetchableRecord, PersistableRecord, Identifiabl
         self.isNSFW = isNSFW
         self.description = description
         self.title = title
-        self.isSelected = false
     }
     
     private enum CodingKeys: String, CodingKey, ColumnExpression, CaseIterable {
@@ -67,7 +65,6 @@ public struct UserData: Codable, FetchableRecord, PersistableRecord, Identifiabl
         case isNSFW = "is_nsfw"
         case description = "description"
         case title = "title"
-        case isSelected = "is_selected"
     }
     
     func toSubscribedUserData() -> SubscribedUserData {

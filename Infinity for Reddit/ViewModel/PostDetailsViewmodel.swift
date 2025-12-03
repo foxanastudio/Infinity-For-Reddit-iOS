@@ -548,8 +548,8 @@ public class PostDetailsViewModel: ObservableObject {
         self.commentFilter = await postDetailsRepository.fetchCommentFilter(usageType: .subreddit, nameOfUsage: post?.subreddit ?? "")
     }
     
-    public func loadIcon(comment: Comment) {
-        guard comment.authorIconUrl == nil else { return }
+    func loadIcon(comment: Comment) {
+        guard comment.authorIconUrlString == nil else { return }
         
         let startIndex = visibleComments.index(id: comment.id) ?? 0
         let commentBatch = Array(
@@ -564,11 +564,8 @@ public class PostDetailsViewModel: ObservableObject {
 
         Task {
             let iconUrl = await UserProfileImageBatchLoader.shared.loadIcons(for: commentBatch)
-            
-            if let iconUrl {
-                await MainActor.run {
-                    comment.authorIconUrl = iconUrl
-                }
+            await MainActor.run {
+                comment.authorIconUrlString = iconUrl
             }
         }
     }

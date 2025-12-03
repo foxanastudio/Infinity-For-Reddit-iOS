@@ -157,7 +157,7 @@ public class Comment : NSObject, Validatable, Identifiable, ObservableObject {
     var isCollasped: Bool = false
     var hasExpandedBefore: Bool = false
     var isFilteredOut: Bool = false
-    @Published var authorIconUrl: URL? = nil
+    @Published var authorIconUrlString: String? = nil
     
     //This is for Continue Thread
     var commentMore: CommentMore?

@@ -34,8 +34,7 @@ struct UserDao {
                 FROM users 
                 WHERE name = ? COLLATE NOCASE 
                 LIMIT 1
-                """,
-                                  arguments: [userName])
+                """, arguments: [userName])
         }
         .publisher(in: dbPool)
         .eraseToAnyPublisher()

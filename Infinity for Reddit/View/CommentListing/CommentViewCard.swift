@@ -81,7 +81,7 @@ struct CommentViewCard: View {
                 HStack {
                     if isInPostDetails && showAuthorAvatar {
                         CustomWebImage(
-                            commentViewModel.comment.authorIconUrl?.absoluteString,
+                            commentViewModel.comment.authorIconUrlString,
                             width: userIconSize,
                             height: userIconSize,
                             circleClipped: true,

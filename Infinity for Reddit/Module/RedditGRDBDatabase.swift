@@ -135,18 +135,18 @@ struct RedditGRDBDatabase {
                 t.column("name", .text)
                 t.column("icon_url", .text)
                 t.column("banner_url", .text)
-                t.column("comment_karma", .text)
+                t.column("comment_karma", .integer)
                 t.column("link_karma", .integer)
                 t.column("awarder_karma", .integer)
                 t.column("awardee_karma", .integer)
                 t.column("total_karma", .integer)
                 t.column("cakeday", .integer)
-                t.column("is_gold", .boolean).notNull().defaults(to: false)
-                t.column("can_follow", .boolean).notNull().defaults(to: false)
-                t.column("is_nsfw", .boolean).notNull().defaults(to: false)
+                t.column("is_gold", .boolean)
+                t.column("can_follow", .boolean)
+                t.column("is_nsfw", .boolean)
                 t.column("description", .text)
                 t.column("title", .text)
-                t.column("is_selected", .boolean).notNull().defaults(to: false)
+                t.column("is_selected", .boolean)
                 t.primaryKey(["id"])
             }
             
@@ -268,6 +268,17 @@ struct RedditGRDBDatabase {
                 t.column("icon_url_string", .text).notNull()
 
                 t.primaryKey(["username", "path", "subreddit_name", "icon_url_string"], onConflict: .replace)
+            }
+            
+            try db.create(table: PartialUserData.databaseTableName, ifNotExists: true) { t in
+                t.column("username", .text).notNull()
+                t.column("profile_image_url", .text)
+                t.column("link_karma", .integer)
+                t.column("comment_karma", .integer)
+                t.column("created_utc", .integer)
+                t.column("over_18", .boolean)
+                t.column("profile_color", .text)
+                t.primaryKey(["username"])
             }
         }
     }
