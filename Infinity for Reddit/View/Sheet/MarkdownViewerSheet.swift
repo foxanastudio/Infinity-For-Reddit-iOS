@@ -12,11 +12,17 @@ struct MarkdownViewerSheet: View {
     @EnvironmentObject private var navigationManager: NavigationManager
     
     let markdown: String
+    let test = ">!^(~~**1**~~2)!<"
+    //let test = "^(***~~strikescript~~***12)"
+    //let test = "super ^(1^(2^(3^(4))))"
+    //let test = "super ^1^2^3^4 haha"
+    //let test = "haha >!spoiler!< >!spoiler!< >!spoiler!< >!spoiler!< >!spoiler!< >!spoiler!< >!spoiler!<"
     
     var body: some View {
         ScrollView {
             VStack(alignment: .leading) {
-                Markdown(markdown)
+                //Markdown(markdown)
+                Markdown(test)
                     .font(.system(size: 24))
                     .padding(16)
                     .themedCommentMarkdown()
@@ -26,6 +32,10 @@ struct MarkdownViewerSheet: View {
                 
                 Spacer()
             }
+        }
+        .onAppear {
+            let content = MarkdownContent(test)
+            print(content)
         }
     }
 }
