@@ -12,11 +12,6 @@ import SwiftyJSON
 class VideoFetcher {
     static let shared = VideoFetcher()
     
-    enum VideoFetcherError: Error {
-        case NetworkError(String)
-        case JSONDecodingError(String)
-    }
-    
     private let redgifsSession: Session
     private let streamableSession: Session
     private let vReddItSession: Session
@@ -49,7 +44,7 @@ class VideoFetcher {
         
         let json = JSON(data)
         if let error = json.error {
-            throw VideoFetcherError.JSONDecodingError(error.localizedDescription)
+            throw APIError.jsonDecodingError(error.localizedDescription)
         }
         
         return parseRedgifsURL(json)
@@ -77,7 +72,7 @@ class VideoFetcher {
         
         let json = JSON(data)
         if let error = json.error {
-            throw VideoFetcherError.JSONDecodingError(error.localizedDescription)
+            throw APIError.jsonDecodingError(error.localizedDescription)
         }
         
         let streamable = try Streamable(fromJson: json)
@@ -138,7 +133,7 @@ class VideoFetcher {
         
         let json = JSON(data)
         if let error = json.error {
-            throw VideoFetcherError.JSONDecodingError(error.localizedDescription)
+            throw APIError.jsonDecodingError(error.localizedDescription)
         }
         
         let postDetails = try PostDetailsRootClass(fromJson: json, parseComments: false)

@@ -5,6 +5,15 @@
 //  Created by Docile Alligator on 2025-09-18.
 //
 
-enum JSONError: Error {
+import Foundation
+
+enum JSONError: LocalizedError {
     case invalidData
+    
+    var errorDescription: String? {
+        switch self {
+        case .invalidData:
+            return "Invalid JSON data"
+        }
+    }
 }

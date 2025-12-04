@@ -11,7 +11,7 @@ import UIKit
 import Photos
 
 class MediaDownloader {
-    enum MediaDownloaderError: Error {
+    enum MediaDownloaderError: LocalizedError {
         case invalidURL
         case invalidRedditVideo
         case cannotLoadVideoTrack
@@ -21,6 +21,29 @@ class MediaDownloader {
         case failedToExportRedditVideoToTempDirectory
         case decodeImageError
         case saveToPhotosLibraryFailed
+        
+        var errorDescription: String? {
+            switch self {
+            case .invalidURL:
+                return "Invalid URL."
+            case .invalidRedditVideo:
+                return "Invalid Reddit Video URL."
+            case .cannotLoadVideoTrack:
+                return "Cannot load video track."
+            case .cannotLoadAudioTrack:
+                return "Cannot load audio track."
+            case .cannotAddVideoOrAudioTrackToExportedVideo:
+                return "Cannot add video or audio track to exported video."
+            case .cannotGetVideoExportSession:
+                return "Cannot get video export session."
+            case .failedToExportRedditVideoToTempDirectory:
+                return "Failed to export Reddit video to temp directory."
+            case .decodeImageError:
+                return "Decode image error."
+            case .saveToPhotosLibraryFailed:
+                return "Save to photos library failed."
+            }
+        }
     }
     
     static let shared = MediaDownloader()

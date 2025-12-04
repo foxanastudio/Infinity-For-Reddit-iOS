@@ -9,11 +9,6 @@ import Alamofire
 import SwiftyJSON
 
 public class SubredditListingRepository: SubredditListingRepositoryProtocol {
-    enum SubredditListingRepositoryError: Error {
-        case NetworkError(String)
-        case JSONDecodingError(String)
-    }
-    
     private let session: Session
     
     public init() {
@@ -39,7 +34,7 @@ public class SubredditListingRepository: SubredditListingRepositoryProtocol {
         
         let json = JSON(data)
         if let error = json.error {
-            throw SubredditListingRepositoryError.JSONDecodingError(error.localizedDescription)
+            throw APIError.jsonDecodingError(error.localizedDescription)
         }
         
         return try SubredditListingRootClass(fromJson: json).data

@@ -10,11 +10,6 @@ import SwiftyJSON
 import UIKit
 
 class SubmitPostRepository: SubmitPostRepositoryProtocol {
-    enum SubmitPostRepositoryError: Error {
-        case NetworkError(String)
-        case JSONDecodingError(String)
-    }
-    
     private let session: Session
     
     init() {
@@ -65,14 +60,14 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
         
         let json = JSON(data)
         if let error = json.error {
-            throw SubmitPostRepositoryError.JSONDecodingError(error.localizedDescription)
+            throw APIError.jsonDecodingError(error.localizedDescription)
         }
         
         try json.throwIfRedditError(defaultErrorMessage: "Failed to submit post.")
         
         let id = json["json"]["data"]["id"].stringValue
         if id.isEmpty {
-            throw SubmitPostRepositoryError.JSONDecodingError("Failed to get the ID of the submitted post.")
+            throw APIError.jsonDecodingError("Failed to get the ID of the submitted post.")
         } else {
             return id
         }
@@ -115,7 +110,7 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
         
         let json = JSON(data)
         if let error = json.error {
-            throw SubmitPostRepositoryError.JSONDecodingError(error.localizedDescription)
+            throw APIError.jsonDecodingError(error.localizedDescription)
         }
         
         try json.throwIfRedditError(defaultErrorMessage: "Failed to submit post.")
@@ -160,7 +155,7 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
         
         let json = JSON(data)
         if let error = json.error {
-            throw SubmitPostRepositoryError.JSONDecodingError(error.localizedDescription)
+            throw APIError.jsonDecodingError(error.localizedDescription)
         }
         
         try json.throwIfRedditError(defaultErrorMessage: "Failed to submit post.")
@@ -204,14 +199,14 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
         
         let json = JSON(data)
         if let error = json.error {
-            throw SubmitPostRepositoryError.JSONDecodingError(error.localizedDescription)
+            throw APIError.jsonDecodingError(error.localizedDescription)
         }
         
         try json.throwIfRedditError(defaultErrorMessage: "Failed to submit post.")
         
         let id = json["json"]["data"]["id"].stringValue
         if id.isEmpty {
-            throw SubmitPostRepositoryError.JSONDecodingError("Failed to get the ID of the submitted post.")
+            throw APIError.jsonDecodingError("Failed to get the ID of the submitted post.")
         } else {
             return id
         }
@@ -253,14 +248,14 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
         
         let json = JSON(data)
         if let error = json.error {
-            throw SubmitPostRepositoryError.JSONDecodingError(error.localizedDescription)
+            throw APIError.jsonDecodingError(error.localizedDescription)
         }
         
         try json.throwIfRedditError(defaultErrorMessage: "Failed to submit post.")
         
         let postUrl = json["json"]["data"]["url"].stringValue
         if postUrl.isEmpty {
-            throw SubmitPostRepositoryError.JSONDecodingError("Failed to get the url of the submitted post.")
+            throw APIError.jsonDecodingError("Failed to get the url of the submitted post.")
         } else {
             return postUrl
         }
@@ -305,7 +300,7 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
         
         let json = JSON(data)
         if let error = json.error {
-            throw SubmitPostRepositoryError.JSONDecodingError(error.localizedDescription)
+            throw APIError.jsonDecodingError(error.localizedDescription)
         }
         
         try json.throwIfRedditError(defaultErrorMessage: "Failed to submit post.")
@@ -383,14 +378,14 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
         
         let json = JSON(data)
         if let error = json.error {
-            throw SubmitPostRepositoryError.JSONDecodingError(error.localizedDescription)
+            throw APIError.jsonDecodingError(error.localizedDescription)
         }
         
         try json.throwIfRedditError(defaultErrorMessage: "Failed to submit post.")
         
         let postUrl = json["json"]["data"]["url"].stringValue
         if postUrl.isEmpty {
-            throw SubmitPostRepositoryError.JSONDecodingError("Failed to get the url of the submitted post.")
+            throw APIError.jsonDecodingError("Failed to get the url of the submitted post.")
         } else {
             return postUrl
         }
@@ -429,14 +424,14 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
         
         let json = JSON(data)
         if let error = json.error {
-            throw SubmitPostRepositoryError.JSONDecodingError(error.localizedDescription)
+            throw APIError.jsonDecodingError(error.localizedDescription)
         }
         
         try json.throwIfRedditError(defaultErrorMessage: "Failed to submit post.")
         
         let id = json["json"]["data"]["id"].stringValue
         if id.isEmpty {
-            throw SubmitPostRepositoryError.JSONDecodingError("Failed to get the ID of the submitted post.")
+            throw APIError.jsonDecodingError("Failed to get the ID of the submitted post.")
         } else {
             return id
         }

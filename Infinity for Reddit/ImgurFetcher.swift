@@ -11,11 +11,6 @@ import SwiftyJSON
 class ImgurFetcher {
     static let shared = ImgurFetcher()
     
-    enum ImgurFetcherError: Error {
-        case NetworkError(String)
-        case JSONDecodingError(String)
-    }
-    
     private let imgurSession: Session
     
     private init() {
@@ -42,7 +37,7 @@ class ImgurFetcher {
         
         let json = JSON(data)
         if let error = json.error {
-            throw ImgurFetcherError.JSONDecodingError(error.localizedDescription)
+            throw APIError.jsonDecodingError(error.localizedDescription)
         }
         
         return try ImgurMediaRootClass(fromJson: json).imgurMedia

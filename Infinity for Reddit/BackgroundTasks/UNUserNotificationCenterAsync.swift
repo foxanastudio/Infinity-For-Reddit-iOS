@@ -7,7 +7,16 @@
 import UserNotifications
 
 extension UNUserNotificationCenter {
-    enum NotificationAuthError: Error { case authorizationDenied }
+    enum NotificationAuthError: LocalizedError {
+        case authorizationDenied
+        
+        var errorDescription: String? {
+            switch self {
+            case .authorizationDenied:
+                return "Notification authorization denied."
+            }
+        }
+    }
 
     func addRequest(_ request: UNNotificationRequest) async throws {
         var settings = await notificationSettings()

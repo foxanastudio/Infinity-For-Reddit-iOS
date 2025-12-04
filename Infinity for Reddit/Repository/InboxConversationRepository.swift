@@ -7,12 +7,18 @@
 
 import Alamofire
 import SwiftyJSON
+import Foundation
 
 public class InboxConversationRepository: InboxConversationRepositoryProtocol {
-    enum InboxConversationRepositoryError: Error {
-        case NetworkError(String)
-        case JSONDecodingError(String)
-        case SendMessageError(String)
+    enum InboxConversationRepositoryError: LocalizedError {
+        case sendMessageError(String)
+        
+        var errorDescription: String? {
+            switch self {
+            case .sendMessageError(let message):
+                return message
+            }
+        }
     }
     
     private let session: Session
@@ -36,7 +42,7 @@ public class InboxConversationRepository: InboxConversationRepositoryProtocol {
         
         let json = JSON(data)
         if let error = json.error {
-            throw InboxConversationRepositoryError.JSONDecodingError(error.localizedDescription)
+            throw APIError.jsonDecodingError(error.localizedDescription)
         }
         
         let errorArray = json["json"]["errors"].array
@@ -48,9 +54,9 @@ public class InboxConversationRepository: InboxConversationRepositoryProtocol {
                 } else {
                     errorString = lastErrorArray[0].stringValue
                 }
-                throw(InboxConversationRepositoryError.SendMessageError(errorString.prefix(1).uppercased() + errorString.dropFirst()))
+                throw(InboxConversationRepositoryError.sendMessageError(errorString.prefix(1).uppercased() + errorString.dropFirst()))
             } else {
-                throw(InboxConversationRepositoryError.SendMessageError("Error sending message"))
+                throw(InboxConversationRepositoryError.sendMessageError("Error sending message"))
             }
         }
         
@@ -61,6 +67,6 @@ public class InboxConversationRepository: InboxConversationRepositoryProtocol {
             }
         }
         
-        throw(InboxConversationRepositoryError.SendMessageError("Error sending message"))
+        throw(InboxConversationRepositoryError.sendMessageError("Error sending message"))
     }
 }

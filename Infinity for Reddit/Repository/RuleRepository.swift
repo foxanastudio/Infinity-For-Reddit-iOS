@@ -7,14 +7,8 @@
 import Combine
 import Alamofire
 import SwiftyJSON
-import Foundation
 
 public class RuleRepository: RuleRepositoryProtocol {
-    enum RuleRepositoryError: Error {
-        case NetworkError(String)
-        case JSONDecodingError(String)
-    }
-    
     private let session: Session
     
     public init() {
@@ -34,7 +28,7 @@ public class RuleRepository: RuleRepositoryProtocol {
         
         let json = JSON(data)
         if let error = json.error {
-            throw RuleRepositoryError.JSONDecodingError(error.localizedDescription)
+            throw APIError.jsonDecodingError(error.localizedDescription)
         }
         
         return RuleRootClass(fromJson: json).toRules()

@@ -16,9 +16,43 @@ struct LoginView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var accountViewModel: AccountViewModel
     
+    @StateObject private var loginViewModel: LoginViewModel
+    
     private let session: Session
     private let dbPool: DatabasePool
     private let operationQueue: OperationQueue
+    
+    enum LoginError: LocalizedError {
+        case failedToGetAccessToken
+        case failedToGetAccessTokenNetworkError
+        case noAccessTokenInResponse
+        case failedToParseAccessToken
+        case failedToGetMyInfo
+        case failedToGetMyInfoNetworkError
+        case failedToSaveAccountInfo
+        case failedToParseAccountInfo
+        
+        var errorDescription: String? {
+            switch self {
+            case .failedToGetAccessToken:
+                return "Failed to get access token"
+            case .failedToGetAccessTokenNetworkError:
+                return "Failed to get access token: network error."
+            case .noAccessTokenInResponse:
+                return "Failed to get access token."
+            case .failedToParseAccessToken:
+                return "Failed to parse access token."
+            case .failedToGetMyInfo:
+                return "Failed to get my info."
+            case .failedToGetMyInfoNetworkError:
+                return "Failed to get my info: network error."
+            case .failedToSaveAccountInfo:
+                return "Failed to save account info."
+            case .failedToParseAccountInfo:
+                return "Failed to parse account info."
+            }
+        }
+    }
     
     init() {
         // Resolve the session ASAP and store it in a property
@@ -31,6 +65,8 @@ struct LoginView: View {
         self.session = Session(configuration: URLSessionConfiguration.af.default)
         self.dbPool = resolvedDBPool
         self.operationQueue = resolvedOperationQueue
+        
+        self._loginViewModel = StateObject(wrappedValue: LoginViewModel())
     }
     
     
@@ -54,134 +90,139 @@ struct LoginView: View {
     }
     
     var body: some View {
-        VStack {
-            WebView(url: getLoginURL()) { url in
-                if url.contains("&code=") || url.contains("?code=") {
-                    print("login ok")
+        WebView(url: getLoginURL()) { url in
+            if url.contains("&code=") || url.contains("?code=") {
+                print("login ok")
+                
+                if let urlComponents = URLComponents(string: url),
+                   let queryItems = urlComponents.queryItems,
+                   let state = queryItems.first(where: { $0.name == "state" })?.value {
                     
-                    if let urlComponents = URLComponents(string: url),
-                       let queryItems = urlComponents.queryItems,
-                       let state = queryItems.first(where: { $0.name == "state" })?.value {
-                        
-                        if state == APIUtils.STATE {
-                            if let authCode = queryItems.first(where: { $0.name == "code" })?.value {
-                                var params: [String: String] = [:]
-                                params[APIUtils.GRANT_TYPE_KEY] = "authorization_code"
-                                params["code"] = authCode
-                                params[APIUtils.REDIRECT_URI_KEY] = APIUtils.REDIRECT_URI
+                    if state == APIUtils.STATE {
+                        if let authCode = queryItems.first(where: { $0.name == "code" })?.value {
+                            var params: [String: String] = [:]
+                            params[APIUtils.GRANT_TYPE_KEY] = "authorization_code"
+                            params["code"] = authCode
+                            params[APIUtils.REDIRECT_URI_KEY] = APIUtils.REDIRECT_URI
+                            
+                            var headers: HTTPHeaders = [:]
+                            let credentials = "\(APIUtils.CLIENT_ID):"
+                            if let encodedData = credentials.data(using: .utf8) {
+                                let base64Credentials = encodedData.base64EncodedString()
+                                let auth = "Basic \(base64Credentials)"
+                                headers[APIUtils.AUTHORIZATION_KEY] = auth
                                 
-                                var headers: HTTPHeaders = [:]
-                                let credentials = "\(APIUtils.CLIENT_ID):"
-                                if let encodedData = credentials.data(using: .utf8) {
-                                    let base64Credentials = encodedData.base64EncodedString()
-                                    let auth = "Basic \(base64Credentials)"
-                                    headers[APIUtils.AUTHORIZATION_KEY] = auth
-                                    
-                                    session.request(RedditAPI.getAccessToken(queries: nil, headers: headers, params: params))
-                                        .validate()
-                                        .responseString { response in
-                                            switch response.result {
-                                            case .success(let accessTokenResponse):
-                                                guard !accessTokenResponse.isEmpty else {
-                                                    print("Error: Empty response body")
-                                                    return
-                                                }
-                                                if let data = accessTokenResponse.data(using: .utf8) {
-                                                    do {
-                                                        if let responseJSON = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                                                            // Step 3: Extract tokens
-                                                            if let accessToken = responseJSON["access_token"] as? String,
-                                                               let refreshToken = responseJSON["refresh_token"] as? String {
-                                                                print("Access Token: \(accessToken)")
-                                                                print("Refresh Token: \(refreshToken)")
-                                                                
-                                                                session.request(RedditOAuthAPI.getMyInfo(headers: APIUtils.getOAuthHeader(accessToken: accessToken)))
-                                                                    .validate()
-                                                                    .responseString { response in
-                                                                        switch response.result {
-                                                                        case .success(let myInfoResponse):
-                                                                            guard !myInfoResponse.isEmpty else {
-                                                                                print("Error: Empty response from Reddit")
-                                                                                return
-                                                                            }
-                                                                            if let myInfo = myInfoResponse.data(using: .utf8) {
-                                                                                operationQueue.addOperation {
+                                session.request(RedditAPI.getAccessToken(queries: nil, headers: headers, params: params))
+                                    .validate()
+                                    .responseString { response in
+                                        switch response.result {
+                                        case .success(let accessTokenResponse):
+                                            guard !accessTokenResponse.isEmpty else {
+                                                loginViewModel.error = LoginError.failedToGetAccessToken
+                                                return
+                                            }
+                                            if let data = accessTokenResponse.data(using: .utf8) {
+                                                do {
+                                                    if let responseJSON = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                                                        if let accessToken = responseJSON["access_token"] as? String,
+                                                           let refreshToken = responseJSON["refresh_token"] as? String {
+                                                            print("Access Token: \(accessToken)")
+                                                            print("Refresh Token: \(refreshToken)")
+                                                            
+                                                            session.request(RedditOAuthAPI.getMyInfo(headers: APIUtils.getOAuthHeader(accessToken: accessToken)))
+                                                                .validate()
+                                                                .responseString { response in
+                                                                    switch response.result {
+                                                                    case .success(let myInfoResponse):
+                                                                        guard !myInfoResponse.isEmpty else {
+                                                                            print("Error: Empty response from Reddit")
+                                                                            loginViewModel.error = LoginError.failedToGetMyInfo
+                                                                            return
+                                                                        }
+                                                                        if let myInfo = myInfoResponse.data(using: .utf8) {
+                                                                            operationQueue.addOperation {
+                                                                                do {
+                                                                                    let jsonResponse = try JSON(data: myInfo)
+                                                                                    
+                                                                                    // Parse the response
+                                                                                    let name = jsonResponse[JSONUtils.NAME_KEY].stringValue
+                                                                                    let profileImageUrl = jsonResponse[JSONUtils.ICON_IMG_KEY].stringValue
+                                                                                    
+                                                                                    var bannerImageUrl: String? = nil
+                                                                                    if let subredditData = jsonResponse[JSONUtils.SUBREDDIT_KEY].dictionary {
+                                                                                        bannerImageUrl = subredditData[JSONUtils.BANNER_IMG_KEY]?.stringValue
+                                                                                    }
+                                                                                    
+                                                                                    let karma = jsonResponse[JSONUtils.TOTAL_KARMA_KEY].intValue
+                                                                                    let isMod = jsonResponse[JSONUtils.IS_MOD_KEY].boolValue
+                                                                                    let createdUTC = jsonResponse[JSONUtils.CREATED_UTC_KEY].doubleValue
+                                                                                    
+                                                                                    let account = Account(
+                                                                                        username: name,
+                                                                                        isCurrentUser: true,
+                                                                                        profileImageUrl: profileImageUrl,
+                                                                                        bannerImageUrl: bannerImageUrl,
+                                                                                        karma: karma,
+                                                                                        isMod: isMod,
+                                                                                        accessToken: accessToken,
+                                                                                        refreshToken: refreshToken,
+                                                                                        code: authCode,
+                                                                                        createdUTC: createdUTC
+                                                                                    )
+                                                                                    
+                                                                                    let accountDao = AccountDao(dbPool: dbPool)
                                                                                     do {
-                                                                                        let jsonResponse = try JSON(data: myInfo)
+                                                                                        try accountDao.markAllAccountsNonCurrent()
+                                                                                        try accountDao.insert(account)
                                                                                         
-                                                                                        // Parse the response
-                                                                                        let name = jsonResponse[JSONUtils.NAME_KEY].stringValue
-                                                                                        let profileImageUrl = jsonResponse[JSONUtils.ICON_IMG_KEY].stringValue
-                                                                                        
-                                                                                        var bannerImageUrl: String? = nil
-                                                                                        if let subredditData = jsonResponse[JSONUtils.SUBREDDIT_KEY].dictionary {
-                                                                                            bannerImageUrl = subredditData[JSONUtils.BANNER_IMG_KEY]?.stringValue
-                                                                                        }
-                                                                                        
-                                                                                        let karma = jsonResponse[JSONUtils.TOTAL_KARMA_KEY].intValue
-                                                                                        let isMod = jsonResponse[JSONUtils.IS_MOD_KEY].boolValue
-                                                                                        let createdUTC = jsonResponse[JSONUtils.CREATED_UTC_KEY].doubleValue
-                                                                                        
-                                                                                        let account = Account(
-                                                                                            username: name,
-                                                                                            isCurrentUser: true,
-                                                                                            profileImageUrl: profileImageUrl,
-                                                                                            bannerImageUrl: bannerImageUrl,
-                                                                                            karma: karma,
-                                                                                            isMod: isMod,
-                                                                                            accessToken: accessToken,
-                                                                                            refreshToken: refreshToken,
-                                                                                            code: authCode,
-                                                                                            createdUTC: createdUTC
-                                                                                        )
-                                                                                        
-                                                                                        let accountDao = AccountDao(dbPool: dbPool)
-                                                                                        do {
-                                                                                            try accountDao.markAllAccountsNonCurrent()
-                                                                                            try accountDao.insert(account)
-                                                                                            
-                                                                                            OperationQueue.main.addOperation {
-                                                                                                AccountViewModel.shared.switchAccount(newAccount: account)
-                                                                                                dismiss()
-                                                                                            }
-                                                                                        } catch {
-                                                                                            print("Error: Failed to insert account - \(error.localizedDescription)")
+                                                                                        OperationQueue.main.addOperation {
+                                                                                            AccountViewModel.shared.switchAccount(newAccount: account)
+                                                                                            dismiss()
                                                                                         }
                                                                                     } catch {
-                                                                                        print("Error: Failed to parse account JSON - \(error.localizedDescription)")
+                                                                                        print("Error: Failed to insert account - \(error.localizedDescription)")
+                                                                                        loginViewModel.error = LoginError.failedToSaveAccountInfo
                                                                                     }
+                                                                                } catch {
+                                                                                    print("Error: Failed to parse account JSON - \(error.localizedDescription)")
+                                                                                    loginViewModel.error = LoginError.failedToParseAccountInfo
                                                                                 }
                                                                             }
-                                                                            break
-                                                                        case .failure(let error):
-                                                                            print("Error: \(error.localizedDescription)")
-                                                                            break
                                                                         }
+                                                                        break
+                                                                    case .failure(let error):
+                                                                        print("Error: \(error.localizedDescription)")
+                                                                        loginViewModel.error = LoginError.failedToGetMyInfoNetworkError
+                                                                        break
                                                                     }
-                                                            } else {
-                                                                print("Error: Tokens not found in response")
-                                                            }
+                                                                }
+                                                        } else {
+                                                            print("Error: Tokens not found in response")
+                                                            loginViewModel.error = LoginError.noAccessTokenInResponse
                                                         }
-                                                    } catch {
-                                                        print("Error: Failed to parse JSON - \(error.localizedDescription)")
                                                     }
+                                                } catch {
+                                                    print("Error: Failed to parse JSON - \(error.localizedDescription)")
+                                                    loginViewModel.error = LoginError.failedToParseAccessToken
                                                 }
-                                                break
-                                            case .failure(let error):
-                                                print("Error: \(error.localizedDescription)")
-                                                break
                                             }
+                                            break
+                                        case .failure(let error):
+                                            print("Error: \(error.localizedDescription)")
+                                            loginViewModel.error = LoginError.failedToGetAccessTokenNetworkError
+                                            break
                                         }
-                                }
+                                    }
                             }
                         }
                     }
-                } else if url.contains("error=access_denied") {
-                    print("login failed")
                 }
+            } else if url.contains("error=access_denied") {
+                print("login failed")
             }
         }
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar("Login", 1.0)
+        .addTitleToInlineNavigationBar("Login")
+        .showErrorUsingSnackbar(loginViewModel.$error)
     }
 }

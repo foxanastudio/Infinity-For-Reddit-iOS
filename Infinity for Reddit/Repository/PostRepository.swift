@@ -8,15 +8,9 @@
 import Combine
 import Alamofire
 import SwiftyJSON
-import Foundation
 import GRDB
 
 class PostRepository: PostRepositoryProtocol {
-    enum PostRepositoryError: Error {
-        case NetworkError(String)
-        case JSONDecodingError(String)
-    }
-    
     private let session: Session
     private let postHistoryDao: PostHistoryDao
     
@@ -58,7 +52,7 @@ class PostRepository: PostRepositoryProtocol {
                         username: Account.ANONYMOUS_ACCOUNT.username,
                         postId: post.id,
                         postHistoryType: .upvoted,
-                        time: Int64(Date().timeIntervalSince1970)
+                        time: Utils.getCurrentTimeEpoch()
                     )
                 )
                 try await postHistoryDao.deletePostHistory(username: Account.ANONYMOUS_ACCOUNT.username, postId: post.id, postHistoryType: .downvoted)
@@ -71,7 +65,7 @@ class PostRepository: PostRepositoryProtocol {
                         username: Account.ANONYMOUS_ACCOUNT.username,
                         postId: post.id,
                         postHistoryType: .downvoted,
-                        time: Int64(Date().timeIntervalSince1970)
+                        time: Utils.getCurrentTimeEpoch()
                     )
                 )
                 try await postHistoryDao.deletePostHistory(username: Account.ANONYMOUS_ACCOUNT.username, postId: post.id, postHistoryType: .upvoted)
@@ -106,7 +100,7 @@ class PostRepository: PostRepositoryProtocol {
                         username: Account.ANONYMOUS_ACCOUNT.username,
                         postId: post.id,
                         postHistoryType: .saved,
-                        time: Int64(Date().timeIntervalSince1970)
+                        time: Utils.getCurrentTimeEpoch()
                     )
                 )
             } else {
@@ -127,7 +121,7 @@ class PostRepository: PostRepositoryProtocol {
                 username: account.username,
                 postId: post.id,
                 postHistoryType: .readPosts,
-                time: Int64(Date().timeIntervalSince1970)
+                time: Utils.getCurrentTimeEpoch()
             )
         )
     }

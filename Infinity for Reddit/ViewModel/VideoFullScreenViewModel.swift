@@ -37,8 +37,15 @@ class VideoFullScreenViewModel: ObservableObject {
     private var audioTrackObserver: NSKeyValueObservation?
     private var timer: Timer?
     
-    enum VideoPlayerError: Error {
+    enum VideoPlayerError: LocalizedError {
         case invalidURL
+        
+        var errorDescription: String? {
+            switch self {
+            case .invalidURL:
+                return "Invalid URL."
+            }
+        }
     }
     
     func loadAndPlay(urlString: String, videoType: VideoType) async {

@@ -11,11 +11,6 @@ import SwiftyJSON
 import Foundation
 
 public class CommentRepository: CommentRepositoryProtocol {
-    enum CommentRepositoryError: Error {
-        case NetworkError(String)
-        case JSONDecodingError(String)
-    }
-    
     private let session: Session
     
     public init() {

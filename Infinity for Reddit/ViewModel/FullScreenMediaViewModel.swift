@@ -97,8 +97,15 @@ enum FullScreenMediaType {
 //    }
 }
 
-enum DownloadMediaTypeError: Error {
+enum DownloadMediaTypeError: LocalizedError {
     case getDownloadMediaTypeFailed
+    
+    var errorDescription: String? {
+        switch self {
+        case .getDownloadMediaTypeFailed:
+            return "Failed to get download media type."
+        }
+    }
 }
 
 enum VideoType {

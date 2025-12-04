@@ -11,11 +11,6 @@ import SwiftyJSON
 import GRDB
 
 actor UserProfileImageBatchLoader {
-    enum UserProfileImageBatchLoaderError: Error {
-        case NetworkError(String)
-        case JSONDecodingError(String)
-    }
-    
     static let shared = UserProfileImageBatchLoader()
     
     private let session: Session
@@ -185,7 +180,7 @@ actor UserProfileImageBatchLoader {
         
         let json = JSON(data)
         if let error = json.error {
-            throw UserProfileImageBatchLoaderError.JSONDecodingError(error.localizedDescription)
+            throw APIError.jsonDecodingError(error.localizedDescription)
         }
         
         let partialUserDataListing = try PartialUserDataListing(fromJson: json)

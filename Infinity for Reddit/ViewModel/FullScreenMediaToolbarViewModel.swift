@@ -23,8 +23,15 @@ class FullScreenMediaToolbarViewModel: ObservableObject {
     private var downloadImgurAllMediaTask: Task<Void, Never>?
     private var shareTask: Task<Void, Never>?
     
-    enum FullScreenMediaToolbarError: Error {
+    enum FullScreenMediaToolbarError: LocalizedError {
         case invalidURL
+        
+        var errorDescription: String? {
+            switch self {
+            case .invalidURL:
+                return "Invalid URL."
+            }
+        }
     }
     
     init(downloadMediaType: DownloadMediaType) {

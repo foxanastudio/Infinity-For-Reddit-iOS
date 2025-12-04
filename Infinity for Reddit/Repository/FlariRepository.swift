@@ -9,11 +9,6 @@ import Alamofire
 import SwiftyJSON
 
 class FlairRepository: FlairRepositoryProtocol {
-    enum FlairRepositoryError: Error {
-        case NetworkError(String)
-        case JSONDecodingError(String)
-    }
-    
     private let session: Session
     
     init() {
@@ -26,13 +21,11 @@ class FlairRepository: FlairRepositoryProtocol {
     func fetchFlairs(subreddit: String) async throws -> [Flair] {
         try Task.checkCancellation()
         
-        let flairs = try await self.session.request(
+        return try await self.session.request(
             RedditOAuthAPI.getFlairs(subredditName: subreddit)
         )
             .validate()
             .serializingDecodable([Flair].self)
             .value
-        
-        return flairs
     }
 }

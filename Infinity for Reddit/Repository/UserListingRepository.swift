@@ -9,10 +9,6 @@ import Alamofire
 import SwiftyJSON
 
 public class UserListingRepository: UserListingRepositoryProtocol {
-    enum UserListingRepositoryError: Error {
-        case NetworkError(String)
-        case JSONDecodingError(String)
-    }
     private let session: Session
     
     public init() {
@@ -38,7 +34,7 @@ public class UserListingRepository: UserListingRepositoryProtocol {
         
         let json = JSON(data)
         if let error = json.error {
-            throw UserListingRepositoryError.JSONDecodingError(error.localizedDescription)
+            throw APIError.jsonDecodingError(error.localizedDescription)
         }
         
         return try UserListingRootClass(fromJson: json).data
