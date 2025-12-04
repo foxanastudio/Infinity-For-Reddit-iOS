@@ -76,11 +76,7 @@ struct ReportView: View {
                 dismiss()
             }
         }
-        .onReceive(reportViewModel.$error) { newValue in
-            if let error = newValue {
-                snackbarManager.showSnackbar(.error(error))
-            }
-        }
+        .showErrorUsingSnackbar(reportViewModel.$error)
     }
     
     struct ReasonItemView: View {

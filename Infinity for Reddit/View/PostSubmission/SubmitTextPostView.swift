@@ -219,11 +219,7 @@ struct SubmitTextPostView: View {
                 navigationManager.replaceCurrentScreen(AppNavigation.postDetailsWithId(postId: id))
             }
         }
-        .onReceive(submitTextPostViewModel.$error) { newValue in
-            if let error = newValue {
-                snackbarManager.showSnackbar(.error(error))
-            }
-        }
+        .showErrorUsingSnackbar(submitTextPostViewModel.$error)
         .overlay(
             CustomAlert<EmptyView>(
                 title: "No Subreddit Selected",

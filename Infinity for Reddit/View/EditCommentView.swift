@@ -234,10 +234,6 @@ struct EditCommentView: View {
                 }
             }
         }
-        .onReceive(editCommentViewModel.$error) { newValue in
-            if let error = newValue {
-                snackbarManager.showSnackbar(.error(error))
-            }
-        }
+        .showErrorUsingSnackbar(editCommentViewModel.$error)
     }
 }

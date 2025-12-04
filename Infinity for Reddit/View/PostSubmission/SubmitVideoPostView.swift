@@ -215,11 +215,7 @@ struct SubmitVideoPostView: View {
                 dismiss()
             }
         }
-        .onReceive(submitVideoPostViewModel.$error) { newValue in
-            if let error = newValue {
-                snackbarManager.showSnackbar(.error(error))
-            }
-        }
+        .showErrorUsingSnackbar(submitVideoPostViewModel.$error)
         .overlay(
             CustomAlert<EmptyView>(
                 title: "No Subreddit Selected",

@@ -160,11 +160,7 @@ struct CreateOrEditCustomFeedView: View {
                 navigationManager.replaceCurrentScreen(AppNavigation.customFeed(customFeed: .myCustomFeed(newValue)))
             }
         }
-        .onReceive(createOrEditCustomFeedViewModel.$error) { newValue in
-            if let error = newValue {
-                snackbarManager.showSnackbar(.error(error))
-            }
-        }
+        .showErrorUsingSnackbar(createOrEditCustomFeedViewModel.$error)
         .sheet(isPresented: $showSubredditAndUserMultiSelectionSheet) {
             NavigationStack {
                 SubredditAndUserMultiSelectionSheet(

@@ -219,11 +219,7 @@ struct SubmitImagePostView: View {
                 dismiss()
             }
         }
-        .onReceive(submitImagePostViewModel.$error) { newValue in
-            if let error = newValue {
-                snackbarManager.showSnackbar(.error(error))
-            }
-        }
+        .showErrorUsingSnackbar(submitImagePostViewModel.$error)
         .overlay(
             CustomAlert<EmptyView>(
                 title: "No Subreddit Selected",

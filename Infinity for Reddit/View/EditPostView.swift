@@ -211,10 +211,6 @@ struct EditPostView: View {
                 }
             }
         }
-        .onReceive(editPostViewModel.$error) { newValue in
-            if let error = newValue {
-                snackbarManager.showSnackbar(.error(error))
-            }
-        }
+        .showErrorUsingSnackbar(editPostViewModel.$error)
     }
 }

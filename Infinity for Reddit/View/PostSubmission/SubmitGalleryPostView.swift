@@ -194,11 +194,7 @@ struct SubmitGalleryPostView: View {
                 navigationManager.replaceCurrentScreen(urlString)
             }
         }
-        .onReceive(submitGalleryPostViewModel.$error) { newValue in
-            if let error = newValue {
-                snackbarManager.showSnackbar(.error(error))
-            }
-        }
+        .showErrorUsingSnackbar(submitGalleryPostViewModel.$error)
         .fullScreenCover(isPresented: $showCamera) {
             if Utils.checkCameraAvailability() {
                 MCamera()

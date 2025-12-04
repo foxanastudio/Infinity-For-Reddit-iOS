@@ -129,11 +129,7 @@ struct CopyCustomFeedView: View {
                 dismiss()
             }
         }
-        .onReceive(copyCustomFeedViewModel.$error) { newValue in
-            if let error = newValue {
-                snackbarManager.showSnackbar(.error(error))
-            }
-        }
+        .showErrorUsingSnackbar(copyCustomFeedViewModel.$error)
     }
     
     private enum FieldType: Hashable {

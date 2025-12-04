@@ -244,11 +244,7 @@ struct SubmitCommentView: View {
                 dismiss()
             }
         }
-        .onReceive(submitCommentViewModel.$error) { newValue in
-            if let error = newValue {
-                snackbarManager.showSnackbar(.error(error))
-            }
-        }
+        .showErrorUsingSnackbar(submitCommentViewModel.$error)
     }
 }
 

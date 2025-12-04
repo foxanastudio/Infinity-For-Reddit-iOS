@@ -104,11 +104,7 @@ struct SendChatMessageView: View {
                 dismiss()
             }
         }
-        .onReceive(sendChatMessageViewModel.$error) { newValue in
-            if let error = newValue {
-                snackbarManager.showSnackbar(.error(error))
-            }
-        }
+        .showErrorUsingSnackbar(sendChatMessageViewModel.$error)
     }
     
     private enum FieldType: Hashable {
