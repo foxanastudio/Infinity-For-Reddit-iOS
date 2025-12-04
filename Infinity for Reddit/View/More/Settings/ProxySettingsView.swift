@@ -103,7 +103,7 @@ struct ProxySettingsView: View {
                 case .hostname:
                     let trimmed = proxyHostnameString.trimmingCharacters(in: .whitespacesAndNewlines)
                     proxyHostnameString = trimmed
-                    guard ProxyInputValidator.isValidHostname(trimmed) else {
+                    guard ProxyUtils.isValidHostname(trimmed) else {
                         snackbarManager.showSnackbar(.info("Not a valid IP or host name"))
                         DispatchQueue.main.async {
                             activeAlert = .hostname
@@ -121,7 +121,7 @@ struct ProxySettingsView: View {
                         }
                         return
                     }
-                    guard ProxyInputValidator.isValidPort(portValue) else {
+                    guard ProxyUtils.isValidPort(portValue) else {
                         snackbarManager.showSnackbar(.info("Not a valid port (0 - 65535)"))
                         DispatchQueue.main.async {
                             activeAlert = .port
@@ -165,26 +165,5 @@ private enum ActiveAlert: Identifiable {
         case .hostname: return "Hostname"
         case .port: return "Port"
         }
-    }
-}
-
-private enum ProxyInputValidator {
-    private static let hostnameRegex = "^(?=^.{1,253}$)(([a-z\\d]([a-z\\d-]{0,62}[a-z\\d])*[\\.]){1,3}[a-z]{1,61})$"
-
-    static func isValidHostname(_ value: String) -> Bool {
-        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else {
-            return false
-        }
-
-        if IPv4Address(trimmed) != nil || IPv6Address(trimmed) != nil {
-            return true
-        }
-
-        return trimmed.range(of: hostnameRegex, options: .regularExpression) != nil
-    }
-
-    static func isValidPort(_ value: Int) -> Bool {
-        return (0...65535).contains(value)
     }
 }
