@@ -14,12 +14,14 @@ struct ImageFullScreenView: View {
     let urlString: String
     let fileName: String
     let matchedGeometryEffectId: String?
+    let isGif: Bool
     let onDismiss: () -> Void
     
-    init(urlString: String, fileName: String, matchedGeometryEffectId: String? = nil, onDismiss: @escaping () -> Void) {
+    init(urlString: String, fileName: String, matchedGeometryEffectId: String? = nil, isGif: Bool, onDismiss: @escaping () -> Void) {
         self.urlString = urlString
         self.fileName = fileName
         self.matchedGeometryEffectId = matchedGeometryEffectId
+        self.isGif = isGif
         self.onDismiss = onDismiss
     }
     
@@ -49,6 +51,7 @@ struct ImageFullScreenView: View {
             ImageFullScreenToolbar(
                 downloadMediaType: DownloadMediaType.image(downloadUrlString: urlString, fileName: fileName),
                 isVisible: $isToolbarVisible,
+                isGif: isGif,
                 onDismiss: {
                     withAnimation {
                         onDismiss()
@@ -65,18 +68,22 @@ struct ImageFullScreenToolbar: View {
     
     @Binding var isVisible: Bool
     
+    let isGif: Bool
+    
     let onDismiss: () -> Void
     
     private let buttonSize: CGFloat = 24
     
     init(downloadMediaType: DownloadMediaType,
          isVisible: Binding<Bool>,
+         isGif: Bool,
          onDismiss: @escaping () -> Void
     ) {
         _fullScreenMediaToolbarViewModel = StateObject(
             wrappedValue: FullScreenMediaToolbarViewModel(downloadMediaType: downloadMediaType)
         )
         self._isVisible = isVisible
+        self.isGif = isGif
         self.onDismiss = onDismiss
     }
     
@@ -106,8 +113,8 @@ struct ImageFullScreenToolbar: View {
             Spacer()
             
             if isVisible {
-                VStack {
-                    HStack {
+                VStack(spacing: 0) {
+                    HStack(spacing: 8) {
                         Button {
                             fullScreenMediaToolbarViewModel.downloadMedia()
                         } label: {
@@ -123,19 +130,21 @@ struct ImageFullScreenToolbar: View {
                                 )
                         }
                         
-                        Button {
-                            fullScreenMediaToolbarViewModel.shareImage()
-                        } label: {
-                            SwiftUI.Image(systemName: "square.and.arrow.up")
-                                .font(.system(size: buttonSize))
-                                .padding(.horizontal, 10)
-                                .padding(.top, 12)
-                                .padding(.bottom, 14)
-                                .foregroundColor(Color.white)
-                                .background(
-                                    Circle()
-                                        .fill(Color(hex: "#2E2E2E"))
-                                )
+                        if !isGif {
+                            Button {
+                                fullScreenMediaToolbarViewModel.shareImage()
+                            } label: {
+                                SwiftUI.Image(systemName: "square.and.arrow.up")
+                                    .font(.system(size: buttonSize))
+                                    .padding(.horizontal, 10)
+                                    .padding(.top, 12)
+                                    .padding(.bottom, 14)
+                                    .foregroundColor(Color.white)
+                                    .background(
+                                        Circle()
+                                            .fill(Color(hex: "#2E2E2E"))
+                                    )
+                            }
                         }
                     }
                     .padding(.horizontal, 16)

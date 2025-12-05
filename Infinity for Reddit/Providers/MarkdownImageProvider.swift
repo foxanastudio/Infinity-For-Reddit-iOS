@@ -31,7 +31,7 @@ struct MarkdownImageProvider: ImageProvider {
                         handleImageTapGesture: false
                     )
                     .highPriorityGesture(TapGesture().onEnded {
-                        onMediaTap(urlString: media.s.gif, fileName: "\(Utils.randomString()).gif")
+                        onMediaTap(urlString: media.s.gif, fileName: "\(Utils.randomString()).gif", isGif: true)
                     })
                     
                     if media.caption != nil {
@@ -47,7 +47,7 @@ struct MarkdownImageProvider: ImageProvider {
                         handleImageTapGesture: false
                     )
                     .highPriorityGesture(TapGesture().onEnded {
-                        onMediaTap(urlString: media.s.u, fileName: "\(Utils.randomString()).jpg")
+                        onMediaTap(urlString: media.s.u, fileName: "\(Utils.randomString()).jpg", isGif: false)
                     })
                     
                     if media.caption != nil {
@@ -78,9 +78,13 @@ struct MarkdownImageProvider: ImageProvider {
         }
     }
     
-    private func onMediaTap(urlString: String?, fileName: String) {
+    private func onMediaTap(urlString: String?, fileName: String, isGif: Bool) {
         if let urlString {
-            fullScreenMediaViewModel.show(.image(urlString: urlString, fileName: fileName))
+            if isGif {
+                fullScreenMediaViewModel.show(.gif(urlString: urlString, fileName: fileName))
+            } else {
+                fullScreenMediaViewModel.show(.image(urlString: urlString, fileName: fileName))
+            }
         }
     }
 }
