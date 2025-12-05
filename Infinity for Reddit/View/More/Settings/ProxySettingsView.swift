@@ -11,12 +11,12 @@ import SwiftUI
 struct ProxySettingsView: View {
     @AppStorage(ProxyUserDefaultsUtils.enableProxyKey, store: .proxy) private var enableProxy: Bool = false
     @AppStorage(ProxyUserDefaultsUtils.proxyTypeKey, store: .proxy) private var proxyType: Int = 0
-    @AppStorage(ProxyUserDefaultsUtils.proxyHostnameKey, store: .proxy) private var proxyHostname: String = ""
+    @AppStorage(ProxyUserDefaultsUtils.proxyHostKey, store: .proxy) private var proxyHost: String = ""
     @AppStorage(ProxyUserDefaultsUtils.proxyPortKey, store: .proxy) private var proxyPort: String = ""
     
     @EnvironmentObject private var snackbarManager: SnackbarManager
     @State private var activeAlert: ActiveAlert? = nil
-    @State private var proxyHostnameString: String = ""
+    @State private var proxyHostString: String = ""
     @State private var proxyPortString: String = ""
     
     @FocusState private var focusedField: FieldType?
@@ -43,9 +43,9 @@ struct ProxySettingsView: View {
                     
                     PreferenceEntry(
                         title: "Hostname",
-                        subtitle: proxyHostname
+                        subtitle: proxyHost
                     ){
-                        proxyHostnameString = proxyHostname
+                        proxyHostString = proxyHost
                         withAnimation(.linear(duration: 0.2)) {
                             activeAlert = .hostname
                         }
@@ -66,7 +66,9 @@ struct ProxySettingsView: View {
         }
         .overlay(
             CustomAlert(title: activeAlert?.title ?? "", isPresented: Binding(
-                get: { activeAlert != nil },
+                get: {
+                    activeAlert != nil
+                },
                 set: { newValue in
                     if !newValue {
                         activeAlert = nil
@@ -77,7 +79,7 @@ struct ProxySettingsView: View {
                 case .hostname:
                     CustomTextField(
                         "Hostname",
-                        text: $proxyHostnameString,
+                        text: $proxyHostString,
                         singleLine: true,
                         fieldType: .hostname,
                         focusedField: $focusedField
@@ -101,8 +103,8 @@ struct ProxySettingsView: View {
 
                 switch alert {
                 case .hostname:
-                    let trimmed = proxyHostnameString.trimmingCharacters(in: .whitespacesAndNewlines)
-                    proxyHostnameString = trimmed
+                    let trimmed = proxyHostString.trimmingCharacters(in: .whitespacesAndNewlines)
+                    proxyHostString = trimmed
                     guard ProxyUtils.isValidHostname(trimmed) else {
                         snackbarManager.showSnackbar(.info("Not a valid IP or host name"))
                         DispatchQueue.main.async {
@@ -110,7 +112,7 @@ struct ProxySettingsView: View {
                         }
                         return
                     }
-                    proxyHostname = trimmed
+                    proxyHost = trimmed
                 case .port:
                     let trimmed = proxyPortString.trimmingCharacters(in: .whitespacesAndNewlines)
                     proxyPortString = trimmed
@@ -138,7 +140,7 @@ struct ProxySettingsView: View {
         .onChange(of: proxyType, initial: false) { _, _ in
             ProxyManager.shared.reloadConfiguration()
         }
-        .onChange(of: proxyHostname, initial: false) { _, _ in
+        .onChange(of: proxyHost, initial: false) { _, _ in
             ProxyManager.shared.reloadConfiguration()
         }
         .onChange(of: proxyPort, initial: false) { _, _ in

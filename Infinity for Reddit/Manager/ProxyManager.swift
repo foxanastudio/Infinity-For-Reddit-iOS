@@ -10,11 +10,50 @@ import GCDWebServer
 
 final class ProxyManager {
     static let shared = ProxyManager()
+    
+    enum State: Equatable {
+        case disabled
+        case configured
+        case running
+        case error(ProxyManagerError)
+    }
+    
+    enum ProxyManagerError: LocalizedError {
+        case invalidConfiguration
+        case serverNotConfigured
+        case serverStartFailed
+        
+        var errorDescription: String? {
+            switch self {
+            case .invalidConfiguration:
+                return "Proxy configuration is missing or malformed."
+            case .serverNotConfigured:
+                return "Proxy server was not configured before start/stop."
+            case .serverStartFailed:
+                return "Proxy server failed to start."
+            }
+        }
+    }
+    
+    private(set) var state: State = .disabled {
+        didSet {
+            if case .error(let error) = state {
+                print("Proxy: State changed from \(oldValue) to \(state) – \(error.errorDescription ?? "Unknown error")")
+            } else {
+                print("Proxy: State changed from \(oldValue) to \(state)")
+            }
+        }
+    }
 
     private let controlQueue = DispatchQueue(label: "com.docilealligator.infinityforreddit.proxymanager.control", qos: .default)
     private var configuration: ProxyConfiguration?
     private var proxyServer: ProxyServer?
-
+    
+    private func updateStateLocked(_ newState: State) {
+        guard state != newState else { return }
+        state = newState
+    }
+    
     private static let ensureGCDWebServerInitialized: Void = {
         let initialize = {
             _ = GCDWebServer()
@@ -30,27 +69,49 @@ final class ProxyManager {
     private init() {
         _ = ProxyManager.ensureGCDWebServerInitialized
         controlQueue.sync {
-            if let proxyConfiguration = ProxyConfiguration() {
-                self.configuration = proxyConfiguration
-                configureProxyServer(with: proxyConfiguration)
-            } else {
+            guard let proxyConfiguration = resolveConfiguration() else {
                 self.configuration = nil
-                print("Proxy: Proxy disabled or misconfigured")
+                return
             }
+
+            self.configuration = proxyConfiguration
+            _ = configureProxyServer(with: proxyConfiguration)
         }
     }
 
-    private func configureProxyServer(with configuration: ProxyConfiguration) {
+    private func resolveConfiguration() -> ProxyConfiguration? {
+        guard ProxyUserDefaultsUtils.enableProxy else {
+            updateStateLocked(.disabled)
+            print("Proxy: Proxy disabled")
+            return nil
+        }
+
+        guard let configuration = ProxyConfiguration() else {
+            updateStateLocked(.error(.invalidConfiguration))
+            print("Proxy: Invalid proxy configuration")
+            return nil
+        }
+
+        return configuration
+    }
+
+    @discardableResult
+    private func configureProxyServer(with configuration: ProxyConfiguration) -> Bool {
+        proxyServer?.stop()
+        proxyServer = nil
+
         if configuration.type == .direct {
             print("Proxy: Direct proxy selected, requests will bypass the proxy server")
-            return
+            updateStateLocked(.configured)
+            return true
         }
 
         guard let proxyDictionary = configuration.connectionProxyDictionary,
               let host = configuration.host,
               let port = configuration.port else {
             print("Proxy: Proxy enabled but missing host/port configuration")
-            return
+            updateStateLocked(.error(.invalidConfiguration))
+            return false
         }
 
         let sessionConfiguration = URLSessionConfiguration.default
@@ -68,17 +129,55 @@ final class ProxyManager {
                                  delegateQueue: delegateQueue)
         let service = URLSessionProxyService(session: session)
         proxyServer = ProxyServer(service: service)
+        updateStateLocked(.configured)
+        return true
     }
 
     private func startLocked() {
-        guard let configuration, configuration.type != .direct else {
+        guard let configuration else {
+            updateStateLocked(.disabled)
             return
         }
-        proxyServer?.start()
+
+        guard configuration.type != .direct else {
+            updateStateLocked(.configured)
+            return
+        }
+
+        guard let proxyServer else {
+            updateStateLocked(.error(.serverNotConfigured))
+            return
+        }
+
+        proxyServer.start()
+        if proxyServer.isRunning {
+            updateStateLocked(.running)
+        } else {
+            updateStateLocked(.error(.serverStartFailed))
+        }
     }
 
     private func stopLocked() {
-        proxyServer?.stop()
+        guard let configuration else {
+            proxyServer?.stop()
+            updateStateLocked(.disabled)
+            return
+        }
+
+        guard configuration.type != .direct else {
+            updateStateLocked(.configured)
+            return
+        }
+
+        guard let proxyServer else {
+            updateStateLocked(.error(.serverNotConfigured))
+            return
+        }
+
+        if proxyServer.isRunning {
+            proxyServer.stop()
+        }
+        updateStateLocked(.configured)
     }
 
     func start() {
@@ -94,13 +193,23 @@ final class ProxyManager {
     }
 
     func proxyURL(_ url: URL) -> URL {
-        return controlQueue.sync {
-            guard let configuration,
-                  configuration.type != .direct else { return url }
+        controlQueue.sync {
+            guard let configuration else {
+                return url
+            }
+
+            guard configuration.type != .direct else {
+                return url
+            }
+
+            guard let proxyServer, state == .running else {
+                print("ProxyManager bypassing proxy because server is not running. State: \(state)")
+                return url
+            }
 
             let ext = url.pathExtension.lowercased()
             guard ProxyResourceFormat(rawValue: ext) != nil,
-                  let proxied = proxyServer?.reverseProxyURL(from: url) else {
+                  let proxied = proxyServer.reverseProxyURL(from: url) else {
                 #if DEBUG
                 print("ProxyManager bypassing proxy for extension:", ext.isEmpty ? "<none>" : ext, url.absoluteString)
                 #endif
@@ -113,7 +222,6 @@ final class ProxyManager {
         }
     }
 
-
     func reloadConfiguration() {
         controlQueue.async { [weak self] in
             guard let self else {
@@ -123,15 +231,15 @@ final class ProxyManager {
             self.stopLocked()
             self.proxyServer = nil
 
-            guard let newConfiguration = ProxyConfiguration() else {
+            guard let newConfiguration = self.resolveConfiguration() else {
                 self.configuration = nil
-                print("Proxy: Proxy disabled or misconfigured")
                 return
             }
 
             self.configuration = newConfiguration
-            self.configureProxyServer(with: newConfiguration)
-            self.startLocked()
+            if self.configureProxyServer(with: newConfiguration) {
+                self.startLocked()
+            }
         }
     }
 }

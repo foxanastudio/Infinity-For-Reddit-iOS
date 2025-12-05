@@ -20,9 +20,9 @@ class ProxyUserDefaultsUtils {
     static let proxyTypes: [Int] = [0, 1, 2]
     static let proxyTypesText: [String] = ["HTTP", "SOCKS", "Direct"]
     
-    static let proxyHostnameKey = "proxy_hostname"
-    static var proxyHostname : String {
-        return UserDefaults.proxy.string(forKey: proxyHostnameKey) ?? ""
+    static let proxyHostKey = "proxy_host"
+    static var proxyHost : String {
+        return UserDefaults.proxy.string(forKey: proxyHostKey) ?? ""
     }
     
     static let proxyPortKey = "proxy_port"

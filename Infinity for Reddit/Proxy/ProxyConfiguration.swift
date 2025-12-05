@@ -42,7 +42,7 @@ struct ProxyConfiguration {
             return
         }
         
-        let rawHost = ProxyUserDefaultsUtils.proxyHostname.trimmingCharacters(in: .whitespacesAndNewlines)
+        let rawHost = ProxyUserDefaultsUtils.proxyHost.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !rawHost.isEmpty else {
             return nil
         }
