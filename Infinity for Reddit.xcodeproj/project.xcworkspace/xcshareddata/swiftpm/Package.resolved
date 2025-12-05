@@ -1,5 +1,5 @@
 {
-  "originHash" : "9e493bc303a6c7483ec2a3f724d4114d286ed0f2b3c61177f692cc6940beb6e9",
+  "originHash" : "97a24f5144b241603057590ae343669d914709af35f084a9f9474d2a9572a28d",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -88,7 +88,7 @@
       "location" : "https://github.com/Docile-Alligator/swift-cmark-reddit",
       "state" : {
         "branch" : "gfm",
-        "revision" : "b830ed7d965a2ec8b8afb41fde8b9a6cef4e27e7"
+        "revision" : "075439f7bbe9ed3825dcabe498df04ee77e6f3fb"
       }
     },
     {
@@ -115,7 +115,7 @@
       "location" : "https://github.com/Docile-Alligator/swift-markdown-ui.git",
       "state" : {
         "branch" : "main",
-        "revision" : "6833583f98b0a231e831353a7efb77f9facc28b5"
+        "revision" : "11d6390e50c74635fa61ec61eab4106a737591eb"
       }
     },
     {
