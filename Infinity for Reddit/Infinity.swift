@@ -10,6 +10,7 @@ import Swinject
 import GRDB
 import GiphyUISDK
 import Kingfisher
+import LocalAuthentication
 
 @main
 struct Infinity: App {
@@ -21,6 +22,7 @@ struct Infinity: App {
     @StateObject private var networkManager: NetworkManager = NetworkManager()
     
     @State private var showAppLockScreen: Bool = false
+    @State private var authenticationSuccess: Bool = false
     
     @AppStorage(SecurityUserDefaultsUtils.appLockKey, store: .security) private var appLock: Bool = false
     @AppStorage(SecurityUserDefaultsUtils.appLockTimeoutKey, store: .security) private var appLockTimeout: Int = 600000
@@ -96,6 +98,18 @@ struct Infinity: App {
                     .onAppear {
                         Giphy.configure(apiKey: APIUtils.GIPHY_GIF_API_KEY)
                     }
+                
+                if showAppLockScreen {
+                    VStack {
+                        Color.blue
+                    }
+                    .zIndex(1)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .task {
+                        try? await Task.sleep(for: .seconds(1))
+                        authenticate()
+                    }
+                }
             }
         }
         .onChange(of: scenePhase) { _, newPhase in
@@ -103,13 +117,36 @@ struct Infinity: App {
                 if NotificationUserDefaultsUtils.enableNotification {
                     PullNotificationBackgroundTaskManager.shared.scheduleBackgroundTask()
                 }
-                if appLock {
+                if appLock && !showAppLockScreen{
                     SecurityUserDefaultsUtils.saveLastForegroundTime()
                 }
             } else if newPhase == .active {
-                if Int(Utils.getCurrentTimeEpoch()) - SecurityUserDefaultsUtils.getLastForegroundTime() >= appLockTimeout {
-                    showAppLockScreen = true
+                if appLock && Int(Utils.getCurrentTimeEpoch()) - SecurityUserDefaultsUtils.getLastForegroundTime() >= appLockTimeout {
+                    if showAppLockScreen {
+                        if authenticationSuccess {
+                            withAnimation {
+                                showAppLockScreen = false
+                            }
+                        }
+                    } else {
+                        withAnimation {
+                            showAppLockScreen = true
+                        }
+                    }
                 }
+            }
+        }
+    }
+    
+    func authenticate() {
+        let context = LAContext()
+        var error: NSError?
+
+        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+            let reason = "We use Face ID to confirm it’s you before entering the app."
+
+            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, authenticationError in
+                authenticationSuccess = success
             }
         }
     }
