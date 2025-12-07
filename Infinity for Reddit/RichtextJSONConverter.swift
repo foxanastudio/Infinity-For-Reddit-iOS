@@ -132,6 +132,8 @@ class RichtextJSONConverter {
                 visitSuperscript(inlineNodes)
             case .spoiler(_, let inlineNodes):
                 visitSpoiler(inlineNodes)
+            case .redditEntity(let entity):
+                visitText(entity)
             }
         }
     }
@@ -521,6 +523,8 @@ class RichtextJSONConverter {
                     node = children.first
                 case .spoiler:
                     node = nil
+                case .redditEntity:
+                    node = nil
                 }
             }
         }
@@ -621,6 +625,8 @@ class RichtextJSONConverter {
                 return getImageCaption(currentCaption: caption, inlineNodes: inlineNodes)
             case .spoiler(_, let inlineNodes):
                 return getImageCaption(currentCaption: caption, inlineNodes: inlineNodes)
+            case .redditEntity(let entity):
+                caption.append(entity)
             }
         }
         
