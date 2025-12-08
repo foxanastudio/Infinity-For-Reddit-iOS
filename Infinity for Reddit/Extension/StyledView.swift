@@ -245,10 +245,12 @@ extension View {
     
     func appForegroundBackgroundListener(
         onAppEntersForeground: (() -> Void)? = nil,
+        onAppEntersInactive: (() -> Void)? = nil,
         onAppEntersBackground: (() -> Void)? = nil
     ) -> some View {
         self.modifier(AppForegroundBackgroundViewModifier(
             onAppEntersForeground: onAppEntersForeground,
+            onAppEntersInactive: onAppEntersInactive,
             onAppEntersBackground: onAppEntersBackground
         ))
     }

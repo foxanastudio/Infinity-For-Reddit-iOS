@@ -209,14 +209,17 @@ struct AppForegroundBackgroundViewModifier: ViewModifier {
     @Environment(\.scenePhase) private var scenePhase
     
     let onAppEntersForeground: (() -> Void)?
+    let onAppEntersInactive: (() -> Void)?
     let onAppEntersBackground: (() -> Void)?
     
     func body(content: Content) -> some View {
         content
             .onChange(of: scenePhase) { oldPhase, newPhase in
                 switch newPhase {
-                case .background, .inactive:
+                case .background:
                     onAppEntersBackground?()
+                case .inactive:
+                    onAppEntersInactive?()
                 case .active:
                     onAppEntersForeground?()
                 @unknown default: break
