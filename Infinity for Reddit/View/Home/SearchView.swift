@@ -10,6 +10,7 @@ import SwiftUI
 struct SearchView: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var customThemeViewModel: CustomThemeViewModel
     
     @StateObject private var searchViewModel: SearchViewModel
     @FocusState var focusedField: FieldType?
@@ -40,6 +41,7 @@ struct SearchView: View {
                                     text: $searchViewModel.query,
                                     singleLine: true,
                                     showBorder: false,
+                                    showBackground: false,
                                     fieldType: .search,
                                     focusedField: $focusedField)
                     .submitLabel(.search)
@@ -62,8 +64,8 @@ struct SearchView: View {
                         }
                     }
                 }
-                .padding(.horizontal, 12)
-                .background(Color(.systemGray5))
+                .padding(.leading, 12)
+                .background(Color(hex: customThemeViewModel.currentCustomTheme.filledCardViewBackgroundColor))
                 .cornerRadius(10)
                 .padding(16)
                 
@@ -94,12 +96,15 @@ struct SearchView: View {
                     if !searchViewModel.recentSearchQueries.isEmpty {
                         HStack {
                             Text("Recent Searches")
-                                .font(.headline)
+                                .primaryText(.f20)
+                                .fontWeight(.bold)
+                            
                             Spacer()
+                            
                             Button("Clear All") {
                                 searchViewModel.clearAllRecentSearchQueries()
                             }
-                            .font(.subheadline)
+                            .customFont()
                             .foregroundColor(.blue)
                         }
                         .padding(.horizontal, 16)

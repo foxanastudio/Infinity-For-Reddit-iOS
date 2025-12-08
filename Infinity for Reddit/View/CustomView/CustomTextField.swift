@@ -57,18 +57,16 @@ struct CustomTextField<FieldType: Hashable>: View {
         .keyboardType(keyboardType)
         .textInputAutocapitalization(autocapitalization)
         .tint(customTextFieldScheme.getTintColor(currentCustomTheme: customThemeViewModel.currentCustomTheme))
+        .padding(16)
         .applyIf(showBorder) {
             // TODO different border color for different focus state
-            $0.padding(16)
-                .overlay(
+            $0.overlay(
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(Color(hex: customThemeViewModel.currentCustomTheme.primaryTextColor), lineWidth: 1)
                 )
         }
         .applyIf(showBackground) {
-            $0.padding(.vertical, 16)
-                .padding(.horizontal, 16)
-                .background(Color(.systemGray5))
+            $0.background(Color(hex: customThemeViewModel.currentCustomTheme.filledCardViewBackgroundColor))
                 .cornerRadius(10)
         }
         .focused($focusedField, equals: fieldType)
@@ -100,7 +98,7 @@ enum CustomTextFieldScheme {
     func getTintColor(currentCustomTheme: CustomTheme) -> Color {
         switch self {
         case .normal:
-            return Color(hex: currentCustomTheme.colorPrimary)
+            return Color(hex: currentCustomTheme.colorPrimaryLightTheme)
         case .fab:
             return Color(hex: currentCustomTheme.fabIconColor)
         }
