@@ -72,7 +72,7 @@ struct UserDetailsView: View {
                                     Button(userDetailsViewModel.userData?.isSubscribed ?? false ? "Followed" : "Follow") {
                                         userDetailsViewModel.toggleFollowUser()
                                     }
-                                    .filledButton()
+                                    .subscribeButton(isSubscribed: userDetailsViewModel.userData?.isSubscribed ?? false)
                                 }
                                 .padding(.horizontal, 16)
                                 

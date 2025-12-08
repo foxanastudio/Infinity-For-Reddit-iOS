@@ -299,6 +299,10 @@ extension View {
         self.modifier(FilledButtonViewModifier())
     }
     
+    func subscribeButton(isSubscribed: Bool) -> some View {
+        self.modifier(SubscribeButtonViewModifier(isSubscribed: isSubscribed))
+    }
+    
     func urlTextField() -> some View {
         self.modifier(URLTextFieldViewModifier())
     }

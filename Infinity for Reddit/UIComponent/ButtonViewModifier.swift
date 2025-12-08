@@ -28,3 +28,17 @@ struct FilledButtonViewModifier: ViewModifier {
             .buttonBorderShape(.capsule)
     }
 }
+
+struct SubscribeButtonViewModifier: ViewModifier {
+    @EnvironmentObject var themeViewModel: CustomThemeViewModel
+    
+    let isSubscribed: Bool
+    
+    func body(content: Content) -> some View {
+        content
+            .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.buttonTextColor))
+            .tint(Color(hex: isSubscribed ? themeViewModel.currentCustomTheme.subscribed : themeViewModel.currentCustomTheme.unsubscribed))
+            .buttonStyle(.borderedProminent)
+            .buttonBorderShape(.capsule)
+    }
+}

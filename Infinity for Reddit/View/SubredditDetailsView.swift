@@ -70,7 +70,7 @@ struct SubredditDetailsView: View {
                                     Button("\(subredditDetailsViewModel.subredditData?.isSubscribed ?? false ? "Subscribed" : "Subscribe") \(subredditDetailsViewModel.subredditData?.nSubscribers ?? 0)") {
                                         subredditDetailsViewModel.toggleSubscribeSubreddit()
                                     }
-                                    .filledButton()
+                                    .subscribeButton(isSubscribed: subredditDetailsViewModel.subredditData?.isSubscribed ?? false)
                                 }
                                 .padding(.horizontal, 16)
                                 
