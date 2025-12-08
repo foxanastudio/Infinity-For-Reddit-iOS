@@ -48,8 +48,12 @@ class Utils {
         return dateFormatter.string(from: date)
     }
     
-    static func getCurrentTimeEpoch() -> Int64 {
-        return Int64(Date().timeIntervalSince1970 * 1000)
+    static func getCurrentTimeEpoch(inSecond: Bool = false) -> Int64 {
+        return Int64(Date().timeIntervalSince1970 * (inSecond ? 1 : 1000))
+    }
+    
+    static func getCurrentTimeEpochInSecond() -> Int {
+        return Int(Date().timeIntervalSince1970)
     }
     
     static func copyText(_ text: String) {

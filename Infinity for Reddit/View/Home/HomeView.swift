@@ -285,7 +285,7 @@ struct HomeView: View {
                 selectedTab = .home
             }
             
-            homeViewModel.startInboxCountPolling()
+            homeViewModel.startInboxCountPolling(resetPollingTime: true)
         }
         .environmentObject(NamespaceManager(animation))
         .appForegroundBackgroundListener(onAppEntersForeground: {
