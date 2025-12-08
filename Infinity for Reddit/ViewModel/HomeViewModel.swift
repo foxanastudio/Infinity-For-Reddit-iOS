@@ -15,7 +15,7 @@ class HomeViewModel: ObservableObject {
     @Published var inboxCount: Int = 0
     
     private let homeRepository: HomeRepositoryProtocol
-    private var inboxCountPollingTask: Task<Void, Never>?
+    @Published private var inboxCountPollingTask: Task<Void, Never>?
     private var hasFetchedInboxCount: Bool = false
     private var lastInboxCountPollingTime: TimeInterval = 0
     
