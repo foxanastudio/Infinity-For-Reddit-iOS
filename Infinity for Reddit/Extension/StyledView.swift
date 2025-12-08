@@ -329,8 +329,9 @@ extension View {
     }
     
     func showErrorUsingSnackbar<P: Publisher>(
-        _ errorPublisher: P
+        _ errorPublisher: P,
+        showTaskCancelledError: Bool = false
     ) -> some View where P.Output == Error?, P.Failure == Never {
-        self.modifier(SnackbarErrorViewModifier(errorPublisher: errorPublisher))
+        self.modifier(SnackbarErrorViewModifier(errorPublisher: errorPublisher, showTaskCancelledError: showTaskCancelledError))
     }
 }

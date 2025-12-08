@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import Alamofire
 
 struct NoPreviewPostTypeIndicatorBackgroundViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
@@ -285,11 +286,19 @@ struct SnackbarErrorViewModifier<P: Publisher>: ViewModifier where P.Output == E
     @EnvironmentObject private var snackbarManager: SnackbarManager
     
     let errorPublisher: P
+    let showTaskCancelledError: Bool
     
     func body(content: Content) -> some View {
         content
             .onReceive(errorPublisher) { newValue in
                 if let newValue {
+                    if !showTaskCancelledError {
+                        if let afError = newValue as? AFError, case .explicitlyCancelled = afError {
+                            return
+                        } else if newValue is CancellationError {
+                            return
+                        }
+                    }
                     snackbarManager.showSnackbar(.error(newValue))
                 } else {
                     snackbarManager.dismiss()
