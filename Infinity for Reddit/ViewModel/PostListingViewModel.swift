@@ -38,7 +38,7 @@ public class PostListingViewModel: ObservableObject {
     @Published var loadPostsTaskId = UUID()
     @Published var postLayout: PostLayout
     
-    @Published var appearedPosts: [Post] = []
+    @Published var appearedPosts: IdentifiedArrayOf<Post> = []
     @Published var lazyModeScrolledPost: Post?
     
     @Published var showMediaDownloadFinishedMessageTrigger: Bool = false
@@ -499,35 +499,16 @@ public class PostListingViewModel: ObservableObject {
     }
     
     func insertIntoAppearedPosts(_ post: Post, saveLastSeenPostInFrontPage: Bool) {
-        self.appearedPosts.removeAll {
-            $0.id == post.id
-        }
-        
-        guard !self.appearedPosts.isEmpty else {
-            appearedPosts.append(post)
+        if appearedPosts.index(id: post.id) != nil {
             return
         }
         
-        if let index = self.posts.index(id: post.id) {
-            var inserted: Bool = false
-            for (i, appearedPost) in self.appearedPosts.enumerated() {
-                if let appearedPostIndex = self.posts.index(id: appearedPost.id), index < appearedPostIndex {
-                    self.appearedPosts.insert(post, at: i)
-                    inserted = true
-                    break
-                }
-            }
-            if !inserted {
-                self.appearedPosts.append(post)
-            }
-        } else {
-            appearedPosts.append(post)
-        }
+        appearedPosts.append(post)
         
         if saveLastSeenPostInFrontPage && postListingMetadata.postListingType.isFrontPage {
             if let lastSeenPost = lastSeenFrontPagePost {
                 if let index = self.posts.index(id: lastSeenPost.id) {
-                    if index < self.posts.index(id: post.id) ?? self.posts.endIndex {
+                    if index < self.posts.index(id: post.id) ?? 0 {
                         self.lastSeenFrontPagePost = post
                     }
                 } else {
@@ -537,6 +518,12 @@ public class PostListingViewModel: ObservableObject {
                 self.lastSeenFrontPagePost = post
             }
         }
+    }
+    
+    func sortAppearedPosts() {
+        appearedPosts.sort(by: { p1, p2 in
+            (self.posts.index(id: p1.id) ?? posts.count) < (self.posts.index(id: p2.id) ?? posts.count)
+        })
     }
     
     @MainActor
