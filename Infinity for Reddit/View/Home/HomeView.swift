@@ -278,8 +278,9 @@ struct HomeView: View {
             await homeViewModel.fetchInboxCount()
         }
         .onChange(of: colorScheme) { _, newValue in
-            print(newValue)
-            customThemeViewModel.setAppColorScheme(newValue)
+            if scenePhase != .background {
+                customThemeViewModel.setAppColorScheme(newValue)
+            }
         }
         .onChange(of: accountViewModel.account) { oldValue, newValue in
             if newValue.isAnonymous(), case .inbox = selectedTab {
