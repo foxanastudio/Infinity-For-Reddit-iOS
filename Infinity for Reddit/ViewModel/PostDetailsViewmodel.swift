@@ -16,7 +16,7 @@ public class PostDetailsViewModel: ObservableObject {
     @Published var post: Post?
     @Published var visibleComments: IdentifiedArrayOf<CommentItem> = []
     var allComments: IdentifiedArrayOf<CommentItem> = []
-    @Published var appearedComments: [CommentItem] = []
+    var appearedComments: IdentifiedArrayOf<CommentItem> = []
     @Published var isSingleThread: Bool =  false
     @Published var isInitialLoad: Bool = true
     @Published var isInitialLoading: Bool = false
@@ -873,33 +873,22 @@ public class PostDetailsViewModel: ObservableObject {
     }
     
     func insertIntoAppearedComments(_ commentItem: CommentItem) {
-        self.appearedComments.removeAll {
-            $0.id == commentItem.id
+        if let index = appearedComments.index(id: commentItem.id) {
+            appearedComments.remove(at: index)
         }
         
-        guard !self.appearedComments.isEmpty else {
-            appearedComments.append(commentItem)
-            return
-        }
-        
-        if let index = self.allComments.index(id: commentItem.id) {
-            var inserted: Bool = false
-            for (i, comment) in self.appearedComments.enumerated() {
-                if let appearedCommentIndex = self.allComments.index(id: comment.id), index < appearedCommentIndex {
-                    self.appearedComments.insert(commentItem, at: i)
-                    inserted = true
-                    break
-                }
-            }
-            if !inserted {
-                self.appearedComments.append(commentItem)
-            }
-        } else {
-            appearedComments.append(commentItem)
-        }
+        appearedComments.append(commentItem)
+    }
+    
+    func sortAppearedComments() {
+        appearedComments.sort(by: { c1, c2 in
+            (self.allComments.index(id: c1.id) ?? allComments.count) < (self.allComments.index(id: c2.id) ?? allComments.count)
+        })
     }
     
     func getNextParentComment() -> CommentItem? {
+        sortAppearedComments()
+        
         for i in appearedComments.indices.reversed() {
             if appearedComments[i].depth == 0 && i >= 2 {
                 return appearedComments[i]
@@ -925,6 +914,7 @@ public class PostDetailsViewModel: ObservableObject {
         if appearedComments.isEmpty {
             return nil
         } else {
+            sortAppearedComments()
             if let firstIndex = visibleComments.index(id: appearedComments[0].id) {
                 for i in (0..<firstIndex).reversed() {
                     if visibleComments[i].depth == 0 && visibleComments[i].isComment {
@@ -957,6 +947,8 @@ public class PostDetailsViewModel: ObservableObject {
                 }
             }
         } else {
+            sortAppearedComments()
+            
             for i in appearedComments.indices.reversed() {
                 if appearedComments[i].containsSearchQuery(searchQuery) {
                     setSearchedComment(appearedComments[i])
@@ -989,11 +981,15 @@ public class PostDetailsViewModel: ObservableObject {
             }
         }
         
-        if !appearedComments.isEmpty, let firstIndex = visibleComments.index(id: appearedComments[0].id) {
-            for i in (0..<firstIndex).reversed() {
-                if visibleComments[i].containsSearchQuery(searchQuery) {
-                    setSearchedComment(visibleComments[i])
-                    return visibleComments[i]
+        
+        if !appearedComments.isEmpty {
+            sortAppearedComments()
+            if let firstIndex = visibleComments.index(id: appearedComments[0].id) {
+                for i in (0..<firstIndex).reversed() {
+                    if visibleComments[i].containsSearchQuery(searchQuery) {
+                        setSearchedComment(visibleComments[i])
+                        return visibleComments[i]
+                    }
                 }
             }
         }

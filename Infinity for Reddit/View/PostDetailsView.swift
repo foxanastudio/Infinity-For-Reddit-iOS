@@ -215,18 +215,16 @@ struct PostDetailsView: View {
                                                 }
                                             }
                                         }
-//                                        .onAppear {
-//                                            postDetailsViewModel.insertIntoAppearedComments(commentItem)
-//                                            
-//                                            if showAuthorAvatar {
-//                                                postDetailsViewModel.loadIcon(comment: comment)
-//                                            }
-//                                        }
-//                                        .onDisappear {
-//                                            postDetailsViewModel.appearedComments.removeAll {
-//                                                $0.id == commentItem.id
-//                                            }
-//                                        }
+                                        .onAppear {
+                                            postDetailsViewModel.insertIntoAppearedComments(commentItem)
+                                            
+                                            if showAuthorAvatar {
+                                                postDetailsViewModel.loadIcon(comment: comment)
+                                            }
+                                        }
+                                        .onDisappear {
+                                            postDetailsViewModel.appearedComments.remove(id: commentItem.id)
+                                        }
                                     } else if case let .more(commentMore) = commentItem {
                                         CommentMoreViewCard(commentMore: commentMore)
                                             .listPlainItemNoInsets()
