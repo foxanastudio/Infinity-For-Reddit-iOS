@@ -223,6 +223,7 @@ public class PostDetailsViewModel: ObservableObject {
                 if isRefreshWithContinuation {
                     self.visibleComments.removeAll()
                     self.allComments.removeAll()
+                    self.appearedComments.removeAll()
                 }
                 self.visibleComments.append(contentsOf: commentsToBeAppendedToVisibleComments)
                 self.allComments.append(contentsOf: processedComments)
@@ -417,6 +418,7 @@ public class PostDetailsViewModel: ObservableObject {
             if refreshPostsContinuation == nil {
                 visibleComments.removeAll()
                 allComments.removeAll()
+                appearedComments.removeAll()
             }
         }
     }
@@ -662,10 +664,8 @@ public class PostDetailsViewModel: ObservableObject {
                         }
                     } else {
                         self.allComments.remove(at: allIndex)
-                        guard let visibleIndex = self.visibleComments.index(id: comment.id) else {
-                            return
-                        }
-                        self.visibleComments.remove(at: visibleIndex)
+                        self.visibleComments.remove(id: comment.id)
+                        self.appearedComments.remove(id: comment.id)
                     }
                 }
             } catch {
@@ -873,8 +873,8 @@ public class PostDetailsViewModel: ObservableObject {
     }
     
     func insertIntoAppearedComments(_ commentItem: CommentItem) {
-        if let index = appearedComments.index(id: commentItem.id) {
-            appearedComments.remove(at: index)
+        if appearedComments.index(id: commentItem.id) != nil {
+            return
         }
         
         appearedComments.append(commentItem)
