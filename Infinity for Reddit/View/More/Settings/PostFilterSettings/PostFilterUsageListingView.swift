@@ -21,7 +21,7 @@ struct PostFilterUsageListingView: View {
     }
     
     var body: some View {
-        Group {
+        RootView {
             if postFilterUsageViewModel.postFilterUsages.isEmpty {
                 VStack(spacing: 0) {
                     VStack(alignment: .center, spacing: 8) {

@@ -21,7 +21,7 @@ struct CommentFilterUsageListingView: View {
     }
     
     var body: some View {
-        Group {
+        RootView {
             if commentFilterUsageListingViewModel.commentFilterUsages.isEmpty {
                 VStack(spacing: 0) {
                     VStack(alignment: .center, spacing: 8) {

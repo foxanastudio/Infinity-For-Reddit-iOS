@@ -54,6 +54,8 @@ struct CommentFilterUsageSheet: View {
                     }
                     case .nameOfUsage(let selectedType):
                     RowText(selectedType.description)
+                        .primaryText()
+                        .fontWeight(.bold)
                         .padding(16)
                     
                     RowText("Leave it blank to apply this comment filter to all the subreddits / users / multireddits")
