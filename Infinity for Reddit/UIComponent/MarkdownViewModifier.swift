@@ -25,6 +25,19 @@ struct MarkdownViewModifier: ViewModifier {
                 ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.colorAccent))
             }.text {
                 ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor))
+            }.code {
+                ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor))
+                BackgroundColor(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor).mix(with: Color(hex: themeViewModel.currentCustomTheme.backgroundColor), by: 0.8))
+            }.codeBlock { codeBlockConfiguration in
+                codeBlockConfiguration.label
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(16)
+                    .foregroundStyle(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor))
+                    .background(
+                        RoundedRectangle(cornerRadius: 12).fill(
+                            Color(hex: themeViewModel.currentCustomTheme.primaryTextColor).mix(with: Color(hex: themeViewModel.currentCustomTheme.backgroundColor), by: 0.8)
+                        )
+                    )
             })
             .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -47,6 +60,19 @@ struct PostContentMarkdownViewModifier: ViewModifier {
                 ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.colorAccent))
             }.text {
                 ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.postContentColor))
+            }.code {
+                ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.postContentColor))
+                BackgroundColor(Color(hex: themeViewModel.currentCustomTheme.postContentColor).mix(with: Color(hex: themeViewModel.currentCustomTheme.backgroundColor), by: 0.8))
+            }.codeBlock { codeBlockConfiguration in
+                codeBlockConfiguration.label
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(16)
+                    .foregroundStyle(Color(hex: themeViewModel.currentCustomTheme.postContentColor))
+                    .background(
+                        RoundedRectangle(cornerRadius: 12).fill(
+                            Color(hex: themeViewModel.currentCustomTheme.postContentColor).mix(with: Color(hex: themeViewModel.currentCustomTheme.backgroundColor), by: 0.8)
+                        )
+                    )
             })
             .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -69,6 +95,19 @@ struct CommentMarkdownViewModifier: ViewModifier {
                 ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.colorAccent))
             }.text {
                 ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.commentColor))
+            }.code {
+                ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.commentColor))
+                BackgroundColor(Color(hex: themeViewModel.currentCustomTheme.commentColor).mix(with: Color(hex: themeViewModel.currentCustomTheme.backgroundColor), by: 0.8))
+            }.codeBlock { codeBlockConfiguration in
+                codeBlockConfiguration.label
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(16)
+                    .foregroundStyle(Color(hex: themeViewModel.currentCustomTheme.commentColor))
+                    .background(
+                        RoundedRectangle(cornerRadius: 12).fill(
+                            Color(hex: themeViewModel.currentCustomTheme.commentColor).mix(with: Color(hex: themeViewModel.currentCustomTheme.backgroundColor), by: 0.8)
+                        )
+                    )
             })
             .frame(maxWidth: .infinity, alignment: .leading)
     }
