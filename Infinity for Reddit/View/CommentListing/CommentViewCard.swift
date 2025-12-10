@@ -249,19 +249,21 @@ struct CommentViewCard: View {
                                     .contentShape(Rectangle())
                                 }
                                 
-                                Button(action: {
-                                    saveTask?.cancel()
-                                    saveTask = Task {
-                                        await commentViewModel.saveComment(save: !commentViewModel.comment.saved)
+                                if !AccountViewModel.shared.account.isAnonymous() {
+                                    Button(action: {
+                                        saveTask?.cancel()
+                                        saveTask = Task {
+                                            await commentViewModel.saveComment(save: !commentViewModel.comment.saved)
+                                        }
+                                    }) {
+                                        SwiftUI.Image(systemName: commentViewModel.comment.saved ? "bookmark.fill" : "bookmark")
+                                            .commentIconTemplateRendering()
+                                            .commentIcon()
                                     }
-                                }) {
-                                    SwiftUI.Image(systemName: commentViewModel.comment.saved ? "bookmark.fill" : "bookmark")
-                                        .commentIconTemplateRendering()
-                                        .commentIcon()
+                                    .buttonStyle(.borderless)
+                                    .padding(8)
+                                    .contentShape(Rectangle())
                                 }
-                                .buttonStyle(.borderless)
-                                .padding(8)
-                                .contentShape(Rectangle())
                                 
                                 if isInPostDetails && !AccountViewModel.shared.account.isAnonymous() {
                                     Button(action: {
@@ -292,10 +294,12 @@ struct CommentViewCard: View {
                                         }
                                     }
                                     
-                                    Button(commentViewModel.comment.saved ? "Unsave" : "Save") {
-                                        saveTask?.cancel()
-                                        saveTask = Task {
-                                            await commentViewModel.saveComment(save: !commentViewModel.comment.saved)
+                                    if !AccountViewModel.shared.account.isAnonymous() {
+                                        Button(commentViewModel.comment.saved ? "Unsave" : "Save") {
+                                            saveTask?.cancel()
+                                            saveTask = Task {
+                                                await commentViewModel.saveComment(save: !commentViewModel.comment.saved)
+                                            }
                                         }
                                     }
                                     
