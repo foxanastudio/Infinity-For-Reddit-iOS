@@ -115,7 +115,7 @@ struct MoreView: View {
             .themedList()
         }
         .overlay(
-            CustomAlert(title: activeAlert?.title ?? "", isPresented: Binding(
+            CustomAlert(title: activeAlert?.title ?? "", confirmButtonText: "Go", isPresented: Binding(
                 get: { activeAlert != nil },
                 set: { newValue in
                     if !newValue {
@@ -133,6 +133,11 @@ struct MoreView: View {
                         focusedField: $focusedField
                     )
                     .urlTextField()
+                    .submitLabel(.go)
+                    .onSubmit {
+                        navigationManager.openLink(handleLinkUrlString)
+                        activeAlert = nil
+                    }
                 case .goToSubreddit:
                     CustomTextField(
                         "Subreddit name",
@@ -142,6 +147,11 @@ struct MoreView: View {
                         fieldType: .subredditName,
                         focusedField: $focusedField
                     )
+                    .submitLabel(.go)
+                    .onSubmit {
+                        navigationManager.append(AppNavigation.subredditDetails(subredditName: subredditName))
+                        activeAlert = nil
+                    }
                     
                     SubredditAutoCompleteView(query: $subredditName, itemPadding: 8) { subreddit in
                         navigationManager.append(
@@ -160,6 +170,11 @@ struct MoreView: View {
                         fieldType: .username,
                         focusedField: $focusedField
                     )
+                    .submitLabel(.go)
+                    .onSubmit {
+                        navigationManager.append(AppNavigation.userDetails(username: username))
+                        activeAlert = nil
+                    }
                 case nil:
                     EmptyView()
                 }

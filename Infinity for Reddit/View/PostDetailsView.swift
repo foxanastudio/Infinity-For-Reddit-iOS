@@ -297,7 +297,7 @@ struct PostDetailsView: View {
                             CustomTextField(
                                 "Search",
                                 text: $postDetailsViewModel.searchQuery,
-                                singleLine: false,
+                                singleLine: true,
                                 keyboardType: .default,
                                 autocapitalization: .never,
                                 customTextFieldScheme: .fab,
@@ -306,6 +306,7 @@ struct PostDetailsView: View {
                                 fieldType: .search,
                                 focusedField: $focusedField
                             )
+                            .submitLabel(.search)
                             .onSubmit {
                                 if let listProxy, let commentItem = postDetailsViewModel.getNextSearchedComment() {
                                     scrollToComment(listProxy: listProxy, commentItem: commentItem)

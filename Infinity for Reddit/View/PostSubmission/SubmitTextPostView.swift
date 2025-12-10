@@ -69,12 +69,12 @@ struct SubmitTextPostView: View {
                                 CustomTextField(
                                     "Title",
                                     text: $submitTextPostViewModel.title,
-                                    singleLine: true,
                                     keyboardType: .default,
                                     showBorder: false,
                                     fieldType: .title,
                                     focusedField: $focusedField
                                 )
+                                .lineLimit(1...5)
                                 .padding(.horizontal, 16)
                                 .padding(.top, 16)
 

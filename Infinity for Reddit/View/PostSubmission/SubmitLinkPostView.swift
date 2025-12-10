@@ -61,12 +61,12 @@ struct SubmitLinkPostView: View {
                                     CustomTextField(
                                         "Title",
                                         text: $submitLinkPostViewModel.title,
-                                        singleLine: true,
                                         keyboardType: .default,
                                         showBorder: false,
                                         fieldType: .title,
                                         focusedField: $focusedField
                                     )
+                                    .lineLimit(1...5)
                                     
                                     Button("Suggest Title") {
                                         submitLinkPostViewModel.suggestTitle()
@@ -85,6 +85,7 @@ struct SubmitLinkPostView: View {
                                     fieldType: .url,
                                     focusedField: $focusedField
                                 )
+                                .submitLabel(.done)
                                 .urlTextField()
                                 .padding(.horizontal, 16)
                                 .padding(.top, 16)

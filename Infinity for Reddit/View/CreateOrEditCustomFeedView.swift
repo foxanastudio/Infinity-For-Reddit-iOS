@@ -60,13 +60,13 @@ struct CreateOrEditCustomFeedView: View {
                             CustomTextField(
                                 "Name (Max 50 characters)",
                                 text: $createOrEditCustomFeedViewModel.name,
-                                singleLine: true,
                                 keyboardType: .default,
                                 autocapitalization: .never,
                                 showBorder: false,
                                 fieldType: .name,
                                 focusedField: $focusedField
                             )
+                            .lineLimit(1...2)
                             .padding(.horizontal, 16)
                             .padding(.top, 16)
                             

@@ -161,7 +161,7 @@ struct MarkdownToolbar: View {
         }
         .frame(maxHeight: .infinity)
         .overlay(
-            CustomAlert(title: activeAlert?.title ?? "", isPresented: Binding(
+            CustomAlert(title: activeAlert?.title ?? "", confirmButtonText: "Insert", isPresented: Binding(
                 get: { activeAlert != nil },
                 set: { newValue in
                     if !newValue {
@@ -178,6 +178,7 @@ struct MarkdownToolbar: View {
                                         autocapitalization: .none,
                                         fieldType: .urlText,
                                         focusedField: $focusedField)
+                        .submitLabel(.done)
                         
                         CustomTextField("URL",
                                         text: $linkURL,
@@ -185,6 +186,7 @@ struct MarkdownToolbar: View {
                                         fieldType: .urlLink,
                                         focusedField: $focusedField)
                         .urlTextField()
+                        .submitLabel(.done)
                     }
                 case .header:
                     VStack(spacing: 4) {

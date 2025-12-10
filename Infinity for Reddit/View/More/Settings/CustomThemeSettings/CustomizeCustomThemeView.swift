@@ -24,8 +24,15 @@ struct CustomizeCustomThemeView: View {
             VStack {
                 List {
                     VStack(alignment: .leading, spacing: 0) {
-                        CustomTextField("Name", text: $customizeCustomThemeViewModel.customTheme.name, singleLine: true, fieldType: FieldType.name, focusedField: $focusedField)
-                            .padding(16)
+                        CustomTextField(
+                            "Name",
+                            text: $customizeCustomThemeViewModel.customTheme.name,
+                            singleLine: true,
+                            fieldType: FieldType.name,
+                            focusedField: $focusedField
+                        )
+                        .submitLabel(.done)
+                        .padding(16)
                         
                         CustomDivider()
                     }

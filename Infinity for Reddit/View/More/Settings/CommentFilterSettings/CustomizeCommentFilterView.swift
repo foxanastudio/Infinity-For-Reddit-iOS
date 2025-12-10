@@ -41,8 +41,10 @@ struct CustomizeCommentFilterView: View {
                                 
                                 CustomTextField("Comment Filter Name",
                                                 text: $customizeCommentFilterViewModel.name,
+                                                singleLine: true,
                                                 fieldType: .commentFilterName,
                                                 focusedField: $focusedField)
+                                .submitLabel(.done)
                                 .id(FieldType.commentFilterName)
                             }
                             .padding(16)
@@ -128,26 +130,27 @@ struct CustomizeCommentFilterView: View {
                                                 singleLine: true,
                                                 fieldType: .minVotes,
                                                 focusedField: $focusedField)
-                                    .onReceive(Just(customizeCommentFilterViewModel.minVoteString)) { newValue in
-                                        var sanitized = ""
-                                        if newValue.hasPrefix("-") {
-                                            sanitized = "-"
-                                        }
-                                        
-                                        sanitized += newValue
-                                            .dropFirst(sanitized == "-" ? 1 : 0)
-                                            .filter { $0.isNumber }
-                                        
-                                        if sanitized != newValue {
-                                            customizeCommentFilterViewModel.minVoteString = sanitized
-                                        }
-                                        
-                                        let newMinVote = Int(sanitized) ?? -1
-                                        if customizeCommentFilterViewModel.minVote != newMinVote {
-                                            customizeCommentFilterViewModel.minVote = newMinVote
-                                        }
+                                .submitLabel(.done)
+                                .id(FieldType.minVotes)
+                                .onReceive(Just(customizeCommentFilterViewModel.minVoteString)) { newValue in
+                                    var sanitized = ""
+                                    if newValue.hasPrefix("-") {
+                                        sanitized = "-"
                                     }
-                                    .id(FieldType.minVotes)
+                                    
+                                    sanitized += newValue
+                                        .dropFirst(sanitized == "-" ? 1 : 0)
+                                        .filter { $0.isNumber }
+                                    
+                                    if sanitized != newValue {
+                                        customizeCommentFilterViewModel.minVoteString = sanitized
+                                    }
+                                    
+                                    let newMinVote = Int(sanitized) ?? -1
+                                    if customizeCommentFilterViewModel.minVote != newMinVote {
+                                        customizeCommentFilterViewModel.minVote = newMinVote
+                                    }
+                                }
                                 
                                 Text("Comments that have a score higher than the following value will be filtered out (-1 means no restriction).")
                                     .primaryText()
@@ -158,26 +161,27 @@ struct CustomizeCommentFilterView: View {
                                                 singleLine: true,
                                                 fieldType: .maxVotes,
                                                 focusedField: $focusedField)
-                                    .onReceive(Just(customizeCommentFilterViewModel.maxVoteString)) { newValue in
-                                        var sanitized = ""
-                                        if newValue.hasPrefix("-") {
-                                            sanitized = "-"
-                                        }
-                                        
-                                        sanitized += newValue
-                                            .dropFirst(sanitized == "-" ? 1 : 0)
-                                            .filter { $0.isNumber }
-                                        
-                                        if sanitized != newValue {
-                                            customizeCommentFilterViewModel.maxVoteString = sanitized
-                                        }
-                                        
-                                        let newMaxVote = Int(sanitized) ?? -1
-                                        if customizeCommentFilterViewModel.maxVote != newMaxVote {
-                                            customizeCommentFilterViewModel.maxVote = newMaxVote
-                                        }
+                                .submitLabel(.done)
+                                .id(FieldType.maxVotes)
+                                .onReceive(Just(customizeCommentFilterViewModel.maxVoteString)) { newValue in
+                                    var sanitized = ""
+                                    if newValue.hasPrefix("-") {
+                                        sanitized = "-"
                                     }
-                                    .id(FieldType.maxVotes)
+                                    
+                                    sanitized += newValue
+                                        .dropFirst(sanitized == "-" ? 1 : 0)
+                                        .filter { $0.isNumber }
+                                    
+                                    if sanitized != newValue {
+                                        customizeCommentFilterViewModel.maxVoteString = sanitized
+                                    }
+                                    
+                                    let newMaxVote = Int(sanitized) ?? -1
+                                    if customizeCommentFilterViewModel.maxVote != newMaxVote {
+                                        customizeCommentFilterViewModel.maxVote = newMaxVote
+                                    }
+                                }
                             }
                             .padding(16)
                         }

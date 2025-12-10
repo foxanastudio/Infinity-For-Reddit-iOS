@@ -88,8 +88,10 @@ struct CustomizePostFilterView: View {
                                 
                                 CustomTextField("Post Filter Name",
                                                 text: $customizePostFilterViewModel.name,
+                                                singleLine: true,
                                                 fieldType: .postFilterName,
                                                 focusedField: $focusedField)
+                                .submitLabel(.done)
                                 .id(FieldType.postFilterName)
                             }
                             .padding(16)
@@ -312,26 +314,28 @@ struct CustomizePostFilterView: View {
                                                 singleLine: true,
                                                 fieldType: .minVotes,
                                                 focusedField: $focusedField)
-                                    .onReceive(Just(customizePostFilterViewModel.minVoteString)) { newValue in
-                                        var sanitized = ""
-                                        if newValue.hasPrefix("-") {
-                                            sanitized = "-"
-                                        }
-                                        
-                                        sanitized += newValue
-                                            .dropFirst(sanitized == "-" ? 1 : 0)
-                                            .filter { $0.isNumber }
-                                        
-                                        if sanitized != newValue {
-                                            customizePostFilterViewModel.minVoteString = sanitized
-                                        }
-                                        
-                                        let newMinVote = Int(sanitized) ?? -1
-                                        if customizePostFilterViewModel.minVote != newMinVote {
-                                            customizePostFilterViewModel.minVote = newMinVote
-                                        }
+                                .submitLabel(.done)
+                                .id(FieldType.minVotes)
+                                .onReceive(Just(customizePostFilterViewModel.minVoteString)) { newValue in
+                                    var sanitized = ""
+                                    if newValue.hasPrefix("-") {
+                                        sanitized = "-"
                                     }
-                                    .id(FieldType.minVotes)
+                                    
+                                    sanitized += newValue
+                                        .dropFirst(sanitized == "-" ? 1 : 0)
+                                        .filter { $0.isNumber }
+                                    
+                                    if sanitized != newValue {
+                                        customizePostFilterViewModel.minVoteString = sanitized
+                                    }
+                                    
+                                    let newMinVote = Int(sanitized) ?? -1
+                                    if customizePostFilterViewModel.minVote != newMinVote {
+                                        customizePostFilterViewModel.minVote = newMinVote
+                                    }
+                                }
+                                    
                                 
                                 Text("Posts that have a score higher than the following value will be filtered out (-1 means no restriction).")
                                     .primaryText()
@@ -342,26 +346,28 @@ struct CustomizePostFilterView: View {
                                                 singleLine: true,
                                                 fieldType: .maxVotes,
                                                 focusedField: $focusedField)
-                                    .onReceive(Just(customizePostFilterViewModel.maxVoteString)) { newValue in
-                                        var sanitized = ""
-                                        if newValue.hasPrefix("-") {
-                                            sanitized = "-"
-                                        }
-                                        
-                                        sanitized += newValue
-                                            .dropFirst(sanitized == "-" ? 1 : 0)
-                                            .filter { $0.isNumber }
-                                        
-                                        if sanitized != newValue {
-                                            customizePostFilterViewModel.maxVoteString = sanitized
-                                        }
-                                        
-                                        let newMaxVote = Int(sanitized) ?? -1
-                                        if customizePostFilterViewModel.maxVote != newMaxVote {
-                                            customizePostFilterViewModel.maxVote = newMaxVote
-                                        }
+                                .submitLabel(.done)
+                                .id(FieldType.maxVotes)
+                                .onReceive(Just(customizePostFilterViewModel.maxVoteString)) { newValue in
+                                    var sanitized = ""
+                                    if newValue.hasPrefix("-") {
+                                        sanitized = "-"
                                     }
-                                    .id(FieldType.maxVotes)
+                                    
+                                    sanitized += newValue
+                                        .dropFirst(sanitized == "-" ? 1 : 0)
+                                        .filter { $0.isNumber }
+                                    
+                                    if sanitized != newValue {
+                                        customizePostFilterViewModel.maxVoteString = sanitized
+                                    }
+                                    
+                                    let newMaxVote = Int(sanitized) ?? -1
+                                    if customizePostFilterViewModel.maxVote != newMaxVote {
+                                        customizePostFilterViewModel.maxVote = newMaxVote
+                                    }
+                                }
+                                    
                             }
                             .padding(16)
                         }
@@ -379,26 +385,28 @@ struct CustomizePostFilterView: View {
                                                 singleLine: true,
                                                 fieldType: .minComments,
                                                 focusedField: $focusedField)
-                                    .onReceive(Just(customizePostFilterViewModel.minCommentsString)) { newValue in
-                                        var sanitized = ""
-                                        if newValue.hasPrefix("-") {
-                                            sanitized = "-"
-                                        }
-                                        
-                                        sanitized += newValue
-                                            .dropFirst(sanitized == "-" ? 1 : 0)
-                                            .filter { $0.isNumber }
-                                        
-                                        if sanitized != newValue {
-                                            customizePostFilterViewModel.minCommentsString = sanitized
-                                        }
-                                        
-                                        let newMinComments = Int(sanitized) ?? -1
-                                        if customizePostFilterViewModel.minComments != newMinComments {
-                                            customizePostFilterViewModel.minComments = newMinComments
-                                        }
+                                .submitLabel(.done)
+                                .id(FieldType.minComments)
+                                .onReceive(Just(customizePostFilterViewModel.minCommentsString)) { newValue in
+                                    var sanitized = ""
+                                    if newValue.hasPrefix("-") {
+                                        sanitized = "-"
                                     }
-                                    .id(FieldType.minComments)
+                                    
+                                    sanitized += newValue
+                                        .dropFirst(sanitized == "-" ? 1 : 0)
+                                        .filter { $0.isNumber }
+                                    
+                                    if sanitized != newValue {
+                                        customizePostFilterViewModel.minCommentsString = sanitized
+                                    }
+                                    
+                                    let newMinComments = Int(sanitized) ?? -1
+                                    if customizePostFilterViewModel.minComments != newMinComments {
+                                        customizePostFilterViewModel.minComments = newMinComments
+                                    }
+                                }
+                                    
                                 
                                 Text("Posts will be filtered out if the number of their comments is larger than the following value. (-1 means no restriction).")
                                     .primaryText()
@@ -409,26 +417,28 @@ struct CustomizePostFilterView: View {
                                                 singleLine: true,
                                                 fieldType: .maxComments,
                                                 focusedField: $focusedField)
-                                    .onReceive(Just(customizePostFilterViewModel.maxCommentsString)) { newValue in
-                                        var sanitized = ""
-                                        if newValue.hasPrefix("-") {
-                                            sanitized = "-"
-                                        }
-                                        
-                                        sanitized += newValue
-                                            .dropFirst(sanitized == "-" ? 1 : 0)
-                                            .filter { $0.isNumber }
-                                        
-                                        if sanitized != newValue {
-                                            customizePostFilterViewModel.maxCommentsString = sanitized
-                                        }
-                                        
-                                        let newMaxComments = Int(sanitized) ?? -1
-                                        if customizePostFilterViewModel.maxComments != newMaxComments {
-                                            customizePostFilterViewModel.maxComments = newMaxComments
-                                        }
+                                .submitLabel(.done)
+                                .id(FieldType.maxComments)
+                                .onReceive(Just(customizePostFilterViewModel.maxCommentsString)) { newValue in
+                                    var sanitized = ""
+                                    if newValue.hasPrefix("-") {
+                                        sanitized = "-"
                                     }
-                                    .id(FieldType.maxComments)
+                                    
+                                    sanitized += newValue
+                                        .dropFirst(sanitized == "-" ? 1 : 0)
+                                        .filter { $0.isNumber }
+                                    
+                                    if sanitized != newValue {
+                                        customizePostFilterViewModel.maxCommentsString = sanitized
+                                    }
+                                    
+                                    let newMaxComments = Int(sanitized) ?? -1
+                                    if customizePostFilterViewModel.maxComments != newMaxComments {
+                                        customizePostFilterViewModel.maxComments = newMaxComments
+                                    }
+                                }
+                                    
                             }
                             .padding(16)
                         }

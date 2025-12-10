@@ -70,12 +70,12 @@ struct SubmitPollPostView: View {
                                 CustomTextField(
                                     "Title",
                                     text: $submitPollPostViewModel.title,
-                                    singleLine: true,
                                     keyboardType: .default,
                                     showBorder: false,
                                     fieldType: .title,
                                     focusedField: $focusedField
                                 )
+                                .lineLimit(1...5)
                                 .padding(.horizontal, 16)
                                 .padding(.top, 16)
                                 
@@ -118,6 +118,7 @@ struct SubmitPollPostView: View {
                                             fieldType: .option(index),
                                             focusedField: $focusedField
                                         )
+                                        .submitLabel(.done)
                                         .padding(.horizontal, 16)
                                         .padding(.top, 16)
                                     }

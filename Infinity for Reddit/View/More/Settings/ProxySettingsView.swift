@@ -69,7 +69,7 @@ struct ProxySettingsView: View {
             .themedList()
         }
         .overlay(
-            CustomAlert(title: activeAlert?.title ?? "", isPresented: Binding(
+            CustomAlert(title: activeAlert?.title ?? "", confirmButtonText: "OK", isPresented: Binding(
                 get: {
                     activeAlert != nil
                 },
@@ -88,6 +88,10 @@ struct ProxySettingsView: View {
                         fieldType: .hostname,
                         focusedField: $focusedField
                     )
+                    .submitLabel(.done)
+                    .onSubmit {
+                        activeAlert = nil
+                    }
                 case .port:
                     CustomTextField(
                         "Port",
@@ -97,6 +101,10 @@ struct ProxySettingsView: View {
                         fieldType: .port,
                         focusedField: $focusedField
                     )
+                    .submitLabel(.done)
+                    .onSubmit {
+                        activeAlert = nil
+                    }
                 case nil:
                     EmptyView()
                 }

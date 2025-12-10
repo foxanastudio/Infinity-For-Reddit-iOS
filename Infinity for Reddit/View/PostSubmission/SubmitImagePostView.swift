@@ -68,12 +68,12 @@ struct SubmitImagePostView: View {
                                 CustomTextField(
                                     "Title",
                                     text: $submitImagePostViewModel.title,
-                                    singleLine: true,
                                     keyboardType: .default,
                                     showBorder: false,
                                     fieldType: .title,
                                     focusedField: $focusedField
                                 )
+                                .lineLimit(1...5)
                                 .padding(.horizontal, 16)
                                 .padding(.top, 16)
                                 

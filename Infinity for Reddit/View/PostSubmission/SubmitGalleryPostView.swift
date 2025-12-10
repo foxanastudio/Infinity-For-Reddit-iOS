@@ -77,6 +77,7 @@ struct SubmitGalleryPostView: View {
                                     fieldType: .title,
                                     focusedField: $focusedField
                                 )
+                                .lineLimit(1...5)
                                 .padding(.horizontal, 16)
                                 .padding(.top, 16)
                                 
@@ -228,7 +229,7 @@ struct SubmitGalleryPostView: View {
             }
         }
         .overlay(
-            CustomAlert(title: "Set Caption and URL", isPresented: $showCaptionAndURLAlert) {
+            CustomAlert(title: "Set Caption and URL", confirmButtonText: "Done", isPresented: $showCaptionAndURLAlert) {
                 CustomTextField(
                     "Caption (optional)",
                     text: $caption,
@@ -236,6 +237,7 @@ struct SubmitGalleryPostView: View {
                     fieldType: .caption,
                     focusedField: $focusedField
                 )
+                .submitLabel(.done)
                 
                 CustomTextField(
                     "URL (optional)",
@@ -244,6 +246,7 @@ struct SubmitGalleryPostView: View {
                     fieldType: .url,
                     focusedField: $focusedField
                 )
+                .submitLabel(.done)
                 .urlTextField()
             } onConfirm: {
                 if let selectedImageIndex {

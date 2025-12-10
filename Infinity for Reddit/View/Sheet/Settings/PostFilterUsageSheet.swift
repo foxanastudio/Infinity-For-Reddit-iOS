@@ -78,9 +78,11 @@ struct PostFilterUsageSheet: View {
                     
                     CustomTextField(selectedType.textFieldPlaceholder,
                                     text: $nameOfUsage,
+                                    singleLine: true,
                                     fieldType: .nameOfUsage,
                                     focusedField: $focusedField)
-                        .padding(16)
+                    .submitLabel(.done)
+                    .padding(16)
                 }
                 
                 Spacer()

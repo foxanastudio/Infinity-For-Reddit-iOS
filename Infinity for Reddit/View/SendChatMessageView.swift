@@ -42,6 +42,7 @@ struct SendChatMessageView: View {
                             fieldType: .recipient,
                             focusedField: $focusedField
                         )
+                        .submitLabel(.done)
                         .padding(.horizontal, 16)
                         .padding(.top, 16)
                         

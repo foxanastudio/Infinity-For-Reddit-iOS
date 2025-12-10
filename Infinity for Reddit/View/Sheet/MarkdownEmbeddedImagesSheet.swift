@@ -86,6 +86,7 @@ struct MarkdownEmbeddedImagesSheet: View {
                                 singleLine: true,
                                 fieldType: .caption,
                                 focusedField: $focusedField)
+                .submitLabel(.done)
             } onConfirm: {
                 if let selectedImage {
                     onInsertImage(selectedImage, caption)
