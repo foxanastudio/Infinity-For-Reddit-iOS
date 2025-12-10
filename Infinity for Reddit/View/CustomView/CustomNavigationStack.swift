@@ -15,6 +15,8 @@ struct CustomNavigationStack<Content: View>: View {
     @StateObject var commentSubmissionShareableViewModel: CommentSubmissionShareableViewModel = CommentSubmissionShareableViewModel()
     @StateObject var postEditingShareableViewModel: PostEditingShareableViewModel = PostEditingShareableViewModel()
     
+    @AppStorage(GesturesButtonsUserDefaultsUtils.hideNavigationBarOnScrollDownKey, store: .gesturesButtons) private var hideNavigationBarOnScrollDown: Bool = false
+    
     let content: () -> Content
     
     init(navigationManager: NavigationManager, @ViewBuilder content: @escaping () -> Content) {
@@ -294,7 +296,7 @@ struct CustomNavigationStack<Content: View>: View {
         .animation(.easeInOut(duration: 0.2), value: navigationManager.rootTabLabelVisibility)
         .introspect(.navigationStack, on: .iOS(.v16, .v17, .v18, .v26)) {
             // UINavigationController
-            $0.hidesBarsOnSwipe = navigationManager.hideNavigationBarOnScroll
+            $0.hidesBarsOnSwipe = hideNavigationBarOnScrollDown && navigationManager.hideNavigationBarOnScrollDown
         }
     }
 }

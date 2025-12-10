@@ -14,7 +14,7 @@ class NavigationManager: ObservableObject {
     
     var fullScreenMediaViewModel: FullScreenMediaViewModel
     
-    private var firstViewShouldHideNavigationBarOnScroll: Bool
+    private var firstViewShouldHideNavigationBarOnScrollDown: Bool
     
     var rootTabLabelVisibility: Visibility {
         if viewShouldHideRootTabLabels.isEmpty {
@@ -24,17 +24,17 @@ class NavigationManager: ObservableObject {
         }
     }
     
-    var hideNavigationBarOnScroll: Bool {
+    var hideNavigationBarOnScrollDown: Bool {
         if viewShouldHideNavigationBarOnScroll.isEmpty {
-            return firstViewShouldHideNavigationBarOnScroll
+            return firstViewShouldHideNavigationBarOnScrollDown
         } else {
             return viewShouldHideNavigationBarOnScroll.last!
         }
     }
     
-    init(fullScreenMediaViewModel: FullScreenMediaViewModel, firstViewShouldHideNavigationBarOnScroll: Bool) {
+    init(fullScreenMediaViewModel: FullScreenMediaViewModel, firstViewShouldHideNavigationBarOnScrollDown: Bool) {
         self.fullScreenMediaViewModel = fullScreenMediaViewModel
-        self.firstViewShouldHideNavigationBarOnScroll = firstViewShouldHideNavigationBarOnScroll
+        self.firstViewShouldHideNavigationBarOnScrollDown = firstViewShouldHideNavigationBarOnScrollDown
     }
     
     func append(_ destination: any Hashable) {

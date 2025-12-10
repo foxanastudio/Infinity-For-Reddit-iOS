@@ -12,8 +12,6 @@ import GRDB
 struct MiscellaneousSettingsView: View {
     @AppStorage(MiscellaneousUserDefaultsUtils.saveLastSeenPostInFrontPageKey, store: .miscellaneous) private var saveLastSeenPostInFrontPage: Bool = false
     
-    private let notificationSettingsViewModel = NotificationSettingsViewModel()
-    
     var body: some View {
         RootView {
             List {

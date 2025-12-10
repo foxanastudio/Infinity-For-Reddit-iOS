@@ -50,15 +50,15 @@ struct HomeView: View {
     init(fullScreenMediaViewModel: FullScreenMediaViewModel) {
         self.fullScreenMediaViewModel = fullScreenMediaViewModel
         _tab1NavigationManager = StateObject(wrappedValue: NavigationManager(fullScreenMediaViewModel: fullScreenMediaViewModel,
-                                                                             firstViewShouldHideNavigationBarOnScroll: true))
+                                                                             firstViewShouldHideNavigationBarOnScrollDown: true))
         _tab2NavigationManager = StateObject(wrappedValue: NavigationManager(fullScreenMediaViewModel: fullScreenMediaViewModel,
-                                                                             firstViewShouldHideNavigationBarOnScroll: false))
+                                                                             firstViewShouldHideNavigationBarOnScrollDown: false))
         _tab3NavigationManager = StateObject(wrappedValue: NavigationManager(fullScreenMediaViewModel: fullScreenMediaViewModel,
-                                                                             firstViewShouldHideNavigationBarOnScroll: false))
+                                                                             firstViewShouldHideNavigationBarOnScrollDown: false))
         _tab4NavigationManager = StateObject(wrappedValue: NavigationManager(fullScreenMediaViewModel: fullScreenMediaViewModel,
-                                                                             firstViewShouldHideNavigationBarOnScroll: false))
+                                                                             firstViewShouldHideNavigationBarOnScrollDown: false))
         _tab5NavigationManager = StateObject(wrappedValue: NavigationManager(fullScreenMediaViewModel: fullScreenMediaViewModel,
-                                                                             firstViewShouldHideNavigationBarOnScroll: false))
+                                                                             firstViewShouldHideNavigationBarOnScrollDown: false))
     }
     
     var body: some View {

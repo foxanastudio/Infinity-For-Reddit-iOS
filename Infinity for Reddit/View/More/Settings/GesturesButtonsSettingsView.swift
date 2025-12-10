@@ -10,9 +10,21 @@ import Swinject
 import GRDB
 
 struct GestureButtonsSettingsView: View {
-    @Environment(\.dependencyManager) private var dependencyManager: Container
+    @AppStorage(GesturesButtonsUserDefaultsUtils.hideNavigationBarOnScrollDownKey, store: .gesturesButtons) private var hideNavigationBarOnScrollDown: Bool = false
     
     var body: some View {
-        Text("Gesture & Buttons")
+        RootView {
+            List {
+                TogglePreference(
+                    isEnabled: $hideNavigationBarOnScrollDown,
+                    title: "Hide Navigation Bar on Scroll Down",
+                    subtitle: "Only applies to some pages"
+                )
+                    .listPlainItemNoInsets()
+            }
+            .themedList()
+        }
+        .themedNavigationBar()
+        .addTitleToInlineNavigationBar("Miscellaneous")
     }
 }

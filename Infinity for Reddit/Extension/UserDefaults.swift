@@ -27,6 +27,7 @@ extension UserDefaults {
     static let miscellaneous = UserDefaults.standard
     static let proxy = UserDefaults.standard
     static let security = UserDefaults(suiteName: "com.docilealligator.infinityforreddit.security")
+    static let gesturesButtons = UserDefaults.standard
 }
 
 extension UserDefaults {
