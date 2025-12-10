@@ -258,6 +258,10 @@ struct PostDetailsView: View {
                                         .listPlainItem()
                                 }
                             }
+                            
+                            Spacer()
+                                .frame(height: 150)
+                                .listPlainItemNoInsets()
                         }
                         .themedList()
                         .scrollIndicators(.hidden)
