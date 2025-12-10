@@ -44,6 +44,7 @@ struct SearchView: View {
                                     showBackground: false,
                                     fieldType: .search,
                                     focusedField: $focusedField)
+                    .padding(16)
                     .submitLabel(.search)
                     .onSubmit {
                         if !accountViewModel.account.isAnonymous() {

@@ -57,16 +57,17 @@ struct CustomTextField<FieldType: Hashable>: View {
         .keyboardType(keyboardType)
         .textInputAutocapitalization(autocapitalization)
         .tint(customTextFieldScheme.getTintColor(currentCustomTheme: customThemeViewModel.currentCustomTheme))
-        .padding(16)
         .applyIf(showBorder) {
             // TODO different border color for different focus state
-            $0.overlay(
+            $0.padding(16)
+                .overlay(
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(Color(hex: customThemeViewModel.currentCustomTheme.primaryTextColor), lineWidth: 1)
                 )
         }
         .applyIf(showBackground) {
-            $0.background(Color(hex: customThemeViewModel.currentCustomTheme.filledCardViewBackgroundColor))
+            $0.padding(16)
+                .background(Color(hex: customThemeViewModel.currentCustomTheme.filledCardViewBackgroundColor))
                 .cornerRadius(10)
         }
         .focused($focusedField, equals: fieldType)
