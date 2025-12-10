@@ -16,6 +16,7 @@ struct CommentListingView: View {
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject private var commentSubmissionShareableViewModel: CommentSubmissionShareableViewModel
+    @EnvironmentObject private var snackbarManager: SnackbarManager
     
     @StateObject var commentListingViewModel: CommentListingViewModel
     @State private var showSortTypeKindSheet: Bool = false
@@ -217,6 +218,9 @@ struct CommentListingView: View {
             CopyContentOptionsSheet(
                 markdown: markdownToBeCopied,
                 plainText: plainTextToBeCopied,
+                onCopyEntireMarkdown: {
+                    snackbarManager.showSnackbar(.info("Copied"))
+                },
                 onCopyMarkdown: {
                     textToBeSelectedAndCopiedItem = TextToBeSelectedAndCopiedItem(content: markdownToBeCopied)
                     showCopyContentSheet = true

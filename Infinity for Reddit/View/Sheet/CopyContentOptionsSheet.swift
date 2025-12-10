@@ -14,7 +14,9 @@ struct CopyContentOptionsSheet: View {
     let markdown: String
     let plainText: String
     
+    var onCopyEntireTitle: (() -> Void)?
     var onCopyTitle: (() -> Void)?
+    let onCopyEntireMarkdown: () -> Void
     let onCopyMarkdown: () -> Void
     let onCopyPlainText: () -> Void
     
@@ -25,6 +27,7 @@ struct CopyContentOptionsSheet: View {
                     if let title, let onCopyTitle {
                         IconTextButton(startIconUrl: "document.on.document", text: "Copy Entire Title") {
                             Utils.copyText(title)
+                            onCopyEntireTitle?()
                             dismiss()
                         }
                         
@@ -37,6 +40,7 @@ struct CopyContentOptionsSheet: View {
                     if !markdown.isEmpty {
                         IconTextButton(startIconUrl: "document.on.document", text: "Copy Entire Markdown") {
                             Utils.copyText(markdown)
+                            onCopyEntireMarkdown()
                             dismiss()
                         }
                         

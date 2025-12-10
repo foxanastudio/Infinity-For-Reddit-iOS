@@ -386,9 +386,15 @@ struct PostListingView: View {
                 title: titleToBeCopied,
                 markdown: markdownToBeCopied,
                 plainText: plainTextToBeCopied,
+                onCopyEntireTitle: {
+                    snackbarManager.showSnackbar(.info("Copied"))
+                },
                 onCopyTitle: {
                     textToBeSelectedAndCopiedItem = TextToBeSelectedAndCopiedItem(title: titleToBeCopied)
                     showCopyContentSheet = true
+                },
+                onCopyEntireMarkdown: {
+                    snackbarManager.showSnackbar(.info("Copied"))
                 },
                 onCopyMarkdown: {
                     textToBeSelectedAndCopiedItem = TextToBeSelectedAndCopiedItem(content: markdownToBeCopied)
