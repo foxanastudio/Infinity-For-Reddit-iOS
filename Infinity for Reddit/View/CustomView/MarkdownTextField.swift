@@ -81,6 +81,7 @@ private struct MarkdownUITextField: UIViewRepresentable {
         textView.delegate = context.coordinator
         textView.borderStyle = .none
         textView.tintColor = UIColor(Color(hex: customThemeViewModel.currentCustomTheme.colorPrimaryLightTheme))
+        textView.textColor = UIColor(Color(hex: customThemeViewModel.currentCustomTheme.primaryTextColor))
         textView.textContainerInset = .zero
         textView.textContainer.lineFragmentPadding = 0
         textView.backgroundColor = .clear
@@ -94,6 +95,7 @@ private struct MarkdownUITextField: UIViewRepresentable {
         if uiView.selectedRange != selectedRange {
             uiView.selectedRange = selectedRange
         }
+        uiView.textColor = UIColor(Color(hex: customThemeViewModel.currentCustomTheme.primaryTextColor))
         
         DispatchQueue.main.async {
             if uiView.isFirstResponder && !canFocus {
