@@ -6,13 +6,46 @@
 //
 
 import SwiftUI
-import Swinject
-import GRDB
 
 struct AboutSettingsView: View {
-    @Environment(\.dependencyManager) private var dependencyManager: Container
-    
     var body: some View {
-        Text("About")
+        RootView {
+            ScrollView {
+                VStack(spacing: 0) {
+                    PreferenceEntry(title: "Acknowledgement") {
+                        
+                    }
+                    PreferenceEntry(title: "Credits") {
+                        
+                    }
+                    PreferenceEntry(title: "Translation") {
+                        
+                    }
+                    PreferenceEntry(title: "Open Source") {
+                        
+                    }
+                    PreferenceEntry(title: "Rate on App Store") {
+                        
+                    }
+                    PreferenceEntry(title: "Email") {
+                        
+                    }
+                    PreferenceEntry(title: "Reddit Account") {
+                        
+                    }
+                    PreferenceEntry(title: "Subreddit") {
+                        
+                    }
+                    PreferenceEntry(title: "Share") {
+                        
+                    }
+                    PreferenceEntry(title: "Infinity For Reddit") {
+                        
+                    }
+                }
+            }
+        }
+        .themedNavigationBar()
+        .addTitleToInlineNavigationBar("About")
     }
 }
