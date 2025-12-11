@@ -40,15 +40,4 @@ class SortTypeSettingsUserDefaultsUtils {
     static var respectSubredditRecommendedCommentSortType: Bool {
         return UserDefaults.sortTypeSettings.bool(forKey: respectSubredditRecommendedCommentSortTypeKey, false)
     }
-
-    static var getAllKeys: [String] {
-        [
-            saveSortTypeKey,
-            subredditDefaultSortTypeKey,
-            subredditDefaultSortTimeKey,
-            userDefaultSortTypeKey,
-            userDefaultSortTimeKey,
-            respectSubredditRecommendedCommentSortTypeKey
-        ]
-    }
 }

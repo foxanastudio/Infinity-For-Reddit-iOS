@@ -55,23 +55,4 @@ enum PostLayoutUserDefaultsUtils {
     static func saveHistory(_ newValue: PostLayout) {
         UserDefaults.postLayout?.set(newValue.rawValue, forKey: historyKey)
     }
-    
-    static func getAllKeys() -> [String] {
-        guard let postLayoutDefaults = UserDefaults.postLayout else { return [] }
-        let fixedKeys = [
-            frontPageKey,
-            searchKey,
-            historyKey
-        ]
-        
-        let dynamicKeys = postLayoutDefaults.dictionaryRepresentation().keys.filter { key in
-            [
-                subredditKeyBase,
-                customFeedKeyBase,
-                userKeyBase
-            ]
-            .contains { prefix in key.hasPrefix(prefix) }
-        }
-        return fixedKeys + dynamicKeys
-    }
 }

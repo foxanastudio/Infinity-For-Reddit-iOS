@@ -73,31 +73,4 @@ enum SortTypeUserDetailsUtils {
         let sortTypeKind = SortType.Kind(rawValue: UserDefaults.sortType?.string(forKey: postCommentSortTypeKey) ?? SortType.Kind.best.rawValue) ?? SortType.Kind.best
         return sortTypeKind
     }
-    
-    static var getAllKeys: [String] {
-        let fixedKeys = [
-            frontPagePostSortTypeKey,
-            frontPagePostSortTimeKey,
-            searchPostSortTypeKey,
-            searchPostSortTimeKey,
-            userCommentSortTypeKey,
-            userCommentSortTimeKey,
-            subredditListingSortTypeKey,
-            userListingSortTypeKey,
-            postCommentSortTypeKey
-        ]
-        
-        let dynamicKeys = UserDefaults.sortType?.dictionaryRepresentation().keys.filter { key in
-            [
-                subredditPostSortTypeBaseKey,
-                subredditPostSortTimeBaseKey,
-                customFeedPostSortTypeBaseKey,
-                customFeedPostSortTimeBaseKey,
-                userPostSortTypeBaseKey,
-                userPostSortTimeBaseKey
-            ].contains { prefix in key.hasPrefix(prefix) }
-        } ?? []
-        
-        return fixedKeys + dynamicKeys
-    }
 }
