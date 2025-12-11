@@ -8,76 +8,55 @@
 import SwiftUI
 
 struct AdvancedSettingsView: View {
+    @EnvironmentObject private var snackbarManager: SnackbarManager
     @StateObject private var advancedSettingsViewModel = AdvancedSettingsViewModel()
     @State private var pendingAction: AdvancedAction?
     @State private var isPerformingAction = false
     
     var body: some View {
         RootView {
-            List {
-                CustomListSection("Database") {
+            ScrollView {
+                VStack(spacing: 0) {
                     PreferenceEntry(title: "Delete All Subreddits in Database", icon: "tray.full") {
                         showConfirmation(for: .deleteSubreddits)
                     }
-                    .listPlainItemNoInsets()
                     .disabled(isPerformingAction)
                     
                     PreferenceEntry(title: "Delete All Users in Database", icon: "person.3") {
                         showConfirmation(for: .deleteUsers)
                     }
-                    .listPlainItemNoInsets()
                     .disabled(isPerformingAction)
                     
                     PreferenceEntry(title: "Delete All Sort Types in Database", icon: "arrow.up.arrow.down") {
                         showConfirmation(for: .deleteSortTypes)
                     }
-                    .listPlainItemNoInsets()
                     .disabled(isPerformingAction)
                     
                     PreferenceEntry(title: "Delete All Post Layouts in Database", icon: "rectangle.3.offgrid") {
                         showConfirmation(for: .deletePostLayouts)
                     }
-                    .listPlainItemNoInsets()
                     .disabled(isPerformingAction)
                     
                     PreferenceEntry(title: "Delete All Themes in Database", icon: "paintpalette") {
                         showConfirmation(for: .deleteThemes)
                     }
-                    .listPlainItemNoInsets()
                     .disabled(isPerformingAction)
                     
                     PreferenceEntry(title: "Delete All Front Page Scrolled Positions in Database", icon: "arrow.uturn.backward") {
                         showConfirmation(for: .deleteFrontPagePositions)
                     }
-                    .listPlainItemNoInsets()
                     .disabled(isPerformingAction)
                     
                     PreferenceEntry(title: "Delete All Read Posts in Database", icon: "book") {
                         showConfirmation(for: .deleteReadPosts)
                     }
-                    .listPlainItemNoInsets()
                     .disabled(isPerformingAction)
-                }
-                
-                CustomListSection("Preferences") {
+                    
                     PreferenceEntry(title: "Reset All Settings", icon: "arrow.counterclockwise") {
                         showConfirmation(for: .resetAllSettings)
                     }
-                    .listPlainItemNoInsets()
                     .disabled(isPerformingAction)
                 }
-            }
-            .themedList()
-        }
-        .themedNavigationBar()
-        .addTitleToInlineNavigationBar("Advanced")
-        .overlay(alignment: .center) {
-            if isPerformingAction {
-                ProgressView("Working…")
-                    .padding()
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .padding()
             }
         }
         .overlay(
@@ -101,10 +80,14 @@ struct AdvancedSettingsView: View {
                 }
             }
         )
+        .themedNavigationBar()
+        .addTitleToInlineNavigationBar("Advanced")
     }
     
     private func showConfirmation(for action: AdvancedAction) {
-        guard !isPerformingAction else { return }
+        guard !isPerformingAction else {
+            return
+        }
         withAnimation(.linear(duration: 0.2)) {
             pendingAction = action
         }
@@ -113,49 +96,59 @@ struct AdvancedSettingsView: View {
     private func handleAdvancedAction(_ action: AdvancedAction) {
         switch action {
         case .deleteSubreddits:
-            runAction {
+            runAction(for: action) {
                 try await advancedSettingsViewModel.deleteAllSubreddits()
             }
         case .deleteUsers:
-            runAction {
+            runAction(for: action) {
                 try await advancedSettingsViewModel.deleteAllUsers()
             }
         case .deleteSortTypes:
-            runAction {
+            runAction(for: action) {
                 await advancedSettingsViewModel.deleteAllSortTypes()
             }
         case .deletePostLayouts:
-            runAction {
+            runAction(for: action) {
                 await advancedSettingsViewModel.deleteAllPostLayouts()
             }
         case .deleteThemes:
-            runAction {
+            runAction(for: action) {
                 try await advancedSettingsViewModel.deleteAllThemes()
             }
         case .deleteFrontPagePositions:
-            runAction {
+            runAction(for: action) {
                 await advancedSettingsViewModel.deleteFrontPagePositions()
             }
         case .deleteReadPosts:
-            runAction {
+            runAction(for: action) {
                 try await advancedSettingsViewModel.deleteReadPosts()
             }
         case .resetAllSettings:
-            runAction {
+            runAction(for: action) {
                 await advancedSettingsViewModel.resetAllSettings()
             }
         }
     }
     
-    private func runAction(_ action: @escaping () async throws -> Void) {
+    private func runAction(for action: AdvancedAction, perform block: @escaping () async throws -> Void) {
         isPerformingAction = true
         Task {
             do {
-                try await action()
+                try await block()
+                await MainActor.run {
+                    print("AdvancedSettings: showing success snackbar for", action)
+                    snackbarManager.showSnackbar(.info(action.successMessage))
+                }
             } catch {
                 print("Advanced settings action failed:", error)
+                await MainActor.run {
+                    print("AdvancedSettings: showing error snackbar for", action)
+                    snackbarManager.showSnackbar(.error(error))
+                }
             }
-            isPerformingAction = false
+            await MainActor.run {
+                isPerformingAction = false
+            }
         }
     }
 }
@@ -169,4 +162,25 @@ private enum AdvancedAction {
     case deleteFrontPagePositions
     case deleteReadPosts
     case resetAllSettings
+    
+    var successMessage: String {
+        switch self {
+        case .deleteSubreddits:
+            return "Delete all subreddits successfully"
+        case .deleteUsers:
+            return "Delete all users successfully"
+        case .deleteSortTypes:
+            return "Delete all sort types successfully"
+        case .deletePostLayouts:
+            return "Delete all post layouts successfully"
+        case .deleteThemes:
+            return "Delete all themes successfully"
+        case .deleteFrontPagePositions:
+            return "Delete all scrolled positions in front page successfully"
+        case .deleteReadPosts:
+            return "Delete all read posts successfully"
+        case .resetAllSettings:
+            return "Reset all settings successfully"
+        }
+    }
 }
