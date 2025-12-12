@@ -181,6 +181,11 @@ struct PostListingView: View {
                             }
                             .onDisappear {
                                 postListingViewModel.appearedPosts.remove(id: post.id)
+                                if !post.isRead {
+                                    Task {
+                                        await postListingViewModel.readPost(post: post, markPostsAsRead: markPostsAsRead, limitReadPosts: limitReadPosts, readPostsLimit: readPostsLimit)
+                                    }
+                                }
                             }
                             .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                 Button {
