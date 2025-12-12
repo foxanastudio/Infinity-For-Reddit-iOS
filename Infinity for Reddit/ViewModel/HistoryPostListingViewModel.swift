@@ -41,6 +41,7 @@ public class HistoryPostListingViewModel: ObservableObject {
     private let historyPostListingRepository: HistoryPostListingRepositoryProtocol
     private let historyPostsRepository: HistoryPostsRepositoryProtocol
     private let thingModerationRepository: ThingModerationRepositoryProtocol
+    private let postRepository: PostRepositoryProtocol
     
     private var refreshPostsContinuation: CheckedContinuation<Void, Never>?
     
@@ -55,6 +56,7 @@ public class HistoryPostListingViewModel: ObservableObject {
         historyPostListingRepository: HistoryPostListingRepositoryProtocol,
         historyPostsRepository: HistoryPostsRepositoryProtocol,
         thingModerationRepository: ThingModerationRepositoryProtocol,
+        postRepository: PostRepositoryProtocol,
         postFeedID: String
     ) {
         self.historyPostListingMetadata = historyPostListingMetadata
@@ -62,6 +64,7 @@ public class HistoryPostListingViewModel: ObservableObject {
         self.historyPostListingRepository = historyPostListingRepository
         self.historyPostsRepository = historyPostsRepository
         self.thingModerationRepository = thingModerationRepository
+        self.postRepository = postRepository
         
         self.sensitiveContent = ContentSensitivityFilterUserDetailsUtils.sensitiveContent
         self.spoilerContent = ContentSensitivityFilterUserDetailsUtils.spoilerContent
@@ -508,6 +511,107 @@ public class HistoryPostListingViewModel: ObservableObject {
             await MainActor.run {
                 self.error = error
             }
+        }
+    }
+    
+    @MainActor
+    func votePost(post: Post, vote: Int) async {
+        guard !AccountViewModel.shared.account.isAnonymous() else {
+            await votePostAnonymous(post: post, vote: vote)
+            return
+        }
+        
+        let previousVote = post.likes
+        
+        var point: String
+        let finalVote: Int
+        if vote == post.likes {
+            point = "0"
+            finalVote = 0
+            post.likes = 0
+        } else {
+            point = String(vote)
+            finalVote = vote
+            post.likes = vote
+        }
+        self.objectWillChange.send()
+        
+        defer {
+            self.objectWillChange.send()
+        }
+        
+        do {
+            try await postRepository.votePost(post: post, point: point)
+            post.likes = finalVote
+        } catch {
+            post.likes = previousVote
+            self.error = error
+            print("Error voting post: \(error)")
+        }
+    }
+    
+    @MainActor
+    private func votePostAnonymous(post: Post, vote: Int) async {
+        let finalVote: Int
+        if vote == post.likes {
+            finalVote = 0
+            post.likes = 0
+        } else {
+            finalVote = vote
+            post.likes = vote
+        }
+        try? await postRepository.votePostAnonymous(post: post, vote: finalVote)
+    }
+    
+    @MainActor
+    func savePost(post: Post, save: Bool) async {
+        guard !AccountViewModel.shared.account.isAnonymous() else {
+            await savePostAnonymous(post: post, save: save)
+            return
+        }
+        
+        let previousSaved = post.saved
+        
+        post.saved = save
+        
+        self.objectWillChange.send()
+        
+        defer {
+            self.objectWillChange.send()
+        }
+        
+        do {
+            try await postRepository.savePost(post: post, save: save)
+        } catch {
+            post.saved = previousSaved
+            self.error = error
+            print("Error (un)saving post: \(error)")
+        }
+    }
+    
+    @MainActor
+    private func savePostAnonymous(post: Post, save: Bool) async {
+        post.saved = save
+        try? await postRepository.savePostAnonymous(post: post, save: save)
+    }
+    
+    @MainActor
+    func readPost(post: Post, markPostsAsRead: Bool, limitReadPosts: Bool, readPostsLimit: Int) async {
+        guard !post.isRead, markPostsAsRead else {
+            return
+        }
+        
+        do {
+            try await postRepository.readPost(
+                post: post,
+                account: AccountViewModel.shared.account,
+                limitReadPosts: limitReadPosts,
+                readPostsLimit: readPostsLimit
+            )
+            
+            post.isRead = true
+        } catch {
+            print("Mark post as read failed with error: \(error)")
         }
     }
 }

@@ -32,13 +32,15 @@ struct PostViewCard: View {
     let onIconTap: () -> Void
     let onSubredditTap: () -> Void
     let onUserTap: () -> Void
-    let onVote: (Int) -> Void
+    let onUpvote: () async -> Void
+    let onDownvote: () async -> Void
     let onCommentsTap: () -> Void
-    let onSave: () -> Void
+    let onToggleSave: () async -> Void
     let onPostTypeClicked: () -> Void
     let onSensitiveClicked: () -> Void
     let onOpenLink: (URL) -> Void
     let onShare: () -> Void
+    let onReadPost: () async -> Void
 
     private let iconSize: CGFloat = 24
 
@@ -49,13 +51,15 @@ struct PostViewCard: View {
         onIconTap: @escaping () -> Void,
         onSubredditTap: @escaping () -> Void,
         onUserTap: @escaping () -> Void,
-        onVote: @escaping (Int) -> Void,
+        onUpvote: @escaping () async -> Void,
+        onDownvote: @escaping () async -> Void,
         onCommentsTap: @escaping () -> Void,
-        onSave: @escaping () -> Void,
+        onToggleSave: @escaping () async -> Void,
         onPostTypeClicked: @escaping () -> Void,
         onSensitiveClicked: @escaping () -> Void,
         onOpenLink: @escaping (URL) -> Void,
-        onShare: @escaping () -> Void
+        onShare: @escaping () -> Void,
+        onReadPost: @escaping () async -> Void
     ) {
         self.postViewModel = postViewModel
         self.isSubredditPostListing = isSubredditPostListing
@@ -63,13 +67,15 @@ struct PostViewCard: View {
         self.onIconTap = onIconTap
         self.onSubredditTap = onSubredditTap
         self.onUserTap = onUserTap
-        self.onVote = onVote
+        self.onUpvote = onUpvote
+        self.onDownvote = onDownvote
         self.onCommentsTap = onCommentsTap
-        self.onSave = onSave
+        self.onToggleSave = onToggleSave
         self.onPostTypeClicked = onPostTypeClicked
         self.onSensitiveClicked = onSensitiveClicked
         self.onOpenLink = onOpenLink
         self.onShare = onShare
+        self.onReadPost = onReadPost
     }
 
     var body: some View {
@@ -184,14 +190,14 @@ struct PostViewCard: View {
                     NoPreviewLinkView(domain: domain) {
                         onOpenLink(url)
                         Task {
-                            await postViewModel.readPost()
+                            await onReadPost()
                         }
                     }
                 } else if let crosspost = postViewModel.post.crosspostParent, let url = URL(string: crosspost.url), let domain = url.host {
                     NoPreviewLinkView(domain: domain) {
                         onOpenLink(url)
                         Task {
-                            await postViewModel.readPost()
+                            await onReadPost()
                         }
                     }
                 }
@@ -209,7 +215,7 @@ struct PostViewCard: View {
                 // May not have a preview!!!!!!
                 GalleryCarousel(post: postViewModel.post) {
                     Task {
-                        await postViewModel.readPost()
+                        await onReadPost()
                     }
                 }
                 .applyIf(limitMediaHeight) {
@@ -231,7 +237,7 @@ struct PostViewCard: View {
                 
                 PostVideoView(post: postViewModel.post, videoUrlString: videoUrlString, inPostListing: true) {
                     Task {
-                        await postViewModel.readPost()
+                        await onReadPost()
                     }
                 }
             } else if case .video(let videoUrlString, _) = postViewModel.post.postType {
@@ -240,7 +246,7 @@ struct PostViewCard: View {
                 
                 PostVideoView(post: postViewModel.post, videoUrlString: videoUrlString, inPostListing: true) {
                     Task {
-                        await postViewModel.readPost()
+                        await onReadPost()
                     }
                 }
             } else if postViewModel.post.postType.isMedia {
@@ -249,7 +255,7 @@ struct PostViewCard: View {
                 
                 PostPreviewView(post: postViewModel.post, inPostListing: true) {
                     Task {
-                        await postViewModel.readPost()
+                        await onReadPost()
                     }
                 }
             }
@@ -260,7 +266,10 @@ struct PostViewCard: View {
                         if postViewModel.post.archived {
                             snackbarManager.showSnackbar(.info("This post has been archived. Vote unavailable."))
                         } else {
-                            onVote(1)
+                            voteTask?.cancel()
+                            voteTask = Task {
+                                await onUpvote()
+                            }
                         }
                     }) {
                         SwiftUI.Image(systemName: postViewModel.post.likes == 1 ? "arrowshape.up.fill" : "arrowshape.up")
@@ -286,7 +295,10 @@ struct PostViewCard: View {
                         if postViewModel.post.archived {
                             snackbarManager.showSnackbar(.info("This post has been archived. Vote unavailable."))
                         } else {
-                            onVote(-1)
+                            voteTask?.cancel()
+                            voteTask = Task {
+                                await onDownvote()
+                            }
                         }
                     }) {
                         SwiftUI.Image(systemName: postViewModel.post.likes == -1 ? "arrowshape.down.fill" : "arrowshape.down")
@@ -324,7 +336,12 @@ struct PostViewCard: View {
                 .padding(.leading, voteButtonsOnTheRight ? 8 : 16)
                 .environment(\.layoutDirection, .leftToRight)
                 
-                Button(action: onSave) {
+                Button(action: {
+                    saveTask?.cancel()
+                    saveTask = Task {
+                        await onToggleSave()
+                    }
+                }) {
                     SwiftUI.Image(systemName: postViewModel.post.saved ? "bookmark.fill" : "bookmark")
                         .postIconTemplateRendering()
                         .postIcon()

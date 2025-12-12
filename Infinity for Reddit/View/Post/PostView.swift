@@ -15,27 +15,39 @@ struct PostView: View {
     let post: Post
     let postLayout: PostLayout
     let isSubredditPostListing: Bool
+    let onUpvote: () async -> Void
+    let onDownvote: () async -> Void
+    let onToggleSave: () async -> Void
     let onPostTypeTap: () -> Void
     let onSensitiveTap: () -> Void
     let onLongPressPost: () -> Void
     let onShare: () -> Void
+    let onReadPost: () async -> Void
 
     init(
         post: Post,
         postLayout: PostLayout,
         isSubredditPostListing: Bool,
+        onUpvote: @escaping () async -> Void,
+        onDownvote: @escaping () async -> Void,
+        onToggleSave: @escaping () async -> Void,
         onPostTypeTap: @escaping () -> Void,
         onSensitiveTap: @escaping () -> Void,
         onLongPressPost: @escaping () -> Void,
-        onShare: @escaping () -> Void
+        onShare: @escaping () -> Void,
+        onReadPost: @escaping () async -> Void
     ) {
         self.post = post
         self.postLayout = postLayout
         self.isSubredditPostListing = isSubredditPostListing
+        self.onUpvote = onUpvote
+        self.onDownvote = onDownvote
+        self.onToggleSave = onToggleSave
         self.onPostTypeTap = onPostTypeTap
         self.onSensitiveTap = onSensitiveTap
         self.onLongPressPost = onLongPressPost
         self.onShare = onShare
+        self.onReadPost = onReadPost
         _postViewModel = StateObject(
             wrappedValue: PostViewModel(
                 account: AccountViewModel.shared.account,
@@ -56,13 +68,15 @@ struct PostView: View {
                     onIconTap: onIconTap,
                     onSubredditTap: onSubredditTap,
                     onUserTap: onUserTap,
-                    onVote: vote,
+                    onUpvote: onUpvote,
+                    onDownvote: onDownvote,
                     onCommentsTap: onCommentsTap,
-                    onSave: savePost,
+                    onToggleSave: onToggleSave,
                     onPostTypeClicked: onPostTypeTap,
                     onSensitiveClicked: onSensitiveTap,
                     onOpenLink: openLink,
-                    onShare: onShare
+                    onShare: onShare,
+                    onReadPost: onReadPost
                 )
             case .compact:
                 PostViewCompact(
@@ -72,13 +86,15 @@ struct PostView: View {
                     onIconTap: onIconTap,
                     onSubredditTap: onSubredditTap,
                     onUserTap: onUserTap,
-                    onVote: vote,
+                    onUpvote: onUpvote,
+                    onDownvote: onDownvote,
                     onCommentsTap: onCommentsTap,
-                    onSave: savePost,
+                    onToggleSave: onToggleSave,
                     onPostTypeClicked: onPostTypeTap,
                     onSensitiveClicked: onSensitiveTap,
                     onOpenLink: openLink,
-                    onShare: onShare
+                    onShare: onShare,
+                    onReadPost: onReadPost
                 )
             }
         }
@@ -124,18 +140,18 @@ struct PostView: View {
         )
     }
     
-    private func vote(_ direction: Int) {
-        guard !accountViewModel.account.isAnonymous() else { return }
-        Task {
-            await postViewModel.votePost(vote: direction)
-        }
-    }
+//    private func vote(_ direction: Int) {
+//        guard !accountViewModel.account.isAnonymous() else { return }
+//        Task {
+//            await postViewModel.votePost(vote: direction)
+//        }
+//    }
     
-    private func savePost() {
-        Task {
-            await postViewModel.savePost(save: !postViewModel.post.saved)
-        }
-    }
+//    private func savePost() {
+//        Task {
+//            await postViewModel.savePost(save: !postViewModel.post.saved)
+//        }
+//    }
     
     private func onCommentsTap() {
         // TODO: Open post details and focus on comments section.

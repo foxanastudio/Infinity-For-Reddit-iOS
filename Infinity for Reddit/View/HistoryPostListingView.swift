@@ -13,6 +13,7 @@ struct HistoryPostListingView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     @EnvironmentObject private var snackbarManager: SnackbarManager
+    @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
     
     @StateObject var historyPostListingViewModel: HistoryPostListingViewModel
     @StateObject var postListingVideoManager: PostListingVideoManager = .init()
@@ -34,6 +35,9 @@ struct HistoryPostListingView: View {
     @State var lazyModeState: LazyModeState = .stopped
     
     @AppStorage(InterfaceUserDefaultsUtils.lazyModeIntervalKey, store: .interface) private var lazyModeInterval: Double = 2.5
+    @AppStorage(PostHistoryUserDefaultsUtils.markPostsAsReadKey, store: .postHistory) private var markPostsAsRead: Bool = true
+    @AppStorage(PostHistoryUserDefaultsUtils.limitReadPostsKey, store: .postHistory) private var limitReadPosts: Bool = true
+    @AppStorage(PostHistoryUserDefaultsUtils.readPostsLimitKey, store: .postHistory) private var readPostsLimit: Int = 500
 
     private let historyPostListingMetadata: HistoryPostListingMetadata
     private let handleToolbarMenu: Bool
@@ -55,6 +59,7 @@ struct HistoryPostListingView: View {
                 historyPostListingRepository: HistoryPostListingRepository(),
                 historyPostsRepository: HistoryPostsRepository(),
                 thingModerationRepository: ThingModerationRepository(),
+                postRepository: PostRepository(),
                 postFeedID: "read_posts"
             )
         )
@@ -87,6 +92,15 @@ struct HistoryPostListingView: View {
                                 post: post,
                                 postLayout: historyPostListingViewModel.postLayout,
                                 isSubredditPostListing: false,
+                                onUpvote: {
+                                    await historyPostListingViewModel.votePost(post: post, vote: 1)
+                                },
+                                onDownvote: {
+                                    await historyPostListingViewModel.votePost(post: post, vote: -1)
+                                },
+                                onToggleSave: {
+                                    await historyPostListingViewModel.savePost(post: post, save: !post.saved)
+                                },
                                 onPostTypeTap: {
                                     onPostTypeClicked(post: post)
                                 },
@@ -100,6 +114,9 @@ struct HistoryPostListingView: View {
                                 onShare: {
                                     postForPostOptionsSheet = post
                                     showPostShareSheet = true
+                                },
+                                onReadPost: {
+                                    await historyPostListingViewModel.readPost(post: post, markPostsAsRead: markPostsAsRead, limitReadPosts: limitReadPosts, readPostsLimit: readPostsLimit)
                                 }
                             )
                             .id(ObjectIdentifier(post))
@@ -115,6 +132,28 @@ struct HistoryPostListingView: View {
                             }
                             .onDisappear {
                                 historyPostListingViewModel.appearedPosts.remove(id: post.id)
+                            }
+                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                Button {
+                                    Task {
+                                        await historyPostListingViewModel.votePost(post: post, vote: 1)
+                                    }
+                                } label: {
+                                    SwiftUI.Image(systemName: "arrowshape.up")
+                                        .foregroundStyle(.white)
+                                }
+                                .tint(Color(hex: customThemeViewModel.currentCustomTheme.upvoted))
+                            }
+                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                Button {
+                                    Task {
+                                        await historyPostListingViewModel.votePost(post: post, vote: -1)
+                                    }
+                                } label: {
+                                    SwiftUI.Image(systemName: "arrowshape.down")
+                                        .foregroundStyle(.white)
+                                }
+                                .tint(Color(hex: customThemeViewModel.currentCustomTheme.downvoted))
                             }
                         }
                         if historyPostListingViewModel.hasMorePages {

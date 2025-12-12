@@ -14,6 +14,7 @@ struct PostListingView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
     @EnvironmentObject private var navigationBarMenuManager: NavigationBarMenuManager
     @EnvironmentObject private var snackbarManager: SnackbarManager
+    @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
     
     @StateObject var postListingViewModel: PostListingViewModel
     @StateObject var postListingVideoManager: PostListingVideoManager = .init()
@@ -39,6 +40,9 @@ struct PostListingView: View {
     
     @AppStorage(InterfaceUserDefaultsUtils.lazyModeIntervalKey, store: .interface) private var lazyModeInterval: Double = 2.5
     @AppStorage(MiscellaneousUserDefaultsUtils.saveLastSeenPostInFrontPageKey, store: .miscellaneous) private var saveLastSeenPostInFrontPage: Bool = false
+    @AppStorage(PostHistoryUserDefaultsUtils.markPostsAsReadKey, store: .postHistory) private var markPostsAsRead: Bool = true
+    @AppStorage(PostHistoryUserDefaultsUtils.limitReadPostsKey, store: .postHistory) private var limitReadPosts: Bool = true
+    @AppStorage(PostHistoryUserDefaultsUtils.readPostsLimitKey, store: .postHistory) private var readPostsLimit: Int = 500
     
     private let postListingMetadata: PostListingMetadata
     private var isSubredditPostListing: Bool = false
@@ -68,7 +72,8 @@ struct PostListingView: View {
                 externalPostFilter: externalPostFilter,
                 postListingRepository: PostListingRepository(),
                 historyPostsRepository: HistoryPostsRepository(),
-                thingModerationRepository: ThingModerationRepository()
+                thingModerationRepository: ThingModerationRepository(),
+                postRepository: PostRepository()
             )
         )
     }
@@ -102,7 +107,8 @@ struct PostListingView: View {
                 externalPostFilter: externalPostFilter,
                 postListingRepository: PostListingRepository(),
                 historyPostsRepository: HistoryPostsRepository(),
-                thingModerationRepository: ThingModerationRepository()
+                thingModerationRepository: ThingModerationRepository(),
+                postRepository: PostRepository()
             )
         )
     }
@@ -134,6 +140,15 @@ struct PostListingView: View {
                                 post: post,
                                 postLayout: postListingViewModel.postLayout,
                                 isSubredditPostListing: isSubredditPostListing,
+                                onUpvote: {
+                                    await postListingViewModel.votePost(post: post, vote: 1)
+                                },
+                                onDownvote: {
+                                    await postListingViewModel.votePost(post: post, vote: -1)
+                                },
+                                onToggleSave: {
+                                    await postListingViewModel.savePost(post: post, save: !post.saved)
+                                },
                                 onPostTypeTap: {
                                     onPostTypeClicked(post: post)
                                 },
@@ -147,6 +162,9 @@ struct PostListingView: View {
                                 onShare: {
                                     postForPostOptionsSheet = post
                                     showPostShareSheet = true
+                                },
+                                onReadPost: {
+                                    await postListingViewModel.readPost(post: post, markPostsAsRead: markPostsAsRead, limitReadPosts: limitReadPosts, readPostsLimit: readPostsLimit)
                                 }
                             )
                             .id(ObjectIdentifier(post))
@@ -163,6 +181,28 @@ struct PostListingView: View {
                             }
                             .onDisappear {
                                 postListingViewModel.appearedPosts.remove(id: post.id)
+                            }
+                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                Button {
+                                    Task {
+                                        await postListingViewModel.votePost(post: post, vote: 1)
+                                    }
+                                } label: {
+                                    SwiftUI.Image(systemName: "arrowshape.up")
+                                        .foregroundStyle(.white)
+                                }
+                                .tint(Color(hex: customThemeViewModel.currentCustomTheme.upvoted))
+                            }
+                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                Button {
+                                    Task {
+                                        await postListingViewModel.votePost(post: post, vote: -1)
+                                    }
+                                } label: {
+                                    SwiftUI.Image(systemName: "arrowshape.down")
+                                        .foregroundStyle(.white)
+                                }
+                                .tint(Color(hex: customThemeViewModel.currentCustomTheme.downvoted))
                             }
                         }
                         if postListingViewModel.hasMorePages {
