@@ -37,6 +37,10 @@ extension View {
         self.modifier(NavigationBarPrimaryTextViewModifier())
     }
     
+    func linkText(_ fontSize: AppFontSize = .f17) -> some View {
+        self.modifier(LinkTextViewModifier(fontSize: fontSize))
+    }
+    
     func themedNavigationBar(opacity: Double = 1) -> some View {
         self.modifier(NavigationBarViewModifier(opacity: opacity))
     }

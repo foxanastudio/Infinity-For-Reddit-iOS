@@ -57,6 +57,19 @@ struct NavigationBarPrimaryTextViewModifier: ViewModifier {
     }
 }
 
+struct LinkTextViewModifier: ViewModifier {
+    @EnvironmentObject var themeViewModel: CustomThemeViewModel
+    
+    let fontSize: AppFontSize
+    
+    func body(content: Content) -> some View {
+        content
+            .fixedSize(horizontal: false, vertical: true)
+            .customFont(fontSize: fontSize)
+            .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.linkColor))
+    }
+}
+
 struct PostInfoTextViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
     

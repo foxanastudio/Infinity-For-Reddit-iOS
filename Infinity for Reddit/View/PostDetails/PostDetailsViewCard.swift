@@ -14,6 +14,7 @@ struct PostDetailsViewCard: View {
     @EnvironmentObject private var accountViewModel: AccountViewModel
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
+    @EnvironmentObject var customThemeViewModel: CustomThemeViewModel
     
     @StateObject var postViewModel: PostViewModel
     @State var voteTask: Task<Void, Never>?
@@ -242,8 +243,11 @@ struct PostDetailsViewCard: View {
                         MarkdownImageProvider(
                             mediaMetadata: postViewModel.post.mediaMetadata,
                             markdownEmbeddedMediaType: markdownEmbeddedMediaType,
+                            linkColor: Color(hex: customThemeViewModel.currentCustomTheme.linkColor),
                             fullScreenMediaViewModel: fullScreenMediaViewModel
-                        )
+                        ) { url in
+                            navigationManager.openLink(url)
+                        }
                     )
                     .padding(.horizontal, 16)
                     .padding(.top, 6)

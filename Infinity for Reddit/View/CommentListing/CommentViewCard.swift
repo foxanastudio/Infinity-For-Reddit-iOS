@@ -30,7 +30,7 @@ struct CommentViewCard: View {
     private var showFewerToolbarOptionsThreshold: Int = 5
     @AppStorage(InterfaceUserDefaultsUtils.voteButtonsOnTheRightKey, store: .interface)
     private var voteButtonsOnTheRight: Bool = false
-    @AppStorage(InterfacePostDetailsUserDefaultsUtils.markdownEmbeddedMediaTypeKey, store: .interfacePostDetails) private var markdownEmbeddedMediaType: Int = 15
+    @AppStorage(InterfaceCommentUserDefaultsUtils.markdownEmbeddedMediaTypeKey, store: .interfaceComment) private var markdownEmbeddedMediaType: Int = 15
     
     @StateObject var commentViewModel: CommentViewModel
     @State private var voteTask: Task<Void, Never>? = nil
@@ -141,8 +141,12 @@ struct CommentViewCard: View {
                                     MarkdownImageProvider(
                                         mediaMetadata: commentViewModel.comment.mediaMetadata,
                                         markdownEmbeddedMediaType: markdownEmbeddedMediaType,
+                                        fontSize: .f15,
+                                        linkColor: Color(hex: customThemeViewModel.currentCustomTheme.linkColor),
                                         fullScreenMediaViewModel: fullScreenMediaViewModel
-                                    )
+                                    ) { url in
+                                        navigationManager.openLink(url)
+                                    }
                                 )
                                 .padding(.horizontal, 16)
                                 .padding(.bottom, 12)
@@ -156,8 +160,12 @@ struct CommentViewCard: View {
                                     MarkdownImageProvider(
                                         mediaMetadata: commentViewModel.comment.mediaMetadata,
                                         markdownEmbeddedMediaType: markdownEmbeddedMediaType,
+                                        fontSize: .f15,
+                                        linkColor: Color(hex: customThemeViewModel.currentCustomTheme.linkColor),
                                         fullScreenMediaViewModel: fullScreenMediaViewModel
-                                    )
+                                    ) { url in
+                                        navigationManager.openLink(url)
+                                    }
                                 )
                                 .padding(.horizontal, 16)
                                 .padding(.bottom, 12)
