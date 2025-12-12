@@ -38,6 +38,7 @@ struct PostListingView: View {
     @State var lazyMode: Task<Void, Error>?
     @State var lazyModeState: LazyModeState = .stopped
     
+    @AppStorage(InterfacePostUserDefaultsUtils.defaultLinkPostLayoutKey, store: .interfacePost) private var defaultLinkPostLayout: Int = 0
     @AppStorage(InterfaceUserDefaultsUtils.lazyModeIntervalKey, store: .interface) private var lazyModeInterval: Double = 2.5
     @AppStorage(MiscellaneousUserDefaultsUtils.saveLastSeenPostInFrontPageKey, store: .miscellaneous) private var saveLastSeenPostInFrontPage: Bool = false
     @AppStorage(PostHistoryUserDefaultsUtils.markPostsAsReadKey, store: .postHistory) private var markPostsAsRead: Bool = false
@@ -138,7 +139,7 @@ struct PostListingView: View {
                         ForEach(postListingViewModel.posts, id: \.id) { post in
                             PostView(
                                 post: post,
-                                postLayout: postListingViewModel.postLayout,
+                                postLayout: getPostLayout(post),
                                 isSubredditPostListing: isSubredditPostListing,
                                 onUpvote: {
                                     await postListingViewModel.votePost(post: post, vote: 1)
@@ -457,6 +458,23 @@ struct PostListingView: View {
             )
         }
         .environment(\.postListingVideoManager, postListingVideoManager)
+    }
+    
+    private func getPostLayout(_ post: Post) -> PostLayout {
+        if post.postType.isLink {
+            switch defaultLinkPostLayout {
+            case 0:
+                return postListingViewModel.postLayout
+            case 1:
+                return .card
+            case 2:
+                return .compact
+            default:
+                return .card
+            }
+        } else {
+            return postListingViewModel.postLayout
+        }
     }
     
     private func setUpMenu() {

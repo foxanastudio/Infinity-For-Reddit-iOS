@@ -25,6 +25,6 @@ struct GestureButtonsSettingsView: View {
             .themedList()
         }
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar("Miscellaneous")
+        .addTitleToInlineNavigationBar("Gestures & Buttons")
     }
 }

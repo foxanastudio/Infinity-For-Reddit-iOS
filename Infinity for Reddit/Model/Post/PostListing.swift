@@ -210,6 +210,15 @@ public class Post : NSObject, ObservableObject, Identifiable {
             }
         }
         
+        var isLink: Bool {
+            switch self {
+            case .link, .noPreviewLink:
+                return true
+            default:
+                return false
+            }
+        }
+        
         var text: String {
             switch self {
             case .text:

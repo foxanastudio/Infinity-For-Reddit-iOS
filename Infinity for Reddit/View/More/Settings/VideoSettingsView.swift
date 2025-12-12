@@ -43,18 +43,18 @@ struct VideoSettingsView: View {
                 }
                 .listPlainItemNoInsets()
                 
-                BarebonePickerPreference(
-                    selected: $redditVideoDefaultResolution,
-                    items: VideoUserDefaultsUtils.redditVideoDefaultResolutions,
-                    title: "Reddit Video Default Resolution"
-                ) { resolution in
-                    if resolution == 0 {
-                        "Auto"
-                    } else {
-                        "\(resolution)p"
-                    }
-                }
-                .listPlainItemNoInsets()
+//                BarebonePickerPreference(
+//                    selected: $redditVideoDefaultResolution,
+//                    items: VideoUserDefaultsUtils.redditVideoDefaultResolutions,
+//                    title: "Reddit Video Default Resolution"
+//                ) { resolution in
+//                    if resolution == 0 {
+//                        "Auto"
+//                    } else {
+//                        "\(resolution)p"
+//                    }
+//                }
+//                .listPlainItemNoInsets()
                 
                 CustomListSection("Video Autoplay") {
                     BarebonePickerPreference(

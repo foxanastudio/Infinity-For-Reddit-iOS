@@ -53,9 +53,6 @@ final class AdvancedSettingsViewModel: ObservableObject {
                 postLayoutDefaults.removeObject(forKey: $0)
             }
         }
-        
-        UserDefaults.interfacePost.removeObject(forKey: InterfacePostUserDefaultsUtils.defaultPostLayoutKey)
-        UserDefaults.interfacePost.removeObject(forKey: InterfacePostUserDefaultsUtils.defaultLinkPostLayoutKey)
     }
     
     private func deleteAllThemes() async throws {

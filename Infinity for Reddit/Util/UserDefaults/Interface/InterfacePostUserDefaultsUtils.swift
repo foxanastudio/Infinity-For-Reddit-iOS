@@ -15,12 +15,12 @@ class InterfacePostUserDefaultsUtils {
     static let defaultPostLayouts = [0, 1]
     static let defaultPostLayoutsText = ["Card Layout", "Compact Layout"]
     
-    static let defaultLinkPostLayoutKey = "default_post_layout"
+    static let defaultLinkPostLayoutKey = "default_link_post_layout"
     static var defaultLinkPostLayout: Int {
         return UserDefaults.interfacePost.integer(forKey: defaultLinkPostLayoutKey)
     }
-    static let defaultLinkPostLayouts = [0, 1]
-    static let defaultLinkPostLayoutsText = ["Auto", "Card Layout"]
+    static let defaultLinkPostLayouts = [0, 1, 2]
+    static let defaultLinkPostLayoutsText = ["Auto", "Card Layout", "Compct Layout"]
     
     static let hidePostTypeKey = "hide_post_type"
     static var hidePostType: Bool {
