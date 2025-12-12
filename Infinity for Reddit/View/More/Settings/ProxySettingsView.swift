@@ -66,7 +66,6 @@ struct ProxySettingsView: View {
                     }
                 }
             }
-            .themedList()
         }
         .overlay(
             CustomAlert(title: activeAlert?.title ?? "", confirmButtonText: "OK", isPresented: Binding(

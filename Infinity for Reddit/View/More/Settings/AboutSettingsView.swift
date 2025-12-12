@@ -6,42 +6,71 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct AboutSettingsView: View {
+    @EnvironmentObject var navigationManager: NavigationManager
+    
     var body: some View {
         RootView {
             ScrollView {
                 VStack(spacing: 0) {
-                    PreferenceEntry(title: "Acknowledgement") {
+                    PreferenceEntry(
+                        title: "Acknowledgement"
+                    ) {
+                        navigationManager.append(AboutSettingsViewNavigation.acknowledgement)
+                    }
+                    
+                    PreferenceEntry(
+                        title: "Open Source",
+                        subtitle: "Star it on Github if you like this app"
+                    ) {
+                        navigationManager.openLink("https://github.com/Docile-Alligator/Infinity-For-Reddit-iOS")
+                    }
+                    
+                    PreferenceEntry(
+                        title: "Rate on App Store",
+                        subtitle: "Give us a 5-star rating and we will be really happy"
+                    ) {
                         
                     }
-                    PreferenceEntry(title: "Credits") {
-                        
+                    
+                    PreferenceEntry(
+                        title: "Email",
+                        subtitle: "docilealligator.app@gmail.com"
+                    ) {
+                        if let url = URL(string: "mailto:docilealligator.app@gmail.com") {
+                            UIApplication.shared.open(url)
+                        }
                     }
-                    PreferenceEntry(title: "Translation") {
-                        
+                    
+                    PreferenceEntry(
+                        title: "Reddit Account",
+                        subtitle: "u/Hostilenemy"
+                    ) {
+                        navigationManager.append(AppNavigation.userDetails(username: "Hostilenemy"))
                     }
-                    PreferenceEntry(title: "Open Source") {
-                        
+                    
+                    PreferenceEntry(
+                        title: "Subreddit",
+                        subtitle: "r/Infinity_For_Reddit"
+                    ) {
+                        navigationManager.append(AppNavigation.subredditDetails(subredditName: "Infinity_For_Reddit"))
                     }
-                    PreferenceEntry(title: "Rate on App Store") {
-                        
+                    
+                    ShareLink(
+                        item: "Check out Infinity for Reddit for iOS, an awesome Reddit client!\nhttps://github.com/Docile-Alligator/Infinity-For-Reddit-iOS"
+                    ) {
+                        PreferenceEntry(
+                            title: "Share",
+                            subtitle: "Share this app to other people if you enjoy it"
+                        ) { }
                     }
-                    PreferenceEntry(title: "Email") {
-                        
-                    }
-                    PreferenceEntry(title: "Reddit Account") {
-                        
-                    }
-                    PreferenceEntry(title: "Subreddit") {
-                        
-                    }
-                    PreferenceEntry(title: "Share") {
-                        
-                    }
-                    PreferenceEntry(title: "Infinity For Reddit") {
-                        
-                    }
+                    
+                    PreferenceEntry(
+                        title: "Infinity For Reddit",
+                        subtitle: "Version \(Bundle.main.appVersion)"
+                    ) { }
                 }
             }
         }

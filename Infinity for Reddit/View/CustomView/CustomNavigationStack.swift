@@ -275,6 +275,13 @@ struct CustomNavigationStack<Content: View>: View {
                     }
                 }
                 .environmentObject(navigationManager)
+                .navigationDestination(for: AboutSettingsViewNavigation.self) { destination in
+                    switch destination {
+                    case .acknowledgement:
+                        AcknowledgementView()
+                            .environmentObject(navigationManager)
+                    }
+                }
                 .navigationDestination(for: FontSettingsViewNavigation.self) { destination in
                     switch destination {
                     case .fontPreview:
