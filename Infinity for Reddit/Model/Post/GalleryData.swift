@@ -61,7 +61,7 @@ class GalleryItem : NSObject, Identifiable {
         
         mimeType = media.m
         if media.m.contains("jpg") || media.m.contains("png") {
-            urlString = media.s.u
+            urlString = media.s?.u
             mediaType = .image
             
             if let urlString, !urlString.isEmpty, let mediaId, !mediaId.isEmpty {
@@ -70,10 +70,10 @@ class GalleryItem : NSObject, Identifiable {
                 hasFallback = true
             }
         } else if media.m.contains("gif") {
-            urlString = media.s.gif
+            urlString = media.s?.gif
             mediaType = .gif
         } else {
-            urlString = media.s.mp4
+            urlString = media.s?.mp4
             mediaType = .video
         }
         

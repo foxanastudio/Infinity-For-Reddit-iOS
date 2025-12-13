@@ -42,13 +42,15 @@ struct MarkdownImageProvider: ImageProvider {
                     if markdownEmbeddedMediaType.allowGif {
                         VStack(spacing: 8) {
                             CustomWebImage(
-                                media.s.gif,
+                                media.s?.gif,
                                 width: 140,
-                                aspectRatio: media.s.aspectRatio,
+                                aspectRatio: media.s?.aspectRatio,
                                 handleImageTapGesture: false
                             )
                             .highPriorityGesture(TapGesture().onEnded {
-                                onMediaTap(urlString: media.s.gif, fileName: "\(Utils.randomString()).gif", isGif: true)
+                                if let urlString = media.s?.gif {
+                                    onMediaTap(urlString: urlString, fileName: "\(Utils.randomString()).gif", isGif: true)
+                                }
                             })
                             
                             if media.caption != nil {
@@ -56,10 +58,10 @@ struct MarkdownImageProvider: ImageProvider {
                                     .secondaryText(.f15)
                             }
                         }
-                    } else if let urlString = media.s.gif {
+                    } else if let urlString = media.s?.gif {
                         VStack(spacing: 8) {
                             Text(getLinkAttributedString(urlString: urlString))
-                                .frame(maxWidth: .infinity)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                                 .linkText(.f15)
                             
                             if media.caption != nil {
@@ -72,12 +74,14 @@ struct MarkdownImageProvider: ImageProvider {
                     if markdownEmbeddedMediaType.allowImage {
                         VStack(spacing: 8) {
                             CustomWebImage(
-                                media.s.u,
-                                aspectRatio: media.s.aspectRatio,
+                                media.s?.u,
+                                aspectRatio: media.s?.aspectRatio,
                                 handleImageTapGesture: false
                             )
                             .highPriorityGesture(TapGesture().onEnded {
-                                onMediaTap(urlString: media.s.u, fileName: "\(Utils.randomString()).jpg", isGif: false)
+                                if let urlString = media.s?.u {
+                                    onMediaTap(urlString: urlString, fileName: "\(Utils.randomString()).jpg", isGif: false)
+                                }
                             })
                             
                             if media.caption != nil {
@@ -85,10 +89,10 @@ struct MarkdownImageProvider: ImageProvider {
                                     .secondaryText(.f15)
                             }
                         }
-                    } else if let urlString = media.s.u {
+                    } else if let urlString = media.s?.u {
                         VStack(spacing: 8) {
                             Text(getLinkAttributedString(urlString: urlString))
-                                .frame(maxWidth: .infinity)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                                 .linkText(.f15)
                             
                             if media.caption != nil {
@@ -98,16 +102,22 @@ struct MarkdownImageProvider: ImageProvider {
                         }
                     }
                 } else if media.e == MediaMetadata.redditVideoType {
-                    VStack {
-                        if let url = URL(string: media.hlsUrl) {
-                            InlineVideoPlayer(videoURL: url, aspectRatio: CGSize(width: media.x, height: media.y))
-                                .id(url)
+                    if markdownEmbeddedMediaType.allowVideo {
+                        VStack {
+                            if let url = URL(string: media.hlsUrl) {
+                                InlineVideoPlayer(videoURL: url, aspectRatio: CGSize(width: media.x, height: media.y))
+                                    .id(url)
+                            }
+                            
+                            if media.caption != nil {
+                                Text(media.caption!)
+                                    .secondaryText(.f15)
+                            }
                         }
-                        
-                        if media.caption != nil {
-                            Text(media.caption!)
-                                .secondaryText(.f15)
-                        }
+                    } else if let urlString = media.videoLinkMarkdown {
+                        Text(getLinkAttributedString(urlString: urlString, caption: media.caption))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .linkText(.f15)
                     }
                 } else {
                     EmptyView()
@@ -133,8 +143,8 @@ struct MarkdownImageProvider: ImageProvider {
         }
     }
     
-    private func getLinkAttributedString(urlString: String) -> AttributedString {
-        var attributedString = AttributedString(urlString)
+    private func getLinkAttributedString(urlString: String, caption: String? = nil) -> AttributedString {
+        var attributedString = AttributedString(caption ?? urlString)
         attributedString.link = URL(string: urlString)!
         attributedString.foregroundColor = linkColor
         return attributedString

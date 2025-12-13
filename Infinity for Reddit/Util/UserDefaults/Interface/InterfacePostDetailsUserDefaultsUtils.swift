@@ -47,63 +47,6 @@ class InterfacePostDetailsUserDefaultsUtils {
     static var markdownEmbeddedMediaType: Int {
         return UserDefaults.interfacePostDetails.integer(forKey: markdownEmbeddedMediaTypeKey, 15)
     }
-    static let markdownEmbeddedMediaTypes = [15, 7, 6, 5, 3, 2, 1, 0]
-    static let markdownEmbeddedMediaTypesText = ["All", "Image and Gif", "Image and Emote", "Gif and Emote", "Image", "Gif", "Emote", "None"]
-}
-
-
-enum MarkdownEmbeddedMediaType: Int {
-    case all = 15
-    case imageAndGif = 7
-    case imageAndEmote = 6
-    case gifAndEmote = 5
-    case image = 3
-    case gif = 2
-    case emote = 1
-    case none = 0
-    
-    var allowImage: Bool {
-        switch self {
-        case .all:
-            return true
-        case .imageAndGif:
-            return true
-        case .imageAndEmote:
-            return true
-        case .image:
-            return true
-        default:
-            return false
-        }
-    }
-    
-    var allowGif: Bool {
-        switch self {
-        case .all:
-            return true
-        case .imageAndGif:
-            return true
-        case .gifAndEmote:
-            return true
-        case .gif:
-            return true
-        default:
-            return false
-        }
-    }
-    
-    var allowEmote: Bool {
-        switch self {
-        case .all:
-            return true
-        case .imageAndEmote:
-            return true
-        case .gifAndEmote:
-            return true
-        case .emote:
-            return true
-        default:
-            return false
-        }
-    }
+    static let markdownEmbeddedMediaTypes = [15, 8, 3, 0]
+    static let markdownEmbeddedMediaTypesText = ["All", "Video and Image", "Image", "None"]
 }

@@ -76,7 +76,9 @@ struct CrosspostView: View {
                                   let preview = mediaMetadata[galleryData.items[0].mediaId] {
                             // May not have a preview!!!!!!
                             GalleryCarousel(post: crosspostViewModel.postToBeCrossposted)
-                                .aspectRatio(preview.s.aspectRatio, contentMode: .fit)
+                                .applyIf(preview.s?.aspectRatio != nil) {
+                                    $0.aspectRatio(preview.s!.aspectRatio, contentMode: .fit)
+                                }
                         } else if case .redditVideo(let videoUrlString, _) = crosspostViewModel.postToBeCrossposted.postType {
                             PostVideoView(post: crosspostViewModel.postToBeCrossposted, videoUrlString: videoUrlString)
                         } else if case .video(let videoUrlString, _) = crosspostViewModel.postToBeCrossposted.postType {

@@ -22,7 +22,7 @@ class MediaMetadata : NSObject, ObservableObject, Identifiable {
     // Preview, only images
     var p : [MediaMetadataPreview]! = [MediaMetadataPreview]()
     // Source, may contain gif and image
-    var s : MediaMetadataSource!
+    var s : MediaMetadataSource?
     //E.g. "Valid"
     var status : String!
     var caption: String?
@@ -32,14 +32,10 @@ class MediaMetadata : NSObject, ObservableObject, Identifiable {
     var dashUrl: String!
     var hlsUrl: String!
     var isGif: Bool!
+    var videoLinkMarkdown: String?
 
     init(fromJson json: JSON!) throws {
         if json.isEmpty {
-            throw JSONError.invalidData
-        }
-        
-        let sJson = json["s"]
-        guard !sJson.isEmpty else {
             throw JSONError.invalidData
         }
         
@@ -52,7 +48,7 @@ class MediaMetadata : NSObject, ObservableObject, Identifiable {
             p.append(value)
         }
         
-        s = MediaMetadataSource(fromJson: sJson)
+        s = MediaMetadataSource(fromJson: json["s"])
         status = json["status"].stringValue
         x = json["x"].intValue
         y = json["y"].intValue

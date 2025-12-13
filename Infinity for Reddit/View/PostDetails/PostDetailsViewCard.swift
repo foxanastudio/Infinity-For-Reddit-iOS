@@ -219,7 +219,9 @@ struct PostDetailsViewCard: View {
                 
                 // May not have a preview!!!!!!
                 GalleryCarousel(post: postViewModel.post)
-                    .aspectRatio(preview.s.aspectRatio, contentMode: .fit)
+                    .applyIf(preview.s?.aspectRatio != nil) {
+                        $0.aspectRatio(preview.s!.aspectRatio, contentMode: .fit)
+                    }
             } else if case .redditVideo(let videoUrlString, _) = postViewModel.post.postType {
                 Spacer()
                     .frame(height: 10)

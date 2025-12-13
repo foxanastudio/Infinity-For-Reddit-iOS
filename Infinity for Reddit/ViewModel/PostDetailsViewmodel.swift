@@ -287,14 +287,16 @@ public class PostDetailsViewModel: ObservableObject {
         MarkdownUtils.parseRedditImagesBlock(post)
         post.selftextProcessedMarkdown = MarkdownContent(post.selftext)
         
-        if await historyPostsRepository.getIfExistInHistoryPostsAnonymous(postId: post.id, postHistoryType: .upvoted) {
-            post.likes = 1
-        } else if await historyPostsRepository.getIfExistInHistoryPostsAnonymous(postId: post.id, postHistoryType: .downvoted) {
-            post.likes = -1
+        if AccountViewModel.shared.account.isAnonymous() {
+            if await historyPostsRepository.getIfExistInHistoryPostsAnonymous(postId: post.id, postHistoryType: .upvoted) {
+                post.likes = 1
+            } else if await historyPostsRepository.getIfExistInHistoryPostsAnonymous(postId: post.id, postHistoryType: .downvoted) {
+                post.likes = -1
+            }
+            
+            post.hidden = await historyPostsRepository.getIfExistInHistoryPostsAnonymous(postId: post.id, postHistoryType: .hidden)
+            post.saved = await historyPostsRepository.getIfExistInHistoryPostsAnonymous(postId: post.id, postHistoryType: .saved)
         }
-        
-        post.hidden = await historyPostsRepository.getIfExistInHistoryPostsAnonymous(postId: post.id, postHistoryType: .hidden)
-        post.saved = await historyPostsRepository.getIfExistInHistoryPostsAnonymous(postId: post.id, postHistoryType: .saved)
     }
     
     public func fetchCommentsPagination() async {

@@ -98,6 +98,14 @@ class MarkdownUtils {
                     
                     let linkID = (markdownString as NSString).substring(with: videoMatch.range(at: 3))
                     mediaMetadata.caption = videoMatch.range(at: 1).location != NSNotFound ? (markdownString as NSString).substring(with: videoMatch.range(at: 1)) : nil
+                    var videoLinkMarkdown = (markdownString as NSString).substring(with: videoMatch.range)
+                    if videoLinkMarkdown.hasPrefix("[") {
+                        if let range = videoLinkMarkdown.range(of: "https://", options: .backwards) {
+                            videoLinkMarkdown = String(videoLinkMarkdown[range.lowerBound..<videoLinkMarkdown.index(videoLinkMarkdown.endIndex, offsetBy: -1)])
+                        }
+                    }
+                    mediaMetadata.videoLinkMarkdown = videoLinkMarkdown
+                    print(mediaMetadata.videoLinkMarkdown)
                     
                     let replacingText = "![](\(videoID))"
                     markdownString.replaceSubrange(matchRange, with: replacingText)
