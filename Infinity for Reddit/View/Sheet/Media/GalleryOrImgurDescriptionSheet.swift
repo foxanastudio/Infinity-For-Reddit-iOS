@@ -43,12 +43,7 @@ private struct DescriptionOrLinkMarkdown: View {
     
     var body: some View {
         Markdown(content)
-            .markdownTheme(Theme().link {
-                ForegroundColor(Color(hex: customThemeViewModel.currentCustomTheme.colorAccent))
-            }.text {
-                ForegroundColor(Color(hex: customThemeViewModel.currentCustomTheme.primaryTextColor))
-            })
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .themedMarkdown()
             .markdownLinkHandler { url in
                 UIApplication.shared.open(url)
             }
