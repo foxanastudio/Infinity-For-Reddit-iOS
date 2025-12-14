@@ -97,8 +97,12 @@ class VideoFullScreenViewModel: ObservableObject {
                     NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime,
                                                            object: player.currentItem,
                                                            queue: .main) { _ in
-                        self.player.seek(to: .zero)
-                        self.play()
+                        if VideoUserDefaultsUtils.loopVideo {
+                            self.player.seek(to: .zero)
+                            self.play()
+                        } else {
+                            self.pause()
+                        }
                     }
                 }
             }

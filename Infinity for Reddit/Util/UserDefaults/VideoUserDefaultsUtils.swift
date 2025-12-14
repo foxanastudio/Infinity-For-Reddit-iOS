@@ -25,7 +25,7 @@ class VideoUserDefaultsUtils {
     
     static let loopVideoKey = "loop_video"
     static var loopVideo: Bool {
-        return UserDefaults.video.bool(forKey: switchToLandscapeInVideoPlayerKey, true)
+        return UserDefaults.video.bool(forKey: loopVideoKey, true)
     }
     
     static let defaultPlaybackSpeedKey = "default_playback_speed"

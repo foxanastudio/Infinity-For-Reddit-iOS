@@ -11,7 +11,7 @@ struct VideoSettingsView: View {
     @AppStorage(VideoUserDefaultsUtils.muteVideoKey, store: .video) private var muteVideo: Bool = false
     @AppStorage(VideoUserDefaultsUtils.muteSensitiveVideoKey, store: .video) private var muteSensitiveVideo: Bool = false
     @AppStorage(VideoUserDefaultsUtils.switchToLandscapeInVideoPlayerKey, store: .video) private var switchToLandscapeInVideoPlayer: Bool = false
-    @AppStorage(VideoUserDefaultsUtils.loopVideoKey, store: .video) private var loopVideo: Bool = false
+    @AppStorage(VideoUserDefaultsUtils.loopVideoKey, store: .video) private var loopVideo: Bool = true
     @AppStorage(VideoUserDefaultsUtils.defaultPlaybackSpeedKey, store: .video) private var defaultPlaybackSpeed: Double = 1.0
     @AppStorage(VideoUserDefaultsUtils.redditVideoDefaultResolutionKey, store: .video) private var redditVideoDefaultResolution: Int = 0
     @AppStorage(VideoUserDefaultsUtils.videoAutoplayKey, store: .video) private var videoAutoplay: Int = 0
@@ -28,8 +28,8 @@ struct VideoSettingsView: View {
                 TogglePreference(isEnabled: $muteSensitiveVideo, title: "Mute Sensitive Video")
                     .listPlainItemNoInsets()
                 
-                TogglePreference(isEnabled: $switchToLandscapeInVideoPlayer, title: "Switch to Landscape in Video Player")
-                    .listPlainItemNoInsets()
+//                TogglePreference(isEnabled: $switchToLandscapeInVideoPlayer, title: "Switch to Landscape in Video Player")
+//                    .listPlainItemNoInsets()
                 
                 TogglePreference(isEnabled: $loopVideo, title: "Loop Video")
                     .listPlainItemNoInsets()
