@@ -14,8 +14,6 @@ struct VideoFullScreenView<Content: View>: View {
     
     @ObservedObject private var videoFullScreenViewModel: VideoFullScreenViewModel
     
-    @AppStorage(VideoUserDefaultsUtils.defaultPlaybackSpeedKey, store: .video) private var defaultPlaybackSpeed: Double = 1.0
-    
     @State private var scale: CGFloat = 1.0
     @GestureState private var dragOffset: CGSize = .zero
     @State private var currentDragOffset = 0.0

@@ -27,6 +27,7 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
     @Published var isDragging = false
     @Published var hasAudio: Bool = false
     @Published var isMuted: Bool = false
+    @Published var playbackSpeed: Double = 1
     var canPlay: Bool
     
     init(canPlay: Bool = true) {
@@ -53,6 +54,7 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
                 
                 self.player.isMuted = muteVideo
                 self.isMuted = muteVideo
+                self.playbackSpeed = VideoUserDefaultsUtils.defaultPlaybackSpeed
                 self.play()
                 
                 observeCurrentItem()
@@ -148,6 +150,7 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
     func play() {
         if canPlay {
             player.play()
+            player.rate = Float(playbackSpeed)
         }
     }
     

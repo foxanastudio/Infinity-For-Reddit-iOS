@@ -88,6 +88,7 @@ class VideoFullScreenViewModel: ObservableObject {
                     isLoaded = true
                     isLoading = false
                     
+                    playbackSpeed = VideoUserDefaultsUtils.defaultPlaybackSpeed
                     isMuted = muteVideo
                     play()
                     
