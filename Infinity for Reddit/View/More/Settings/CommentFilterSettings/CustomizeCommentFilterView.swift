@@ -222,16 +222,22 @@ struct CustomizeCommentFilterView: View {
         }
         .sheet(isPresented: $showUserSelectionSheet) {
             NavigationStack {
-                UserSelectionSheet { thing in
-                    switch thing {
-                    case .subscribedUser(let subscribedUserData):
-                        addUserToExcludeUsers(subscribedUserData.name)
-                    case .user(let userData):
-                        addUserToExcludeUsers(userData.name)
-                    default:
-                        break
-                    }
-                }
+                SubredditAndUserMultiSelectionSheet(subscriptionSelectionMode: .userMultiSelection(selectedUsers: nil, onConfirmSelection: { things in
+                    addUsersToExcludeUsers(things)
+                }))
+            }
+        }
+    }
+    
+    private func addUsersToExcludeUsers(_ things: [Thing]) {
+        for thing in things {
+            switch thing {
+            case .subscribedUser(let subscribedUserData):
+                addUserToExcludeUsers(subscribedUserData.name)
+            case .user(let userData):
+                addUserToExcludeUsers(userData.name)
+            default:
+                break
             }
         }
     }
