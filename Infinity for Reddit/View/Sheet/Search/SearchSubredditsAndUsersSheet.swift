@@ -44,13 +44,23 @@ struct SearchSubredditsAndUsersSheet: View {
             switch thingSelectionMode {
             case .noSelection:
                 return thingSelectionMode
-            case .thingSelection(onSelectThing: let onSelectThing):
+            case .thingSelection(let onSelectThing):
                 return .thingSelection(onSelectThing: { thing in
                     onSelectThing(thing)
                     dismiss()
                 })
-            case .subredditAndUserMultiSelection(selectedSubredditsAndUsers: let selectedSubredditsAndUsers, onConfirmSelection: let onConfirmSelection):
+            case .subredditAndUserMultiSelection(let selectedSubredditsAndUsers, let onConfirmSelection):
                 return .subredditAndUserMultiSelection(selectedSubredditsAndUsers: selectedSubredditsAndUsers, onConfirmSelection: { things in
+                    onConfirmSelection(things)
+                    dismiss()
+                })
+            case .subredditMultiSelection(let selectedSubreddits, let onConfirmSelection):
+                return .subredditMultiSelection(selectedSubreddits: selectedSubreddits, onConfirmSelection: { things in
+                    onConfirmSelection(things)
+                    dismiss()
+                })
+            case .userMultiSelection(let selectedUsers, let onConfirmSelection):
+                return .userMultiSelection(selectedUsers: selectedUsers, onConfirmSelection: { things in
                     onConfirmSelection(things)
                     dismiss()
                 })

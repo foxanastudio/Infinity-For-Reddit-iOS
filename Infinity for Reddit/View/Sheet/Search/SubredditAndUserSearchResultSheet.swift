@@ -42,19 +42,36 @@ struct SubredditAndUserSearchResultSheet: View {
     var body: some View {
         SheetRootView {
             VStack(spacing: 0) {
-                SegmentedPicker(selectedValue: $selectedOption, values: ["Subreddits", "Users"])
-                    .padding(4)
+                switch thingSelectionMode {
+                case .subredditAndUserMultiSelection:
+                    SegmentedPicker(selectedValue: $selectedOption, values: ["Subreddits", "Users"])
+                        .padding(4)
+                default:
+                    EmptyView()
+                }
                 
                 TabView(selection: $selectedOption) {
-                    SubredditListingView(account: accountViewModel.account, subredditListingViewModel: subredditListingViewModel)
-                        .tag(0)
-                    
-                    UserListingView(account: accountViewModel.account, userListingViewModel: userListingViewModel)
-                        .tag(1)
+                    switch thingSelectionMode {
+                    case .subredditAndUserMultiSelection:
+                        SubredditListingView(account: accountViewModel.account, subredditListingViewModel: subredditListingViewModel)
+                            .tag(0)
+                        
+                        UserListingView(account: accountViewModel.account, userListingViewModel: userListingViewModel)
+                            .tag(1)
+                    case .subredditMultiSelection:
+                        SubredditListingView(account: accountViewModel.account, subredditListingViewModel: subredditListingViewModel)
+                            .tag(0)
+                    case .userMultiSelection:
+                        UserListingView(account: accountViewModel.account, userListingViewModel: userListingViewModel)
+                            .tag(0)
+                    default:
+                        EmptyView()
+                    }
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 
-                if case .subredditAndUserMultiSelection(_, let onSelectMultipleSubscriptions) = thingSelectionMode {
+                switch thingSelectionMode {
+                case .subredditAndUserMultiSelection(_, let onSelectMultipleSubscriptions):
                     Button {
                         var selectedThings: [Thing] = []
                         for subreddit in subredditListingViewModel.selectedSubreddits {
@@ -74,12 +91,48 @@ struct SubredditAndUserSearchResultSheet: View {
                     }
                     .padding(16)
                     .filledButton()
+                case .subredditMultiSelection(_, let onConfirmSelection):
+                    Button {
+                        var selectedSubreddits: [Thing] = []
+                        for subreddit in subredditListingViewModel.selectedSubreddits {
+                            selectedSubreddits.append(.subreddit(subreddit.toSubredditData()))
+                        }
+                        
+                        onConfirmSelection(selectedSubreddits)
+                        dismiss()
+                    } label: {
+                        HStack {
+                            Text("Done")
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .padding(16)
+                    .filledButton()
+                case .userMultiSelection(_, let onConfirmSelection):
+                    Button {
+                        var selectedUsers: [Thing] = []
+                        for user in userListingViewModel.selectedUsers {
+                            selectedUsers.append(.user(user.toUserData()))
+                        }
+                        
+                        onConfirmSelection(selectedUsers)
+                        dismiss()
+                    } label: {
+                        HStack {
+                            Text("Done")
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .padding(16)
+                    .filledButton()
+                default:
+                    EmptyView()
                 }
             }
         }
         .id(accountViewModel.account.username)
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar("Select a Destination")
+        .addTitleToInlineNavigationBar("Select")
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {

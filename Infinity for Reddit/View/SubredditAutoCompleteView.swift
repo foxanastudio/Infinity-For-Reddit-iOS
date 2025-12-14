@@ -84,6 +84,11 @@ struct SubredditAutoCompleteView: View {
                                 onSelectThing(.subreddit(subreddit.toSubredditData()))
                             case .subredditAndUserMultiSelection:
                                 subredditAutoCompleteViewModel.toggleSelection(subreddit: subreddit)
+                            case .subredditMultiSelection(selectedSubreddits: let selectedSubreddits, onConfirmSelection: let onConfirmSelection):
+                                subredditAutoCompleteViewModel.toggleSelection(subreddit: subreddit)
+                            case .userMultiSelection(selectedUsers: let selectedUsers, onConfirmSelection: let onConfirmSelection):
+                                // Shouldn't happen
+                                break
                             }
                         }
                     }

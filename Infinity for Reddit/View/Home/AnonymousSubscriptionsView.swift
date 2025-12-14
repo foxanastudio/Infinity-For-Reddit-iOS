@@ -40,6 +40,10 @@ struct AnonymousSubscriptionsView: View {
                         values: ["Subreddits", "Users", "Custom Feed"]
                     )
                     .padding(4)
+                case .subredditMultiSelection:
+                    EmptyView()
+                case .userMultiSelection:
+                    EmptyView()
                 default:
                     SegmentedPicker(
                         selectedValue: $selectedOption,
@@ -76,12 +80,19 @@ struct AnonymousSubscriptionsView: View {
                             
                             AnonymousSubscribedUserListingMultiSelectionView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
                                 .tag(1)
+                        case .subredditMultiSelection:
+                            AnonymousSubscribedSubredditListingMultiSelectionView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
+                                .tag(0)
+                        case .userMultiSelection:
+                            AnonymousSubscribedUserListingMultiSelectionView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
+                                .tag(0)
                         }
                     }
                     .toolbar(.hidden, for: .tabBar)
                 }
                 
-                if case .subredditAndUserMultiSelection(_, let onConfirmSelection) = anonymousSubscriptionListingViewModel.subscriptionSelectionMode {
+                switch anonymousSubscriptionListingViewModel.subscriptionSelectionMode {
+                case .subredditAndUserMultiSelection(_, let onConfirmSelection):
                     Button {
                         onConfirmSelection(anonymousSubscriptionListingViewModel.getSelectedSubredditsAndUsers())
                         dismiss()
@@ -93,6 +104,32 @@ struct AnonymousSubscriptionsView: View {
                     }
                     .padding(16)
                     .filledButton()
+                case .subredditMultiSelection(_, let onConfirmSelection):
+                    Button {
+                        onConfirmSelection(anonymousSubscriptionListingViewModel.getSelectedSubreddits())
+                        dismiss()
+                    } label: {
+                        HStack {
+                            Text("Done")
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .padding(16)
+                    .filledButton()
+                case .userMultiSelection(_, let onConfirmSelection):
+                    Button {
+                        onConfirmSelection(anonymousSubscriptionListingViewModel.getSelectedUsers())
+                        dismiss()
+                    } label: {
+                        HStack {
+                            Text("Done")
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .padding(16)
+                    .filledButton()
+                default:
+                    EmptyView()
                 }
             }
         }

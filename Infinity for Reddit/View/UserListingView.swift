@@ -86,6 +86,11 @@ struct UserListingView: View {
                                 dismiss()
                             case .subredditAndUserMultiSelection:
                                 userListingViewModel.toggleSelection(user: user)
+                            case .subredditMultiSelection:
+                                // Shouldn't happen
+                                break
+                            case .userMultiSelection:
+                                userListingViewModel.toggleSelection(user: user)
                             }
                         }
                     }

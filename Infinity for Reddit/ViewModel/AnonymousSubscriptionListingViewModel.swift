@@ -314,4 +314,24 @@ public class AnonymousSubscriptionListingViewModel: ObservableObject {
         
         return result
     }
+    
+    func getSelectedSubreddits() -> [Thing] {
+        var result: [Thing] = []
+        
+        for subscribedSubredditData in selectedSubscribedSubreddits {
+            result.append(.subscribedSubreddit(subscribedSubredditData))
+        }
+        
+        return result
+    }
+    
+    func getSelectedUsers() -> [Thing] {
+        var result: [Thing] = []
+        
+        for subscribedUserData in selectedSubscribedUsers {
+            result.append(.subscribedUser(subscribedUserData))
+        }
+        
+        return result
+    }
 }

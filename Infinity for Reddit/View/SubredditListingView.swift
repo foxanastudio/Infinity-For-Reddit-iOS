@@ -94,6 +94,11 @@ struct SubredditListingView: View {
                                 dismiss()
                             case .subredditAndUserMultiSelection:
                                 subredditListingViewModel.toggleSelection(subreddit: subreddit)
+                            case .subredditMultiSelection:
+                                subredditListingViewModel.toggleSelection(subreddit: subreddit)
+                            case .userMultiSelection(selectedUsers: let selectedUsers, onConfirmSelection: let onConfirmSelection):
+                                // Shouldn't happen
+                                break
                             }
                         }
                     }

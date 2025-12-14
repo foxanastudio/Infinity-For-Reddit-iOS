@@ -15,6 +15,9 @@ struct CustomizePostFilterView: View {
     
     @StateObject private var customizePostFilterViewModel: CustomizePostFilterViewModel
     
+    @State private var subredditSelectionPurpose: SubredditSelectionSheetPurpose?
+    @State private var userSelectionPurpose: UserSelectionSheetPurpose?
+    
     @FocusState private var focusedField: FieldType?
     
     private let showInSheet: Bool
@@ -214,9 +217,14 @@ struct CustomizePostFilterView: View {
                                         .lineLimit(1...5)
                                         .id(FieldType.excludeSubreddits)
                                     
-                                    Button(action: {}) {
-                                        SwiftUI.Image(systemName: "plus")
+                                    Button(action: {
+                                        subredditSelectionPurpose = .excludeSubreddits
+                                    }) {
+                                        SwiftUI.Image(systemName: "plus.bubble")
+                                            .resizable()
+                                            .scaledToFit()
                                             .primaryIcon()
+                                            .frame(width: 36)
                                     }
                                     .padding(.leading, 16)
                                 }
@@ -233,9 +241,14 @@ struct CustomizePostFilterView: View {
                                         .lineLimit(1...5)
                                         .id(FieldType.excludeUsers)
                                     
-                                    Button(action: {}) {
-                                        SwiftUI.Image(systemName: "plus")
+                                    Button(action: {
+                                        userSelectionPurpose = .excludeUsers
+                                    }) {
+                                        SwiftUI.Image(systemName: "person.crop.circle.badge.plus")
+                                            .resizable()
+                                            .scaledToFit()
                                             .primaryIcon()
+                                            .frame(width: 36)
                                     }
                                     .padding(.leading, 16)
                                 }
@@ -483,10 +496,90 @@ struct CustomizePostFilterView: View {
             onApplyPostFilter?(customizePostFilterViewModel.getPostFilter())
             dismiss()
         }
+        .sheet(item: $subredditSelectionPurpose) { item in
+            NavigationStack {
+                SubredditAndUserMultiSelectionSheet(subscriptionSelectionMode: .subredditMultiSelection(selectedSubreddits: nil, onConfirmSelection: { things in
+                    if item == .excludeSubreddits {
+                        addSubredditsToExcludeSubreddits(things)
+                    }
+                }))
+            }
+        }
+        .sheet(item: $userSelectionPurpose) { item in
+            NavigationStack {
+                SubredditAndUserMultiSelectionSheet(subscriptionSelectionMode: .userMultiSelection(selectedUsers: nil, onConfirmSelection: { things in
+                    if item == .excludeUsers {
+                        addUsersToExcludeUsers(things)
+                    }
+                }))
+            }
+        }
+    }
+    
+    private func addSubredditsToExcludeSubreddits(_ things: [Thing]) {
+        for thing in things {
+            switch thing {
+            case .subscribedSubreddit(let subscribedSubredditData):
+                addSubredditToExcludeSubreddits(subscribedSubredditData.name)
+            case .subreddit(let subredditData):
+                addSubredditToExcludeSubreddits(subredditData.name)
+            default:
+                break
+            }
+        }
+    }
+    
+    private func addSubredditToExcludeSubreddits(_ subreddit: String) {
+        if customizePostFilterViewModel.excludeSubreddits.isEmpty {
+            customizePostFilterViewModel.excludeSubreddits = subreddit
+        } else if customizePostFilterViewModel.excludeSubreddits.last != "," {
+            customizePostFilterViewModel.excludeSubreddits += ",\(subreddit)"
+        } else {
+            customizePostFilterViewModel.excludeSubreddits += subreddit
+        }
+    }
+    
+    private func addUsersToExcludeUsers(_ things: [Thing]) {
+        for thing in things {
+            switch thing {
+            case .subscribedUser(let subscribedUserData):
+                addUserToExcludeUsers(subscribedUserData.name)
+            case .user(let userData):
+                addUserToExcludeUsers(userData.name)
+            default:
+                break
+            }
+        }
+    }
+    
+    private func addUserToExcludeUsers(_ username: String) {
+        if customizePostFilterViewModel.excludeUsers.isEmpty {
+            customizePostFilterViewModel.excludeUsers = username
+        } else if customizePostFilterViewModel.excludeUsers.last != "," {
+            customizePostFilterViewModel.excludeUsers += ",\(username)"
+        } else {
+            customizePostFilterViewModel.excludeUsers += username
+        }
     }
     
     private enum FieldType: Hashable {
         case postFilterName, excludeKeywords, containKeywords, titleExcludeRegex, titleContainRegex, excludeSubreddits, excludeUsers,
              excludeFlairs, containFlairs, excludeDomains, containDomains, minVotes, maxVotes, minComments, maxComments
+    }
+    
+    private enum SubredditSelectionSheetPurpose: Identifiable {
+        var id: Self {
+            self
+        }
+        
+        case excludeSubreddits, containSubreddits
+    }
+    
+    private enum UserSelectionSheetPurpose: Identifiable {
+        var id: Self {
+            self
+        }
+        
+        case excludeUsers, containUsers
     }
 }
