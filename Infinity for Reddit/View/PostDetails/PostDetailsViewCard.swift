@@ -277,6 +277,10 @@ struct PostDetailsViewCard: View {
                             fullScreenMediaViewModel: fullScreenMediaViewModel
                         ) { url in
                             navigationManager.openLink(url)
+                        } onFullScreenVideo: { videoUrlString in
+                            fullScreenMediaViewModel.show(
+                                .video(urlString: videoUrlString, videoType: .direct, canDownload: false)
+                            )
                         }
                     )
                     .padding(.horizontal, 16)

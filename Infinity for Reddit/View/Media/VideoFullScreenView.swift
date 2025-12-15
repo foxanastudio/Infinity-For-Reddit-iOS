@@ -27,6 +27,7 @@ struct VideoFullScreenView<Content: View>: View {
     // This is for wrapper view to control if the video can be played
     let canPlay: Bool
     let muteVideo: Bool
+    let canDownload: Bool
     let downloadAllMediaMessageView: () -> Content
     let onShowDescription: (() -> Void)?
     let onDownloadAllMedia: (() -> Void)?
@@ -40,6 +41,7 @@ struct VideoFullScreenView<Content: View>: View {
         hasDescription: Bool = false,
         canPlay: Bool = true,
         muteVideo: Bool,
+        canDownload: Bool = true,
         @ViewBuilder downloadAllMediaMessageView: @escaping () -> Content = { EmptyView() },
         onShowDescription: (() -> Void)? = nil,
         onDownloadAllMedia: (() -> Void)? = nil,
@@ -52,6 +54,7 @@ struct VideoFullScreenView<Content: View>: View {
         self.hasDescription = hasDescription
         self.canPlay = canPlay
         self.muteVideo = muteVideo
+        self.canDownload = canDownload
         self.downloadAllMediaMessageView = downloadAllMediaMessageView
         self.onShowDescription = onShowDescription
         self.onDownloadAllMedia = onDownloadAllMedia

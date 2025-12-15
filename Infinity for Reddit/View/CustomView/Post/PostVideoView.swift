@@ -9,6 +9,7 @@ import SwiftUI
 
 struct PostVideoView: View {
     @EnvironmentObject private var networkManager: NetworkManager
+    @EnvironmentObject private var fullScreenMediaViewModel: FullScreenMediaViewModel
 
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSensitiveImagesKey, store: .contentSensitivityFilter) private var blurSensitiveImages: Bool = false
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSpoilerImagesKey, store: .contentSensitivityFilter) private var blurSpoilerImages: Bool = false
@@ -39,10 +40,32 @@ struct PostVideoView: View {
         Group {
             if !isDataSavingModeActive && VideoUserDefaultsUtils.canAutoplayVideo(videoAutoplay: videoAutoplay, isWifiConnected: networkManager.isWifiConnected) && ((post.over18 && autoplaySensitiveVideo) || !post.over18) {
                 if let preview = post.preview, preview.images.count > 0, !(limitMediaHeight && inPostListing) {
-                    InlineVideoPlayer(videoURL: URL(string: videoUrlString)!, aspectRatio: preview.images[0].source.aspectRatio, muteVideo: muteAutoplayingVideo, canPlay: canPlay, isSensitive: post.over18)
+                    InlineVideoPlayer(
+                        videoURL: URL(string: videoUrlString)!,
+                        aspectRatio: preview.images[0].source.aspectRatio,
+                        muteVideo: muteAutoplayingVideo,
+                        canPlay: canPlay,
+                        isSensitive: post.over18
+                    ) {
+                        showFullScreenVideo()
+                        if inPostListing {
+                            onReadPost?()
+                        }
+                    }
                 } else {
-                    InlineVideoPlayer(videoURL: URL(string: videoUrlString)!, aspectRatio: nil, muteVideo: muteAutoplayingVideo, canPlay: canPlay, isSensitive: post.over18)
-                        .frame(height: 200)
+                    InlineVideoPlayer(
+                        videoURL: URL(string: videoUrlString)!,
+                        aspectRatio: nil,
+                        muteVideo: muteAutoplayingVideo,
+                        canPlay: canPlay,
+                        isSensitive: post.over18
+                    ) {
+                        showFullScreenVideo()
+                        if inPostListing {
+                            onReadPost?()
+                        }
+                    }
+                    .frame(height: 200)
                 }
             } else {
                 if !shouldHideVideoPreview, let preview = post.preview, preview.images.count > 0 {
@@ -93,9 +116,30 @@ struct PostVideoView: View {
         }
     }
     
-    func getPreviewUrl(_ preview: Preview) -> String {
+    private func getPreviewUrl(_ preview: Preview) -> String {
         return isDataSavingModeActive
         ? (preview.images[0].resolutions.first?.url ?? preview.images[0].source.url)
         : preview.images[0].source.url
+    }
+    
+    private func showFullScreenVideo() {
+        switch post.postType {
+        case .redditVideo(let videoUrlString, _):
+            fullScreenMediaViewModel.show(.video(urlString: videoUrlString, post: post))
+        case .video(let videoUrlString, _):
+            fullScreenMediaViewModel.show(.video(urlString: videoUrlString, post: post))
+        case .gallery:
+            if let items = post.galleryData?.items, let firstGalleryItem = items.first {
+                fullScreenMediaViewModel.show(.gallery(currentUrlString: firstGalleryItem.urlString, post: post, items: items, galleryScrollState: GalleryScrollState(scrollId: 0)))
+            }
+        case .imgurVideo(let urlString):
+            fullScreenMediaViewModel.show(.video(urlString: urlString, videoType: .direct))
+        case .redgifs(let redgifsId):
+            fullScreenMediaViewModel.show(.video(urlString: post.url, videoType: .redgifs(id: redgifsId)))
+        case .streamable(let shortCode):
+            fullScreenMediaViewModel.show(.video(urlString: post.url, videoType: .streamable(shortCode: shortCode)))
+        default:
+            break
+        }
     }
 }

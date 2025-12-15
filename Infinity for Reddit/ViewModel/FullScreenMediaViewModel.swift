@@ -10,7 +10,7 @@ import Foundation
 enum FullScreenMediaType {
     case image(urlString: String, aspectRatio: CGSize? = nil, post: Post? = nil, fileName: String, matchedGeometryEffectId: String? = nil)
     case gif(urlString: String, post: Post? = nil, fileName: String)
-    case video(urlString: String, post: Post? = nil, videoType: VideoType = .reddit)
+    case video(urlString: String, post: Post? = nil, videoType: VideoType = .reddit, canDownload: Bool = true)
     case gallery(currentUrlString: String, post: Post? = nil, items: [GalleryItem], galleryScrollState: GalleryScrollState)
     case imgurGallery(imgurId: String, post: Post? = nil)
     case imgurAlbum(imgurId: String, post: Post? = nil)

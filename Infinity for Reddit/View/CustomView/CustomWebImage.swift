@@ -32,8 +32,6 @@ struct CustomWebImage<Placeholder: View, Fallback: View>: View {
     private let placeholderViewBuilder: () -> Placeholder
     private let fallbackViewBuilder: (() -> Fallback)?
 
-    // MARK: - Initializers
-
     // Primary Initializer: All parameters explicit, with default @ViewBuilder closures
     init(
         _ urlString: String? = nil,
@@ -84,8 +82,6 @@ struct CustomWebImage<Placeholder: View, Fallback: View>: View {
                   placeholderView: { EmptyView() },
                   fallbackView: fallbackView)
     }
-
-    // MARK: - Body Implementation
 
     var body: some View {
         Group {

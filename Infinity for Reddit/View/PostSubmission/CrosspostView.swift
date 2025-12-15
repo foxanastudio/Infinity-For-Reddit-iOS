@@ -93,7 +93,12 @@ struct CrosspostView: View {
                                     MarkdownImageProvider(
                                         mediaMetadata: crosspostViewModel.postToBeCrossposted.mediaMetadata,
                                         isSensitive: crosspostViewModel.postToBeCrossposted.over18,
-                                        fullScreenMediaViewModel: fullScreenMediaViewModel
+                                        fullScreenMediaViewModel: fullScreenMediaViewModel,
+                                        onFullScreenVideo: { videoUrlString in
+                                            fullScreenMediaViewModel.show(
+                                                .video(urlString: videoUrlString, videoType: .direct, canDownload: false)
+                                            )
+                                        }
                                     )
                                 )
                                 .font(.system(size: 24))

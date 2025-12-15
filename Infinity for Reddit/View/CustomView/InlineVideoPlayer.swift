@@ -23,21 +23,23 @@ struct InlineVideoPlayer: View {
     private let muteVideo: Bool
     private let canPlay: Bool
     private let isSensitive: Bool
+    private let onFullScreen: (() -> Void)?
     
-    init(videoURL: URL, aspectRatio: CGSize?, muteVideo: Bool = false, canPlay: Bool = true, isSensitive: Bool) {
+    init(videoURL: URL, aspectRatio: CGSize?, muteVideo: Bool = false, canPlay: Bool = true, isSensitive: Bool, onFullScreen: (() -> Void)? = nil) {
         self.videoURL = videoURL
         self.player = AVPlayer(url: ProxyManager.shared.proxyURL(videoURL))
         self.aspectRatio = aspectRatio
         self.muteVideo = muteVideo
         self.canPlay = canPlay
         self.isSensitive = isSensitive
+        self.onFullScreen = onFullScreen
         self.showPlayer = false
     }
 
     var body: some View {
         Group {
             if showPlayer == true {
-                InlineVideoPlayerWithControls(url: videoURL, aspectRatio: aspectRatio, muteVideo: muteVideo, canPlay: canPlay)
+                InlineVideoPlayerWithControls(url: videoURL, aspectRatio: aspectRatio, muteVideo: muteVideo, canPlay: canPlay, onFullScreen: onFullScreen)
             } else {
                 VStack {
                     Spacer()
@@ -95,13 +97,15 @@ private struct InlineVideoPlayerWithControls: View {
     private let url: URL
     private let aspectRatio: CGSize?
     private let muteVideo: Bool
+    private let onFullScreen: (() -> Void)?
 
-    init(url: URL, aspectRatio: CGSize?, muteVideo: Bool = false, canPlay: Bool) {
+    init(url: URL, aspectRatio: CGSize?, muteVideo: Bool = false, canPlay: Bool, onFullScreen: (() -> Void)?) {
         _manager = StateObject(wrappedValue: VideoPlayerViewModel(canPlay: canPlay))
         self.url = url
         self.aspectRatio = aspectRatio
         self.muteVideo = muteVideo
         self.canPlay = canPlay
+        self.onFullScreen = onFullScreen
     }
 
     var body: some View {
@@ -114,25 +118,6 @@ private struct InlineVideoPlayerWithControls: View {
 
             ZStack {
                 VStack(spacing: 0) {
-                    HStack {
-                        Spacer()
-                        
-                        if manager.hasAudio {
-                            Button(action: {
-                                let isMuted = manager.toggleMute()
-                                manager.resetControlsTimer()
-                                postListingVideoManager?.isMuted = isMuted
-                            }) {
-                                SwiftUI.Image(systemName: manager.isMuted ? "speaker.slash" : "speaker.wave.2")
-                                    .resizable()
-                                    .frame(width: 24, height: 24)
-                                    .foregroundColor(.white)
-                            }
-                            .buttonStyle(.borderless)
-                        }
-                    }
-                    .padding(16)
-                    
                     Spacer()
                     
                     HStack(spacing: 0) {
@@ -163,23 +148,58 @@ private struct InlineVideoPlayerWithControls: View {
                     .padding(8)
                 }
                 
-                Button(action: {
-                    manager.togglePlayPause()
-                    manager.resetControlsTimer()
-                }) {
-                    SwiftUI.Image(systemName: manager.isPlaying ? "pause.fill" : "play.fill")
-                        .resizable()
-                        .frame(width: 24, height: 24)
-                        .foregroundColor(.white)
+                HStack(spacing: 48) {
+                    if manager.hasAudio {
+                        Button(action: {
+                            let isMuted = manager.toggleMute()
+                            manager.resetControlsTimer()
+                            postListingVideoManager?.isMuted = isMuted
+                        }) {
+                            SwiftUI.Image(systemName: manager.isMuted ? "speaker.slash" : "speaker.wave.2")
+                                .resizable()
+                                .frame(width: 24, height: 24)
+                                .foregroundColor(.white)
+                        }
+                        .buttonStyle(.borderless)
+                    } else {
+                        Spacer()
+                            .frame(width: 24)
+                    }
+                    
+                    Button(action: {
+                        manager.togglePlayPause()
+                        manager.resetControlsTimer()
+                    }) {
+                        SwiftUI.Image(systemName: manager.isPlaying ? "pause.fill" : "play.fill")
+                            .resizable()
+                            .frame(width: 24, height: 24)
+                            .foregroundColor(.white)
+                    }
+                    .buttonStyle(.borderless)
+                    
+                    if let onFullScreen {
+                        Button(action: {
+                            onFullScreen()
+                        }) {
+                            SwiftUI.Image(systemName: "arrow.down.left.and.arrow.up.right.rectangle")
+                                .resizable()
+                                .frame(width: 24, height: 24)
+                                .foregroundColor(.white)
+                        }
+                        .buttonStyle(.borderless)
+                    } else {
+                        Spacer()
+                            .frame(width: 24)
+                    }
                 }
-                .buttonStyle(.borderless)
+                .padding(16)
             }
             .background(Color.black.opacity(0.5))
             .opacity(manager.showControls ? 1 : 0)
             .animation(.easeInOut(duration: 0.3), value: manager.showControls)
-//            .onTapGesture {
-//                manager.resetControlsTimer()
-//            }
+            .onTapGesture {
+                manager.toggleControls()
+            }
         }
         .applyIf(aspectRatio != nil) {
             $0.aspectRatio(aspectRatio!, contentMode: .fit)

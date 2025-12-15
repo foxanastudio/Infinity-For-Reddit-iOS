@@ -17,7 +17,11 @@ class LinkHandler {
         return URL(string: full)!
     }
     
+    // Check https://www.reddit.com/r/u_infinityAN/comments/1oismj6/test/
     func handle(link: String) -> LinkDestination {
+        //guard let url = URL(string: "https://imgur.com/gallery/something-something-bad-day-gGRbfEQ") else {
+        //guard let url = URL(string: "https://imgur.com/0Jee0DV") else {
+        //guard let url = URL(string: "https://imgur.com/0Jee0DVasdfadsf") else {
         guard let url = URL(string: link) else {
             return LinkDestination.invalid
         }

@@ -53,7 +53,12 @@ struct EditPostView: View {
                                         MarkdownImageProvider(
                                             mediaMetadata: editPostViewModel.postToBeEdited.mediaMetadata,
                                             isSensitive: editPostViewModel.postToBeEdited.over18,
-                                            fullScreenMediaViewModel: fullScreenMediaViewModel
+                                            fullScreenMediaViewModel: fullScreenMediaViewModel,
+                                            onFullScreenVideo: { videoUrlString in
+                                                fullScreenMediaViewModel.show(
+                                                    .video(urlString: videoUrlString, videoType: .direct, canDownload: false)
+                                                )
+                                            }
                                         )
                                     )
                                     .padding(16)
@@ -67,7 +72,12 @@ struct EditPostView: View {
                                         MarkdownImageProvider(
                                             mediaMetadata: editPostViewModel.postToBeEdited.mediaMetadata,
                                             isSensitive: editPostViewModel.postToBeEdited.over18,
-                                            fullScreenMediaViewModel: fullScreenMediaViewModel
+                                            fullScreenMediaViewModel: fullScreenMediaViewModel,
+                                            onFullScreenVideo: { videoUrlString in
+                                                fullScreenMediaViewModel.show(
+                                                    .video(urlString: videoUrlString, videoType: .direct, canDownload: false)
+                                                )
+                                            }
                                         )
                                     )
                                     .padding(16)
