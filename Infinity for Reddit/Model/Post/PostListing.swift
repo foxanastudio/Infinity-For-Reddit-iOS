@@ -470,11 +470,12 @@ public class Post : NSObject, ObservableObject, Identifiable {
         case .imageWithUrlPreview:
             return .image(downloadUrlString: url, fileName: "\(fileNameWithoutExtension).jpg")
         case .gif:
-            if let gif = preview.images.first?.gifVariant {
-                return .gif(downloadUrlString: gif.source.url, fileName: "\(fileNameWithoutExtension).gif")
-            } else {
-                return .gif(downloadUrlString: url, fileName: "\(fileNameWithoutExtension).gif")
-            }
+//            if let gif = preview.images.first?.gifVariant {
+//                return .gif(downloadUrlString: gif.source.url, fileName: "\(fileNameWithoutExtension).gif")
+//            } else {
+//                return .gif(downloadUrlString: url, fileName: "\(fileNameWithoutExtension).gif")
+//            }
+            return .gif(downloadUrlString: url, fileName: "\(fileNameWithoutExtension).gif")
         case .redditVideo:
             return .redditVideo(post: self)
         case .video(_, let downloadUrlString):
