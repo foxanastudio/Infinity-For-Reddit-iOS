@@ -89,6 +89,7 @@ private struct InlineVideoAVPlayer: UIViewControllerRepresentable {
 
 private struct InlineVideoPlayerWithControls: View {
     @Environment(\.postListingVideoManager) private var postListingVideoManager: PostListingVideoManager?
+    @EnvironmentObject private var fullScreenMediaViewModel: FullScreenMediaViewModel
     
     @StateObject private var manager: VideoPlayerViewModel
     
@@ -203,6 +204,11 @@ private struct InlineVideoPlayerWithControls: View {
         }
         .applyIf(aspectRatio != nil) {
             $0.aspectRatio(aspectRatio!, contentMode: .fit)
+        }
+        .onReceive(fullScreenMediaViewModel.$media) { newValue in
+            if newValue != nil {
+                manager.pause()
+            }
         }
         .onDisappear {
             manager.pause()
