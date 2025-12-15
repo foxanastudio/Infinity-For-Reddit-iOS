@@ -85,14 +85,7 @@ struct AccountSheet: View {
                         
                         ForEach(accountListingViewModel.otherAccounts, id: \.username) { account in
                             SimpleWebImageTouchItemRow(text: account.username, iconUrl: account.profileImageUrl ?? "") {
-                                do {
-                                    AccountViewModel.shared.switchAccount(newAccount: account)
-                                    try AccountViewModel.shared.updateTokens(accessToken: account.accessToken ?? "", refreshToken: account.refreshToken ?? "")
-                                }
-                                catch{
-                                    print("Error: switching account failed")
-                                }
-                                
+                                AccountViewModel.shared.switchAccount(newAccount: account)
                                 dismiss()
                             }
                         }

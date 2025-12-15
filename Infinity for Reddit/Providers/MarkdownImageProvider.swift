@@ -19,6 +19,7 @@ struct MarkdownImageProvider: ImageProvider {
     let linkColor: Color
     let fullScreenMediaViewModel: FullScreenMediaViewModel
     let onLinkTap: ((URL) -> Void)?
+    let onFullScreenVideo: ((String) -> Void)?
     
     init(
         mediaMetadata: [String: MediaMetadata]?,
@@ -27,7 +28,9 @@ struct MarkdownImageProvider: ImageProvider {
         fontSize: AppFontSize = .f17,
         // We don't care about the linkColor if it is not passed in
         linkColor: Color = .black,
-        fullScreenMediaViewModel: FullScreenMediaViewModel, onLinkTap: ((URL) -> Void)? = nil
+        fullScreenMediaViewModel: FullScreenMediaViewModel,
+        onLinkTap: ((URL) -> Void)? = nil,
+        onFullScreenVideo: ((String) -> Void)? = nil
     ) {
         self.mediaMetadata = mediaMetadata
         self.markdownEmbeddedMediaType = MarkdownEmbeddedMediaType(rawValue: markdownEmbeddedMediaType) ?? .all
@@ -36,6 +39,7 @@ struct MarkdownImageProvider: ImageProvider {
         self.linkColor = linkColor
         self.fullScreenMediaViewModel = fullScreenMediaViewModel
         self.onLinkTap = onLinkTap
+        self.onFullScreenVideo = onFullScreenVideo
     }
     
     func makeImage(url: URL?) -> some View {
@@ -112,7 +116,10 @@ struct MarkdownImageProvider: ImageProvider {
                                     videoURL: url,
                                     aspectRatio: CGSize(width: media.x, height: media.y),
                                     muteVideo: VideoUserDefaultsUtils.muteAutoplayingVideo,
-                                    isSensitive: isSensitive
+                                    isSensitive: isSensitive,
+                                    onFullScreen: onFullScreenVideo == nil ? nil : {
+                                        onFullScreenVideo?(media.hlsUrl)
+                                    }
                                 )
                                 .id(url)
                             }

@@ -23,9 +23,27 @@ public class AccountViewModel: ObservableObject {
     private static var _shared: AccountViewModel?
     
     @Published var account: Account
+    @Published var error: Error?
     
-    let accountDao: AccountDao
+    private let accountDao: AccountDao
     private var cancellables: Set<AnyCancellable> = []
+    
+    enum AccountError: LocalizedError {
+        case failedToUnmarkCurrentAccount
+        case failedToMarkNewAccountCurrent
+        case failedToObserveCurrentAccount
+        
+        var errorDescription: String? {
+            switch self {
+            case .failedToUnmarkCurrentAccount:
+                return "Failed to remove the current account."
+            case .failedToMarkNewAccountCurrent:
+                return "Failed to switch to new account."
+            case .failedToObserveCurrentAccount:
+                return "Failed to observe the current account."
+            }
+        }
+    }
     
     private init(dbPool: DatabasePool) {
         self.accountDao = AccountDao(dbPool: dbPool)
@@ -40,7 +58,7 @@ public class AccountViewModel: ObservableObject {
             print(error.localizedDescription)
         }
         
-        //subscribeToCurrentAccount()
+        subscribeToCurrentAccount()
     }
     
     public func switchAccount(newAccount: Account) {
@@ -49,15 +67,24 @@ public class AccountViewModel: ObservableObject {
                 try accountDao.unmarkAccountCurrent(username: account.username)
             } catch {
                 print("Failed to unmark account as current: \(error)")
+                self.error = AccountError.failedToUnmarkCurrentAccount
+                return
             }
         }
-        account = newAccount
         do {
-            try accountDao.markAccountCurrent(username: account.username)
+            try accountDao.markAccountCurrent(username: newAccount.username)
         } catch {
             print("Failed to mark account as current: \(error)")
+            self.error = AccountError.failedToMarkNewAccountCurrent
         }
-        objectWillChange.send()
+    }
+    
+    public func switchToAnonymous() throws {
+        try accountDao.markAllAccountsNonCurrent()
+    }
+    
+    public func logout() throws {
+        try accountDao.deleteCurrentAccount()
     }
     
     public func updateTokens(accessToken: String, refreshToken: String?) throws {
@@ -84,25 +111,11 @@ public class AccountViewModel: ObservableObject {
         }
         try accountDao.updateCustomFeedSyncTime(username: account.username, customFeedSyncTime: account.customFeedSyncTime)
     }
-    
-    public func switchToAnonymous() throws {
-        account = Account.ANONYMOUS_ACCOUNT
-        try accountDao.markAllAccountsNonCurrent()
-        objectWillChange.send()
-    }
-    
-    public func logout() throws {
-        account = Account.ANONYMOUS_ACCOUNT
-        try accountDao.deleteCurrentAccount()
-        objectWillChange.send()
-    }
-    
-    // TODO May not work
+
     private func subscribeToCurrentAccount() {
-        // Subscribe to the getCurrentAccountObservation publisher
         do {
             try accountDao.getCurrentAccountObservation()
-                .receive(on: DispatchQueue.main) // Ensure UI updates are done on the main thread
+                .receive(on: DispatchQueue.main)
                 .sink(receiveCompletion: { completion in
                     switch completion {
                     case .finished:
@@ -111,12 +124,12 @@ public class AccountViewModel: ObservableObject {
                         print("Error observing current account: \(error)")
                     }
                 }, receiveValue: { [weak self] updatedAccount in
-                    // Update the current account property when the value changes
                     self?.account = updatedAccount ?? Account.ANONYMOUS_ACCOUNT
                 })
-                .store(in: &cancellables) // Store the subscription to avoid it being deallocated
+                .store(in: &cancellables)
         } catch {
-            print("Cannot observe current account: \(error.localizedDescription)")
+            print("Cannot observe current account: \(error)")
+            self.error = AccountError.failedToObserveCurrentAccount
         }
     }
     
@@ -126,7 +139,7 @@ public class AccountViewModel: ObservableObject {
         }
         
         guard let resolvedDBPool = container.resolve(DatabasePool.self) else {
-            fatalError("Failed to resolve AccountViewModel from container")
+            fatalError("Failed to resolve AccountViewModel in AccountViewModel")
         }
         
         _shared = AccountViewModel(dbPool: resolvedDBPool)
@@ -141,4 +154,3 @@ public class AccountViewModel: ObservableObject {
         }
     }
 }
-
