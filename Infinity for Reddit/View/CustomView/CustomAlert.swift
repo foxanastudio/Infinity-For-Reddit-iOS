@@ -20,6 +20,7 @@ struct CustomAlert<Content: View>: View {
     var confirmButtonText: String
     var buttonStyle: AlertButtonStyle
     var showDismissButton: Bool
+    var canDismissByTapOutside: Bool = true
     var onDismiss: (() -> Void)?
     var onConfirm: (() -> Void)?
     
@@ -30,6 +31,7 @@ struct CustomAlert<Content: View>: View {
         confirmButtonText: String = "Yes",
         buttonStyle: AlertButtonStyle = .info,
         showDismissButton: Bool = true,
+        canDismissByTapOutside: Bool = true,
         isPresented: Binding<Bool>,
         @ViewBuilder content: () -> Content? = { nil },
         onDismiss: (() -> Void)? = nil,
@@ -41,6 +43,7 @@ struct CustomAlert<Content: View>: View {
         self.confirmButtonText = confirmButtonText
         self.buttonStyle = buttonStyle
         self.showDismissButton = showDismissButton
+        self.canDismissByTapOutside = canDismissByTapOutside
         self._isPresented = isPresented
         self.content = content()
         self.onDismiss = onDismiss
@@ -48,52 +51,80 @@ struct CustomAlert<Content: View>: View {
     }
     
     var body: some View {
-        if isPresented {
-            ZStack {
-                Color.black.opacity(0.4)
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        onDismiss?()
-                        withAnimation(.linear(duration: 0.2)) {
-                            isPresented = false
-                        }
-                    }
-                
-                VStack(spacing: 0) {
-                    Text(title)
-                        .primaryText(.f20)
-                        .fontWeight(.bold)
-                        .padding(.top, 16)
-                        .padding(.horizontal, 16)
-                    
-                    if let subtitle {
-                        Text(subtitle)
-                            .secondaryText()
-                            .padding(.top, 16)
-                            .padding(.horizontal, 16)
-                    }
-                    
-                    Spacer()
-                        .frame(height: 16)
-                    
-                    if let content {
-                        content
-                            .padding(.horizontal, 16)
-                            .padding(.bottom, 20)
-                    }
-                    
-                    CustomDivider()
-                    
-                    HStack(spacing: 0) {
-                        if showDismissButton {
-                            TouchRipple(action: {
+        Group {
+            if isPresented {
+                ZStack {
+                    if canDismissByTapOutside {
+                        Color.black.opacity(0.4)
+                            .ignoresSafeArea()
+                            .onTapGesture {
                                 onDismiss?()
                                 withAnimation(.linear(duration: 0.2)) {
                                     isPresented = false
                                 }
+                            }
+                            .zIndex(1)
+                    }
+                    
+                    VStack(spacing: 0) {
+                        Text(title)
+                            .primaryText(.f20)
+                            .fontWeight(.bold)
+                            .padding(.top, 16)
+                            .padding(.horizontal, 16)
+                        
+                        if let subtitle {
+                            Text(subtitle)
+                                .secondaryText()
+                                .padding(.top, 16)
+                                .padding(.horizontal, 16)
+                        }
+                        
+                        Spacer()
+                            .frame(height: 16)
+                        
+                        if let content {
+                            content
+                                .padding(.horizontal, 16)
+                                .padding(.bottom, 20)
+                        }
+                        
+                        CustomDivider()
+                        
+                        HStack(spacing: 0) {
+                            if showDismissButton {
+                                TouchRipple(action: {
+                                    onDismiss?()
+                                    withAnimation(.linear(duration: 0.2)) {
+                                        isPresented = false
+                                    }
+                                }) {
+                                    Text(dismissButtonText)
+                                        .neutralTextButton()
+                                        .frame(maxWidth: .infinity)
+                                        .padding(16)
+                                        .contentShape(Rectangle())
+                                }
+                                .background(GeometryReader { geo in
+                                    Color.clear.preference(key: MaxHeightKey.self, value: geo.size.height)
+                                })
+                                
+                                CustomDivider()
+                            }
+                            
+                            TouchRipple(action: {
+                                onConfirm?()
+                                withAnimation(.linear(duration: 0.2)) {
+                                    isPresented = false
+                                }
                             }) {
-                                Text(dismissButtonText)
-                                    .neutralTextButton()
+                                Text(confirmButtonText)
+                                    .applyIf(buttonStyle == .info) {
+                                        $0.positiveTextButton()
+                                    }
+                                    .applyIf(buttonStyle == .warning) {
+                                        $0.warningTextButton()
+                                    }
                                     .frame(maxWidth: .infinity)
                                     .padding(16)
                                     .contentShape(Rectangle())
@@ -101,44 +132,27 @@ struct CustomAlert<Content: View>: View {
                             .background(GeometryReader { geo in
                                 Color.clear.preference(key: MaxHeightKey.self, value: geo.size.height)
                             })
-                            
-                            CustomDivider()
                         }
-                        
-                        TouchRipple(action: {
-                            onConfirm?()
-                            withAnimation(.linear(duration: 0.2)) {
-                                isPresented = false
-                            }
-                        }) {
-                            Text(confirmButtonText)
-                                .applyIf(buttonStyle == .info) {
-                                    $0.positiveTextButton()
-                                }
-                                .applyIf(buttonStyle == .warning) {
-                                    $0.warningTextButton()
-                                }
-                                .frame(maxWidth: .infinity)
-                                .padding(16)
-                                .contentShape(Rectangle())
-                        }
-                        .background(GeometryReader { geo in
-                            Color.clear.preference(key: MaxHeightKey.self, value: geo.size.height)
-                        })
+                        .frame(height: buttonHStackMaxHeight)
                     }
-                    .frame(height: buttonHStackMaxHeight)
+                    .zIndex(10)
+                    .frame(maxWidth: 300)
+                    .background {
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color(hex: customThemeViewModel.currentCustomTheme.cardViewBackgroundColor))
+                            .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: -1)
+                            .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 4)
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .padding(.vertical, 16)
+                    .onPreferenceChange(MaxHeightKey.self) { value in
+                        buttonHStackMaxHeight = value
+                    }
                 }
-                .frame(maxWidth: 300)
-                .background {
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color(hex: customThemeViewModel.currentCustomTheme.cardViewBackgroundColor))
-                        .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: -1)
-                        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 4)
-                }
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-                .padding(.vertical, 16)
-                .onPreferenceChange(MaxHeightKey.self) { value in
-                    buttonHStackMaxHeight = value
+                .animation(.linear, value: isPresented)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .applyIf(!canDismissByTapOutside) {
+                    $0.background(.ultraThinMaterial)
                 }
             }
         }

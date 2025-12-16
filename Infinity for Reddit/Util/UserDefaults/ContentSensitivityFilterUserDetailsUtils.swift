@@ -35,6 +35,6 @@ enum ContentSensitivityFilterUserDetailsUtils {
     
     static let disableSensitiveContentForeverKey = "disable_sensitive_content_forever"
     static var disableSensitiveContentForever: Bool {
-        return UserDefaults.contentSensitivityFilter.bool(forKey: disableSensitiveContentForeverKey)
+        return UserDefaults.contentSensitivityFilter.bool(forKey: disableSensitiveContentForeverKey, false)
     }
 }

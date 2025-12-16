@@ -1580,26 +1580,6 @@
         }
       }
     },
-    "theme_item_switch_color" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Switch Color"
-          }
-        }
-      }
-    },
-    "theme_item_switch_color_detail" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Applied to: Switch"
-          }
-        }
-      }
-    },
     "theme_item_single_comment_thread_background_color" : {
       "localizations" : {
         "en" : {
@@ -1796,6 +1776,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Applied to: Unsubscribe button"
+          }
+        }
+      }
+    },
+    "theme_item_switch_color" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch Color"
+          }
+        }
+      }
+    },
+    "theme_item_switch_color_detail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Switch"
           }
         }
       }

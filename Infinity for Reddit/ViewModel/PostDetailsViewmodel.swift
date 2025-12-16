@@ -34,6 +34,8 @@ public class PostDetailsViewModel: ObservableObject {
     @Published var showMediaDownloadFinishedMessageTrigger: Bool = false
     @Published var showAllGalleryMediaDownloadFinishedMessageTrigger: Bool = false
     
+    @Published var showSensitiveContentWarningTrigger: Bool = false
+    
     private var commentMore: CommentMore?
     private var lastLoadedSortTypeKind: SortType.Kind? = nil
     private var commentFilter: CommentFilter?
@@ -210,6 +212,10 @@ public class PostDetailsViewModel: ObservableObject {
                 await postProcessPost(post)
                 
                 await MainActor.run {
+                    if !ContentSensitivityFilterUserDetailsUtils.sensitiveContent || ContentSensitivityFilterUserDetailsUtils.disableSensitiveContentForever {
+                        self.showSensitiveContentWarningTrigger = true
+                    }
+                    
                     self.post = post
                 }
             }

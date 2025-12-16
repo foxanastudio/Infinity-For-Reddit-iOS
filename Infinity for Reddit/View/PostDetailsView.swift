@@ -11,8 +11,10 @@ import GRDB
 import Alamofire
 
 struct PostDetailsView: View {
-    @EnvironmentObject var navigationManager: NavigationManager
-    @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
+    @Environment(\.dismiss) private var dismiss
+    
+    @EnvironmentObject private var navigationManager: NavigationManager
+    @EnvironmentObject private var navigationBarMenuManager: NavigationBarMenuManager
     @EnvironmentObject private var commentSubmissionShareableViewModel: CommentSubmissionShareableViewModel
     @EnvironmentObject private var postEditingShareableViewModel: PostEditingShareableViewModel
     @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
@@ -545,6 +547,11 @@ struct PostDetailsView: View {
             guard let navigationBarMenuKey else { return }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
+        .onChange(of: postDetailsViewModel.showSensitiveContentWarningTrigger) { _, newValue in
+            if newValue {
+                activeAlert = .sensitiveContentWarning
+            }
+        }
         .wrapContentSheet(isPresented: $showSortTypeSheet) {
             SortTypeKindSheet(
                 sortTypeKindSource: OtherSortTypeKindSource.postDetails,
@@ -704,8 +711,12 @@ struct PostDetailsView: View {
         .overlay(
             CustomAlert(
                 title: activeAlert?.title ?? "",
+                subtitle: activeAlert?.subTitle,
+                dismissButtonText: activeAlert?.dismissButtonText ?? "",
                 confirmButtonText: activeAlert?.confirmButtonText ?? "",
                 buttonStyle: activeAlert?.buttonStyle ?? .info,
+                showDismissButton: activeAlert?.showDismissButton ?? true,
+                canDismissByTapOutside: activeAlert?.canDismissByTapOutside ?? true,
                 isPresented: Binding(
                     get: { activeAlert != nil },
                     set: { newValue in
@@ -713,11 +724,14 @@ struct PostDetailsView: View {
                             activeAlert = nil
                         }
                     }
-                )) {} onConfirm: {
+                )
+            ) {} onConfirm: {
                     if let alert = activeAlert {
                         switch alert {
                         case .deletePost:
                             postDetailsViewModel.deletePost()
+                        case .sensitiveContentWarning:
+                            dismiss()
                         }
                     }
                 }
@@ -915,6 +929,7 @@ struct PostDetailsView: View {
     
     private enum ActiveAlert: Identifiable {
         case deletePost
+        case sensitiveContentWarning
 
         var id: Int {
             hashValue
@@ -924,6 +939,26 @@ struct PostDetailsView: View {
             switch self {
             case .deletePost:
                 return "Delete Post?"
+            case .sensitiveContentWarning:
+                return "Sensivite Content"
+            }
+        }
+        
+        var subTitle: String? {
+            switch self {
+            case .deletePost:
+                return nil
+            case .sensitiveContentWarning:
+                return "This post may contain sensitive content. You have disabled sensitive content in your settings, so you can only go back."
+            }
+        }
+        
+        var dismissButtonText: String {
+            switch self {
+            case .deletePost:
+                return "Cancel"
+            case .sensitiveContentWarning:
+                return "View Anyway"
             }
         }
         
@@ -931,6 +966,8 @@ struct PostDetailsView: View {
             switch self {
             case .deletePost:
                 return "Delete"
+            case .sensitiveContentWarning:
+                return "Go Back"
             }
         }
         
@@ -938,6 +975,26 @@ struct PostDetailsView: View {
             switch self {
             case .deletePost:
                 return .warning
+            case .sensitiveContentWarning:
+                return .info
+            }
+        }
+        
+        var showDismissButton: Bool {
+            switch self {
+            case .deletePost:
+                return true
+            case .sensitiveContentWarning:
+                return false
+            }
+        }
+        
+        var canDismissByTapOutside: Bool {
+            switch self {
+            case .deletePost:
+                return true
+            case .sensitiveContentWarning:
+                return false
             }
         }
     }
