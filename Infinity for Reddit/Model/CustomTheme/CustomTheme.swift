@@ -38,6 +38,9 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
     @objc var receivedMessageBackgroundColor: Int
     @objc var sentMessageBackgroundColor: Int
     @objc var bottomAppBarBackgroundColor: Int
+    @objc var snackbarTextColor: Int
+    @objc var snackbarActionTextColor: Int
+    @objc var snackbarBackgroundColor: Int
     @objc var primaryIconColor: Int
     @objc var bottomAppBarIconColor: Int
     @objc var postIconAndInfoColor: Int
@@ -124,6 +127,9 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
         readPostFilledCardViewBackgroundColor: Int,
         commentBackgroundColor: Int,
         bottomAppBarBackgroundColor: Int,
+        snackbarTextColor: Int,
+        snackbarActionTextColor: Int,
+        snackbarBackgroundColor: Int,
         primaryIconColor: Int,
         bottomAppBarIconColor: Int,
         postIconAndInfoColor: Int,
@@ -202,6 +208,9 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
         self.readPostFilledCardViewBackgroundColor = readPostFilledCardViewBackgroundColor
         self.commentBackgroundColor = commentBackgroundColor
         self.bottomAppBarBackgroundColor = bottomAppBarBackgroundColor
+        self.snackbarTextColor = snackbarTextColor
+        self.snackbarActionTextColor = snackbarActionTextColor
+        self.snackbarBackgroundColor = snackbarBackgroundColor
         self.primaryIconColor = primaryIconColor
         self.bottomAppBarIconColor = bottomAppBarIconColor
         self.postIconAndInfoColor = postIconAndInfoColor
@@ -338,6 +347,9 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
             readPostFilledCardViewBackgroundColor: 0xF5F5F5,
             commentBackgroundColor: 0xFFFFFF,
             bottomAppBarBackgroundColor: 0xFFFFFF,
+            snackbarTextColor: 0xFFFFFF,
+            snackbarActionTextColor: 0xFFFFFF,
+            snackbarBackgroundColor: 0x353E41,
             primaryIconColor: 0x000000,
             bottomAppBarIconColor: 0x000000,
             postIconAndInfoColor: 0x8A000000,
@@ -420,6 +432,9 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
             readPostFilledCardViewBackgroundColor: 0x101010,
             commentBackgroundColor: 0x242424,
             bottomAppBarBackgroundColor: 0x121212,
+            snackbarTextColor: 0xFFFFFF,
+            snackbarActionTextColor: 0xFFFFFF,
+            snackbarBackgroundColor: 0x353E41,
             primaryIconColor: 0xFFFFFF,
             bottomAppBarIconColor: 0xFFFFFF,
             postIconAndInfoColor: 0xB3FFFFFF,
@@ -502,6 +517,9 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
             readPostFilledCardViewBackgroundColor: 0x000000,
             commentBackgroundColor: 0x000000,
             bottomAppBarBackgroundColor: 0x000000,
+            snackbarTextColor: 0xFFFFFF,
+            snackbarActionTextColor: 0xFFFFFF,
+            snackbarBackgroundColor: 0x353E41,
             primaryIconColor: 0xFFFFFF,
             bottomAppBarIconColor: 0xFFFFFF,
             postIconAndInfoColor: 0xB3FFFFFF,
@@ -583,6 +601,9 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
             readPostFilledCardViewBackgroundColor: 0xF5F5F5,
             commentBackgroundColor: 0xFFFFFF,
             bottomAppBarBackgroundColor: 0xFFFFFF,
+            snackbarTextColor: 0xFFFFFF,
+            snackbarActionTextColor: 0xFFFFFF,
+            snackbarBackgroundColor: 0x353E41,
             primaryIconColor: 0x000000,
             bottomAppBarIconColor: 0x000000,
             postIconAndInfoColor: 0x3C4043,
@@ -664,6 +685,9 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
             readPostFilledCardViewBackgroundColor: 0x101010,
             commentBackgroundColor: 0x242424,
             bottomAppBarBackgroundColor: 0x121212,
+            snackbarTextColor: 0xFFFFFF,
+            snackbarActionTextColor: 0xFFFFFF,
+            snackbarBackgroundColor: 0x353E41,
             primaryIconColor: 0xFFFFFF,
             bottomAppBarIconColor: 0xFFFFFF,
             postIconAndInfoColor: 0xB3FFFFFF,
@@ -745,6 +769,9 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
             readPostFilledCardViewBackgroundColor: 0x000000,
             commentBackgroundColor: 0x000000,
             bottomAppBarBackgroundColor: 0x000000,
+            snackbarTextColor: 0xFFFFFF,
+            snackbarActionTextColor: 0xFFFFFF,
+            snackbarBackgroundColor: 0x353E41,
             primaryIconColor: 0xFFFFFF,
             bottomAppBarIconColor: 0xFFFFFF,
             postIconAndInfoColor: 0xB3FFFFFF,
@@ -828,6 +855,9 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
             readPostFilledCardViewBackgroundColor: 0xF5F5F5,
             commentBackgroundColor: 0xFFFFFF,
             bottomAppBarBackgroundColor: 0xFFFFFF,
+            snackbarTextColor: 0xFFFFFF,
+            snackbarActionTextColor: 0xFFFFFF,
+            snackbarBackgroundColor: 0x353E41,
             primaryIconColor: 0x000000,
             bottomAppBarIconColor: 0x000000,
             postIconAndInfoColor: 0x8A000000,

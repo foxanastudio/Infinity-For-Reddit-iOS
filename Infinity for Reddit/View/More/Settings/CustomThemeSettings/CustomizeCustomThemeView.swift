@@ -261,6 +261,12 @@ struct CustomizeCustomThemeView: View {
             return $customizeCustomThemeViewModel.customTheme.sentMessageBackgroundColor
         case "bottomAppBarBackgroundColor":
             return $customizeCustomThemeViewModel.customTheme.bottomAppBarBackgroundColor
+        case "snackbarTextColor":
+            return $customizeCustomThemeViewModel.customTheme.snackbarTextColor
+        case "snackbarActionTextColor":
+            return $customizeCustomThemeViewModel.customTheme.snackbarActionTextColor
+        case "snackbarBackgroundColor":
+            return $customizeCustomThemeViewModel.customTheme.snackbarBackgroundColor
         case "primaryIconColor":
             return $customizeCustomThemeViewModel.customTheme.primaryIconColor
         case "bottomAppBarIconColor":

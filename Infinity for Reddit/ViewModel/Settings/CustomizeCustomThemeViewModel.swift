@@ -231,6 +231,19 @@ class CustomizeCustomThemeViewModel: ObservableObject {
             description: NSLocalizedString("theme_item_bottom_app_bar_background_color_detail", comment: "")
         )
         
+        customThemeSettingsItems["snackbarTextColor"] = CustomThemeSettingsItem(
+            title: NSLocalizedString("theme_item_snackbar_text_color", comment: ""),
+            description: NSLocalizedString("theme_item_snackbar_text_color_detail", comment: "")
+        )
+        customThemeSettingsItems["snackbarActionTextColor"] = CustomThemeSettingsItem(
+            title: NSLocalizedString("theme_item_snackbar_action_text_color", comment: ""),
+            description: NSLocalizedString("theme_item_snackbar_action_text_color_detail", comment: "")
+        )
+        customThemeSettingsItems["snackbarBackgroundColor"] = CustomThemeSettingsItem(
+            title: NSLocalizedString("theme_item_snackbar_background_color", comment: ""),
+            description: NSLocalizedString("theme_item_snackbar_background_color_detail", comment: "")
+        )
+        
         customThemeSettingsItems["primaryIconColor"] = CustomThemeSettingsItem(
             title: NSLocalizedString("theme_item_primary_icon_color", comment: ""),
             description: NSLocalizedString("theme_item_primary_icon_color_detail", comment: "")
