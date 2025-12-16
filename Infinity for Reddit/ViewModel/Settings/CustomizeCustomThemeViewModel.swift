@@ -181,6 +181,11 @@ class CustomizeCustomThemeViewModel: ObservableObject {
             description: NSLocalizedString("theme_item_sent_message_text_color_detail", comment: "")
         )
         
+        customThemeSettingsItems["switchColor"] = CustomThemeSettingsItem(
+            title: NSLocalizedString("theme_item_switch_color", comment: ""),
+            description: NSLocalizedString("theme_item_switch_color_detail", comment: "")
+        )
+        
         customThemeSettingsItems["backgroundColor"] = CustomThemeSettingsItem(
             title: NSLocalizedString("theme_item_background_color", comment: ""),
             description: NSLocalizedString("theme_item_background_color_detail", comment: "")

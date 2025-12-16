@@ -241,6 +241,8 @@ struct CustomizeCustomThemeView: View {
             return $customizeCustomThemeViewModel.customTheme.receivedMessageTextColor
         case "sentMessageTextColor":
             return $customizeCustomThemeViewModel.customTheme.sentMessageTextColor
+        case "switchColor":
+            return $customizeCustomThemeViewModel.customTheme.switchColor
         case "backgroundColor":
             return $customizeCustomThemeViewModel.customTheme.backgroundColor
         case "cardViewBackgroundColor":

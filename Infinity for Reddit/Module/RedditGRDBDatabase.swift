@@ -203,7 +203,7 @@ struct RedditGRDBDatabase {
                 let colorColumns = [
                     "colorPrimary", "colorAccent", "colorPrimaryLightTheme",
                     "primaryTextColor", "secondaryTextColor", "postTitleColor", "postContentColor",
-                    "readPostTitleColor", "readPostContentColor", "commentColor", "buttonTextColor",
+                    "readPostTitleColor", "readPostContentColor", "commentColor", "buttonTextColor", "switchColor",
                     "backgroundColor", "cardViewBackgroundColor", "readPostCardViewBackgroundColor",
                     "filledCardViewBackgroundColor", "readPostFilledCardViewBackgroundColor",
                     "commentBackgroundColor", "bottomAppBarBackgroundColor", "snackbarTextColor",

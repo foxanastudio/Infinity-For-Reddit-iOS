@@ -22,7 +22,7 @@ struct MarkdownViewModifier: ViewModifier {
                 FontSize(fontSize.scaledContentFontSize(ContentFontScale(rawValue: contentFontScale)))
             }
             .markdownTheme(.gitHub.link {
-                ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.colorAccent))
+                ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.linkColor))
             }.text {
                 ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor))
             }.code {
@@ -57,7 +57,7 @@ struct PostContentMarkdownViewModifier: ViewModifier {
                 FontSize(fontSize.scaledContentFontSize(ContentFontScale(rawValue: contentFontScale)))
             }
             .markdownTheme(.gitHub.link {
-                ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.colorAccent))
+                ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.linkColor))
             }.text {
                 ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.postContentColor))
             }.code {
@@ -92,7 +92,7 @@ struct CommentMarkdownViewModifier: ViewModifier {
                 FontSize(fontSize.scaledContentFontSize(ContentFontScale(rawValue: contentFontScale)))
             }
             .markdownTheme(.gitHub.link {
-                ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.colorAccent))
+                ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.linkColor))
             }.text {
                 ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.commentColor))
             }.code {

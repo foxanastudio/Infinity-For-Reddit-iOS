@@ -470,66 +470,6 @@
         }
       }
     },
-    "theme_item_snackbar_text_color" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Snackbar Text Color"
-          }
-        }
-      }
-    },
-    "theme_item_snackbar_text_color_detail" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Applied to: Snackbar content"
-          }
-        }
-      }
-    },
-    "theme_item_snackbar_action_text_color" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Snackbar Action Text Color"
-          }
-        }
-      }
-    },
-    "theme_item_snackbar_action_text_color_detail" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Applied to: Snackbar action button"
-          }
-        }
-      }
-    },
-    "theme_item_snackbar_background_color" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Snackbar Background Color"
-          }
-        }
-      }
-    },
-    "theme_item_snackbar_background_color_detail" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Applied to: Snackbar"
-          }
-        }
-      }
-    },
     "theme_item_bottom_app_bar_icon_color" : {
       "localizations" : {
         "en" : {
@@ -1640,6 +1580,26 @@
         }
       }
     },
+    "theme_item_switch_color" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch Color"
+          }
+        }
+      }
+    },
+    "theme_item_switch_color_detail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Switch"
+          }
+        }
+      }
+    },
     "theme_item_single_comment_thread_background_color" : {
       "localizations" : {
         "en" : {
@@ -1656,6 +1616,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Applied to: Single Comment"
+          }
+        }
+      }
+    },
+    "theme_item_snackbar_action_text_color" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snackbar Action Text Color"
+          }
+        }
+      }
+    },
+    "theme_item_snackbar_action_text_color_detail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Snackbar action button"
+          }
+        }
+      }
+    },
+    "theme_item_snackbar_background_color" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snackbar Background Color"
+          }
+        }
+      }
+    },
+    "theme_item_snackbar_background_color_detail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Snackbar"
+          }
+        }
+      }
+    },
+    "theme_item_snackbar_text_color" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snackbar Text Color"
+          }
+        }
+      }
+    },
+    "theme_item_snackbar_text_color_detail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Snackbar content"
           }
         }
       }
