@@ -847,7 +847,7 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
             isDarkTheme: false,
             isAmoledTheme: false,
             colorPrimary: 0xEE0270,
-            colorAccent: 0x02EE80,
+            colorAccent: 0x2ECFA4,
             colorPrimaryLightTheme: 0xEE0270,
             primaryTextColor: 0x000000,
             secondaryTextColor: 0x808080,
