@@ -9,6 +9,7 @@ import SwiftUI
 
 struct Snackbar: View {
     @EnvironmentObject private var snackbarManager: SnackbarManager
+    @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
     
     @State private var dragOffset: CGSize = .zero
     @State private var isVisible = true
@@ -22,7 +23,8 @@ struct Snackbar: View {
                 
                 HStack(spacing: 8) {
                     RowText(snackbarManager.text)
-                        .foregroundStyle(Color.white)
+                        .foregroundStyle(Color(hex: customThemeViewModel.currentCustomTheme.snackbarTextColor))
+                        .lineLimit(5)
                     
                     if let actionText = snackbarManager.actionText, !actionText.isEmpty {
                         Button(action: {
@@ -30,14 +32,14 @@ struct Snackbar: View {
                             snackbarManager.dismiss()
                         }) {
                             Text(actionText)
-                                .foregroundStyle(Color.white)
+                                .foregroundStyle(Color(hex: customThemeViewModel.currentCustomTheme.snackbarActionTextColor))
                         }
                     }
                 }
                 .padding(16)
                 .background(
                     RoundedRectangle(cornerRadius: 16)
-                        .fill(Color(hex: "#353E41"))
+                        .fill(Color(hex: customThemeViewModel.currentCustomTheme.snackbarBackgroundColor))
                 )
                 .padding(16)
                 .applyIf(snackbarManager.canDismissByGesture) {
