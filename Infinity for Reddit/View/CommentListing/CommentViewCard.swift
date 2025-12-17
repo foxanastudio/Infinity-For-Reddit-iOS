@@ -191,7 +191,6 @@ struct CommentViewCard: View {
                                 .buttonStyle(.borderless)
                                 .padding(8)
                                 .contentShape(Rectangle())
-//                                .excludeFromTouchRipple()
 
                                 VotesText(votes: commentViewModel.comment.score + commentViewModel.comment.likes, hideNVotes: hideNVotes)
                                     .frame(width: 72, alignment: .center)
@@ -208,7 +207,6 @@ struct CommentViewCard: View {
                                 .buttonStyle(.borderless)
                                 .padding(8)
                                 .contentShape(Rectangle())
-//                                .excludeFromTouchRipple()
                             }
                             .environment(\.layoutDirection, .leftToRight)
                             
@@ -257,7 +255,6 @@ struct CommentViewCard: View {
                                         .commentIcon()
                                 }
                                 .padding(8)
-//                                .excludeFromTouchRipple()
                                 
                                 if let onToggleExpand, commentViewModel.comment.hasReplies {
                                     Button(action: {
@@ -373,7 +370,6 @@ struct CommentViewCard: View {
                                         .commentIcon()
                                 }
                                 .padding(8)
-//                                .excludeFromTouchRipple()
                             }
                         }
                         .environment(\.layoutDirection, voteButtonsOnTheRight ? .rightToLeft : .leftToRight)
