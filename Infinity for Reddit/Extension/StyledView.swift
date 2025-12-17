@@ -280,7 +280,7 @@ extension View {
     func mediaGesture(
         minZoomScale: CGFloat = 1,
         doubleTapZoomScale: CGFloat = 2,
-        outOfBoundsColor: Color? = nil,
+        outOfBoundsColor: Color = .black,
         onDragEnded: @escaping (CGAffineTransform) -> Bool,
         onDismiss: @escaping () -> Void
     ) -> some View {

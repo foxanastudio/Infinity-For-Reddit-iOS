@@ -238,6 +238,7 @@ struct HomeView: View {
                         fullScreenMediaViewModel.dismiss()
                     }
                     .id(currentUrlString)
+                    .zIndex(1)
                 } else if case let .video(urlString, post, videoType, canDownload) = media {
                     VideoFullScreenView(
                         urlString: urlString,

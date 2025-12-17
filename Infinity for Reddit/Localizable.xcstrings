@@ -14,9 +14,6 @@
         }
       }
     },
-    "%lld" : {
-
-    },
     "%lld days" : {
 
     },
@@ -166,9 +163,6 @@
 
     },
     "Hide Favorite Subreddits Section" : {
-
-    },
-    "Hide Nav Bar" : {
 
     },
     "Hide Subscribed Subreddits Section" : {

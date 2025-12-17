@@ -10,16 +10,18 @@ import SwiftUI
 struct MediaGestureViewModifier: ViewModifier {
     let minZoomScale: CGFloat
     let doubleTapZoomScale: CGFloat
-    let outOfBoundsColor: Color?
+    let outOfBoundsColor: Color
     
     @State private var lastTransform: CGAffineTransform = .identity
     @State private var transform: CGAffineTransform = .identity
+    @State private var predictedEndTranslation: CGSize = .zero
+    @State private var containerSize: CGSize = .zero
     @State private var contentSize: CGSize = .zero
     let onDragEnded: (CGAffineTransform) -> Bool
     let onDismiss: () -> Void
     
     func body(content: Content) -> some View {
-        if let outOfBoundsColor = outOfBoundsColor {
+        GeometryReader { proxy in
             ZStack {
                 outOfBoundsColor
                     .opacity(opacityForBackground(maxYDistance: 300))
@@ -27,11 +29,14 @@ struct MediaGestureViewModifier: ViewModifier {
                     .ignoresSafeArea()
                 
                 content
-                    .background(alignment: .topLeading) {
+                    .background {
                         GeometryReader { proxy in
                             Color.clear
                                 .onAppear {
                                     contentSize = proxy.size
+                                }
+                                .onChange(of: proxy.size) { _, newValue in
+                                    contentSize = newValue
                                 }
                         }
                     }
@@ -47,27 +52,12 @@ struct MediaGestureViewModifier: ViewModifier {
                     .gesture(doubleTapGesture)
             }
             .gesture(dragGesture)
-        } else {
-            content
-                .background(alignment: .topLeading) {
-                    GeometryReader { proxy in
-                        Color.clear
-                            .onAppear {
-                                contentSize = proxy.size
-                            }
-                    }
-                }
-                .animatableTransformEffect(transform)
-                .gesture(dragGesture)
-                .modify { view in
-                    if #available(iOS 17.0, *) {
-                        view.gesture(magnificationGesture)
-                    } else {
-                        view.gesture(oldMagnificationGesture)
-                    }
-                }
-                .gesture(doubleTapGesture)
+            .onAppear {
+                containerSize = proxy.size
+            }
         }
+        .edgesIgnoringSafeArea(.all)
+        .ignoresSafeArea()
     }
     
     @available(iOS, introduced: 16.0, deprecated: 17.0)
@@ -162,27 +152,32 @@ struct MediaGestureViewModifier: ViewModifier {
             return .identity
         }
         
-        let maxX = contentSize.width * (scaleX - 1)
-        let maxY = contentSize.height * (scaleY - 1)
+        var transform = transform
         
-        if transform.tx > 0
-            || transform.tx < -maxX
-            || transform.ty > 0
-            || transform.ty < -maxY
-        {
-            let tx = min(max(transform.tx, -maxX), 0)
-            let ty = min(max(transform.ty, -maxY), 0)
-            var transform = transform
-            transform.tx = tx
-            transform.ty = ty
-            return transform
+        let scaledWidth = contentSize.width * transform.scaleX
+        let scaledHeight = contentSize.height * transform.scaleY
+        
+        if scaledWidth > containerSize.width {
+            let minTx = -((containerSize.width - contentSize.width) / 2) - (scaledWidth - containerSize.width)
+            let maxTx = -((containerSize.width - contentSize.width) / 2)
+            transform.tx = min(max(transform.tx, minTx), maxTx)
+        } else {
+            transform.tx = -contentSize.width * (transform.scaleX - 1) / 2
+        }
+        
+        if scaledHeight > containerSize.height {
+            let minTy = -((containerSize.height - contentSize.height) / 2) - (scaledHeight - containerSize.height)
+            let maxTy = -((containerSize.height - contentSize.height) / 2)
+            transform.ty = min(max(transform.ty, minTy), maxTy)
+        } else {
+            transform.ty = -contentSize.height * (transform.scaleY - 1) / 2
         }
         
         return transform
     }
     
     private func opacityForBackground(maxYDistance: CGFloat) -> Double {
-        if transform.scaleX > minZoomScale || transform.scaleY > minZoomScale {
+        if transform.scaleX != minZoomScale || transform.scaleY != minZoomScale {
             return 1
         }
         

@@ -33,7 +33,6 @@ struct ImageFullScreenView: View {
                 matchedGeometryEffectId: matchedGeometryEffectId
             )
             .mediaGesture(
-                outOfBoundsColor: .black,
                 onDragEnded: { transform in
                     if transform.scaleX == 1 && transform.scaleY == 1 && abs(transform.ty) > 100 {
                         return true
