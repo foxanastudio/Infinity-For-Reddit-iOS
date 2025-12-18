@@ -188,7 +188,9 @@ struct GalleryImageToolbar: View {
             if isVisible {
                 HStack {
                     Button {
-                        onDismiss()
+                        withAnimation {
+                            onDismiss()
+                        }
                     } label: {
                         SwiftUI.Image(systemName: "xmark")
                             .font(.system(size: buttonSize))
