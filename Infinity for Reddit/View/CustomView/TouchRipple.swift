@@ -13,6 +13,7 @@ struct TouchRipple<Content: View, BackgroundShape: Shape>: View {
     let action: (() -> Void)?
     let onLongPress: (() -> Void)?
     let content: () -> Content
+    let allowTapAfterLongPress: Bool
     
     @State private var didLongPress = false
 
@@ -20,17 +21,19 @@ struct TouchRipple<Content: View, BackgroundShape: Shape>: View {
         backgroundShape: BackgroundShape = Rectangle(),
         action: (() -> Void)? = nil,
         onLongPress: (() -> Void)? = nil,
+        allowTapAfterLongPress: Bool = true,
         @ViewBuilder content: @escaping () -> Content
     ) {
         self.backgroundShape = backgroundShape
         self.action = action
         self.content = content
         self.onLongPress = onLongPress
+        self.allowTapAfterLongPress = allowTapAfterLongPress
     }
 
     var body: some View {
         Button {
-            if !didLongPress {
+            if allowTapAfterLongPress || !didLongPress {
                 action?()
             }
             didLongPress = false
@@ -44,7 +47,9 @@ struct TouchRipple<Content: View, BackgroundShape: Shape>: View {
         .simultaneousGesture(
             LongPressGesture(minimumDuration: 0.5)
                 .onEnded { _ in
-                    didLongPress = true
+                    if !allowTapAfterLongPress {
+                        didLongPress = true
+                    }
                     onLongPress?()
                 }
         )

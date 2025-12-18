@@ -134,18 +134,12 @@ struct PostViewCard: View {
                 .padding(.horizontal, 16)
                 .padding(.bottom, 16)
                 .contentShape(Rectangle())
-//                .onLongPressGesture {
-//                    onLongPressPost()
-//                }
                 
                 Text(postViewModel.post.title)
                     .padding(.horizontal, 16)
                     .padding(.bottom, 8)
                     .postTitle()
                     .contentShape(Rectangle())
-//                    .onLongPressGesture {
-//                        onLongPressPost()
-//                    }
                 
                 if hidePostType && !postViewModel.post.spoiler
                     && !postViewModel.post.over18 && hidePostFlair
@@ -204,9 +198,6 @@ struct PostViewCard: View {
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
                     .contentShape(Rectangle())
-//                    .onLongPressGesture {
-//                        onLongPressPost()
-//                    }
                 }
                 
                 Group {
@@ -232,9 +223,6 @@ struct PostViewCard: View {
                     }
                 }
                 .contentShape(Rectangle())
-//                .onLongPressGesture {
-//                    onLongPressPost()
-//                }
                 
                 if let galleryData = postViewModel.post.galleryData,
                    !galleryData.items.isEmpty,
@@ -256,9 +244,6 @@ struct PostViewCard: View {
                         $0.aspectRatio(preview.s!.aspectRatio, contentMode: .fit)
                     }
                     .contentShape(Rectangle())
-//                    .onLongPressGesture {
-//                        onLongPressPost()
-//                    }
                 } else if !hideTextPostContent, case .text = postViewModel.post.postType, let selftextTruncated = postViewModel.post.selftextTruncated, !selftextTruncated.isEmpty {
                     Spacer()
                         .frame(height: 6)
@@ -267,9 +252,6 @@ struct PostViewCard: View {
                         .postContent()
                         .padding(.horizontal, 16)
                         .contentShape(Rectangle())
-//                        .onLongPressGesture {
-//                            onLongPressPost()
-//                        }
                 } else if case .redditVideo(let videoUrlString, _) = postViewModel.post.postType {
                     Spacer()
                         .frame(height: 10)
@@ -298,9 +280,6 @@ struct PostViewCard: View {
                         }
                     }
                     .contentShape(Rectangle())
-//                    .onLongPressGesture {
-//                        onLongPressPost()
-//                    }
                 }
                 
                 HStack(spacing: 0) {
@@ -405,9 +384,6 @@ struct PostViewCard: View {
                 .environment(\.layoutDirection, voteButtonsOnTheRight ? .rightToLeft : .leftToRight)
                 .padding(.horizontal, 8)
                 .contentShape(Rectangle())
-//                .onLongPressGesture {
-//                    onLongPressPost()
-//                }
             }
         }
         .background {

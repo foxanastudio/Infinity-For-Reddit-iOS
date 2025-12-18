@@ -1,8 +1,8 @@
 //
-// PostViewCompact.swift
-// Infinity for Reddit
+//  PostViewCompact.swift
+//  Infinity for Reddit
 //
-// Created by joeylr2042 on 2025-10-30
+//  Created by joeylr2042 on 2025-10-30.
 
 import SwiftUI
 import Flow
@@ -36,6 +36,7 @@ struct PostViewCompact: View {
     let onOpenLink: (URL) -> Void
     let onShare: () -> Void
     let onReadPost: () async -> Void
+    let onLongPressPost: () -> Void
 
     private let iconSize: CGFloat = 24
 
@@ -54,7 +55,8 @@ struct PostViewCompact: View {
         onSensitiveClicked: @escaping () -> Void,
         onOpenLink: @escaping (_ url: URL) -> Void,
         onShare: @escaping () -> Void,
-        onReadPost: @escaping () async -> Void
+        onReadPost: @escaping () async -> Void,
+        onLongPressPost: @escaping () -> Void
     ) {
         self.postViewModel = postViewModel
         self.isSubredditPostListing = isSubredditPostListing
@@ -71,12 +73,16 @@ struct PostViewCompact: View {
         self.onOpenLink = onOpenLink
         self.onShare = onShare
         self.onReadPost = onReadPost
+        self.onLongPressPost = onLongPressPost
     }
     
     var body: some View {
         TouchRipple(
             action: {
                 onPostTap()
+            },
+            onLongPress: {
+                onLongPressPost()
             }
         ) {
             VStack(alignment: .leading, spacing: 0) {
