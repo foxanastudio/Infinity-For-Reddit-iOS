@@ -121,7 +121,7 @@ struct ImageFullScreenToolbar: View {
             Spacer()
             
             if isVisible {
-                VStack(spacing: 0) {
+                VStack(spacing: 16) {
                     HStack(spacing: 8) {
                         Button {
                             fullScreenMediaToolbarViewModel.downloadMedia()
@@ -163,20 +163,57 @@ struct ImageFullScreenToolbar: View {
                     )
                     .contentShape(Capsule())
                     
-                    VStack {
-                        Text("Downloading...")
-                            .foregroundStyle(.white)
+                    ZStack {
+                        VStack {
+                            Text("Downloading...")
+                                .foregroundStyle(.white)
+                                .customFont(fontSize: .f17)
+                            
+                            ProgressView(value: fullScreenMediaToolbarViewModel.downloadProgress)
+                                .tint(.white)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(hex: "#6B6B6B", opacity: 0.5))
+                        )
+                        .opacity(fullScreenMediaToolbarViewModel.downloadProgress == 0 ? 0 : 1)
                         
-                        ProgressView(value: fullScreenMediaToolbarViewModel.downloadProgress)
-                            .tint(.white)
+                        HStack {
+                            SwiftUI.Image(systemName: "checkmark.seal")
+                                .foregroundStyle(.white)
+                                .customFont(fontSize: .f24)
+                            
+                            Text("Image downloaded")
+                                .foregroundStyle(.white)
+                                .customFont(fontSize: .f17)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(hex: "#6B6B6B", opacity: 0.5))
+                        )
+                        .opacity(fullScreenMediaToolbarViewModel.showFinishedDownloadMessage ? 1 : 0)
+                        
+                        HStack {
+                            SwiftUI.Image(systemName: "xmark.seal")
+                                .foregroundStyle(.white)
+                                .customFont(fontSize: .f24)
+                            
+                            Text("Download failed: \(fullScreenMediaToolbarViewModel.error?.localizedDescription ?? "Unknown error")")
+                                .foregroundStyle(.white)
+                                .customFont(fontSize: .f17)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(hex: "#6B6B6B", opacity: 0.5))
+                        )
+                        .opacity(fullScreenMediaToolbarViewModel.error != nil ? 1 : 0)
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(hex: "#6B6B6B", opacity: 0.5))
-                    )
-                    .opacity(fullScreenMediaToolbarViewModel.downloadProgress == 0 ? 0 : 1)
                 }
                 .padding(.horizontal, 32)
                 .padding(.bottom, 32)

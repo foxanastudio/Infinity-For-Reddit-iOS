@@ -268,7 +268,7 @@ struct ImgurImageToolbar: View {
             Spacer()
             
             if isVisible {
-                VStack {
+                VStack(spacing: 16) {
                     HStack {
                         Button {
                             fullScreenMediaToolbarViewModel.downloadMedia()
@@ -344,6 +344,7 @@ struct ImgurImageToolbar: View {
                         VStack {
                             Text("Downloading...")
                                 .foregroundStyle(.white)
+                                .customFont(fontSize: .f17)
                             
                             ProgressView(value: fullScreenMediaToolbarViewModel.downloadProgress)
                                 .tint(.white)
@@ -359,9 +360,11 @@ struct ImgurImageToolbar: View {
                         HStack {
                             SwiftUI.Image(systemName: "checkmark.seal")
                                 .foregroundStyle(.white)
+                                .customFont(fontSize: .f24)
                             
                             Text("Image downloaded")
                                 .foregroundStyle(.white)
+                                .customFont(fontSize: .f17)
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
