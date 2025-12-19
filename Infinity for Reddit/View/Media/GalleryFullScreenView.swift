@@ -210,7 +210,7 @@ struct GalleryImageToolbar: View {
             Spacer()
             
             if isVisible {
-                VStack {
+                VStack(spacing: 16) {
                     HStack {
                         Button {
                             fullScreenMediaToolbarViewModel.downloadMedia()
@@ -284,6 +284,7 @@ struct GalleryImageToolbar: View {
                         VStack {
                             Text("Downloading...")
                                 .foregroundStyle(.white)
+                                .customFont(fontSize: .f17)
                             
                             ProgressView(value: fullScreenMediaToolbarViewModel.downloadProgress)
                                 .tint(.white)
@@ -299,9 +300,11 @@ struct GalleryImageToolbar: View {
                         HStack {
                             SwiftUI.Image(systemName: "checkmark.seal")
                                 .foregroundStyle(.white)
+                                .customFont(fontSize: .f24)
                             
                             Text("Image downloaded")
                                 .foregroundStyle(.white)
+                                .customFont(fontSize: .f17)
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
@@ -310,6 +313,23 @@ struct GalleryImageToolbar: View {
                                 .fill(Color(hex: "#6B6B6B", opacity: 0.5))
                         )
                         .opacity(fullScreenMediaToolbarViewModel.showFinishedDownloadMessage ? 1 : 0)
+                        
+                        HStack {
+                            SwiftUI.Image(systemName: "xmark.seal")
+                                .foregroundStyle(.white)
+                                .customFont(fontSize: .f24)
+                            
+                            Text("Download failed: \(fullScreenMediaToolbarViewModel.error?.localizedDescription ?? "Unknown error")")
+                                .foregroundStyle(.white)
+                                .customFont(fontSize: .f17)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(hex: "#6B6B6B", opacity: 0.5))
+                        )
+                        .opacity(fullScreenMediaToolbarViewModel.error != nil ? 1 : 0)
                     }
                     
                     ZStack {
