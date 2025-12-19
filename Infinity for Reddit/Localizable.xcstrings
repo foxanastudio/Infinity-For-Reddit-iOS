@@ -129,6 +129,9 @@
     "Download all media" : {
 
     },
+    "Download failed: %@" : {
+
+    },
     "Downloading all media..." : {
 
     },

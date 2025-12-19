@@ -27,7 +27,8 @@ class VideoFullScreenViewModel: ObservableObject {
     @Published var downloadProgress: Double = 0
     @Published var showDownloadFinishedMessage: Bool = false
     @Published var isShowingController: Bool = false
-    @Published private var error: Error?
+    @Published var error: Error?
+    @Published var downloadError: Error?
     
     private var canPlay: Bool = true
     private var loadedURL: URL?
@@ -173,6 +174,8 @@ class VideoFullScreenViewModel: ObservableObject {
         loadedURL = nil
         isLoaded = false
         isLoading = false
+        error = nil
+        downloadError = nil
     }
     
     private func observeTime() {
@@ -260,21 +263,18 @@ class VideoFullScreenViewModel: ObservableObject {
         } catch {
             print(error)
             await MainActor.run {
-                self.error = error
+                self.downloadError = error
             }
         }
         await MainActor.run {
             self.downloadProgress = 0
-            self.showDownloadFinishedMessage = true
+            self.showDownloadFinishedMessage = downloadError == nil
         }
         
-        do {
-            try await Task.sleep(for: .seconds(1))
-        } catch {
-            // Ignore
-        }
+        try? await Task.sleep(for: .seconds(1))
         
         await MainActor.run {
+            self.downloadError = nil
             self.showDownloadFinishedMessage = false
             self.downloadTask = nil
         }

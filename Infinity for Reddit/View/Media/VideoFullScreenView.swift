@@ -85,6 +85,20 @@ struct VideoFullScreenView<Content: View>: View {
                     }
                 )
             
+            if let error = videoFullScreenViewModel.error {
+                HStack(spacing: 16) {
+                    SwiftUI.Image(systemName: "play.slash.fill")
+                        .foregroundColor(.white)
+                        .customFont(fontSize: .f24)
+                    
+                    Text(error.localizedDescription)
+                        .frame(alignment: .leading)
+                        .foregroundStyle(.white)
+                        .customFont(fontSize: .f17)
+                }
+                .padding(32)
+            }
+            
             if videoFullScreenViewModel.isShowingController {
                 VideoController(
                     isPlaying: videoFullScreenViewModel.isPlaying,
@@ -98,6 +112,7 @@ struct VideoFullScreenView<Content: View>: View {
                     downloadProgressTitle: videoFullScreenViewModel.downloadProgressTitle,
                     downloadProgress: videoFullScreenViewModel.downloadProgress,
                     showDownloadFinishedMessage: videoFullScreenViewModel.showDownloadFinishedMessage,
+                    downloadError: videoFullScreenViewModel.downloadError,
                     hasDescription: hasDescription,
                     canDownload: canDownload,
                     onTogglePlayPause: {
@@ -201,6 +216,7 @@ struct VideoController<Content: View>: View {
     let downloadProgressTitle: String
     let downloadProgress: Double
     let showDownloadFinishedMessage: Bool
+    let downloadError: Error?
     let hasDescription: Bool
     let canDownload: Bool
     let onTogglePlayPause: () -> Void
@@ -227,6 +243,7 @@ struct VideoController<Content: View>: View {
         downloadProgressTitle: String,
         downloadProgress: Double,
         showDownloadFinishedMessage: Bool,
+        downloadError: Error?,
         hasDescription: Bool,
         canDownload: Bool,
         onTogglePlayPause: @escaping () -> Void,
@@ -252,6 +269,7 @@ struct VideoController<Content: View>: View {
         self.downloadProgressTitle = downloadProgressTitle
         self.downloadProgress = downloadProgress
         self.showDownloadFinishedMessage = showDownloadFinishedMessage
+        self.downloadError = downloadError
         self.hasDescription = hasDescription
         self.canDownload = canDownload
         self.onTogglePlayPause = onTogglePlayPause
@@ -390,6 +408,7 @@ struct VideoController<Content: View>: View {
                     VStack {
                         Text(downloadProgressTitle)
                             .foregroundStyle(.white)
+                            .customFont(fontSize: .f17)
                         
                         ProgressView(value: downloadProgress)
                             .tint(.white)
@@ -405,9 +424,11 @@ struct VideoController<Content: View>: View {
                     HStack {
                         SwiftUI.Image(systemName: "checkmark.seal")
                             .foregroundStyle(.white)
+                            .customFont(fontSize: .f24)
                         
                         Text("Video downloaded")
                             .foregroundStyle(.white)
+                            .customFont(fontSize: .f17)
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
@@ -416,6 +437,23 @@ struct VideoController<Content: View>: View {
                             .fill(Color(hex: "#6B6B6B", opacity: 0.5))
                     )
                     .opacity(showDownloadFinishedMessage ? 1 : 0)
+                    
+                    HStack {
+                        SwiftUI.Image(systemName: "checkmark.seal")
+                            .foregroundStyle(.white)
+                            .customFont(fontSize: .f24)
+                        
+                        Text("Download failed: \(downloadError?.localizedDescription ?? "Unknown error")")
+                            .foregroundStyle(.white)
+                            .customFont(fontSize: .f17)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color(hex: "#6B6B6B", opacity: 0.5))
+                    )
+                    .opacity(downloadError != nil ? 1 : 0)
                 }
                 
                 if let title {
