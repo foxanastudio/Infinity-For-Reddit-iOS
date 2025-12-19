@@ -196,6 +196,7 @@ struct ImgurImageView: View {
             ImgurImageToolbar(
                 downloadMediaType: imgurMediaItem.toDownloadMediaType(post: post),
                 isVisible: $isToolbarVisible,
+                imgurMediaItem: imgurMediaItem,
                 imgurMedia: imgurMedia,
                 post: post,
                 hasDescription: !imgurMediaItem.title.isEmpty || !imgurMediaItem.description.isEmpty,
@@ -211,6 +212,7 @@ struct ImgurImageToolbar: View {
     
     @Binding var isVisible: Bool
     
+    let imgurMediaItem: ImgurMediaItem
     let imgurMedia: ImgurMedia
     let post: Post?
     let hasDescription: Bool
@@ -221,6 +223,7 @@ struct ImgurImageToolbar: View {
     
     init(downloadMediaType: DownloadMediaType,
          isVisible: Binding<Bool>,
+         imgurMediaItem: ImgurMediaItem,
          imgurMedia: ImgurMedia,
          post: Post?,
          hasDescription: Bool,
@@ -231,6 +234,7 @@ struct ImgurImageToolbar: View {
             wrappedValue: FullScreenMediaToolbarViewModel(downloadMediaType: downloadMediaType)
         )
         self._isVisible = isVisible
+        self.imgurMediaItem = imgurMediaItem
         self.imgurMedia = imgurMedia
         self.post = post
         self.hasDescription = hasDescription
@@ -281,19 +285,21 @@ struct ImgurImageToolbar: View {
                                 )
                         }
                         
-                        Button {
-                            fullScreenMediaToolbarViewModel.shareImage()
-                        } label: {
-                            SwiftUI.Image(systemName: "square.and.arrow.up")
-                                .font(.system(size: buttonSize))
-                                .padding(.horizontal, 10)
-                                .padding(.top, 12)
-                                .padding(.bottom, 14)
-                                .foregroundColor(Color.white)
-                                .background(
-                                    Circle()
-                                        .fill(Color(hex: "#2E2E2E"))
-                                )
+                        if imgurMediaItem.mediaType == .image {
+                            Button {
+                                fullScreenMediaToolbarViewModel.shareImage()
+                            } label: {
+                                SwiftUI.Image(systemName: "square.and.arrow.up")
+                                    .font(.system(size: buttonSize))
+                                    .padding(.horizontal, 10)
+                                    .padding(.top, 12)
+                                    .padding(.bottom, 14)
+                                    .foregroundColor(Color.white)
+                                    .background(
+                                        Circle()
+                                            .fill(Color(hex: "#2E2E2E"))
+                                    )
+                            }
                         }
                         
                         if hasDescription {
