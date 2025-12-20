@@ -80,10 +80,16 @@ public class CommentListingViewModel: ObservableObject {
             let commentListing: CommentListing
             switch commentListingMetadata.commentListingType {
             case .user:
+                var queries: [String: String]
+                if let time = sortType.time?.rawValue {
+                    queries = ["sort": sortType.type.rawValue, "t": time, "limit": "100", "after": after ?? ""]
+                } else {
+                    queries = ["sort": sortType.type.rawValue, "limit": "100", "after": after ?? ""]
+                }
                 commentListing = try await commentListingRepository.fetchComments(
                     commentListingType: commentListingMetadata.commentListingType,
                     pathComponents: commentListingMetadata.pathComponents,
-                    queries: ["sort": sortType.type.rawValue, "t": sortType.time?.rawValue ?? "", "limit": "100", "after": after ?? ""].merging(commentListingMetadata.queries ?? [:], uniquingKeysWith: { _, new in new })
+                    queries: queries.merging(commentListingMetadata.queries ?? [:], uniquingKeysWith: { _, new in new })
                 )
             case .userSaved:
                 commentListing = try await commentListingRepository.fetchComments(
@@ -182,9 +188,9 @@ public class CommentListingViewModel: ObservableObject {
     
     func changeSortTypeKind(sortTypeKind: SortType.Kind) {
         if sortTypeKind != self.sortType.type {
-            self.sortType = self.sortType.with(type: sortTypeKind)
+            self.sortType = SortType(type: sortTypeKind)
             loadCommentsTaskId = UUID()
-            commentListingMetadata.commentListingType.saveSortType(sortType: SortType(type: sortTypeKind))
+            commentListingMetadata.commentListingType.saveSortType(sortType: self.sortType)
         }
     }
     

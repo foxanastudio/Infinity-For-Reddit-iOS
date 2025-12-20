@@ -100,8 +100,4 @@ struct SortType: Equatable {
         self.type = type
         self.time = time
     }
-    
-    func with(type: Kind) -> SortType {
-        SortType(type: type, time: self.time)
-    }
 }

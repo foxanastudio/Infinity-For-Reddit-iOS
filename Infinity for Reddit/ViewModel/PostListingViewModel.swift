@@ -232,7 +232,12 @@ public class PostListingViewModel: ObservableObject {
             let postListing: PostListing
             switch postListingMetadata.postListingType.sortEmbeddingStyle {
             case .inPath:
-                var queries = ["t": sortType.time?.rawValue ?? "", "limit": "100", "after": self.after ?? ""]
+                var queries: [String: String]
+                if let time = sortType.time?.rawValue {
+                    queries = ["t": time, "limit": "100", "after": self.after ?? ""]
+                } else {
+                    queries = ["limit": "100", "after": self.after ?? ""]
+                }
                 if postListingMetadata.postListingType.canQuerySensitiveInAPICall {
                     queries["include_over_18"] = sensitiveContent ? "1" : "0"
                 }
@@ -243,7 +248,12 @@ public class PostListingViewModel: ObservableObject {
                     params: postListingMetadata.params
                 )
             case .inQuery(let key):
-                var queries = [key: sortType.type.rawValue, "t": sortType.time?.rawValue ?? "", "limit": "100", "after": self.after ?? ""]
+                var queries: [String: String]
+                if let time = sortType.time?.rawValue {
+                    queries = [key: sortType.type.rawValue, "t": time, "limit": "100", "after": self.after ?? ""]
+                } else {
+                    queries = [key: sortType.type.rawValue, "limit": "100", "after": self.after ?? ""]
+                }
                 if postListingMetadata.postListingType.canQuerySensitiveInAPICall {
                     queries["include_over_18"] = sensitiveContent ? "1" : "0"
                 }
@@ -452,10 +462,10 @@ public class PostListingViewModel: ObservableObject {
     
     func changeSortTypeKind(_ sortTypeKind: SortType.Kind) {
         if sortTypeKind != self.sortType.type {
-            self.sortType = self.sortType.with(type: sortTypeKind)
+            self.sortType = SortType(type: sortTypeKind)
             loadPostsTaskId = UUID()
             if SortTypeSettingsUserDefaultsUtils.saveSortType {
-                postListingMetadata.postListingType.saveSortType(sortType: SortType(type: sortTypeKind))
+                postListingMetadata.postListingType.saveSortType(sortType: self.sortType)
             }
         }
     }
