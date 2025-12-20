@@ -110,7 +110,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
         case .getSearchPostsInSpecificThing(let pathComponents, _):
             return "\(pathComponents["name"] ?? "")/search.json"
         case .getCustomFeedPosts(let pathComponents, _):
-            return "\(pathComponents["multipath"] ?? "").json"
+            return "\(pathComponents["multipath"] ?? "")/\(pathComponents["sortType"] ?? "hot").json"
         case .getSubredditConcatPosts(let pathComponents, _):
             return "/r/\(pathComponents["subreddit"] ?? "popular")/\(pathComponents["sortType"] ?? "hot").json"
         case .getSubscribedThings:
