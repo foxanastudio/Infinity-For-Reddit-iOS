@@ -17,15 +17,15 @@ class LinkHandler {
         return URL(string: full)!
     }
     
-    func handle(link: String) -> LinkDestination {
+    func handle(link: String, allowRedditShareLink: Bool = true) -> LinkDestination {
         guard let url = URL(string: link) else {
             return LinkDestination.invalid
         }
         
-        return handle(url: url)
+        return handle(url: url, allowRedditShareLink: allowRedditShareLink)
     }
     
-    func handle(url: URL) -> LinkDestination {
+    func handle(url: URL, allowRedditShareLink: Bool = true) -> LinkDestination {
         let finalURL: URL
         
         if url.scheme == nil && url.host == nil {
@@ -65,7 +65,7 @@ class LinkHandler {
             return openUploadedRedditImage(finalURL)
             
         case _ where host.contains("reddit.com") || host.contains("redd.it") || host.contains("reddit.app"):
-            return handleRedditPath(path, segments: segments, url: finalURL)
+            return handleRedditPath(path, segments: segments, url: finalURL, allowRedditShareLink: allowRedditShareLink)
             
         case _ where host.contains("imgur.com"):
             return handleImgurURL(path: path, segments: segments, url: finalURL)
@@ -94,9 +94,11 @@ class LinkHandler {
         return LinkDestination.openInBrowser(finalURL)
     }
     
-    private func handleRedditPath(_ path: String, segments: [String], url: URL) -> LinkDestination {
+    private func handleRedditPath(_ path: String, segments: [String], url: URL, allowRedditShareLink: Bool) -> LinkDestination {
         if path == "/report" {
             return LinkDestination.openInBrowser(url)
+        } else if allowRedditShareLink && segments.count == 4 && (segments[0] == "r" || segments[0] == "u"), segments[2] == "s" {
+            return LinkDestination.redditShareLink(url)
         } else if segments.count == 4, segments[0] == "r", segments[2] == "wiki" {
             // Wiki
             return LinkDestination.navigation(AppNavigation.wiki(subredditName: segments[1], wikiPath: segments[3]))
@@ -197,6 +199,7 @@ class LinkHandler {
 
 enum LinkDestination {
     case navigation(any Hashable)
+    case redditShareLink(URL)
     case fullScreenMedia(FullScreenMediaType)
     case openInBrowser(URL)
     case invalid
