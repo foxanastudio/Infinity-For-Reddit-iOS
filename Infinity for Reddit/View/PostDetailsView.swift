@@ -258,22 +258,30 @@ struct PostDetailsView: View {
                                                     postDetailsViewModel.appearedComments.remove(id: commentItem.id)
                                                 }
                                                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                                    Button {
-                                                        postDetailsViewModel.voteComment(comment, vote: 1)
-                                                    } label: {
-                                                        SwiftUI.Image(systemName: "arrowshape.up")
-                                                            .foregroundStyle(.white)
+                                                    if AccountViewModel.shared.account.isAnonymous() {
+                                                        EmptyView()
+                                                    } else {
+                                                        Button {
+                                                            postDetailsViewModel.voteComment(comment, vote: 1)
+                                                        } label: {
+                                                            SwiftUI.Image(systemName: "arrowshape.up")
+                                                                .foregroundStyle(.white)
+                                                        }
+                                                        .tint(Color(hex: customThemeViewModel.currentCustomTheme.upvoted))
                                                     }
-                                                    .tint(Color(hex: customThemeViewModel.currentCustomTheme.upvoted))
                                                 }
                                                 .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                                                    Button {
-                                                        postDetailsViewModel.voteComment(comment, vote: -1)
-                                                    } label: {
-                                                        SwiftUI.Image(systemName: "arrowshape.down")
-                                                            .foregroundStyle(.white)
+                                                    if AccountViewModel.shared.account.isAnonymous() {
+                                                        EmptyView()
+                                                    } else {
+                                                        Button {
+                                                            postDetailsViewModel.voteComment(comment, vote: -1)
+                                                        } label: {
+                                                            SwiftUI.Image(systemName: "arrowshape.down")
+                                                                .foregroundStyle(.white)
+                                                        }
+                                                        .tint(Color(hex: customThemeViewModel.currentCustomTheme.downvoted))
                                                     }
-                                                    .tint(Color(hex: customThemeViewModel.currentCustomTheme.downvoted))
                                                 }
                                             case .more(let commentMore):
                                                 CommentMoreViewCard(commentMore: commentMore)
