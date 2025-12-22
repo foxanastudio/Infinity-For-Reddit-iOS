@@ -11,13 +11,10 @@ struct NavigationBarImageViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
     
     func body(content: Content) -> some View {
-        if Utils.isIOS26() {
             content
-                .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.colorPrimaryLightTheme))
-        } else {
-            content
-                .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.toolbarPrimaryTextAndIconColor))
-        }
+            .applyIf(!Utils.isIOS26()) {
+                $0.foregroundColor(Color(hex: themeViewModel.currentCustomTheme.toolbarPrimaryTextAndIconColor))
+            }
     }
 }
 
