@@ -36,35 +36,38 @@ struct ProxySettingsView: View {
                     )
                     .transition(.opacity)
                     
-                    BarebonePickerPreference(
-                        selected: $proxyType,
-                        items: ProxyUserDefaultsUtils.proxyTypes,
-                        title: "Proxy Type"
-                    ) { index in
-                        ProxyUserDefaultsUtils.proxyTypesText[index]
-                    }
-                    .listPlainItemNoInsets()
-                    
-                    PreferenceEntry(
-                        title: "Hostname",
-                        subtitle: proxyHost
-                    ){
-                        proxyHostString = proxyHost
-                        withAnimation(.linear(duration: 0.2)) {
-                            activeAlert = .hostname
+                    if enableProxy {
+                        BarebonePickerPreference(
+                            selected: $proxyType,
+                            items: ProxyUserDefaultsUtils.proxyTypes,
+                            title: "Proxy Type"
+                        ) { index in
+                            ProxyUserDefaultsUtils.proxyTypesText[index]
                         }
-                    }
-                    
-                    PreferenceEntry(
-                        title: "Port",
-                        subtitle: proxyPort
-                    ){
-                        proxyPortString = proxyPort
-                        withAnimation(.linear(duration: 0.2)) {
-                            activeAlert = .port
+                        .listPlainItemNoInsets()
+                        
+                        PreferenceEntry(
+                            title: "Hostname",
+                            subtitle: proxyHost
+                        ){
+                            proxyHostString = proxyHost
+                            withAnimation(.linear(duration: 0.2)) {
+                                activeAlert = .hostname
+                            }
+                        }
+                        
+                        PreferenceEntry(
+                            title: "Port",
+                            subtitle: proxyPort
+                        ){
+                            proxyPortString = proxyPort
+                            withAnimation(.linear(duration: 0.2)) {
+                                activeAlert = .port
+                            }
                         }
                     }
                 }
+                .animation(.easeInOut, value: enableProxy)
             }
         }
         .overlay(
