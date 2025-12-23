@@ -64,8 +64,6 @@ struct CustomizeCustomThemeView: View {
                                     BooleanEntry(
                                         fieldName: fieldName,
                                         title: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.title ?? "",
-                                        // Notice we use the same string as the title
-                                        description: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.title ?? "",
                                         isEnabled: binding
                                     )
                                     .listPlainItemNoInsets()
@@ -159,24 +157,14 @@ struct CustomizeCustomThemeView: View {
     private struct BooleanEntry: View {
         let fieldName: String
         let title: String
-        let description: String
         let isEnabled: Binding<Bool>
         
         var body: some View {
             VStack(spacing: 0) {
-                HStack(alignment: .center) {
-                    VStack(alignment: .leading, spacing: 0) {
-                        Text(title)
-                            .primaryText()
-                        
-                        Spacer()
-                            .frame(height: 8)
-                        
-                        Text(description)
-                            .font(.system(size: 14))
-                            .secondaryText()
-                    }
-                    .padding(16)
+                HStack(alignment: .center, spacing: 0) {
+                    Text(title)
+                        .primaryText()
+                        .padding(16)
                     
                     Spacer()
                     
@@ -266,8 +254,8 @@ struct CustomizeCustomThemeView: View {
             return $customizeCustomThemeViewModel.customTheme.receivedMessageBackgroundColor
         case "sentMessageBackgroundColor":
             return $customizeCustomThemeViewModel.customTheme.sentMessageBackgroundColor
-        case "bottomAppBarBackgroundColor":
-            return $customizeCustomThemeViewModel.customTheme.bottomAppBarBackgroundColor
+        case "tabBarBackgroundColor":
+            return $customizeCustomThemeViewModel.customTheme.tabBarBackgroundColor
         case "snackbarTextColor":
             return $customizeCustomThemeViewModel.customTheme.snackbarTextColor
         case "snackbarActionTextColor":
@@ -276,8 +264,8 @@ struct CustomizeCustomThemeView: View {
             return $customizeCustomThemeViewModel.customTheme.snackbarBackgroundColor
         case "primaryIconColor":
             return $customizeCustomThemeViewModel.customTheme.primaryIconColor
-        case "bottomAppBarIconColor":
-            return $customizeCustomThemeViewModel.customTheme.bottomAppBarIconColor
+        case "tabBarTextAndIconColor":
+            return $customizeCustomThemeViewModel.customTheme.tabBarTextAndIconColor
         case "postIconAndInfoColor":
             return $customizeCustomThemeViewModel.customTheme.postIconAndInfoColor
         case "commentIconAndInfoColor":

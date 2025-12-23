@@ -16,15 +16,15 @@ struct TabViewCustomThemeViewModifier: ViewModifier {
                 let appearance = UITabBarAppearance()
                 
                 appearance.configureWithOpaqueBackground()
-                appearance.backgroundColor = UIColor(Color(hex: customThemeViewModel.currentCustomTheme.bottomAppBarBackgroundColor))
-                appearance.stackedLayoutAppearance.normal.iconColor = UIColor(Color(hex: customThemeViewModel.currentCustomTheme.bottomAppBarIconColor))
+                appearance.backgroundColor = UIColor(Color(hex: customThemeViewModel.currentCustomTheme.tabBarBackgroundColor))
+                appearance.stackedLayoutAppearance.normal.iconColor = UIColor(Color(hex: customThemeViewModel.currentCustomTheme.tabBarTextAndIconColor))
                 appearance.stackedLayoutAppearance.selected.iconColor = UIColor(Color(hex: customThemeViewModel.currentCustomTheme.colorPrimaryLightTheme))
-                appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor(Color(hex: customThemeViewModel.currentCustomTheme.bottomAppBarIconColor))]
+                appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor(Color(hex: customThemeViewModel.currentCustomTheme.tabBarTextAndIconColor))]
                 appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor(Color(hex: customThemeViewModel.currentCustomTheme.colorPrimaryLightTheme))]
 
                 tabBarController.tabBar.standardAppearance = appearance
                 tabBarController.tabBar.scrollEdgeAppearance = appearance
-                tabBarController.view.backgroundColor = UIColor(Color(hex: customThemeViewModel.currentCustomTheme.bottomAppBarBackgroundColor))
+                tabBarController.view.backgroundColor = UIColor(Color(hex: customThemeViewModel.currentCustomTheme.tabBarBackgroundColor))
             }
     }
 }

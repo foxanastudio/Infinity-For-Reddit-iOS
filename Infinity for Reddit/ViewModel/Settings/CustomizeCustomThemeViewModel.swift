@@ -231,9 +231,9 @@ class CustomizeCustomThemeViewModel: ObservableObject {
             description: NSLocalizedString("theme_item_sent_message_background_color_detail", comment: "")
         )
         
-        customThemeSettingsItems["bottomAppBarBackgroundColor"] = CustomThemeSettingsItem(
-            title: NSLocalizedString("theme_item_bottom_app_bar_background_color", comment: ""),
-            description: NSLocalizedString("theme_item_bottom_app_bar_background_color_detail", comment: "")
+        customThemeSettingsItems["tabBarBackgroundColor"] = CustomThemeSettingsItem(
+            title: NSLocalizedString("theme_item_tab_bar_background_color", comment: ""),
+            description: NSLocalizedString("theme_item_tab_bar_background_color_detail", comment: "")
         )
         
         customThemeSettingsItems["snackbarTextColor"] = CustomThemeSettingsItem(
@@ -254,9 +254,9 @@ class CustomizeCustomThemeViewModel: ObservableObject {
             description: NSLocalizedString("theme_item_primary_icon_color_detail", comment: "")
         )
         
-        customThemeSettingsItems["bottomAppBarIconColor"] = CustomThemeSettingsItem(
-            title: NSLocalizedString("theme_item_bottom_app_bar_icon_color", comment: ""),
-            description: NSLocalizedString("theme_item_bottom_app_bar_icon_color_detail", comment: "")
+        customThemeSettingsItems["tabBarTextAndIconColor"] = CustomThemeSettingsItem(
+            title: NSLocalizedString("theme_item_tab_bar_text_and_icon_color", comment: ""),
+            description: NSLocalizedString("theme_item_tab_bar_text_and_icon_color_detail", comment: "")
         )
         
         customThemeSettingsItems["postIconAndInfoColor"] = CustomThemeSettingsItem(

@@ -38,7 +38,7 @@ struct CopyContentSheet: View {
         SheetRootView {
             HTMLStringView(
                 content: html,
-                tintColor: UIColor(Color(hex: customThemeViewModel.currentCustomTheme.colorPrimary))
+                tintColor: UIColor(Color(hex: customThemeViewModel.currentCustomTheme.linkColor))
             )
         }
         .padding(16)
