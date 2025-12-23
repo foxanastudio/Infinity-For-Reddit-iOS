@@ -33,7 +33,6 @@ struct PostDetailsView: View {
     @State private var showPostOptionsSheet: Bool = false
     @State private var showPostShareSheet: Bool = false
     @State private var showCopyContentOptionsSheet: Bool = false
-    @State private var showCopyContentSheet: Bool = false
     @State private var titleToBeCopied: String?
     @State private var markdownToBeCopied: String = ""
     @State private var plainTextToBeCopied: String = ""
@@ -696,18 +695,15 @@ struct PostDetailsView: View {
                 },
                 onCopyTitle: {
                     textToBeSelectedAndCopiedItem = TextToBeSelectedAndCopiedItem(title: titleToBeCopied)
-                    showCopyContentSheet = true
                 },
                 onCopyEntireMarkdown: {
                     snackbarManager.showSnackbar(.info("Copied"))
                 },
                 onCopyMarkdown: {
                     textToBeSelectedAndCopiedItem = TextToBeSelectedAndCopiedItem(content: markdownToBeCopied)
-                    showCopyContentSheet = true
                 },
                 onCopyPlainText: {
                     textToBeSelectedAndCopiedItem = TextToBeSelectedAndCopiedItem(content: plainTextToBeCopied)
-                    showCopyContentSheet = true
                 }
             )
         }

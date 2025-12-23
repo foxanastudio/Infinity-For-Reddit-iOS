@@ -9,6 +9,7 @@ import SwiftUI
 import WebKit
 
 struct CopyContentSheet: View {
+    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
     
     @AppStorage(InterfaceFontUserDefaultsUtils.contentFontFamilyKey, store: .interfaceFont) private var contentFontFamily: Int = 0
@@ -20,6 +21,10 @@ struct CopyContentSheet: View {
         return Color(hex: customThemeViewModel.currentCustomTheme.primaryTextColor).toHexString()
     }
     
+    var linkColor: String? {
+        return Color(hex: customThemeViewModel.currentCustomTheme.linkColor).toHexString()
+    }
+    
     var html: String {
         return """
                <head>
@@ -29,6 +34,9 @@ struct CopyContentSheet: View {
                                color: \(textColor ?? "#000000");
                                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
                            }
+                           a {
+                               color: \(linkColor ?? "#FF1868");
+                           }
                        </style>
                </head>
                """ + content
@@ -36,10 +44,22 @@ struct CopyContentSheet: View {
     
     var body: some View {
         SheetRootView {
-            HTMLStringView(
-                content: html,
-                tintColor: UIColor(Color(hex: customThemeViewModel.currentCustomTheme.linkColor))
-            )
+            VStack(spacing: 16) {
+                HTMLStringView(
+                    content: html,
+                    tintColor: UIColor(Color(hex: customThemeViewModel.currentCustomTheme.colorPrimaryLightTheme))
+                )
+                
+                Button {
+                    dismiss()
+                } label: {
+                    Text("Done")
+                        .buttonText()
+                        .frame(maxWidth: .infinity)
+                }
+                .frame(maxWidth: .infinity)
+                .filledButton()
+            }
         }
         .padding(16)
     }
@@ -53,6 +73,8 @@ struct HTMLStringView: UIViewRepresentable {
         let wv = WKWebView()
         wv.tintColor = tintColor
         wv.isOpaque = false
+        wv.scrollView.showsVerticalScrollIndicator = false
+        wv.scrollView.showsHorizontalScrollIndicator = false
         return wv
     }
 

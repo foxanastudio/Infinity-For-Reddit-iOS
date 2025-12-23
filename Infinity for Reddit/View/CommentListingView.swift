@@ -23,7 +23,6 @@ struct CommentListingView: View {
     @State private var showSortTypeTimeSheet: Bool = false
     @State private var showCommentModerationSheet: Bool = false
     @State private var showCopyContentOptionsSheet: Bool = false
-    @State private var showCopyContentSheet: Bool = false
     @State private var markdownToBeCopied: String = ""
     @State private var plainTextToBeCopied: String = ""
     @State private var textToBeSelectedAndCopiedItem: TextToBeSelectedAndCopiedItem?
@@ -233,11 +232,9 @@ struct CommentListingView: View {
                 },
                 onCopyMarkdown: {
                     textToBeSelectedAndCopiedItem = TextToBeSelectedAndCopiedItem(content: markdownToBeCopied)
-                    showCopyContentSheet = true
                 },
                 onCopyPlainText: {
                     textToBeSelectedAndCopiedItem = TextToBeSelectedAndCopiedItem(content: plainTextToBeCopied)
-                    showCopyContentSheet = true
                 }
             )
         }
