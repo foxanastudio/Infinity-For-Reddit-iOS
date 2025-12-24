@@ -181,6 +181,11 @@ struct SearchView: View {
                 }
                 
                 Spacer()
+                
+                KeyboardToolbar {
+                    focusedField = nil
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                }
             }
         }
         .themedNavigationBar()
@@ -230,6 +235,9 @@ struct SearchView: View {
                     searchViewModel.searchInThing = thing
                 }
             }
+        }
+        .onAppear {
+            focusedField = .search
         }
     }
     
