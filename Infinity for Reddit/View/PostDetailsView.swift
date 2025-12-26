@@ -21,7 +21,6 @@ struct PostDetailsView: View {
     @EnvironmentObject private var snackbarManager: SnackbarManager
     @EnvironmentObject private var accountViewModel: AccountViewModel
     
-    @StateObject var playerManager = PlayerManager()
     @StateObject var postDetailsViewModel: PostDetailsViewModel
     
     @FocusState private var focusedField: FieldType?
