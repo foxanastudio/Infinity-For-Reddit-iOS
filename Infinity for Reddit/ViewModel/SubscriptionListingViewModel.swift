@@ -253,6 +253,11 @@ public class SubscriptionListingViewModel: ObservableObject {
             return
         }
         
+        if !forceLoad {
+            subscriptionsPrivate = []
+            after = nil
+        }
+        
         await MainActor.run {
             isLoadingSubscriptions = true
         }
