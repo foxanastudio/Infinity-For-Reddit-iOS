@@ -24,7 +24,9 @@ struct SearchUsersSheet: View {
             showUserSearchResultSheet = true
         }
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar("Search Users")
+        .applyIf(!Utils.isIOS26()) {
+            $0.addTitleToInlineNavigationBar("Search Users")
+        }
         .id(accountViewModel.account.username)
         .sheet(item: $queryItem) { queryItem in
             NavigationStack {

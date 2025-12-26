@@ -229,6 +229,9 @@ struct SearchView: View {
                 }
             }
         }
+        .applyIf(!Utils.isIOS26()) {
+            $0.addTitleToInlineNavigationBar("Search")
+        }
         .sheet(isPresented: $showSelectSearchInThingSheet) {
             NavigationStack {
                 SelectSearchInThingSheet { thing in
