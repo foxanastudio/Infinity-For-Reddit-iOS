@@ -17,7 +17,7 @@ actor UserProfileImageBatchLoader {
     private let userDao: UserDao
     private let partialUserDao: PartialUserDao
     public static let batchSize = 100
-    private var cache: [String: String] = [:]
+    private var cache: NSCache<NSString, NSString> = NSCache()
     private var inFlight: Set<String> = []
     private var loadingQueue: [String] = []
     private var waitingContinuations: [String: [CheckedContinuation<String, Never>]] = [:]
@@ -34,6 +34,7 @@ actor UserProfileImageBatchLoader {
         self.session = resolvedSession
         self.userDao = UserDao(dbPool: resolvedDBPool)
         self.partialUserDao = PartialUserDao(dbPool: resolvedDBPool)
+        self.cache.countLimit = 2000
     }
     
     func loadIcons(comments: [Comment]) async -> String {
@@ -43,19 +44,19 @@ actor UserProfileImageBatchLoader {
             return ""
         }
         
-        if let cached = cache[callingAuthorFullname] {
-            return cached
+        if let cached = cache.object(forKey: callingAuthorFullname as NSString) {
+            return cached as String
         }
         
         if let partialUserData = try? await partialUserDao.getPartialUserData(username: callingAuthorUsername) {
             let iconUrlString = partialUserData.profileImageUrlString
-            cache[callingAuthorFullname] = iconUrlString
+            cache.setObject(iconUrlString as NSString, forKey: callingAuthorFullname as NSString)
             return iconUrlString
         }
         
         if let userData = try? await userDao.getUserData(username: callingAuthorUsername) {
             let iconUrlString = userData.iconUrl ?? ""
-            cache[callingAuthorFullname] = iconUrlString
+            cache.setObject(iconUrlString as NSString, forKey: callingAuthorFullname as NSString)
             return iconUrlString
         }
         
@@ -67,7 +68,7 @@ actor UserProfileImageBatchLoader {
         
         let batch = comments
             .map(\.authorFullname)
-            .filter { !cache.keys.contains($0) && !inFlight.contains($0) }
+            .filter { cache.object(forKey: $0 as NSString) == nil && !inFlight.contains($0) }
             .prefix(UserProfileImageBatchLoader.batchSize)
         
         for author in batch {
@@ -93,19 +94,19 @@ actor UserProfileImageBatchLoader {
             return ""
         }
         
-        if let cached = cache[callingAuthorFullname] {
-            return cached
+        if let cached = cache.object(forKey: callingAuthorFullname as NSString) {
+            return cached as String
         }
         
         if let partialUserData = try? await partialUserDao.getPartialUserData(username: callingAuthorUsername) {
             let iconUrlString = partialUserData.profileImageUrlString
-            cache[callingAuthorFullname] = iconUrlString
+            cache.setObject(iconUrlString as NSString, forKey: callingAuthorFullname as NSString)
             return iconUrlString
         }
         
         if let userData = try? await userDao.getUserData(username: callingAuthorUsername) {
             let iconUrlString = userData.iconUrl ?? ""
-            cache[callingAuthorFullname] = iconUrlString
+            cache.setObject(iconUrlString as NSString, forKey: callingAuthorFullname as NSString)
             return iconUrlString
         }
         
@@ -123,7 +124,7 @@ actor UserProfileImageBatchLoader {
                     return $0.authorFullname
                 }
             }
-            .filter { !cache.keys.contains($0) && !inFlight.contains($0) }
+            .filter { cache.object(forKey: $0 as NSString) == nil && !inFlight.contains($0) }
             .prefix(UserProfileImageBatchLoader.batchSize)
         
         for author in batch {
@@ -193,7 +194,7 @@ actor UserProfileImageBatchLoader {
     }
     
     private func resumeWaiters(author: String, url: String) {
-        cache[author] = url
+        cache.setObject(url as NSString, forKey: author as NSString)
         inFlight.remove(author)
         if let continuations = waitingContinuations[author] {
             for continuation in continuations {

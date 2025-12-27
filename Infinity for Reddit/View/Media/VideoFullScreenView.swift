@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AVKit
+import SeekBar
 
 struct VideoFullScreenView<Content: View>: View {
     @ObservedObject private var videoFullScreenViewModel: VideoFullScreenViewModel
@@ -145,7 +146,7 @@ struct VideoFullScreenView<Content: View>: View {
         .edgesIgnoringSafeArea(.all)
         .ignoresSafeArea()
         .applyIf(onDownloadAllMedia == nil) {
-            // In TabVideoView
+            // Not in TabVideoView
             $0.mediaGesture(
                 onDragEnded: { transform in
                     if transform.scaleX == 1 && transform.scaleY == 1 && abs(transform.ty) > 100 {
@@ -467,18 +468,32 @@ struct VideoController<Content: View>: View {
                         .foregroundStyle(.white)
                 }
                 
-                HStack {
-                    Text(formatTime(currentTime))
-                        .foregroundStyle(.white)
+                ZStack(alignment: .bottom) {
+                    HStack(spacing: 0) {
+                        Text(formatTime(currentTime))
+                            .foregroundStyle(.white)
+                            .customFont()
+                        
+                        Spacer()
+                        
+                        Text(formatTime(duration))
+                            .foregroundStyle(.white)
+                            .customFont()
+                    }
+                    .padding(.bottom, 32)
                     
-                    Slider(value: $currentTime, in: 0...duration, onEditingChanged: { isEditing in
-                        isSeekingProgress = isEditing
+                    SeekBar(value: $currentTime, in: 0...duration, onEditingChanged: { isEditing in
+                        withAnimation {
+                            isSeekingProgress = isEditing
+                        }
                         onResetControllerTimer()
                     })
-                    .padding(.horizontal, 16)
-                    
-                    Text(formatTime(duration))
-                        .foregroundStyle(.white)
+                    .seekBarDisplay(with: .trackOnly)
+                    .trackDimensions(
+                        trackHeight: isSeekingProgress ? 24 : 16,
+                        inactiveTrackCornerRadius: 24
+                    )
+                    .trackColors(activeTrackColor: .white, inactiveTrackColor: .gray)
                 }
             }
             .padding(.horizontal, 16)

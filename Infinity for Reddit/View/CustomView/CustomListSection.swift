@@ -32,12 +32,15 @@ struct CustomListSection<Content: View>: View {
         } header: {
             Text(title)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-                .padding(.horizontal, max(padding, (currentWidth - 500) / 2) + 16)
+                .padding(.horizontal, max(0, (currentWidth - 500) / 2) + 16)
                 .background(
                     GeometryReader { proxy in
                         Color(hex: customThemeViewModel.currentCustomTheme.backgroundColor)
                             .onAppear {
                                 currentWidth = proxy.size.width
+                            }
+                            .onChange(of: proxy.size) { _, newValue in
+                                currentWidth = newValue.width
                             }
                     }
                 )

@@ -13,6 +13,8 @@
 		55155AE12CFD5BCF003D5F14 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 55155AE02CFD5BCF003D5F14 /* GRDB */; };
 		554918CB2E26D8ED00355B48 /* Flow in Frameworks */ = {isa = PBXBuildFile; productRef = 554918CA2E26D8ED00355B48 /* Flow */; };
 		555F0B842D07AD53003A1CA7 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 555F0B832D07AD53003A1CA7 /* SDWebImageSwiftUI */; };
+		5582E51B2EFF32550031EDE7 /* SeekBar in Frameworks */ = {isa = PBXBuildFile; productRef = 5582E51A2EFF32550031EDE7 /* SeekBar */; };
+		5582E51C2EFF45980031EDE7 /* SeekBar in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 5582E51A2EFF32550031EDE7 /* SeekBar */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		5588B8552E0A30A1004CDAA2 /* IdentifiedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 5588B8542E0A30A1004CDAA2 /* IdentifiedCollections */; };
 		559389B12E459F600062724F /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 559389B02E459F600062724F /* Kingfisher */; };
 		55949B882CFA7EAD002D1C46 /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = 55949B872CFA7EAD002D1C46 /* Swinject */; };
@@ -38,6 +40,20 @@
 			remoteInfo = "Infinity for Reddit";
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		5582E51D2EFF45980031EDE7 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				5582E51C2EFF45980031EDE7 /* SeekBar in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		559BD2332CF7D58500621685 /* Infinity for Reddit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Infinity for Reddit.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -68,6 +84,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5582E51B2EFF32550031EDE7 /* SeekBar in Frameworks */,
 				555F0B842D07AD53003A1CA7 /* SDWebImageSwiftUI in Frameworks */,
 				55949B882CFA7EAD002D1C46 /* Swinject in Frameworks */,
 				46978AED2E863D7100EAF60F /* MijickCamera in Frameworks */,
@@ -131,6 +148,7 @@
 				559BD22F2CF7D58500621685 /* Sources */,
 				559BD2302CF7D58500621685 /* Frameworks */,
 				559BD2312CF7D58500621685 /* Resources */,
+				5582E51D2EFF45980031EDE7 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -154,6 +172,7 @@
 				5509013C2EB42E2400707F87 /* GiphyUISDK */,
 				462393A82EE25BEE00466F5E /* GCDWebServer */,
 				5597B1E02EE3417000D79683 /* SwiftUIIntrospect */,
+				5582E51A2EFF32550031EDE7 /* SeekBar */,
 			);
 			productName = "Infinity for Reddit";
 			productReference = 559BD2332CF7D58500621685 /* Infinity for Reddit.app */;
@@ -251,6 +270,7 @@
 				5509013B2EB42E2400707F87 /* XCRemoteSwiftPackageReference "giphy-ios-sdk" */,
 				462393A72EE25BEE00466F5E /* XCRemoteSwiftPackageReference "GCDWebServer" */,
 				5597B1DF2EE3417000D79683 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
+				5582E5192EFF32550031EDE7 /* XCRemoteSwiftPackageReference "SeekBar" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 559BD2342CF7D58500621685 /* Products */;
@@ -673,6 +693,14 @@
 				minimumVersion = 3.1.3;
 			};
 		};
+		5582E5192EFF32550031EDE7 /* XCRemoteSwiftPackageReference "SeekBar" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kim-minseong/SeekBar";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		5588B8532E0A30A1004CDAA2 /* XCRemoteSwiftPackageReference "swift-identified-collections" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-identified-collections.git";
@@ -761,6 +789,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 555F0B822D07AD53003A1CA7 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
 			productName = SDWebImageSwiftUI;
+		};
+		5582E51A2EFF32550031EDE7 /* SeekBar */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5582E5192EFF32550031EDE7 /* XCRemoteSwiftPackageReference "SeekBar" */;
+			productName = SeekBar;
 		};
 		5588B8542E0A30A1004CDAA2 /* IdentifiedCollections */ = {
 			isa = XCSwiftPackageProductDependency;

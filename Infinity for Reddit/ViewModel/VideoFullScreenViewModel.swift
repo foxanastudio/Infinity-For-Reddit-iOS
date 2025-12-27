@@ -157,6 +157,10 @@ class VideoFullScreenViewModel: ObservableObject {
         player.rate = Float(playbackSpeed)
         isPlaying = true
         userPaused = false
+        
+        Task {
+            await ScreenWakeManager.shared.videoDidPlay(player)
+        }
     }
     
     func pause(userPaused: Bool = false) {
@@ -164,6 +168,10 @@ class VideoFullScreenViewModel: ObservableObject {
         isPlaying = false
         if userPaused {
             self.userPaused = true
+        }
+        
+        Task {
+            await ScreenWakeManager.shared.videoDidPause(player)
         }
     }
     
@@ -179,6 +187,10 @@ class VideoFullScreenViewModel: ObservableObject {
         isLoading = false
         error = nil
         downloadError = nil
+        
+        Task {
+            await ScreenWakeManager.shared.videoDidPause(player)
+        }
     }
     
     private func observeTime() {

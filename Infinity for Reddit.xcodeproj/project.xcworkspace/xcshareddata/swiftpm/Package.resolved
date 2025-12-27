@@ -1,5 +1,5 @@
 {
-  "originHash" : "0a91b79e985a1db8fafeffaa0e84547cf242abf0ff7e2b34d3dd49b2090e66a2",
+  "originHash" : "6148b72ee326d47805364978e161d32535cca729044b2ccb429d77905bed8650",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -89,6 +89,15 @@
       "state" : {
         "revision" : "0e331457ca9af2f0b08bcaa138a91ffb907b004f",
         "version" : "3.1.4"
+      }
+    },
+    {
+      "identity" : "seekbar",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kim-minseong/SeekBar",
+      "state" : {
+        "branch" : "main",
+        "revision" : "aad83f51a597c4ca1fb8512f284cd8de016073fb"
       }
     },
     {

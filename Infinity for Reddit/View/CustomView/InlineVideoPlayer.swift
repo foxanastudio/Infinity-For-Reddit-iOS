@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AVKit
+import SeekBar
 
 struct InlineVideoPlayer: View {
     @EnvironmentObject private var networkManager: NetworkManager
@@ -171,32 +172,42 @@ private struct InlineVideoPlayerWithControls: View {
                 VStack(spacing: 0) {
                     Spacer()
                     
-                    HStack(spacing: 0) {
-                        Text(formatTime(videoPlayerViewModel.currentTime))
-                            .foregroundColor(.white)
-                            .font(.caption)
-                            .frame(width: 50)
+                    ZStack(alignment: .bottom) {
+                        HStack(spacing: 0) {
+                            Text(formatTime(videoPlayerViewModel.currentTime))
+                                .foregroundColor(.white)
+                                .customFont(fontSize: .f11)
 
-                        Slider(value: $videoPlayerViewModel.currentTime, in: 0...videoPlayerViewModel.duration, onEditingChanged: { editing in
-                            print(editing)
-                            videoPlayerViewModel.isDragging = editing
+                            Spacer()
+
+                            Text(formatTime(videoPlayerViewModel.duration))
+                                .foregroundColor(.white)
+                                .customFont(fontSize: .f11)
+                        }
+                        .padding(.bottom, 28)
+                        
+                        SeekBar(value: $videoPlayerViewModel.currentTime, in: 0...videoPlayerViewModel.duration, onEditingChanged: { editing in
+                            withAnimation {
+                                videoPlayerViewModel.isDragging = editing
+                            }
                             if !editing {
                                 videoPlayerViewModel.seek(to: videoPlayerViewModel.currentTime)
                             }
                         })
-                        .accentColor(.white)
+                        .seekBarDisplay(with: .trackOnly)
+                        .trackDimensions(
+                            trackHeight: videoPlayerViewModel.isDragging ? 24 : 16,
+                            inactiveTrackCornerRadius: 24
+                        )
+                        .trackColors(activeTrackColor: .white, inactiveTrackColor: .gray)
                         .onChange(of: videoPlayerViewModel.currentTime, initial: false) { _, _  in
                             if videoPlayerViewModel.isDragging {
                                 videoPlayerViewModel.resetControlsTimer()
                             }
                         }
-
-                        Text(formatTime(videoPlayerViewModel.duration))
-                            .foregroundColor(.white)
-                            .font(.caption)
-                            .frame(width: 50)
                     }
-                    .padding(8)
+                    .padding(.bottom, 16)
+                    .padding(.horizontal, 16)
                 }
                 
                 HStack(spacing: 48) {
