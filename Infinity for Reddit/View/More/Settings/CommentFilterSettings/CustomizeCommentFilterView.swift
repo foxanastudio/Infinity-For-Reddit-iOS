@@ -11,7 +11,6 @@ import Combine
 
 struct CustomizeCommentFilterView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.dependencyManager) private var dependencyManager: Container
     
     @StateObject private var customizeCommentFilterViewModel: CustomizeCommentFilterViewModel
     

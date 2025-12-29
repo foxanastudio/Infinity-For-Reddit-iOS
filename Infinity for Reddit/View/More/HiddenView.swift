@@ -10,7 +10,6 @@ import Swinject
 import GRDB
 
 struct HiddenView: View {
-    @Environment(\.dependencyManager) private var dependencyManager: Container
     @EnvironmentObject var accountViewModel: AccountViewModel
     
     var body: some View {

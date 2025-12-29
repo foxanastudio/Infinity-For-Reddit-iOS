@@ -14,7 +14,6 @@ import Alamofire
 
 struct HomeView: View {
     @Environment(\.colorScheme) var colorScheme
-    @Environment(\.dependencyManager) private var dependencyManager: Container
     @Environment(\.scenePhase) var scenePhase
     @EnvironmentObject var accountViewModel: AccountViewModel
     @EnvironmentObject var customThemeViewModel: CustomThemeViewModel

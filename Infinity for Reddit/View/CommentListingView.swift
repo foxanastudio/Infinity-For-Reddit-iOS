@@ -11,7 +11,6 @@ import GRDB
 import Alamofire
 
 struct CommentListingView: View {
-    @Environment(\.dependencyManager) private var dependencyManager: Container
     @EnvironmentObject var accountViewModel: AccountViewModel
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     @EnvironmentObject var navigationManager: NavigationManager

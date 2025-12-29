@@ -11,7 +11,6 @@ import Combine
 
 struct CustomizePostFilterView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.dependencyManager) private var dependencyManager: Container
     
     @StateObject private var customizePostFilterViewModel: CustomizePostFilterViewModel
     

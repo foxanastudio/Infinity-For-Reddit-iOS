@@ -12,7 +12,6 @@ import GRDB
 struct PostFilterSettingsView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
-    @Environment(\.dependencyManager) private var dependencyManager: Container
     
     @StateObject var postFilterViewModel: PostFilterViewModel
     @State private var selectedPostFilter: PostFilter?
