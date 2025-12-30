@@ -1,8 +1,9 @@
 //
-// PostView.swift
-// Infinity for Reddit
+//  PostView.swift
+//  Infinity for Reddit
 //
-// Created by joeylr2042 on 2025-11-01
+//  Created by joeylr2042 on 2025-11-01.
+//
 
 import SwiftUI
 
@@ -101,11 +102,9 @@ struct PostView: View {
                     onSensitiveClicked: onSensitiveTap,
                     onOpenLink: openLink,
                     onShare: onShare,
-                    onReadPost: onReadPost
+                    onReadPost: onReadPost,
+                    onLongPressPost: onLongPressPost
                 )
-                .onLongPressGesture {
-                    onLongPressPost()
-                }
             }
         }
         .frame(maxWidth: 500)

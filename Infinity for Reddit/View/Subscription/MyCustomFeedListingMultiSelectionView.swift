@@ -33,7 +33,7 @@ struct MyCustomFeedListingMultiSelectionView: View {
                 List {
                     if !subscriptionListingViewModel.favoriteMyCustomFeeds.isEmpty {
                         CustomListSection("Favorite") {
-                            ForEach(subscriptionListingViewModel.favoriteMyCustomFeeds, id: \.identityInView) { customFeed in
+                            ForEach(subscriptionListingViewModel.favoriteMyCustomFeeds, id: \.path) { customFeed in
                                 SubscriptionItemMultiSelectionView(
                                     text: customFeed.displayName,
                                     iconUrl: customFeed.iconUrl,
@@ -47,7 +47,7 @@ struct MyCustomFeedListingMultiSelectionView: View {
                     }
                     
                     CustomListSection("All") {
-                        ForEach(subscriptionListingViewModel.myCustomFeeds, id: \.identityInView) { customFeed in
+                        ForEach(subscriptionListingViewModel.myCustomFeeds, id: \.path) { customFeed in
                             SubscriptionItemMultiSelectionView(
                                 text: customFeed.displayName,
                                 iconUrl: customFeed.iconUrl,

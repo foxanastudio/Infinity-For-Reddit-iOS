@@ -23,7 +23,11 @@ struct SearchSubredditsSheet: View {
             showSubredditSearchResultSheet = true
         }
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar("Search Subreddits")
+        .modify {
+            if #unavailable(iOS 26) {
+                $0.addTitleToInlineNavigationBar("Search Subreddits")
+            }
+        }
         .id(accountViewModel.account.username)
         .sheet(item: $queryItem) { queryItem in
             NavigationStack {

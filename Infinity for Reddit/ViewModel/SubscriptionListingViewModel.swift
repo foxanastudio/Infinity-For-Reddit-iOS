@@ -11,7 +11,6 @@ import GRDB
 import IdentifiedCollections
 
 public class SubscriptionListingViewModel: ObservableObject {
-    // MARK: - Properties
     @Published var subredditSubscriptions: [SubscribedSubredditData] = []
     @Published var favoriteSubredditSubscriptions: [SubscribedSubredditData] = []
     @Published var userSubscriptions: [SubscribedUserData] = []
@@ -38,6 +37,7 @@ public class SubscriptionListingViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     private let operationqueue: OperationQueue
     private let dbPool: DatabasePool
+    private let refreshInterval = 60 * 60 * 24
     
     private let searchQueryPublisher = CurrentValueSubject<String, Error>("")
     private let subredditSubscriptionsPublisher: AnyPublisher<[SubscribedSubredditData], Error>
@@ -140,8 +140,6 @@ public class SubscriptionListingViewModel: ObservableObject {
         receiveSubscriptions()
     }
     
-    // MARK: - Methods
-    
     private func receiveSubscriptions() {
         subredditSubscriptionsPublisher
             .sink(
@@ -153,7 +151,10 @@ public class SubscriptionListingViewModel: ObservableObject {
                         print("Encountered an error: \(error)")
                     }
                 },
-                receiveValue: { result in
+                receiveValue: { [weak self] result in
+                    guard let self else {
+                        return
+                    }
                     self.subredditSubscriptions = result
                 }
             )
@@ -169,7 +170,10 @@ public class SubscriptionListingViewModel: ObservableObject {
                         print("Encountered an error: \(error)")
                     }
                 },
-                receiveValue: { result in
+                receiveValue: { [weak self] result in
+                    guard let self else {
+                        return
+                    }
                     self.favoriteSubredditSubscriptions = result
                 }
             )
@@ -185,7 +189,10 @@ public class SubscriptionListingViewModel: ObservableObject {
                         print("Encountered an error: \(error)")
                     }
                 },
-                receiveValue: { result in
+                receiveValue: { [weak self] result in
+                    guard let self else {
+                        return
+                    }
                     self.userSubscriptions = result
                 }
             )
@@ -201,7 +208,10 @@ public class SubscriptionListingViewModel: ObservableObject {
                         print("Encountered an error: \(error)")
                     }
                 },
-                receiveValue: { result in
+                receiveValue: { [weak self] result in
+                    guard let self else {
+                        return
+                    }
                     self.favoriteUserSubscriptions = result
                 }
             )
@@ -217,7 +227,10 @@ public class SubscriptionListingViewModel: ObservableObject {
                         print("Encountered an error: \(error)")
                     }
                 },
-                receiveValue: { result in
+                receiveValue: { [weak self] result in
+                    guard let self else {
+                        return
+                    }
                     self.myCustomFeeds = result
                 }
             )
@@ -233,7 +246,10 @@ public class SubscriptionListingViewModel: ObservableObject {
                         print("Encountered an error: \(error)")
                     }
                 },
-                receiveValue: { result in
+                receiveValue: { [weak self] result in
+                    guard let self else {
+                        return
+                    }
                     self.favoriteMyCustomFeeds = result
                 }
             )
@@ -244,13 +260,19 @@ public class SubscriptionListingViewModel: ObservableObject {
         searchQueryPublisher.send(query)
     }
     
-    public func loadSubscriptionsOnline(forceLoad: Bool = false) async {
-        guard forceLoad || Int64(Date().timeIntervalSince1970) - AccountViewModel.shared.account.subscriptionSyncTime >= 60 * 60 * 24 else {
+    public func loadSubscriptionsOnline(isPagination: Bool = false) async {
+        guard isPagination || Int64(Date().timeIntervalSince1970) - AccountViewModel.shared.account.subscriptionSyncTime >= refreshInterval else {
             return
         }
         
-        guard !isLoadingSubscriptions || forceLoad else {
+        guard !isLoadingSubscriptions || isPagination else {
             return
+        }
+        
+        if !isPagination {
+            // Start over
+            subscriptionsPrivate = []
+            after = nil
         }
         
         await MainActor.run {
@@ -295,7 +317,7 @@ public class SubscriptionListingViewModel: ObservableObject {
                         print("Unable to update subscription sync time: \(error)")
                     }
                 } else {
-                    await loadSubscriptionsOnline(forceLoad: true)
+                    await loadSubscriptionsOnline(isPagination: true)
                 }
             }
         } catch {
@@ -361,14 +383,13 @@ public class SubscriptionListingViewModel: ObservableObject {
         
         await MainActor.run {
             self.after = nil
+            self.subscriptionsPrivate = []
             self.isLoadingSubscriptions = false
-            self.subredditSubscriptions = subredditSubscriptionsTemp
-            self.userSubscriptions = userSubscriptionsTemp
         }
     }
     
     public func loadMyCustomFeedsOnline() async {
-        guard Int64(Date().timeIntervalSince1970) - AccountViewModel.shared.account.customFeedSyncTime >= 60 * 60 * 24 else { return }
+        guard Int64(Date().timeIntervalSince1970) - AccountViewModel.shared.account.customFeedSyncTime >= refreshInterval else { return }
         
         guard !isLoadingMyCustomFeeds else { return }
         
@@ -401,7 +422,6 @@ public class SubscriptionListingViewModel: ObservableObject {
             
             await MainActor.run {
                 self.isLoadingMyCustomFeeds = false
-                self.myCustomFeeds = myCustomFeedsTemp
             }
         } catch {
             await MainActor.run {
@@ -416,9 +436,6 @@ public class SubscriptionListingViewModel: ObservableObject {
     func refreshSubscriptions() {
         isLoadingSubscriptions = false
         isLoadingMyCustomFeeds = false
-        
-        after = nil
-        subscriptionsPrivate = []
         
         AccountViewModel.shared.account.subscriptionSyncTime = 0
         AccountViewModel.shared.account.customFeedSyncTime = 0

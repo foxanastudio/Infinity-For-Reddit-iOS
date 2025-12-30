@@ -36,7 +36,7 @@ struct CustomFeedListingView: View {
                 List {
                     if !subscriptionListingViewModel.favoriteMyCustomFeeds.isEmpty {
                         CustomListSection("Favorite") {
-                            ForEach(subscriptionListingViewModel.favoriteMyCustomFeeds, id: \.identityInView) { customFeed in
+                            ForEach(subscriptionListingViewModel.favoriteMyCustomFeeds, id: \.path) { customFeed in
                                 SubscriptionItemView(text: customFeed.displayName, iconUrl: customFeed.iconUrl, isFavorite: customFeed.isFavorite, action: {
                                     if let onSelectCustomAction {
                                         onSelectCustomAction(Thing.myCustomFeed(customFeed))
@@ -68,7 +68,7 @@ struct CustomFeedListingView: View {
                     }
                     
                     CustomListSection("All") {
-                        ForEach(subscriptionListingViewModel.myCustomFeeds, id: \.identityInView) { customFeed in
+                        ForEach(subscriptionListingViewModel.myCustomFeeds, id: \.path) { customFeed in
                             SubscriptionItemView(text: customFeed.displayName, iconUrl: customFeed.iconUrl, isFavorite: customFeed.isFavorite, action: {
                                 if let onSelectCustomAction {
                                     onSelectCustomAction(Thing.myCustomFeed(customFeed))

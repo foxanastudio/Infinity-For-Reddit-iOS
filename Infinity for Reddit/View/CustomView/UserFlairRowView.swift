@@ -35,7 +35,6 @@ struct UserFlairRowView: View {
                             .padding(.trailing, 16)
                     }
                     .contentShape(Rectangle())
-                    .excludeFromTouchRipple()
                     .onTapGesture {
                         // TODO modify flair
                     }

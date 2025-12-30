@@ -64,7 +64,6 @@ struct PostSubmissionSubredditChooserView: View {
                     }
                 }
                 .filledButton()
-                .excludeFromTouchRipple()
             }
             .frame(maxWidth: .infinity)
             .padding(16)

@@ -16,7 +16,7 @@ struct AccountSheet: View {
     
     @StateObject var accountListingViewModel: AccountListingViewModel
     
-    private let profileImageSize: CGFloat = 96
+    private let profileImageSize: CGFloat = 86
     
     init() {
         guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
@@ -49,7 +49,7 @@ struct AccountSheet: View {
                             handleImageTapGesture: false,
                             fallbackView: {
                                 if accountViewModel.account.isAnonymous() {
-                                    SwiftUI.Image(systemName: "person.crop.circle.badge.questionmark.fill")
+                                    SwiftUI.Image(systemName: "questionmark.circle.fill")
                                         .resizable()
                                         .scaledToFit()
                                         .frame(width: profileImageSize, height: profileImageSize)

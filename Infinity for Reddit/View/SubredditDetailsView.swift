@@ -46,8 +46,13 @@ struct SubredditDetailsView: View {
                                 handleImageTapGesture: false,
                                 centerCrop: true,
                                 fallbackView: {
-                                    Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
-                                        .frame(height: proxy.safeAreaInsets.top)
+                                    if #available(iOS 26, *) {
+                                        Color.clear
+                                            .frame(height: proxy.safeAreaInsets.top)
+                                    } else {
+                                        Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
+                                            .frame(height: proxy.safeAreaInsets.top)
+                                    }
                                 }
                             )
                             
@@ -123,22 +128,26 @@ struct SubredditDetailsView: View {
                     )
                 }
                 .edgesIgnoringSafeArea(.top)
-                .overlay(alignment: .top) {
-                    Rectangle()
-                        .fill(
-                            LinearGradient(
-                                gradient: Gradient(
-                                    colors: [
-                                        Color(hex: themeViewModel.currentCustomTheme.colorPrimary),
-                                        isSubredditInfoVisible ? .clear : Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
-                                    ]
-                                ),
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        )
-                        .frame(height: proxy.safeAreaInsets.top)
-                        .ignoresSafeArea()
+                .modify {
+                    if #unavailable(iOS 26) {
+                        $0.overlay(alignment: .top) {
+                                Rectangle()
+                                    .fill(
+                                        LinearGradient(
+                                            gradient: Gradient(
+                                                colors: [
+                                                    Color(hex: themeViewModel.currentCustomTheme.colorPrimary),
+                                                    isSubredditInfoVisible ? .clear : Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
+                                                ]
+                                            ),
+                                            startPoint: .top,
+                                            endPoint: .bottom
+                                        )
+                                    )
+                                    .frame(height: proxy.safeAreaInsets.top)
+                                    .ignoresSafeArea()
+                            }
+                    }
                 }
             }
         }

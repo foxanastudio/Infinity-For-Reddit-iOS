@@ -51,7 +51,6 @@ struct TogglePreference: View {
                 Toggle("", isOn: $isEnabled)
                     .themedToggle()
                     .labelsHidden()
-                    .excludeFromTouchRipple()
             }
             .contentShape(Rectangle())
             .padding(.horizontal, 16)

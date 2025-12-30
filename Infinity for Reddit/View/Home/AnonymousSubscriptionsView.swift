@@ -52,43 +52,51 @@ struct AnonymousSubscriptionsView: View {
                     .padding(4)
                 }
                 
-                TabView(selection: $selectedOption) {
+                ZStack {
                     Group {
                         switch anonymousSubscriptionListingViewModel.subscriptionSelectionMode {
                         case .noSelection:
                             AnonymousSubscribedSubredditListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
-                                .tag(0)
+                                .opacity(selectedOption == 0 ? 1 : 0)
+                                .allowsHitTesting(selectedOption == 0)
                             
                             AnonymousSubscribedUserListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
-                                .tag(1)
+                                .opacity(selectedOption == 1 ? 1 : 0)
+                                .allowsHitTesting(selectedOption == 1)
                             
                             AnonymousCustomFeedView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
-                                .tag(2)
+                                .opacity(selectedOption == 2 ? 1 : 0)
+                                .allowsHitTesting(selectedOption == 2)
                         case .thingSelection(let onSelectThing):
                             AnonymousSubscribedSubredditListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel) { subscribedSubredditData in
                                 onSelectThing(Thing.subscribedSubreddit(subscribedSubredditData))
                             }
-                            .tag(0)
+                            .opacity(selectedOption == 0 ? 1 : 0)
+                            .allowsHitTesting(selectedOption == 0)
                             
                             AnonymousSubscribedUserListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel) { subscribedUserData in
                                 onSelectThing(Thing.subscribedUser(subscribedUserData))
                             }
-                            .tag(1)
+                            .opacity(selectedOption == 1 ? 1 : 0)
+                            .allowsHitTesting(selectedOption == 1)
                         case .subredditAndUserMultiSelection:
                             AnonymousSubscribedSubredditListingMultiSelectionView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
-                                .tag(0)
+                                .opacity(selectedOption == 0 ? 1 : 0)
+                                .allowsHitTesting(selectedOption == 0)
                             
                             AnonymousSubscribedUserListingMultiSelectionView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
-                                .tag(1)
+                                .opacity(selectedOption == 1 ? 1 : 0)
+                                .allowsHitTesting(selectedOption == 1)
                         case .subredditMultiSelection:
                             AnonymousSubscribedSubredditListingMultiSelectionView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
-                                .tag(0)
+                                .opacity(selectedOption == 0 ? 1 : 0)
+                                .allowsHitTesting(selectedOption == 0)
                         case .userMultiSelection:
                             AnonymousSubscribedUserListingMultiSelectionView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
-                                .tag(0)
+                                .opacity(selectedOption == 0 ? 1 : 0)
+                                .allowsHitTesting(selectedOption == 0)
                         }
                     }
-                    .toolbar(.hidden, for: .tabBar)
                 }
                 
                 switch anonymousSubscriptionListingViewModel.subscriptionSelectionMode {
@@ -167,7 +175,7 @@ struct AnonymousSubscriptionsView: View {
                     List {
                         if !anonymousSubscriptionListingViewModel.favoriteMyCustomFeeds.isEmpty {
                             CustomListSection("Favorite") {
-                                ForEach(anonymousSubscriptionListingViewModel.favoriteMyCustomFeeds, id: \.identityInView) { customFeed in
+                                ForEach(anonymousSubscriptionListingViewModel.favoriteMyCustomFeeds, id: \.path) { customFeed in
                                     SubscriptionItemView(text: customFeed.displayName, iconUrl: customFeed.iconUrl, isFavorite: customFeed.isFavorite, action: {
                                         navigationManager.append(AppNavigation.customFeed(customFeed: .myCustomFeed(customFeed)))
                                     }) {
@@ -191,7 +199,7 @@ struct AnonymousSubscriptionsView: View {
                         }
                         
                         CustomListSection("All") {
-                            ForEach(anonymousSubscriptionListingViewModel.myCustomFeeds, id: \.identityInView) { customFeed in
+                            ForEach(anonymousSubscriptionListingViewModel.myCustomFeeds, id: \.path) { customFeed in
                                 SubscriptionItemView(text: customFeed.displayName, iconUrl: customFeed.iconUrl, isFavorite: customFeed.isFavorite, action: {
                                     navigationManager.append(AppNavigation.customFeed(customFeed: .myCustomFeed(customFeed)))
                                 }) {

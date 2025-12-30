@@ -23,7 +23,7 @@ struct SubscribedSubredditDao {
     
     func insertAll(subscribedSubredditData: [SubscribedSubredditData]) async throws {
         try await dbPool.write { db in
-            for data in subscribedSubredditData{
+            for data in subscribedSubredditData {
                 try data.insert(db, onConflict: .replace)
             }
         }

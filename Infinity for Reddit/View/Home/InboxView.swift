@@ -19,6 +19,7 @@ struct InboxView: View {
     @State private var selectedOption = 0
     @State private var navigationBarMenuKey: UUID?
     @State private var hasReadAllMessages: Bool = false
+    @State private var isPresented: Bool = false
     
     private let account: Account
     
@@ -33,15 +34,16 @@ struct InboxView: View {
                 SegmentedPicker(selectedValue: $selectedOption, values: ["Notifications", "Messages"])
                     .padding(4)
                 
-                TabView(selection: $selectedOption) {
+                ZStack {
                     Group {
-                        InboxListingView(messageWhere: MessageWhere.inbox, hasReadAllMessages: $hasReadAllMessages)
-                            .tag(0)
+                        InboxListingView(messageWhere: MessageWhere.inbox, hasReadAllMessages: $hasReadAllMessages, isPresented: selectedOption == 0)
+                            .opacity(selectedOption == 0 ? 1 : 0)
+                            .allowsHitTesting(selectedOption == 0)
                         
-                        InboxListingView(messageWhere: MessageWhere.messages, hasReadAllMessages: $hasReadAllMessages)
-                            .tag(1)
+                        InboxListingView(messageWhere: MessageWhere.messages, hasReadAllMessages: $hasReadAllMessages, isPresented: selectedOption == 1)
+                            .opacity(selectedOption == 1 ? 1 : 0)
+                            .allowsHitTesting(selectedOption == 1)
                     }
-                    .toolbar(.hidden, for: .tabBar)
                 }
             }
         }

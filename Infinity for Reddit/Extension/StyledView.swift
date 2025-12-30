@@ -49,16 +49,12 @@ extension View {
         self.modifier(InlineNavigationBarWithTitle(title: title, opacity: opacity))
     }
     
-    func navigationBarButton() -> some View {
-        self.modifier(NavigationBarButtonViewModifier())
-    }
-    
     func navigationBarImage() -> some View {
         self.modifier(NavigationBarImageViewModifier())
     }
     
-    func themedNavigationBarBackButton() -> some View {
-        self.modifier(NavigationBarBackButtonViewModifier())
+    func themedNavigationBarButton() -> some View {
+        self.modifier(NavigationBarButtonViewModifier())
     }
     
     func themedTabView() -> some View {

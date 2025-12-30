@@ -61,7 +61,7 @@ struct SubscribedSubredditListingView: View {
                     
                     if !subscriptionListingViewModel.favoriteSubredditSubscriptions.isEmpty {
                         CustomListSection("Favorite") {
-                            ForEach(subscriptionListingViewModel.favoriteSubredditSubscriptions, id: \.identityInView) { subscription in
+                            ForEach(subscriptionListingViewModel.favoriteSubredditSubscriptions, id: \.fullName) { subscription in
                                 SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
                                     if let onSelectCustomAction {
                                         onSelectCustomAction(subscription)
@@ -93,7 +93,7 @@ struct SubscribedSubredditListingView: View {
                     }
                     
                     CustomListSection("All") {
-                        ForEach(subscriptionListingViewModel.subredditSubscriptions, id: \.identityInView) { subscription in
+                        ForEach(subscriptionListingViewModel.subredditSubscriptions, id: \.fullName) { subscription in
                             SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
                                 if let onSelectCustomAction {
                                     onSelectCustomAction(subscription)

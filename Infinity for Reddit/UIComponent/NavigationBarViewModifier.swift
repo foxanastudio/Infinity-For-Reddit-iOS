@@ -13,9 +13,15 @@ struct NavigationBarViewModifier: ViewModifier {
     var opacity: Double = 1
     
     func body(content: Content) -> some View {
-        content
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(Color(hex: themeViewModel.currentCustomTheme.colorPrimary, opacity: opacity), for: .navigationBar)
+        if #available(iOS 26, *) {
+            content
+                .navigationBarTitleDisplayMode(.inline)
+        } else {
+            content
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbarBackground(.visible, for: .navigationBar)
+                .toolbarBackground(Color(hex: themeViewModel.currentCustomTheme.colorPrimary, opacity: opacity), for: .navigationBar)
+        }
     }
 }
 
@@ -26,23 +32,38 @@ struct InlineNavigationBarWithTitle: ViewModifier {
     var opacity: Double
 
     func body(content: Content) -> some View {
-        content
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text(title)
-                        .navigationBarPrimaryText()
-                        .opacity(opacity)
+        if #available(iOS 26, *) {
+            content
+                .toolbar {
+                    ToolbarItem(placement: .principal) {
+                        Text(title)
+                            .navigationBarPrimaryText()
+                    }
                 }
-            }
-            .navigationBarTitleDisplayMode(.inline)
+                .navigationBarTitleDisplayMode(.inline)
+        } else {
+            content
+                .toolbar {
+                    ToolbarItem(placement: .principal) {
+                        Text(title)
+                            .navigationBarPrimaryText()
+                            .opacity(opacity)
+                    }
+                }
+                .navigationBarTitleDisplayMode(.inline)
+        }
     }
 }
 
-struct NavigationBarBackButtonViewModifier: ViewModifier {
+struct NavigationBarButtonViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
     
     func body(content: Content) -> some View {
-        content
-            .tint(Color(hex: themeViewModel.currentCustomTheme.toolbarPrimaryTextAndIconColor))
+        if #available(iOS 26, *) {
+            content
+        } else {
+            content
+                .tint(Color(hex: themeViewModel.currentCustomTheme.toolbarPrimaryTextAndIconColor))
+        }
     }
 }

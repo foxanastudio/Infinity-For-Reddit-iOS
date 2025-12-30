@@ -23,7 +23,12 @@ struct SearchSubredditsAndUsersSheet: View {
             }
         }
         .id(accountViewModel.account.username)
-        .addTitleToInlineNavigationBar(navigationBarTitle)
+        .modify {
+            if #unavailable(iOS 26) {
+                $0.addTitleToInlineNavigationBar(navigationBarTitle)
+            }
+        }
+
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {

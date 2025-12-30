@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SeekBar
 
 struct TestView: View {
     @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
@@ -15,25 +14,9 @@ struct TestView: View {
     @State private var isEditing = false
     
     var body: some View {
-        VStack {
-            SeekBar(
-                value: $value,
-                in: 0...100,
-                onEditingChanged: { edited in
-                    print(value)
-                    withAnimation {
-                        isEditing = edited
-                    }
-                }
-            )
-            .seekBarDisplay(with: .trackOnly)
-            .trackDimensions(
-                trackHeight: isEditing ? 24 : 16,
-                inactiveTrackCornerRadius: 24
-            )
-            .trackColors(activeTrackColor: Color(hex: customThemeViewModel.currentCustomTheme.colorPrimary), inactiveTrackColor: Color.red)
-            .padding(.horizontal, isEditing ? 12 : 24)
+        List(1...10, id: \.self) { index in
+            Text("\(index)")
         }
-        .themedNavigationBar()
+        .listStyle(.plain)
     }
 }

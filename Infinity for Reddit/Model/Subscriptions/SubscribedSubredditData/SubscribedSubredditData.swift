@@ -20,8 +20,6 @@ class SubscribedSubredditData: Codable, FetchableRecord, PersistableRecord, Iden
     var iconUrl: String?
     var username: String
     var isFavorite: Bool
-    
-    let identityInView = UUID().uuidString
 
     init(fullName: String = "", name: String, iconUrl: String? = nil, username: String, isFavorite: Bool = false) {
         self.fullName = fullName

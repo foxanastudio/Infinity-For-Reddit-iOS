@@ -12,7 +12,7 @@ struct NavigationStackItemViewModifier: ViewModifier {
     
     @State private var showProfile: Bool = false
     
-    private let userIconSize: CGFloat = 30
+    private let userIconSize: CGFloat = 24
     
     func body(content: Content) -> some View {
         content
@@ -29,7 +29,7 @@ struct NavigationStackItemViewModifier: ViewModifier {
                             handleImageTapGesture: false,
                             fallbackView: {
                                 if accountViewModel.account.isAnonymous() {
-                                    SwiftUI.Image(systemName: "person.crop.circle.badge.questionmark.fill")
+                                    SwiftUI.Image(systemName: "questionmark.circle")
                                         .resizable()
                                         .scaledToFit()
                                         .frame(width: userIconSize, height: userIconSize)

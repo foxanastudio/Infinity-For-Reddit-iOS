@@ -35,7 +35,7 @@ struct SubscribedUserListingMultiSelectionView: View {
                 List {
                     if !subscriptionListingViewModel.favoriteUserSubscriptions.isEmpty {
                         CustomListSection("Favorite") {
-                            ForEach(subscriptionListingViewModel.favoriteUserSubscriptions, id: \.identityInView) { subscription in
+                            ForEach(subscriptionListingViewModel.favoriteUserSubscriptions, id: \.name) { subscription in
                                 SubscriptionItemMultiSelectionView(
                                     text: subscription.name,
                                     iconUrl: subscription.iconUrl,
@@ -49,7 +49,7 @@ struct SubscribedUserListingMultiSelectionView: View {
                     }
                     
                     CustomListSection("All") {
-                        ForEach(subscriptionListingViewModel.userSubscriptions, id: \.identityInView) { subscription in
+                        ForEach(subscriptionListingViewModel.userSubscriptions, id: \.name) { subscription in
                             SubscriptionItemMultiSelectionView(
                                 text: subscription.name,
                                 iconUrl: subscription.iconUrl,

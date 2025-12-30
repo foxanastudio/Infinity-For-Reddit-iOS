@@ -291,7 +291,7 @@ struct CustomNavigationStack<Content: View>: View {
                 }
                 .environmentObject(navigationManager)
         }
-        .themedNavigationBarBackButton()
+        .themedNavigationBarButton()
         .onChange(of: navigationManager.path) { _, newValue in
             let newCount = newValue.count
             if navigationManager.viewShouldHideNavigationBarOnScroll.count > newCount {

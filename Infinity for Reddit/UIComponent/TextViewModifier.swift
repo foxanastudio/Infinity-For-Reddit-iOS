@@ -50,10 +50,21 @@ struct NavigationBarPrimaryTextViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
     
     func body(content: Content) -> some View {
-        content
-            .customFont()
-            .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.toolbarPrimaryTextAndIconColor))
-            .navigationBarTitleDisplayMode(.inline)
+        if #available(iOS 26, *) {
+            content
+                .customFont()
+                .foregroundColor(
+                    Color(hex: themeViewModel.currentCustomTheme.primaryTextColor)
+                )
+                .navigationBarTitleDisplayMode(.inline)
+        } else {
+            content
+                .customFont()
+                .foregroundColor(
+                    Color(hex: themeViewModel.currentCustomTheme.toolbarPrimaryTextAndIconColor)
+                )
+                .navigationBarTitleDisplayMode(.inline)
+        }
     }
 }
 

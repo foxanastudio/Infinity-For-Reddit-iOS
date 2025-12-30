@@ -30,8 +30,6 @@ public class MyCustomFeed: Codable, FetchableRecord, PersistableRecord, Equatabl
     var isFavorite: Bool
     var subreddits: [String]?
     
-    let identityInView = UUID().uuidString
-    
     init(path: String, displayName: String, name: String, description: String? = nil,
          copiedFrom: String? = nil, iconUrl: String? = nil, visibility: String? = nil,
          owner: String, nSubscribers: Int, createdUTC: Int64, over18: Bool,

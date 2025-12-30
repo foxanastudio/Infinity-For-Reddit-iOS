@@ -53,46 +53,55 @@ struct SubscriptionsView: View {
                     .padding(4)
                 }
                 
-                TabView(selection: $selectedOption) {
+                ZStack {
                     Group {
                         switch subscriptionListingViewModel.subscriptionSelectionMode {
                         case .noSelection:
                             SubscribedSubredditListingView(subscriptionListingViewModel: subscriptionListingViewModel)
-                                .tag(0)
+                                .opacity(selectedOption == 0 ? 1 : 0)
+                                .allowsHitTesting(selectedOption == 0)
                             
                             SubscribedUserListingView(subscriptionListingViewModel: subscriptionListingViewModel, onSelectCustomAction: nil)
-                                .tag(1)
+                                .opacity(selectedOption == 1 ? 1 : 0)
+                                .allowsHitTesting(selectedOption == 1)
                             
                             CustomFeedListingView(subscriptionListingViewModel: subscriptionListingViewModel, onSelectCustomAction: nil)
-                                .tag(2)
+                                .opacity(selectedOption == 2 ? 1 : 0)
+                                .allowsHitTesting(selectedOption == 2)
                         case .thingSelection(let onSelectThing):
                             SubscribedSubredditListingView(subscriptionListingViewModel: subscriptionListingViewModel) { subscribedSubredditData in
                                 onSelectThing(Thing.subscribedSubreddit(subscribedSubredditData))
                             }
-                            .tag(0)
+                            .opacity(selectedOption == 0 ? 1 : 0)
+                            .allowsHitTesting(selectedOption == 0)
                             
                             SubscribedUserListingView(subscriptionListingViewModel: subscriptionListingViewModel) { subscribedUserData in
                                 onSelectThing(Thing.subscribedUser(subscribedUserData))
                             }
-                            .tag(1)
+                            .opacity(selectedOption == 1 ? 1 : 0)
+                            .allowsHitTesting(selectedOption == 1)
                             
                             CustomFeedListingView(subscriptionListingViewModel: subscriptionListingViewModel, onSelectCustomAction: onSelectThing)
-                                .tag(2)
+                                .opacity(selectedOption == 2 ? 1 : 0)
+                                .allowsHitTesting(selectedOption == 2)
                         case .subredditAndUserMultiSelection:
                             SubscribedSubredditListingMultiSelectionView(subscriptionListingViewModel: subscriptionListingViewModel)
-                                .tag(0)
+                                .opacity(selectedOption == 0 ? 1 : 0)
+                                .allowsHitTesting(selectedOption == 0)
                             
                             SubscribedUserListingMultiSelectionView(subscriptionListingViewModel: subscriptionListingViewModel)
-                                .tag(1)
+                                .opacity(selectedOption == 1 ? 1 : 0)
+                                .allowsHitTesting(selectedOption == 1)
                         case .subredditMultiSelection:
                             SubscribedSubredditListingMultiSelectionView(subscriptionListingViewModel: subscriptionListingViewModel)
-                                .tag(0)
+                                .opacity(selectedOption == 0 ? 1 : 0)
+                                .allowsHitTesting(selectedOption == 0)
                         case .userMultiSelection:
                             SubscribedUserListingMultiSelectionView(subscriptionListingViewModel: subscriptionListingViewModel)
-                                .tag(0)
+                                .opacity(selectedOption == 0 ? 1 : 0)
+                                .allowsHitTesting(selectedOption == 0)
                         }
                     }
-                    .toolbar(.hidden, for: .tabBar)
                 }
                 
                 switch subscriptionListingViewModel.subscriptionSelectionMode {

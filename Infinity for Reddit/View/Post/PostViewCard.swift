@@ -86,342 +86,317 @@ struct PostViewCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Spacer()
-                .frame(height: 16)
-            
-            HStack {
-                CustomWebImage(
-                    postViewModel.post.subredditOrUserIcon,
-                    width: iconSize,
-                    height: iconSize,
-                    circleClipped: true,
-                    handleImageTapGesture: false,
-                    fallbackView: {
-                        InitialLetterAvatarImageFallbackView(name: isSubredditPostListing ? postViewModel.post.author : postViewModel.post.subreddit, size: iconSize)
-                    }
-                )
-                .frame(width: iconSize, height: iconSize)
-                .onTapGesture {
-                    onIconTap()
-                }
-                
-                VStack(alignment: .leading) {
-                    Text(hideSubredditAndUserPrefix ? postViewModel.post.subreddit : postViewModel.post.subredditNamePrefixed)
-                        .subreddit()
-                        .onTapGesture {
-                            onSubredditTap()
-                        }
-                    
-                    Text(hideSubredditAndUserPrefix ? postViewModel.post.author : "u/\(postViewModel.post.author ?? "")")
-                        .usernameOnPost(post: postViewModel.post)
-                        .onTapGesture {
-                            onUserTap()
-                        }
-                }
-                .padding(.leading, 4)
-                
-                Spacer()
-                
-                TimeText(timeUTCInSeconds: postViewModel.post.createdUtc)
-                    .secondaryText()
-            }
-            .padding(.horizontal, 16)
-            .padding(.bottom, 16)
-            .contentShape(Rectangle())
-            .onLongPressGesture {
+        TouchRipple(
+            backgroundShape: RoundedRectangle(cornerRadius: 20),
+            action: {
+                onPostTap(videoPlayerViewModel.currentTime)
+            },
+            onLongPress: {
                 onLongPressPost()
             }
-            
-            Text(postViewModel.post.title)
-                .padding(.horizontal, 16)
-                .padding(.bottom, 8)
-                .postTitle()
-                .contentShape(Rectangle())
-                .onLongPressGesture {
-                    onLongPressPost()
+        ) {
+            VStack(alignment: .leading, spacing: 0) {
+                Spacer()
+                    .frame(height: 16)
+                
+                HStack {
+                    CustomWebImage(
+                        postViewModel.post.subredditOrUserIcon,
+                        width: iconSize,
+                        height: iconSize,
+                        circleClipped: true,
+                        handleImageTapGesture: false,
+                        fallbackView: {
+                            InitialLetterAvatarImageFallbackView(name: isSubredditPostListing ? postViewModel.post.author : postViewModel.post.subreddit, size: iconSize)
+                        }
+                    )
+                    .frame(width: iconSize, height: iconSize)
+                    .onTapGesture {
+                        onIconTap()
+                    }
+                    
+                    VStack(alignment: .leading) {
+                        Text(hideSubredditAndUserPrefix ? postViewModel.post.subreddit : postViewModel.post.subredditNamePrefixed)
+                            .subreddit()
+                            .onTapGesture {
+                                onSubredditTap()
+                            }
+                        
+                        Text(hideSubredditAndUserPrefix ? postViewModel.post.author : "u/\(postViewModel.post.author ?? "")")
+                            .usernameOnPost(post: postViewModel.post)
+                            .onTapGesture {
+                                onUserTap()
+                            }
+                    }
+                    .padding(.leading, 4)
+                    
+                    Spacer()
+                    
+                    TimeText(timeUTCInSeconds: postViewModel.post.createdUtc)
+                        .secondaryText()
                 }
-            
-            if hidePostType && !postViewModel.post.spoiler
-                && !postViewModel.post.over18 && hidePostFlair
-                && !postViewModel.post.archived && !postViewModel.post.locked
-                && postViewModel.post.crosspostParent == nil && !postViewModel.post.stickied
-                && postViewModel.post.postType != .link {
-                // Not showing post metadata
-                EmptyView()
-            } else {
-                HFlow(alignment: .center) {
-                    if !hidePostType {
-                        PostTypeTag(post: postViewModel.post)
-                            .onTapGesture {
-                                onPostTypeClicked()
+                .padding(.horizontal, 16)
+                .padding(.bottom, 16)
+                .contentShape(Rectangle())
+                
+                Text(postViewModel.post.title)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 8)
+                    .postTitle()
+                    .contentShape(Rectangle())
+                
+                if hidePostType && !postViewModel.post.spoiler
+                    && !postViewModel.post.over18 && hidePostFlair
+                    && !postViewModel.post.archived && !postViewModel.post.locked
+                    && postViewModel.post.crosspostParent == nil && postViewModel.post.postType != .link {
+                    // Not showing post metadata
+                    EmptyView()
+                } else {
+                    HFlow(alignment: .center) {
+                        if !hidePostType {
+                            PostTypeTag(post: postViewModel.post)
+                                .onTapGesture {
+                                    onPostTypeClicked()
+                                }
+                        }
+                        
+                        if postViewModel.post.spoiler {
+                            SpoilerTag()
+                        }
+                        
+                        if postViewModel.post.over18 {
+                            SensitiveTag()
+                                .onTapGesture {
+                                    onSensitiveClicked()
+                                }
+                        }
+                        
+                        if !hidePostFlair {
+                            FlairView(flairRichtext: postViewModel.post.linkFlairRichtext,
+                                      flairText: postViewModel.post.linkFlairText)
+                        }
+                        
+                        if postViewModel.post.archived {
+                            ArchivedTag()
+                        }
+                        
+                        if postViewModel.post.locked {
+                            LockedTag()
+                        }
+                        
+                        if postViewModel.post.crosspostParent != nil {
+                            CrosspostTag()
+                        }
+                        
+                        switch postViewModel.post.postType {
+                        case .link:
+                            if let url = URL(string: postViewModel.post.url), let domain = url.host {
+                                Text(domain)
+                                    .secondaryText()
                             }
+                        default:
+                            EmptyView()
+                        }
                     }
-                    
-                    if postViewModel.post.spoiler {
-                        SpoilerTag()
-                    }
-                    
-                    if postViewModel.post.over18 {
-                        SensitiveTag()
-                            .onTapGesture {
-                                onSensitiveClicked()
-                            }
-                    }
-                    
-                    if !hidePostFlair {
-                        FlairView(flairRichtext: postViewModel.post.linkFlairRichtext,
-                                  flairText: postViewModel.post.linkFlairText)
-                    }
-                    
-                    if postViewModel.post.archived {
-                        ArchivedTag()
-                    }
-                    
-                    if postViewModel.post.locked {
-                        LockedTag()
-                    }
-                    
-                    if postViewModel.post.crosspostParent != nil {
-                        CrosspostTag()
-                    }
-                    
-                    if postViewModel.post.stickied {
-                        StickiedTag()
-                    }
-                    
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .contentShape(Rectangle())
+                }
+                
+                Group {
                     switch postViewModel.post.postType {
-                    case .link:
+                    case .noPreviewLink:
                         if let url = URL(string: postViewModel.post.url), let domain = url.host {
-                            Text(domain)
-                                .secondaryText()
+                            NoPreviewLinkView(domain: domain) {
+                                onOpenLink(url)
+                                Task {
+                                    await onReadPost()
+                                }
+                            }
+                        } else if let crosspost = postViewModel.post.crosspostParent, let url = URL(string: crosspost.url), let domain = url.host {
+                            NoPreviewLinkView(domain: domain) {
+                                onOpenLink(url)
+                                Task {
+                                    await onReadPost()
+                                }
+                            }
                         }
                     default:
                         EmptyView()
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
                 .contentShape(Rectangle())
-                .onLongPressGesture {
-                    onLongPressPost()
-                }
-            }
-            
-            Group {
-                switch postViewModel.post.postType {
-                case .noPreviewLink:
-                    if let url = URL(string: postViewModel.post.url), let domain = url.host {
-                        NoPreviewLinkView(domain: domain) {
-                            onOpenLink(url)
-                            Task {
-                                await onReadPost()
-                            }
-                        }
-                    } else if let crosspost = postViewModel.post.crosspostParent, let url = URL(string: crosspost.url), let domain = url.host {
-                        NoPreviewLinkView(domain: domain) {
-                            onOpenLink(url)
-                            Task {
-                                await onReadPost()
-                            }
-                        }
-                    }
-                default:
-                    EmptyView()
-                }
-            }
-            .contentShape(Rectangle())
-            .onLongPressGesture {
-                onLongPressPost()
-            }
-            
-            if let galleryData = postViewModel.post.galleryData,
-               !galleryData.items.isEmpty,
-               let mediaMetadata = postViewModel.post.mediaMetadata,
-               let preview = mediaMetadata[galleryData.items[0].mediaId] {
-                Spacer()
-                    .frame(height: 10)
                 
-                // May not have a preview!!!!!!
-                GalleryCarousel(post: postViewModel.post) {
-                    Task {
-                        await onReadPost()
-                    }
-                }
-                .applyIf(limitMediaHeight) {
-                    $0.frame(height: 200)
-                }
-                .applyIf(!limitMediaHeight && preview.s?.aspectRatio != nil) {
-                    $0.aspectRatio(preview.s!.aspectRatio, contentMode: .fit)
-                }
-                .contentShape(Rectangle())
-                .onLongPressGesture {
-                    onLongPressPost()
-                }
-            } else if !hideTextPostContent, case .text = postViewModel.post.postType, let selftextTruncated = postViewModel.post.selftextTruncated, !selftextTruncated.isEmpty {
-                Spacer()
-                    .frame(height: 6)
-                
-                Text(selftextTruncated)
-                    .postContent()
-                    .padding(.horizontal, 16)
-                    .contentShape(Rectangle())
-                    .onLongPressGesture {
-                        onLongPressPost()
-                    }
-            } else if case .redditVideo(let videoUrlString, _) = postViewModel.post.postType {
-                Spacer()
-                    .frame(height: 10)
-                
-                PostVideoView(post: postViewModel.post, videoUrlString: videoUrlString, inPostListing: true, videoPlayerViewModel: videoPlayerViewModel) {
-                    Task {
-                        await onReadPost()
-                    }
-                }
-            } else if case .video(let videoUrlString, _) = postViewModel.post.postType {
-                Spacer()
-                    .frame(height: 10)
-                
-                PostVideoView(post: postViewModel.post, videoUrlString: videoUrlString, inPostListing: true, videoPlayerViewModel: videoPlayerViewModel) {
-                    Task {
-                        await onReadPost()
-                    }
-                }
-            } else if postViewModel.post.postType.isMedia {
-                Spacer()
-                    .frame(height: 10)
-                
-                PostPreviewView(post: postViewModel.post, inPostListing: true) {
-                    Task {
-                        await onReadPost()
-                    }
-                }
-                .contentShape(Rectangle())
-                .onLongPressGesture {
-                    onLongPressPost()
-                }
-            }
-            
-            HStack(spacing: 0) {
-                HStack(spacing: 0) {
-                    Button(action: {
-                        if postViewModel.post.archived {
-                            snackbarManager.showSnackbar(.info("This post has been archived. Vote unavailable."))
-                        } else {
-                            voteTask?.cancel()
-                            voteTask = Task {
-                                await onUpvote()
-                            }
-                        }
-                    }) {
-                        SwiftUI.Image(systemName: postViewModel.post.likes == 1 ? "arrowshape.up.fill" : "arrowshape.up")
-                            .postIconTemplateRendering()
-                            .applyIf(postViewModel.post.archived) {
-                                $0.voteAndReplyUnavailbleIcon()
-                            }
-                            .applyIf(!postViewModel.post.archived) {
-                                $0.postUpvoteIcon(isUpvoted: postViewModel.post.likes == 1)
-                            }
-                    }
-                    .buttonStyle(.borderless)
-                    .padding(8)
-                    .contentShape(Rectangle())
-                    
-                    VotesText(votes: accountViewModel.account.isAnonymous() ? postViewModel.post.score : postViewModel.post.score + postViewModel.post.likes, hideNVotes: hideNVotes)
-                        .frame(width: 72, alignment: .center)
-                        .postInfo()
-                        .contentShape(Rectangle())
-                        .onTapGesture {}
-                    
-                    Button(action: {
-                        if postViewModel.post.archived {
-                            snackbarManager.showSnackbar(.info("This post has been archived. Vote unavailable."))
-                        } else {
-                            voteTask?.cancel()
-                            voteTask = Task {
-                                await onDownvote()
-                            }
-                        }
-                    }) {
-                        SwiftUI.Image(systemName: postViewModel.post.likes == -1 ? "arrowshape.down.fill" : "arrowshape.down")
-                            .postIconTemplateRendering()
-                            .applyIf(postViewModel.post.archived) {
-                                $0.voteAndReplyUnavailbleIcon()
-                            }
-                            .applyIf(!postViewModel.post.archived) {
-                                $0.postDownvoteIcon(isDownvoted: postViewModel.post.likes == -1)
-                            }
-                    }
-                    .buttonStyle(.borderless)
-                    .padding(8)
-                    .contentShape(Rectangle())
-                }
-                .environment(\.layoutDirection, .leftToRight)
-                .padding(.vertical, 8)
-                .contentShape(Rectangle())
-                .onTapGesture {}
-
-                HStack {
-                    if !hideNComments {
-                        HStack() {
-                            SwiftUI.Image(systemName: "text.bubble")
-                                .postIconTemplateRendering()
-                                .postIcon()
-                            
-                            Text(String(postViewModel.post.numComments))
-                                .postInfo()
-                        }
-                    }
-                    
+                if let galleryData = postViewModel.post.galleryData,
+                   !galleryData.items.isEmpty,
+                   let mediaMetadata = postViewModel.post.mediaMetadata,
+                   let preview = mediaMetadata[galleryData.items[0].mediaId] {
                     Spacer()
-                }
-                .padding(.leading, voteButtonsOnTheRight ? 8 : 16)
-                .environment(\.layoutDirection, .leftToRight)
-                
-                Button(action: {
-                    saveTask?.cancel()
-                    saveTask = Task {
-                        await onToggleSave()
+                        .frame(height: 10)
+                    
+                    // May not have a preview!!!!!!
+                    GalleryCarousel(post: postViewModel.post) {
+                        Task {
+                            await onReadPost()
+                        }
                     }
-                }) {
-                    SwiftUI.Image(systemName: postViewModel.post.saved ? "bookmark.fill" : "bookmark")
-                        .postIconTemplateRendering()
-                        .postIcon()
+                    .applyIf(limitMediaHeight) {
+                        $0.frame(height: 200)
+                    }
+                    .applyIf(!limitMediaHeight && preview.s?.aspectRatio != nil) {
+                        $0.aspectRatio(preview.s!.aspectRatio, contentMode: .fit)
+                    }
+                    .contentShape(Rectangle())
+                } else if !hideTextPostContent, case .text = postViewModel.post.postType, let selftextTruncated = postViewModel.post.selftextTruncated, !selftextTruncated.isEmpty {
+                    Spacer()
+                        .frame(height: 6)
+                    
+                    Text(selftextTruncated)
+                        .postContent()
+                        .padding(.horizontal, 16)
+                        .contentShape(Rectangle())
+                } else if case .redditVideo(let videoUrlString, _) = postViewModel.post.postType {
+                    Spacer()
+                        .frame(height: 10)
+                    
+                    PostVideoView(post: postViewModel.post, videoUrlString: videoUrlString, inPostListing: true, videoPlayerViewModel: videoPlayerViewModel) {
+                        Task {
+                            await onReadPost()
+                        }
+                    }
+                } else if case .video(let videoUrlString, _) = postViewModel.post.postType {
+                    Spacer()
+                        .frame(height: 10)
+                    
+                    PostVideoView(post: postViewModel.post, videoUrlString: videoUrlString, inPostListing: true, videoPlayerViewModel: videoPlayerViewModel) {
+                        Task {
+                            await onReadPost()
+                        }
+                    }
+                } else if postViewModel.post.postType.isMedia {
+                    Spacer()
+                        .frame(height: 10)
+                    
+                    PostPreviewView(post: postViewModel.post, inPostListing: true) {
+                        Task {
+                            await onReadPost()
+                        }
+                    }
+                    .contentShape(Rectangle())
                 }
-                .buttonStyle(.borderless)
-                .padding(8)
-                .contentShape(Rectangle())
                 
-                Button(action: onShare) {
-                    SwiftUI.Image(systemName: "square.and.arrow.up")
-                        .postIconTemplateRendering()
-                        .postIcon()
+                HStack(spacing: 0) {
+                    HStack(spacing: 0) {
+                        Button(action: {
+                            if postViewModel.post.archived {
+                                snackbarManager.showSnackbar(.info("This post has been archived. Vote unavailable."))
+                            } else {
+                                voteTask?.cancel()
+                                voteTask = Task {
+                                    await onUpvote()
+                                }
+                            }
+                        }) {
+                            SwiftUI.Image(systemName: postViewModel.post.likes == 1 ? "arrowshape.up.fill" : "arrowshape.up")
+                                .postIconTemplateRendering()
+                                .applyIf(postViewModel.post.archived) {
+                                    $0.voteAndReplyUnavailbleIcon()
+                                }
+                                .applyIf(!postViewModel.post.archived) {
+                                    $0.postUpvoteIcon(isUpvoted: postViewModel.post.likes == 1)
+                                }
+                        }
+                        .buttonStyle(.borderless)
+                        .padding(8)
+                        .contentShape(Rectangle())
+                        
+                        VotesText(votes: accountViewModel.account.isAnonymous() ? postViewModel.post.score : postViewModel.post.score + postViewModel.post.likes, hideNVotes: hideNVotes)
+                            .frame(width: 72, alignment: .center)
+                            .postInfo()
+                            .contentShape(Rectangle())
+                            .onTapGesture {}
+                        
+                        Button(action: {
+                            if postViewModel.post.archived {
+                                snackbarManager.showSnackbar(.info("This post has been archived. Vote unavailable."))
+                            } else {
+                                voteTask?.cancel()
+                                voteTask = Task {
+                                    await onDownvote()
+                                }
+                            }
+                        }) {
+                            SwiftUI.Image(systemName: postViewModel.post.likes == -1 ? "arrowshape.down.fill" : "arrowshape.down")
+                                .postIconTemplateRendering()
+                                .applyIf(postViewModel.post.archived) {
+                                    $0.voteAndReplyUnavailbleIcon()
+                                }
+                                .applyIf(!postViewModel.post.archived) {
+                                    $0.postDownvoteIcon(isDownvoted: postViewModel.post.likes == -1)
+                                }
+                        }
+                        .buttonStyle(.borderless)
+                        .padding(8)
+                        .contentShape(Rectangle())
+                    }
+                    .environment(\.layoutDirection, .leftToRight)
+                    .padding(.vertical, 8)
+                    .contentShape(Rectangle())
+                    .onTapGesture {}
+                    
+                    HStack {
+                        if !hideNComments {
+                            HStack() {
+                                SwiftUI.Image(systemName: "text.bubble")
+                                    .postIconTemplateRendering()
+                                    .postIcon()
+                                
+                                Text(String(postViewModel.post.numComments))
+                                    .postInfo()
+                            }
+                        }
+                        
+                        Spacer()
+                    }
+                    .padding(.leading, voteButtonsOnTheRight ? 8 : 16)
+                    .environment(\.layoutDirection, .leftToRight)
+                    
+                    Button(action: {
+                        saveTask?.cancel()
+                        saveTask = Task {
+                            await onToggleSave()
+                        }
+                    }) {
+                        SwiftUI.Image(systemName: postViewModel.post.saved ? "bookmark.fill" : "bookmark")
+                            .postIconTemplateRendering()
+                            .postIcon()
+                    }
+                    .buttonStyle(.borderless)
+                    .padding(8)
+                    .contentShape(Rectangle())
+                    
+                    Button(action: onShare) {
+                        SwiftUI.Image(systemName: "square.and.arrow.up")
+                            .postIconTemplateRendering()
+                            .postIcon()
+                    }
+                    .buttonStyle(.borderless)
+                    .padding(8)
+                    .contentShape(Rectangle())
                 }
-                .buttonStyle(.borderless)
-                .padding(8)
+                .environment(\.layoutDirection, voteButtonsOnTheRight ? .rightToLeft : .leftToRight)
+                .padding(.horizontal, 8)
                 .contentShape(Rectangle())
-            }
-            .environment(\.layoutDirection, voteButtonsOnTheRight ? .rightToLeft : .leftToRight)
-            .padding(.horizontal, 8)
-            .contentShape(Rectangle())
-            .onLongPressGesture {
-                onLongPressPost()
             }
         }
         .background {
-            TouchRipple(backgroundShape: RoundedRectangle(cornerRadius: 20)) {
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(Color(hex: postViewModel.post.isRead ? themeViewModel.currentCustomTheme.readPostCardViewBackgroundColor : themeViewModel.currentCustomTheme.cardViewBackgroundColor))
-                    .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: -1)
-                    .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 4)
-            }
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color(hex: postViewModel.post.isRead ? themeViewModel.currentCustomTheme.readPostCardViewBackgroundColor : themeViewModel.currentCustomTheme.cardViewBackgroundColor))
+                .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: -1)
+                .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 4)
         }
         .padding(.vertical, 8)
-        .onTapGesture {
-            // Don't care if it's a video post or not
-            onPostTap(videoPlayerViewModel.currentTime)
-        }
     }
 }
 

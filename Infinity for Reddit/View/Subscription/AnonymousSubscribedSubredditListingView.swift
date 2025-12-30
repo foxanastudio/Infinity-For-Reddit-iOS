@@ -33,7 +33,7 @@ struct AnonymousSubscribedSubredditListingView: View {
                 List {
                     if !anonymousSubscriptionListingViewModel.favoriteSubredditSubscriptions.isEmpty {
                         CustomListSection("Favorite") {
-                            ForEach(anonymousSubscriptionListingViewModel.favoriteSubredditSubscriptions, id: \.identityInView) { subscription in
+                            ForEach(anonymousSubscriptionListingViewModel.favoriteSubredditSubscriptions, id: \.fullName) { subscription in
                                 SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
                                     if let onSelectCustomAction {
                                         onSelectCustomAction(subscription)
@@ -63,7 +63,7 @@ struct AnonymousSubscribedSubredditListingView: View {
                     }
                     
                     CustomListSection("All") {
-                        ForEach(anonymousSubscriptionListingViewModel.subredditSubscriptions, id: \.identityInView) { subscription in
+                        ForEach(anonymousSubscriptionListingViewModel.subredditSubscriptions, id: \.fullName) { subscription in
                             SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
                                 if let onSelectCustomAction {
                                     onSelectCustomAction(subscription)
