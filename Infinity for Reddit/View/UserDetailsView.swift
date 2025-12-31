@@ -122,7 +122,7 @@ struct UserDetailsView: View {
                     )
                     .padding(4)
                     
-                    TabView(selection: $selectedTab) {
+                    ZStack {
                         Group {
                             PostListingView(
                                 postListingMetadata:PostListingMetadata(
@@ -147,12 +147,11 @@ struct UserDetailsView: View {
                                             isUserInfoVisible = false
                                         }
                                     }
-                                }
+                                },
+                                isPresented: selectedTab == 0
                             )
-                            .tabItem {
-                                Label("Posts", systemImage: "list.bullet.rectangle")
-                            }
-                            .tag(0)
+                            .opacity(selectedTab == 0 ? 1 : 0)
+                            .allowsHitTesting(selectedTab == 0)
                             
                             CommentListingView(
                                 commentListingMetadata: CommentListingMetadata(
@@ -167,14 +166,12 @@ struct UserDetailsView: View {
                                             isUserInfoVisible = false
                                         }
                                     }
-                                }
+                                },
+                                isPresented: selectedTab == 1
                             )
-                            .tabItem {
-                                Label("Comments", systemImage: "text.bubble")
-                            }
-                            .tag(1)
+                            .opacity(selectedTab == 1 ? 1 : 0)
+                            .allowsHitTesting(selectedTab == 1)
                         }
-                        .toolbar(.hidden, for: .tabBar)
                     }
                 }
                 .modify {

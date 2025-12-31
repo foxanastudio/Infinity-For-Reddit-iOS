@@ -36,6 +36,7 @@ struct PostListingView: View {
     @State private var textToBeSelectedAndCopiedItem: TextToBeSelectedAndCopiedItem?
     @State var lazyMode: Task<Void, Error>?
     @State var lazyModeState: LazyModeState = .stopped
+    @State private var hasInitialLoaded = false
     
     @AppStorage(InterfacePostUserDefaultsUtils.defaultLinkPostLayoutKey, store: .interfacePost) private var defaultLinkPostLayout: Int = 0
     @AppStorage(InterfaceUserDefaultsUtils.lazyModeIntervalKey, store: .interface) private var lazyModeInterval: Double = 2.5
@@ -53,11 +54,13 @@ struct PostListingView: View {
     private var onStartLazyMode: (() -> Void)?
     private var onStopLazyMode: (() -> Void)?
     private var onScroll: (() -> Void)?
+    private let isPresented: Bool
     
     init(postListingMetadata: PostListingMetadata,
+         isPresented: Bool,
          externalPostFilter: PostFilter? = nil,
          handleToolbarMenu: Bool = true,
-         showFilterPostsOption: Bool = true
+         showFilterPostsOption: Bool = true,
     ) {
         self.postListingMetadata = postListingMetadata
         if case .subreddit = postListingMetadata.postListingType {
@@ -65,6 +68,7 @@ struct PostListingView: View {
         }
         self.handleToolbarMenu = handleToolbarMenu
         self.showFilterPostsOption = showFilterPostsOption
+        self.isPresented = isPresented
         
         _postListingViewModel = StateObject(
             wrappedValue: PostListingViewModel(
@@ -86,7 +90,8 @@ struct PostListingView: View {
          pauseLazyModeExternalFlag: Bool,
          onStartLazyMode: (() -> Void)? = nil,
          onStopLazyMode: (() -> Void)? = nil,
-         onScroll: (() -> Void)? = nil
+         onScroll: (() -> Void)? = nil,
+         isPresented: Bool = true
     ) {
         self.isRootView = isRootView
         self.postListingMetadata = postListingMetadata
@@ -100,6 +105,7 @@ struct PostListingView: View {
         self.onStartLazyMode = onStartLazyMode
         self.onStopLazyMode = onStopLazyMode
         self.onScroll = onScroll
+        self.isPresented = isPresented
         
         _postListingViewModel = StateObject(
             wrappedValue: PostListingViewModel(
@@ -219,6 +225,9 @@ struct PostListingView: View {
                             .frame(maxWidth: .infinity)
                             .listPlainItemNoInsets()
                             .task {
+                                guard isPresented else {
+                                    return
+                                }
                                 await postListingViewModel.loadPosts()
                             } 
                         }
@@ -262,22 +271,19 @@ struct PostListingView: View {
                 NavigationBarMenu()
             }
         }
-        .task(id: postListingViewModel.loadPostsTaskId) {
-            await postListingViewModel.initialLoadPosts(saveLastSeenPostInFrontPage: saveLastSeenPostInFrontPage)
-        }
         .onAppear {
             if lazyModeState == .paused {
                 resumeLazyMode()
             }
-            
-            setUpMenu()
         }
         .onDisappear {
             if lazyModeState == .started {
                 pauseLazyMode(resetScrolledPost: false)
             }
             
-            guard let navigationBarMenuKey else { return }
+            guard let navigationBarMenuKey else {
+                return
+            }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
             
             if saveLastSeenPostInFrontPage {
@@ -314,6 +320,38 @@ struct PostListingView: View {
         }
         .onChange(of: postListingViewModel.showAllGalleryMediaDownloadFinishedMessageTrigger) {
             snackbarManager.showSnackbar(.info("Gallery download complete."))
+        }
+        .onChange(of: isPresented, initial: true) { _, presented in
+            if presented {
+                setUpMenu()
+                
+                guard !hasInitialLoaded else {
+                    return
+                }
+                hasInitialLoaded = true
+
+                Task {
+                    await postListingViewModel.initialLoadPosts(
+                        saveLastSeenPostInFrontPage: saveLastSeenPostInFrontPage
+                    )
+                }
+            } else {
+                guard let navigationBarMenuKey else {
+                    return
+                }
+                navigationBarMenuManager.pop(key: navigationBarMenuKey)
+            }
+        }
+        .onChange(of: postListingViewModel.loadPostsTaskId) { _, _ in
+            guard isPresented else {
+                return
+            }
+
+            Task {
+                await postListingViewModel.initialLoadPosts(
+                    saveLastSeenPostInFrontPage: saveLastSeenPostInFrontPage
+                )
+            }
         }
         .wrapContentSheet(isPresented: $showSortTypeKindSheet) {
             SortTypeKindSheet(

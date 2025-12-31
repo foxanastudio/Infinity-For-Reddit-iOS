@@ -41,6 +41,7 @@ struct SavedView: View {
                                     queries: nil,
                                     params: nil
                                 ),
+                                isPresented: true,
                                 handleToolbarMenu: false
                             )
                             .tag(0)
@@ -52,7 +53,8 @@ struct SavedView: View {
                                     commentListingType:.userSaved,
                                     pathComponents: ["username": "\(accountViewModel.account.username)"],
                                     queries: nil
-                                )
+                                ),
+                                isPresented: true
                             )
                             .tag(1)
                         }

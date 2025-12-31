@@ -29,14 +29,17 @@ struct CommentListingView: View {
     @State private var navigationBarMenuKey: UUID?
     @State private var commentToBeEdited: Comment? = nil
     @State private var commentToBeModerated: Comment? = nil
+    @State private var hasInitialLoaded = false
     
     private let commentListingMetadata: CommentListingMetadata
     private let thingModerationRepository: ThingModerationRepositoryProtocol = ThingModerationRepository()
     private let onScroll: (() -> Void)?
+    private let isPresented: Bool
     
-    init(commentListingMetadata: CommentListingMetadata, onScroll: (() -> Void)? = nil) {
+    init(commentListingMetadata: CommentListingMetadata, onScroll: (() -> Void)? = nil, isPresented: Bool) {
         self.commentListingMetadata = commentListingMetadata
         self.onScroll = onScroll
+        self.isPresented = isPresented
         _commentListingViewModel = StateObject(
             wrappedValue: CommentListingViewModel(
                 commentListingMetadata: commentListingMetadata,
@@ -115,6 +118,9 @@ struct CommentListingView: View {
                     if commentListingViewModel.hasMorePages {
                         ProgressIndicator()
                             .task {
+                                guard isPresented else {
+                                    return
+                                }
                                 await commentListingViewModel.loadComments()
                             }
                             .listPlainItem()
@@ -131,9 +137,6 @@ struct CommentListingView: View {
                 .showErrorUsingSnackbar(commentListingViewModel.$error)
             }
         }
-        .task(id: commentListingViewModel.loadCommentsTaskId) {
-            await commentListingViewModel.initialLoadComments()
-        }
         .refreshable {
             await commentListingViewModel.refreshCommentsWithContinuation()
         }
@@ -147,30 +150,55 @@ struct CommentListingView: View {
                 commentToBeEdited = nil
             }
         }
-        .onAppear {
-            if let key = navigationBarMenuKey {
-                navigationBarMenuManager.pop(key: key)
+        .onChange(of: isPresented, initial: true) { _, presented in
+            if presented {
+                if let key = navigationBarMenuKey {
+                    navigationBarMenuManager.pop(key: key)
+                }
+                let menu: [NavigationBarMenuItem]
+                switch commentListingMetadata.commentListingType {
+                case .user:
+                    menu = [
+                        NavigationBarMenuItem(title: "Refresh") {
+                            commentListingViewModel.refreshComments()
+                        },
+                        
+                        NavigationBarMenuItem(title: "Sort") {
+                            showSortTypeKindSheet = true
+                        }
+                    ]
+                case .userSaved:
+                    menu = [
+                        NavigationBarMenuItem(title: "Refresh") {
+                            commentListingViewModel.refreshComments()
+                        }
+                    ]
+                }
+                navigationBarMenuKey = navigationBarMenuManager.push(menu)
+                
+                guard !hasInitialLoaded else {
+                    return
+                }
+                hasInitialLoaded = true
+                
+                Task {
+                    await commentListingViewModel.initialLoadComments()
+                }
+            } else {
+                guard let navigationBarMenuKey else {
+                    return
+                }
+                navigationBarMenuManager.pop(key: navigationBarMenuKey)
             }
-            let menu: [NavigationBarMenuItem]
-            switch commentListingMetadata.commentListingType {
-            case .user:
-                menu = [
-                    NavigationBarMenuItem(title: "Refresh") {
-                        commentListingViewModel.refreshComments()
-                    },
-                    
-                    NavigationBarMenuItem(title: "Sort") {
-                        showSortTypeKindSheet = true
-                    }
-                ]
-            case .userSaved:
-                menu = [
-                    NavigationBarMenuItem(title: "Refresh") {
-                        commentListingViewModel.refreshComments()
-                    }
-                ]
+        }
+        .onChange(of: commentListingViewModel.loadCommentsTaskId) {
+            guard isPresented else {
+                return
             }
-            navigationBarMenuKey = navigationBarMenuManager.push(menu)
+            
+            Task {
+                await commentListingViewModel.initialLoadComments()
+            }
         }
         .onDisappear {
             guard let navigationBarMenuKey else {

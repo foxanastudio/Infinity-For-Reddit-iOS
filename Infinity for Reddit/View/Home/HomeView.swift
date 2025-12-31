@@ -72,6 +72,7 @@ struct HomeView: View {
                                 queries: nil,
                                 params: nil
                             ),
+                            isPresented: true,
                             handleToolbarMenu: false
                         )
                         .setUpHomeTabViewChildNavigationBar()

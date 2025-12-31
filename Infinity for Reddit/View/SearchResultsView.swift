@@ -57,7 +57,7 @@ struct SearchResultsView: View {
                         headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
                         queries: ["q": searchResultsViewModel.query, "type": "link"],
                         params: nil
-                    ), handleToolbarMenu: false)
+                    ), isPresented: true, handleToolbarMenu: false)
                     .tag(0)
                     
                     SubredditListingView(account: accountViewModel.account, subredditListingViewModel: subredditListingViewModel)
