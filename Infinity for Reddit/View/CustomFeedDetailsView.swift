@@ -33,8 +33,7 @@ struct CustomFeedDetailsView: View {
                 headers: nil,
                 queries: nil,
                 params: nil
-            ),
-            isPresented: true
+            )
         )
         .id(accountViewModel.account.username)
         .themedNavigationBar()

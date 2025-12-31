@@ -123,55 +123,53 @@ struct UserDetailsView: View {
                     .padding(4)
                     
                     ZStack {
-                        Group {
-                            PostListingView(
-                                postListingMetadata:PostListingMetadata(
-                                    postListingType:.user(username: userDetailsViewModel.username, userWhere: .submitted),
-                                    pathComponents: ["username": "\(userDetailsViewModel.username)"],
-                                    headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
-                                    queries: nil,
-                                    params: nil
-                                ),
-                                isRootView: true,
-                                pauseLazyModeExternalFlag: pauseLazyModeFlag,
-                                onStartLazyMode: {
-                                    if isUserInfoVisible {
-                                        withAnimation {
-                                            isUserInfoVisible = false
-                                        }
+                        PostListingView(
+                            postListingMetadata:PostListingMetadata(
+                                postListingType:.user(username: userDetailsViewModel.username, userWhere: .submitted),
+                                pathComponents: ["username": "\(userDetailsViewModel.username)"],
+                                headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
+                                queries: nil,
+                                params: nil
+                            ),
+                            isRootView: true,
+                            pauseLazyModeExternalFlag: pauseLazyModeFlag,
+                            onStartLazyMode: {
+                                if isUserInfoVisible {
+                                    withAnimation {
+                                        isUserInfoVisible = false
                                     }
-                                },
-                                onScroll: {
-                                    if isUserInfoVisible {
-                                        withAnimation {
-                                            isUserInfoVisible = false
-                                        }
+                                }
+                            },
+                            onScroll: {
+                                if isUserInfoVisible {
+                                    withAnimation {
+                                        isUserInfoVisible = false
                                     }
-                                },
-                                isPresented: selectedTab == 0
-                            )
-                            .opacity(selectedTab == 0 ? 1 : 0)
-                            .allowsHitTesting(selectedTab == 0)
-                            
-                            CommentListingView(
-                                commentListingMetadata: CommentListingMetadata(
-                                    commentListingType:.user(username: userDetailsViewModel.username),
-                                    pathComponents: ["username": "\(userDetailsViewModel.username)"],
-                                    headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
-                                    queries: nil
-                                ),
-                                onScroll: {
-                                    if isUserInfoVisible {
-                                        withAnimation {
-                                            isUserInfoVisible = false
-                                        }
+                                }
+                            },
+                            isPresented: selectedTab == 0
+                        )
+                        .opacity(selectedTab == 0 ? 1 : 0)
+                        .allowsHitTesting(selectedTab == 0)
+                        
+                        CommentListingView(
+                            commentListingMetadata: CommentListingMetadata(
+                                commentListingType:.user(username: userDetailsViewModel.username),
+                                pathComponents: ["username": "\(userDetailsViewModel.username)"],
+                                headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
+                                queries: nil
+                            ),
+                            isPresented: selectedTab == 1,
+                            onScroll: {
+                                if isUserInfoVisible {
+                                    withAnimation {
+                                        isUserInfoVisible = false
                                     }
-                                },
-                                isPresented: selectedTab == 1
-                            )
-                            .opacity(selectedTab == 1 ? 1 : 0)
-                            .allowsHitTesting(selectedTab == 1)
-                        }
+                                }
+                            }
+                        )
+                        .opacity(selectedTab == 1 ? 1 : 0)
+                        .allowsHitTesting(selectedTab == 1)
                     }
                 }
                 .modify {

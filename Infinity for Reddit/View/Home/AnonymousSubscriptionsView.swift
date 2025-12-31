@@ -53,49 +53,47 @@ struct AnonymousSubscriptionsView: View {
                 }
                 
                 ZStack {
-                    Group {
-                        switch anonymousSubscriptionListingViewModel.subscriptionSelectionMode {
-                        case .noSelection:
-                            AnonymousSubscribedSubredditListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
-                                .opacity(selectedOption == 0 ? 1 : 0)
-                                .allowsHitTesting(selectedOption == 0)
-                            
-                            AnonymousSubscribedUserListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
-                                .opacity(selectedOption == 1 ? 1 : 0)
-                                .allowsHitTesting(selectedOption == 1)
-                            
-                            AnonymousCustomFeedView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
-                                .opacity(selectedOption == 2 ? 1 : 0)
-                                .allowsHitTesting(selectedOption == 2)
-                        case .thingSelection(let onSelectThing):
-                            AnonymousSubscribedSubredditListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel) { subscribedSubredditData in
-                                onSelectThing(Thing.subscribedSubreddit(subscribedSubredditData))
-                            }
+                    switch anonymousSubscriptionListingViewModel.subscriptionSelectionMode {
+                    case .noSelection:
+                        AnonymousSubscribedSubredditListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
                             .opacity(selectedOption == 0 ? 1 : 0)
                             .allowsHitTesting(selectedOption == 0)
-                            
-                            AnonymousSubscribedUserListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel) { subscribedUserData in
-                                onSelectThing(Thing.subscribedUser(subscribedUserData))
-                            }
+                        
+                        AnonymousSubscribedUserListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
                             .opacity(selectedOption == 1 ? 1 : 0)
                             .allowsHitTesting(selectedOption == 1)
-                        case .subredditAndUserMultiSelection:
-                            AnonymousSubscribedSubredditListingMultiSelectionView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
-                                .opacity(selectedOption == 0 ? 1 : 0)
-                                .allowsHitTesting(selectedOption == 0)
-                            
-                            AnonymousSubscribedUserListingMultiSelectionView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
-                                .opacity(selectedOption == 1 ? 1 : 0)
-                                .allowsHitTesting(selectedOption == 1)
-                        case .subredditMultiSelection:
-                            AnonymousSubscribedSubredditListingMultiSelectionView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
-                                .opacity(selectedOption == 0 ? 1 : 0)
-                                .allowsHitTesting(selectedOption == 0)
-                        case .userMultiSelection:
-                            AnonymousSubscribedUserListingMultiSelectionView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
-                                .opacity(selectedOption == 0 ? 1 : 0)
-                                .allowsHitTesting(selectedOption == 0)
+                        
+                        AnonymousCustomFeedView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
+                            .opacity(selectedOption == 2 ? 1 : 0)
+                            .allowsHitTesting(selectedOption == 2)
+                    case .thingSelection(let onSelectThing):
+                        AnonymousSubscribedSubredditListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel) { subscribedSubredditData in
+                            onSelectThing(Thing.subscribedSubreddit(subscribedSubredditData))
                         }
+                        .opacity(selectedOption == 0 ? 1 : 0)
+                        .allowsHitTesting(selectedOption == 0)
+                        
+                        AnonymousSubscribedUserListingView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel) { subscribedUserData in
+                            onSelectThing(Thing.subscribedUser(subscribedUserData))
+                        }
+                        .opacity(selectedOption == 1 ? 1 : 0)
+                        .allowsHitTesting(selectedOption == 1)
+                    case .subredditAndUserMultiSelection:
+                        AnonymousSubscribedSubredditListingMultiSelectionView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
+                            .opacity(selectedOption == 0 ? 1 : 0)
+                            .allowsHitTesting(selectedOption == 0)
+                        
+                        AnonymousSubscribedUserListingMultiSelectionView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
+                            .opacity(selectedOption == 1 ? 1 : 0)
+                            .allowsHitTesting(selectedOption == 1)
+                    case .subredditMultiSelection:
+                        AnonymousSubscribedSubredditListingMultiSelectionView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
+                            .opacity(selectedOption == 0 ? 1 : 0)
+                            .allowsHitTesting(selectedOption == 0)
+                    case .userMultiSelection:
+                        AnonymousSubscribedUserListingMultiSelectionView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
+                            .opacity(selectedOption == 0 ? 1 : 0)
+                            .allowsHitTesting(selectedOption == 0)
                     }
                 }
                 

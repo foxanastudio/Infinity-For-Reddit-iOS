@@ -50,25 +50,38 @@ struct SubredditAndUserSearchResultSheet: View {
                     EmptyView()
                 }
                 
-                TabView(selection: $selectedOption) {
+                ZStack {
                     switch thingSelectionMode {
                     case .subredditAndUserMultiSelection:
-                        SubredditListingView(account: accountViewModel.account, subredditListingViewModel: subredditListingViewModel)
-                            .tag(0)
+                        SubredditListingView(
+                            account: accountViewModel.account,
+                            subredditListingViewModel: subredditListingViewModel,
+                            isPresented: selectedOption == 0
+                        )
+                        .opacity(selectedOption == 0 ? 1 : 0)
+                        .allowsHitTesting(selectedOption == 0)
                         
-                        UserListingView(account: accountViewModel.account, userListingViewModel: userListingViewModel)
-                            .tag(1)
+                        UserListingView(
+                            account: accountViewModel.account,
+                            userListingViewModel: userListingViewModel,
+                            isPresented: selectedOption == 1
+                        )
+                        .opacity(selectedOption == 1 ? 1 : 0)
+                        .allowsHitTesting(selectedOption == 1)
                     case .subredditMultiSelection:
-                        SubredditListingView(account: accountViewModel.account, subredditListingViewModel: subredditListingViewModel)
-                            .tag(0)
+                        SubredditListingView(
+                            account: accountViewModel.account,
+                            subredditListingViewModel: subredditListingViewModel
+                        )
                     case .userMultiSelection:
-                        UserListingView(account: accountViewModel.account, userListingViewModel: userListingViewModel)
-                            .tag(0)
+                        UserListingView(
+                            account: accountViewModel.account,
+                            userListingViewModel: userListingViewModel
+                        )
                     default:
                         EmptyView()
                     }
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
                 
                 switch thingSelectionMode {
                 case .subredditAndUserMultiSelection(_, let onSelectMultipleSubscriptions):

@@ -105,9 +105,6 @@
     "Collapse Subscribed Subreddits Section" : {
 
     },
-    "Comments" : {
-
-    },
     "Comments submitted by the following users will be filtered out." : {
 
     },
@@ -259,9 +256,6 @@
 
     },
     "Once enabled, sensitive content will always be hidden, regardless of the sensitive content setting. This option is irreversible; the only way to re-enable the sensitive content is to clear the app data.\n\nDo you still want to enable it?" : {
-
-    },
-    "Posts" : {
 
     },
     "Posts from the following subreddits will be filtered out." : {

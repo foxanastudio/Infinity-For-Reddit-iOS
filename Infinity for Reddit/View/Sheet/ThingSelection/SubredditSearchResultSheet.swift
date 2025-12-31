@@ -30,7 +30,10 @@ struct SubredditSearchResultSheet: View {
     }
     
     var body: some View {
-        SubredditListingView(account: accountViewModel.account, subredditListingViewModel: subredditListingViewModel)
+        SubredditListingView(
+            account: accountViewModel.account,
+            subredditListingViewModel: subredditListingViewModel
+        )
             .themedNavigationBar()
             .addTitleToInlineNavigationBar("Subreddits")
             .id(accountViewModel.account.username)

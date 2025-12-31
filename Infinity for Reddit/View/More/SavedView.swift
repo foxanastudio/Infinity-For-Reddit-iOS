@@ -41,7 +41,6 @@ struct SavedView: View {
                                     queries: nil,
                                     params: nil
                                 ),
-                                isPresented: true,
                                 handleToolbarMenu: false
                             )
                             .tag(0)

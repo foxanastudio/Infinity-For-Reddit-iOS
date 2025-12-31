@@ -14,7 +14,7 @@ struct SearchResultsView: View {
     @StateObject private var subredditListingViewModel: SubredditListingViewModel
     @StateObject private var userListingViewModel: UserListingViewModel
     
-    @State private var selectedOption: Int
+    @State private var selectedTab: Int
     
     init(query: String,
          searchInSubredditOrUserName: String?,
@@ -22,7 +22,7 @@ struct SearchResultsView: View {
          searchInThingType: SearchInThingType,
          searchResultTab: Int
     ) {
-        self.selectedOption = searchResultTab
+        self.selectedTab = searchResultTab
         _searchResultsViewModel = StateObject(wrappedValue: SearchResultsViewModel(query: query, searchInSubredditOrUserName: searchInSubredditOrUserName, searchInMultiReddit: searchInMultiReddit, searchInThingType: searchInThingType))
         _subredditListingViewModel = StateObject(
             wrappedValue: SubredditListingViewModel(
@@ -43,30 +43,44 @@ struct SearchResultsView: View {
     var body: some View {
         RootView {
             VStack(spacing: 0) {
-                SegmentedPicker(selectedValue: $selectedOption, values: ["Posts", "Subreddits", "Users"])
+                SegmentedPicker(selectedValue: $selectedTab, values: ["Posts", "Subreddits", "Users"])
                     .padding(4)
                 
-                TabView(selection: $selectedOption) {
-                    PostListingView(postListingMetadata: PostListingMetadata(
-                        postListingType: PostListingType.search(
-                            query: searchResultsViewModel.query,
-                            searchInSubredditOrUserName: searchResultsViewModel.searchInSubredditOrUserName,
-                            searchInMultiReddit: searchResultsViewModel.searchInMultiReddit,
-                            searchInThingType: searchResultsViewModel.searchInThingType
+                ZStack {
+                    PostListingView(
+                        postListingMetadata: PostListingMetadata(
+                            postListingType: PostListingType.search(
+                                query: searchResultsViewModel.query,
+                                searchInSubredditOrUserName: searchResultsViewModel.searchInSubredditOrUserName,
+                                searchInMultiReddit: searchResultsViewModel.searchInMultiReddit,
+                                searchInThingType: searchResultsViewModel.searchInThingType
+                            ),
+                            headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
+                            queries: ["q": searchResultsViewModel.query, "type": "link"],
+                            params: nil
                         ),
-                        headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
-                        queries: ["q": searchResultsViewModel.query, "type": "link"],
-                        params: nil
-                    ), isPresented: true, handleToolbarMenu: false)
-                    .tag(0)
+                        handleToolbarMenu: false,
+                        isPresented: selectedTab == 0
+                    )
+                    .opacity(selectedTab == 0 ? 1 : 0)
+                    .allowsHitTesting(selectedTab == 0)
                     
-                    SubredditListingView(account: accountViewModel.account, subredditListingViewModel: subredditListingViewModel)
-                        .tag(1)
+                    SubredditListingView(
+                        account: accountViewModel.account,
+                        subredditListingViewModel: subredditListingViewModel,
+                        isPresented: selectedTab == 1
+                    )
+                    .opacity(selectedTab == 1 ? 1 : 0)
+                    .allowsHitTesting(selectedTab == 1)
                     
-                    UserListingView(account: accountViewModel.account, userListingViewModel: userListingViewModel)
-                        .tag(2)
+                    UserListingView(
+                        account: accountViewModel.account,
+                        userListingViewModel: userListingViewModel,
+                        isPresented: selectedTab == 2
+                    )
+                    .opacity(selectedTab == 2 ? 1 : 0)
+                    .allowsHitTesting(selectedTab == 2)
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
             }
         }
         .themedNavigationBar()

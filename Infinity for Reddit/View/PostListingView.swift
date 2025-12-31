@@ -36,7 +36,6 @@ struct PostListingView: View {
     @State private var textToBeSelectedAndCopiedItem: TextToBeSelectedAndCopiedItem?
     @State var lazyMode: Task<Void, Error>?
     @State var lazyModeState: LazyModeState = .stopped
-    @State private var hasInitialLoaded = false
     
     @AppStorage(InterfacePostUserDefaultsUtils.defaultLinkPostLayoutKey, store: .interfacePost) private var defaultLinkPostLayout: Int = 0
     @AppStorage(InterfaceUserDefaultsUtils.lazyModeIntervalKey, store: .interface) private var lazyModeInterval: Double = 2.5
@@ -57,10 +56,10 @@ struct PostListingView: View {
     private let isPresented: Bool
     
     init(postListingMetadata: PostListingMetadata,
-         isPresented: Bool,
          externalPostFilter: PostFilter? = nil,
          handleToolbarMenu: Bool = true,
          showFilterPostsOption: Bool = true,
+         isPresented: Bool = true
     ) {
         self.postListingMetadata = postListingMetadata
         if case .subreddit = postListingMetadata.postListingType {
@@ -225,9 +224,6 @@ struct PostListingView: View {
                             .frame(maxWidth: .infinity)
                             .listPlainItemNoInsets()
                             .task {
-                                guard isPresented else {
-                                    return
-                                }
                                 await postListingViewModel.loadPosts()
                             } 
                         }
@@ -271,7 +267,16 @@ struct PostListingView: View {
                 NavigationBarMenu()
             }
         }
+        .task(id: taskKey) {
+            guard isPresented else {
+                return
+            }
+            
+            await postListingViewModel.initialLoadPosts(saveLastSeenPostInFrontPage: saveLastSeenPostInFrontPage)
+        }
         .onAppear {
+            setUpMenu()
+            
             if lazyModeState == .paused {
                 resumeLazyMode()
             }
@@ -321,36 +326,22 @@ struct PostListingView: View {
         .onChange(of: postListingViewModel.showAllGalleryMediaDownloadFinishedMessageTrigger) {
             snackbarManager.showSnackbar(.info("Gallery download complete."))
         }
-        .onChange(of: isPresented, initial: true) { _, presented in
-            if presented {
+        .onChange(of: isPresented) { _, newValue in
+            if newValue {
                 setUpMenu()
                 
-                guard !hasInitialLoaded else {
-                    return
-                }
-                hasInitialLoaded = true
-
-                Task {
-                    await postListingViewModel.initialLoadPosts(
-                        saveLastSeenPostInFrontPage: saveLastSeenPostInFrontPage
-                    )
+                if lazyModeState == .paused {
+                    resumeLazyMode()
                 }
             } else {
+                if lazyModeState == .started {
+                    pauseLazyMode(resetScrolledPost: false)
+                }
+                
                 guard let navigationBarMenuKey else {
                     return
                 }
                 navigationBarMenuManager.pop(key: navigationBarMenuKey)
-            }
-        }
-        .onChange(of: postListingViewModel.loadPostsTaskId) { _, _ in
-            guard isPresented else {
-                return
-            }
-
-            Task {
-                await postListingViewModel.initialLoadPosts(
-                    saveLastSeenPostInFrontPage: saveLastSeenPostInFrontPage
-                )
             }
         }
         .wrapContentSheet(isPresented: $showSortTypeKindSheet) {
@@ -498,6 +489,13 @@ struct PostListingView: View {
             )
         }
         .environment(\.postListingVideoManager, postListingVideoManager)
+    }
+    
+    private var taskKey: LoadPostsTaskKey {
+        LoadPostsTaskKey(
+            loadPostsTaskId: postListingViewModel.loadPostsTaskId,
+            isPresented: isPresented
+        )
     }
     
     private func getPostLayout(_ post: Post) -> PostLayout {
@@ -693,5 +691,10 @@ struct PostListingView: View {
         lazyMode?.cancel()
         lazyMode = nil
         startLazyMode()
+    }
+    
+    struct LoadPostsTaskKey: Hashable {
+        let loadPostsTaskId: UUID
+        let isPresented: Bool
     }
 }

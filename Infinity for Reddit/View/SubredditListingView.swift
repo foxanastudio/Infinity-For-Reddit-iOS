@@ -18,11 +18,13 @@ struct SubredditListingView: View {
     @State private var showSortTypeKindSheet: Bool = false
     @State private var navigationBarMenuKey: UUID?
     private let account: Account
+    private let isPresented: Bool
     private let iconSize: CGFloat = 28
     
-    init(account: Account, subredditListingViewModel: SubredditListingViewModel) {
+    init(account: Account, subredditListingViewModel: SubredditListingViewModel, isPresented: Bool = true) {
         self.account = account
         self.subredditListingViewModel = subredditListingViewModel
+        self.isPresented = isPresented
     }
     
     var body: some View {
@@ -115,29 +117,34 @@ struct SubredditListingView: View {
                 .showErrorUsingSnackbar(subredditListingViewModel.$error)
             }
         }
-        .task(id: subredditListingViewModel.loadSubredditsTaskId) {
+        .task(id: taskKey) {
+            guard isPresented else {
+                return
+            }
+            
             await subredditListingViewModel.initialLoadSubreddits()
         }
         .refreshable {
             await subredditListingViewModel.refreshSubredditsWithContinuation()
         }
         .onAppear {
-            if let key = navigationBarMenuKey {
-                navigationBarMenuManager.pop(key: key)
-            }
-            navigationBarMenuKey = navigationBarMenuManager.push([
-                NavigationBarMenuItem(title: "Refresh") {
-                    subredditListingViewModel.refreshSubreddits()
-                },
-                
-                NavigationBarMenuItem(title: "Sort") {
-                    showSortTypeKindSheet = true
-                }
-            ])
+            setUpMenu()
         }
         .onDisappear {
-            guard let navigationBarMenuKey else { return }
+            guard let navigationBarMenuKey else {
+                return
+            }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
+        }
+        .onChange(of: isPresented) { _, newValue in
+            if isPresented {
+                setUpMenu()
+            } else {
+                guard let navigationBarMenuKey else {
+                    return
+                }
+                navigationBarMenuManager.pop(key: navigationBarMenuKey)
+            }
         }
         .wrapContentSheet(isPresented: $showSortTypeKindSheet) {
             SortTypeKindSheet(
@@ -149,10 +156,37 @@ struct SubredditListingView: View {
         }
     }
     
-    func isSelected(_ subreddit: Subreddit) -> Bool {
+    private var taskKey: LoadSubredditsTaskKey {
+        LoadSubredditsTaskKey(
+            loadSubredditsTaskId: subredditListingViewModel.loadSubredditsTaskId,
+            isPresented: isPresented
+        )
+    }
+    
+    private func setUpMenu() {
+        if let key = navigationBarMenuKey {
+            navigationBarMenuManager.pop(key: key)
+        }
+        navigationBarMenuKey = navigationBarMenuManager.push([
+            NavigationBarMenuItem(title: "Refresh") {
+                subredditListingViewModel.refreshSubreddits()
+            },
+            
+            NavigationBarMenuItem(title: "Sort") {
+                showSortTypeKindSheet = true
+            }
+        ])
+    }
+    
+    private func isSelected(_ subreddit: Subreddit) -> Bool {
         return subredditListingViewModel.selectedSubreddits.index(id: subreddit.id) != nil
         || subredditListingViewModel.selectedSubredditData.index(id: subreddit.id) != nil
         || subredditListingViewModel.selectedSubscribedSubreddits.index(id: subreddit.id) != nil
         || subredditListingViewModel.selectedSubredditsInCustomFeed.index(id: subreddit.name) != nil
+    }
+    
+    struct LoadSubredditsTaskKey: Hashable {
+        let loadSubredditsTaskId: UUID
+        let isPresented: Bool
     }
 }

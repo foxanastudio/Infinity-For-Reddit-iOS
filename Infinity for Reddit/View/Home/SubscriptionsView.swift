@@ -54,53 +54,51 @@ struct SubscriptionsView: View {
                 }
                 
                 ZStack {
-                    Group {
-                        switch subscriptionListingViewModel.subscriptionSelectionMode {
-                        case .noSelection:
-                            SubscribedSubredditListingView(subscriptionListingViewModel: subscriptionListingViewModel)
-                                .opacity(selectedOption == 0 ? 1 : 0)
-                                .allowsHitTesting(selectedOption == 0)
-                            
-                            SubscribedUserListingView(subscriptionListingViewModel: subscriptionListingViewModel, onSelectCustomAction: nil)
-                                .opacity(selectedOption == 1 ? 1 : 0)
-                                .allowsHitTesting(selectedOption == 1)
-                            
-                            CustomFeedListingView(subscriptionListingViewModel: subscriptionListingViewModel, onSelectCustomAction: nil)
-                                .opacity(selectedOption == 2 ? 1 : 0)
-                                .allowsHitTesting(selectedOption == 2)
-                        case .thingSelection(let onSelectThing):
-                            SubscribedSubredditListingView(subscriptionListingViewModel: subscriptionListingViewModel) { subscribedSubredditData in
-                                onSelectThing(Thing.subscribedSubreddit(subscribedSubredditData))
-                            }
+                    switch subscriptionListingViewModel.subscriptionSelectionMode {
+                    case .noSelection:
+                        SubscribedSubredditListingView(subscriptionListingViewModel: subscriptionListingViewModel)
                             .opacity(selectedOption == 0 ? 1 : 0)
                             .allowsHitTesting(selectedOption == 0)
-                            
-                            SubscribedUserListingView(subscriptionListingViewModel: subscriptionListingViewModel) { subscribedUserData in
-                                onSelectThing(Thing.subscribedUser(subscribedUserData))
-                            }
+                        
+                        SubscribedUserListingView(subscriptionListingViewModel: subscriptionListingViewModel, onSelectCustomAction: nil)
                             .opacity(selectedOption == 1 ? 1 : 0)
                             .allowsHitTesting(selectedOption == 1)
-                            
-                            CustomFeedListingView(subscriptionListingViewModel: subscriptionListingViewModel, onSelectCustomAction: onSelectThing)
-                                .opacity(selectedOption == 2 ? 1 : 0)
-                                .allowsHitTesting(selectedOption == 2)
-                        case .subredditAndUserMultiSelection:
-                            SubscribedSubredditListingMultiSelectionView(subscriptionListingViewModel: subscriptionListingViewModel)
-                                .opacity(selectedOption == 0 ? 1 : 0)
-                                .allowsHitTesting(selectedOption == 0)
-                            
-                            SubscribedUserListingMultiSelectionView(subscriptionListingViewModel: subscriptionListingViewModel)
-                                .opacity(selectedOption == 1 ? 1 : 0)
-                                .allowsHitTesting(selectedOption == 1)
-                        case .subredditMultiSelection:
-                            SubscribedSubredditListingMultiSelectionView(subscriptionListingViewModel: subscriptionListingViewModel)
-                                .opacity(selectedOption == 0 ? 1 : 0)
-                                .allowsHitTesting(selectedOption == 0)
-                        case .userMultiSelection:
-                            SubscribedUserListingMultiSelectionView(subscriptionListingViewModel: subscriptionListingViewModel)
-                                .opacity(selectedOption == 0 ? 1 : 0)
-                                .allowsHitTesting(selectedOption == 0)
+                        
+                        CustomFeedListingView(subscriptionListingViewModel: subscriptionListingViewModel, onSelectCustomAction: nil)
+                            .opacity(selectedOption == 2 ? 1 : 0)
+                            .allowsHitTesting(selectedOption == 2)
+                    case .thingSelection(let onSelectThing):
+                        SubscribedSubredditListingView(subscriptionListingViewModel: subscriptionListingViewModel) { subscribedSubredditData in
+                            onSelectThing(Thing.subscribedSubreddit(subscribedSubredditData))
                         }
+                        .opacity(selectedOption == 0 ? 1 : 0)
+                        .allowsHitTesting(selectedOption == 0)
+                        
+                        SubscribedUserListingView(subscriptionListingViewModel: subscriptionListingViewModel) { subscribedUserData in
+                            onSelectThing(Thing.subscribedUser(subscribedUserData))
+                        }
+                        .opacity(selectedOption == 1 ? 1 : 0)
+                        .allowsHitTesting(selectedOption == 1)
+                        
+                        CustomFeedListingView(subscriptionListingViewModel: subscriptionListingViewModel, onSelectCustomAction: onSelectThing)
+                            .opacity(selectedOption == 2 ? 1 : 0)
+                            .allowsHitTesting(selectedOption == 2)
+                    case .subredditAndUserMultiSelection:
+                        SubscribedSubredditListingMultiSelectionView(subscriptionListingViewModel: subscriptionListingViewModel)
+                            .opacity(selectedOption == 0 ? 1 : 0)
+                            .allowsHitTesting(selectedOption == 0)
+                        
+                        SubscribedUserListingMultiSelectionView(subscriptionListingViewModel: subscriptionListingViewModel)
+                            .opacity(selectedOption == 1 ? 1 : 0)
+                            .allowsHitTesting(selectedOption == 1)
+                    case .subredditMultiSelection:
+                        SubscribedSubredditListingMultiSelectionView(subscriptionListingViewModel: subscriptionListingViewModel)
+                            .opacity(selectedOption == 0 ? 1 : 0)
+                            .allowsHitTesting(selectedOption == 0)
+                    case .userMultiSelection:
+                        SubscribedUserListingMultiSelectionView(subscriptionListingViewModel: subscriptionListingViewModel)
+                            .opacity(selectedOption == 0 ? 1 : 0)
+                            .allowsHitTesting(selectedOption == 0)
                     }
                 }
                 

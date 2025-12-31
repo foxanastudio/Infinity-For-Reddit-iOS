@@ -18,11 +18,13 @@ struct UserListingView: View {
     @State private var showSortTypeKindSheet: Bool = false
     @State private var navigationBarMenuKey: UUID?
     private let account: Account
+    private let isPresented: Bool
     private let iconSize: CGFloat = 28
     
-    init(account: Account, userListingViewModel: UserListingViewModel) {
+    init(account: Account, userListingViewModel: UserListingViewModel, isPresented: Bool = true) {
         self.account = account
         self.userListingViewModel = userListingViewModel
+        self.isPresented = isPresented
     }
     
     var body: some View {
@@ -108,29 +110,34 @@ struct UserListingView: View {
                 .showErrorUsingSnackbar(userListingViewModel.$error)
             }
         }
-        .task(id: userListingViewModel.loadUsersTaskId) {
+        .task(id: taskKey) {
+            guard isPresented else {
+                return
+            }
+            
             await userListingViewModel.initialLoadUsers()
         }
         .refreshable {
             await userListingViewModel.refreshUsersWithContinuation()
         }
         .onAppear {
-            if let key = navigationBarMenuKey {
-                navigationBarMenuManager.pop(key: key)
-            }
-            navigationBarMenuKey = navigationBarMenuManager.push([
-                NavigationBarMenuItem(title: "Refresh") {
-                    userListingViewModel.refreshUsers()
-                },
-                
-                NavigationBarMenuItem(title: "Sort") {
-                    showSortTypeKindSheet = true
-                }
-            ])
+            setUpMenu()
         }
         .onDisappear {
-            guard let navigationBarMenuKey else { return }
+            guard let navigationBarMenuKey else {
+                return
+            }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
+        }
+        .onChange(of: isPresented) { _, newValue in
+            if newValue {
+                setUpMenu()
+            } else {
+                guard let navigationBarMenuKey else {
+                    return
+                }
+                navigationBarMenuManager.pop(key: navigationBarMenuKey)
+            }
         }
         .wrapContentSheet(isPresented: $showSortTypeKindSheet) {
             SortTypeKindSheet(
@@ -142,10 +149,37 @@ struct UserListingView: View {
         }
     }
     
-    func isSelected(_ user: User) -> Bool {
+    private var taskKey: LoadUsersTaskKey {
+        LoadUsersTaskKey(
+            loadUsersTaskId: userListingViewModel.loadUsersTaskId,
+            isPresented: isPresented
+        )
+    }
+    
+    private func setUpMenu() {
+        if let key = navigationBarMenuKey {
+            navigationBarMenuManager.pop(key: key)
+        }
+        navigationBarMenuKey = navigationBarMenuManager.push([
+            NavigationBarMenuItem(title: "Refresh") {
+                userListingViewModel.refreshUsers()
+            },
+            
+            NavigationBarMenuItem(title: "Sort") {
+                showSortTypeKindSheet = true
+            }
+        ])
+    }
+    
+    private func isSelected(_ user: User) -> Bool {
         return userListingViewModel.selectedUsers.index(id: user.id) != nil
         || userListingViewModel.selectedSubscribedUsers.index(id: user.id) != nil
         || userListingViewModel.selectedUserData.index(id: user.id) != nil
         || userListingViewModel.selectedUserSubredditsInCustomFeed.index(id: "u_\(user.name)") != nil
+    }
+    
+    struct LoadUsersTaskKey: Hashable {
+        let loadUsersTaskId: UUID
+        let isPresented: Bool
     }
 }

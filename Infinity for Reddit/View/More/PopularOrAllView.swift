@@ -20,8 +20,7 @@ struct PopularOrAllView: View {
                 headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
                 queries: nil,
                 params: nil
-            ),
-            isPresented: true
+            )
         )
         .id(accountViewModel.account.username)
         .themedNavigationBar()

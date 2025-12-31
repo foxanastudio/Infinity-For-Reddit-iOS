@@ -29,17 +29,17 @@ struct CommentListingView: View {
     @State private var navigationBarMenuKey: UUID?
     @State private var commentToBeEdited: Comment? = nil
     @State private var commentToBeModerated: Comment? = nil
-    @State private var hasInitialLoaded = false
     
     private let commentListingMetadata: CommentListingMetadata
     private let thingModerationRepository: ThingModerationRepositoryProtocol = ThingModerationRepository()
     private let onScroll: (() -> Void)?
     private let isPresented: Bool
     
-    init(commentListingMetadata: CommentListingMetadata, onScroll: (() -> Void)? = nil, isPresented: Bool) {
+    init(commentListingMetadata: CommentListingMetadata, isPresented: Bool, onScroll: (() -> Void)? = nil) {
         self.commentListingMetadata = commentListingMetadata
-        self.onScroll = onScroll
         self.isPresented = isPresented
+        self.onScroll = onScroll
+        
         _commentListingViewModel = StateObject(
             wrappedValue: CommentListingViewModel(
                 commentListingMetadata: commentListingMetadata,
@@ -118,9 +118,6 @@ struct CommentListingView: View {
                     if commentListingViewModel.hasMorePages {
                         ProgressIndicator()
                             .task {
-                                guard isPresented else {
-                                    return
-                                }
                                 await commentListingViewModel.loadComments()
                             }
                             .listPlainItem()
@@ -137,6 +134,22 @@ struct CommentListingView: View {
                 .showErrorUsingSnackbar(commentListingViewModel.$error)
             }
         }
+        .task(id: taskKey) {
+            guard isPresented else {
+                return
+            }
+            
+            await commentListingViewModel.initialLoadComments()
+        }
+        .onAppear {
+            setUpMenu()
+        }
+        .onDisappear {
+            guard let navigationBarMenuKey else {
+                return
+            }
+            navigationBarMenuManager.pop(key: navigationBarMenuKey)
+        }
         .refreshable {
             await commentListingViewModel.refreshCommentsWithContinuation()
         }
@@ -150,61 +163,15 @@ struct CommentListingView: View {
                 commentToBeEdited = nil
             }
         }
-        .onChange(of: isPresented, initial: true) { _, presented in
-            if presented {
-                if let key = navigationBarMenuKey {
-                    navigationBarMenuManager.pop(key: key)
-                }
-                let menu: [NavigationBarMenuItem]
-                switch commentListingMetadata.commentListingType {
-                case .user:
-                    menu = [
-                        NavigationBarMenuItem(title: "Refresh") {
-                            commentListingViewModel.refreshComments()
-                        },
-                        
-                        NavigationBarMenuItem(title: "Sort") {
-                            showSortTypeKindSheet = true
-                        }
-                    ]
-                case .userSaved:
-                    menu = [
-                        NavigationBarMenuItem(title: "Refresh") {
-                            commentListingViewModel.refreshComments()
-                        }
-                    ]
-                }
-                navigationBarMenuKey = navigationBarMenuManager.push(menu)
-                
-                guard !hasInitialLoaded else {
-                    return
-                }
-                hasInitialLoaded = true
-                
-                Task {
-                    await commentListingViewModel.initialLoadComments()
-                }
+        .onChange(of: isPresented) { _, newValue in
+            if newValue {
+                setUpMenu()
             } else {
                 guard let navigationBarMenuKey else {
                     return
                 }
                 navigationBarMenuManager.pop(key: navigationBarMenuKey)
             }
-        }
-        .onChange(of: commentListingViewModel.loadCommentsTaskId) {
-            guard isPresented else {
-                return
-            }
-            
-            Task {
-                await commentListingViewModel.initialLoadComments()
-            }
-        }
-        .onDisappear {
-            guard let navigationBarMenuKey else {
-                return
-            }
-            navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
         .wrapContentSheet(isPresented: $showSortTypeKindSheet) {
             SortTypeKindSheet(
@@ -268,6 +235,44 @@ struct CommentListingView: View {
         .sheet(item: $textToBeSelectedAndCopiedItem) { item in
             CopyContentSheet(content: item.content)
         }
+    }
+    
+    private var taskKey: LoadCommentsTaskKey {
+        LoadCommentsTaskKey(
+            loadCommentsTaskId: commentListingViewModel.loadCommentsTaskId,
+            isPresented: isPresented
+        )
+    }
+    
+    private func setUpMenu() {
+        if let key = navigationBarMenuKey {
+            navigationBarMenuManager.pop(key: key)
+        }
+        let menu: [NavigationBarMenuItem]
+        switch commentListingMetadata.commentListingType {
+        case .user:
+            menu = [
+                NavigationBarMenuItem(title: "Refresh") {
+                    commentListingViewModel.refreshComments()
+                },
+                
+                NavigationBarMenuItem(title: "Sort") {
+                    showSortTypeKindSheet = true
+                }
+            ]
+        case .userSaved:
+            menu = [
+                NavigationBarMenuItem(title: "Refresh") {
+                    commentListingViewModel.refreshComments()
+                }
+            ]
+        }
+        navigationBarMenuKey = navigationBarMenuManager.push(menu)
+    }
+    
+    struct LoadCommentsTaskKey: Hashable {
+        let loadCommentsTaskId: UUID
+        let isPresented: Bool
     }
 }
 
