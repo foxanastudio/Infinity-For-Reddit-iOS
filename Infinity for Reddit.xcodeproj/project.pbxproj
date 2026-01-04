@@ -12,6 +12,7 @@
 		5509013D2EB42E2400707F87 /* GiphyUISDK in Frameworks */ = {isa = PBXBuildFile; productRef = 5509013C2EB42E2400707F87 /* GiphyUISDK */; };
 		55155AE12CFD5BCF003D5F14 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 55155AE02CFD5BCF003D5F14 /* GRDB */; };
 		554918CB2E26D8ED00355B48 /* Flow in Frameworks */ = {isa = PBXBuildFile; productRef = 554918CA2E26D8ED00355B48 /* Flow */; };
+		555866B42F09F73F00A609C5 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 555866B32F09F73F00A609C5 /* AppIcon.icon */; };
 		555F0B842D07AD53003A1CA7 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 555F0B832D07AD53003A1CA7 /* SDWebImageSwiftUI */; };
 		5582E51B2EFF32550031EDE7 /* SeekBar in Frameworks */ = {isa = PBXBuildFile; productRef = 5582E51A2EFF32550031EDE7 /* SeekBar */; };
 		5582E51C2EFF45980031EDE7 /* SeekBar in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 5582E51A2EFF32550031EDE7 /* SeekBar */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -56,6 +57,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		555866B32F09F73F00A609C5 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = AppIcon.icon; sourceTree = "<group>"; };
 		559BD2332CF7D58500621685 /* Infinity for Reddit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Infinity for Reddit.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		559BD2452CF7D58600621685 /* Infinity for RedditTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Infinity for RedditTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		559BD24F2CF7D58600621685 /* Infinity for RedditUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Infinity for RedditUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -125,6 +127,7 @@
 				559BD2482CF7D58600621685 /* Infinity for RedditTests */,
 				559BD2522CF7D58600621685 /* Infinity for RedditUITests */,
 				559BD2342CF7D58500621685 /* Products */,
+				555866B32F09F73F00A609C5 /* AppIcon.icon */,
 			);
 			sourceTree = "<group>";
 		};
@@ -289,6 +292,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				555866B42F09F73F00A609C5 /* AppIcon.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -472,6 +476,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Infinity for Reddit/Preview Content\"";
@@ -493,7 +498,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.docilealligator.infinityforreddit;
+				PRODUCT_BUNDLE_IDENTIFIER = com.docilealligator.infinityforreddit1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -506,6 +511,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Infinity for Reddit/Preview Content\"";
@@ -527,7 +533,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.docilealligator.infinityforreddit;
+				PRODUCT_BUNDLE_IDENTIFIER = com.docilealligator.infinityforreddit1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
