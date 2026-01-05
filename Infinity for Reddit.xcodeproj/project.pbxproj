@@ -13,6 +13,7 @@
 		55155AE12CFD5BCF003D5F14 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 55155AE02CFD5BCF003D5F14 /* GRDB */; };
 		554918CB2E26D8ED00355B48 /* Flow in Frameworks */ = {isa = PBXBuildFile; productRef = 554918CA2E26D8ED00355B48 /* Flow */; };
 		555866B42F09F73F00A609C5 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 555866B32F09F73F00A609C5 /* AppIcon.icon */; };
+		555866B72F0ABFA800A609C5 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 555866B62F0ABFA800A609C5 /* Lottie */; };
 		555F0B842D07AD53003A1CA7 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 555F0B832D07AD53003A1CA7 /* SDWebImageSwiftUI */; };
 		5582E51B2EFF32550031EDE7 /* SeekBar in Frameworks */ = {isa = PBXBuildFile; productRef = 5582E51A2EFF32550031EDE7 /* SeekBar */; };
 		5582E51C2EFF45980031EDE7 /* SeekBar in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 5582E51A2EFF32550031EDE7 /* SeekBar */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -91,6 +92,7 @@
 				55949B882CFA7EAD002D1C46 /* Swinject in Frameworks */,
 				46978AED2E863D7100EAF60F /* MijickCamera in Frameworks */,
 				462393A92EE25BEE00466F5E /* GCDWebServer in Frameworks */,
+				555866B72F0ABFA800A609C5 /* Lottie in Frameworks */,
 				5597B1E12EE3417000D79683 /* SwiftUIIntrospect in Frameworks */,
 				55C7421F2CFD1E4300853D4E /* SwiftyJSON in Frameworks */,
 				559389B12E459F600062724F /* Kingfisher in Frameworks */,
@@ -176,6 +178,7 @@
 				462393A82EE25BEE00466F5E /* GCDWebServer */,
 				5597B1E02EE3417000D79683 /* SwiftUIIntrospect */,
 				5582E51A2EFF32550031EDE7 /* SeekBar */,
+				555866B62F0ABFA800A609C5 /* Lottie */,
 			);
 			productName = "Infinity for Reddit";
 			productReference = 559BD2332CF7D58500621685 /* Infinity for Reddit.app */;
@@ -274,6 +277,7 @@
 				462393A72EE25BEE00466F5E /* XCRemoteSwiftPackageReference "GCDWebServer" */,
 				5597B1DF2EE3417000D79683 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
 				5582E5192EFF32550031EDE7 /* XCRemoteSwiftPackageReference "SeekBar" */,
+				555866B52F0ABFA800A609C5 /* XCRemoteSwiftPackageReference "lottie-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 559BD2342CF7D58500621685 /* Products */;
@@ -498,7 +502,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.docilealligator.infinityforreddit1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.docilealligator.infinityforreddit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -533,7 +537,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.docilealligator.infinityforreddit1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.docilealligator.infinityforreddit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -691,6 +695,14 @@
 				minimumVersion = 3.1.1;
 			};
 		};
+		555866B52F0ABFA800A609C5 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.2;
+			};
+		};
 		555F0B822D07AD53003A1CA7 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI.git";
@@ -790,6 +802,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 554918C92E26D8ED00355B48 /* XCRemoteSwiftPackageReference "SwiftUI-Flow" */;
 			productName = Flow;
+		};
+		555866B62F0ABFA800A609C5 /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 555866B52F0ABFA800A609C5 /* XCRemoteSwiftPackageReference "lottie-ios" */;
+			productName = Lottie;
 		};
 		555F0B832D07AD53003A1CA7 /* SDWebImageSwiftUI */ = {
 			isa = XCSwiftPackageProductDependency;
