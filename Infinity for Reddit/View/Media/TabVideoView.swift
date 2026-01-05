@@ -13,6 +13,8 @@ struct TabVideoView: View {
     
     @ObservedObject var tabViewDismissalViewModel: TabViewDismissalViewModel
     
+    @Binding var childViewHasZoomed: Bool
+    
     let urlString: String
     
     // The following two are for downloading all media. Null-able
@@ -37,6 +39,7 @@ struct TabVideoView: View {
          isSelected: Bool,
          tabViewDismissalViewModel: TabViewDismissalViewModel,
          hasDescription: Bool,
+         childViewHasZoomed: Binding<Bool>,
          onShowDescription: @escaping () -> Void,
          onDismiss: @escaping () -> Void
     ) {
@@ -51,6 +54,7 @@ struct TabVideoView: View {
         )
         self.isSelected = isSelected
         self.hasDescription = hasDescription
+        self._childViewHasZoomed = childViewHasZoomed
         self.onShowDescription = onShowDescription
         self.tabViewDismissalViewModel = tabViewDismissalViewModel
         self.onDismiss = onDismiss
@@ -111,14 +115,7 @@ struct TabVideoView: View {
             onDismiss()
         }
         .tabItemMediaGesture(
-            onDragEnded: { transform in
-                if transform.scaleX == 1 && transform.scaleY == 1 && abs(transform.ty) > 100 {
-                    return true
-                }
-                return false
-            },
-            onStartDismiss: {},
-            onDismiss: onDismiss
+            childViewHasZoomed: $childViewHasZoomed
         )
         .onChange(of: isSelected) { _, newValue in
             videoFullScreenViewModel.setCanPlay(to: newValue)

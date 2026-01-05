@@ -19,6 +19,8 @@ struct ImgurFullScreenView: View {
     @State private var isAnimatingBack: Bool = false
     @State private var selectedTab: Int = 0
     @State private var sheetImgurMediaItem: ImgurMediaItem?
+    @State private var dismissStarted: Bool = false
+    @State private var childViewHasZoomed: Bool = false
     
     let post: Post?
     let onDismiss: () -> Void
@@ -35,58 +37,58 @@ struct ImgurFullScreenView: View {
     var body: some View {
         Group {
             if let imgurMedia = imgurFullScreenViewModel.imgurMedia {
-                ZStack {
-                    Color.black
-                        .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-                        .edgesIgnoringSafeArea(.all)
-                        .ignoresSafeArea()
-                    
-                    TabView(selection: $selectedTab) {
-                        ForEach(Array(imgurMedia.images.enumerated()), id: \.offset) { index, item in
-                            if item.mediaType != .video {
-                                ImgurImageView(
-                                    imgurMediaItem: item,
-                                    imgurMedia: imgurMedia,
-                                    post: post,
-                                    onShowDescription: {
-                                        sheetImgurMediaItem = item
-                                    }
-                                ) {
-                                    tabViewDismissalViewModel.isDismissed = true
-                                    onDismiss()
+                TabView(selection: $selectedTab) {
+                    ForEach(Array(imgurMedia.images.enumerated()), id: \.offset) { index, item in
+                        if item.mediaType != .video {
+                            ImgurImageView(
+                                childViewHasZoomed: $childViewHasZoomed,
+                                imgurMediaItem: item,
+                                imgurMedia: imgurMedia,
+                                post: post,
+                                onShowDescription: {
+                                    sheetImgurMediaItem = item
                                 }
-                                .containerRelativeFrame(.horizontal, count: 1, span: 1, spacing: 0, alignment: .center)
-                                .tag(index)
-                            } else {
-                                TabVideoView(
-                                    urlString: item.link,
-                                    imgurMedia: imgurMedia,
-                                    post: nil,
-                                    videoType: .direct,
-                                    downloadMediaType: item.toDownloadMediaType(post: post),
-                                    isSelected: selectedTab == index,
-                                    tabViewDismissalViewModel: tabViewDismissalViewModel,
-                                    hasDescription: !item.title.isEmpty || !item.description.isEmpty,
-                                    onShowDescription: {
-                                        sheetImgurMediaItem = item
-                                    }
-                                ) {
-                                    tabViewDismissalViewModel.isDismissed = true
-                                    onDismiss()
-                                }
-                                .tag(index)
+                            ) {
+                                tabViewDismissalViewModel.isDismissed = true
+                                onDismiss()
                             }
+                            .containerRelativeFrame(.horizontal, count: 1, span: 1, spacing: 0, alignment: .center)
+                            .tag(index)
+                        } else {
+                            TabVideoView(
+                                urlString: item.link,
+                                imgurMedia: imgurMedia,
+                                post: nil,
+                                videoType: .direct,
+                                downloadMediaType: item.toDownloadMediaType(post: post),
+                                isSelected: selectedTab == index,
+                                tabViewDismissalViewModel: tabViewDismissalViewModel,
+                                hasDescription: !item.title.isEmpty || !item.description.isEmpty,
+                                childViewHasZoomed: $childViewHasZoomed,
+                                onShowDescription: {
+                                    sheetImgurMediaItem = item
+                                }
+                            ) {
+                                tabViewDismissalViewModel.isDismissed = true
+                                onDismiss()
+                            }
+                            .tag(index)
                         }
                     }
-                    .edgesIgnoringSafeArea(.all)
-                    .ignoresSafeArea()
-                    .tabViewStyle(.page(indexDisplayMode: .never))
                 }
+                .edgesIgnoringSafeArea(.all)
+                .ignoresSafeArea()
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .tabItemMediaGesture(
+                    dismissStarted: $dismissStarted,
+                    childViewHasZoomed: childViewHasZoomed,
+                    onDismiss: onDismiss
+                )
             } else {
                 ZStack {
                     Color.black
                         .opacity(opacityForBackground)
-                        .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .edgesIgnoringSafeArea(.all)
                         .ignoresSafeArea()
                     
@@ -158,6 +160,8 @@ struct ImgurImageView: View {
     @State private var isToolbarVisible: Bool = true
     @State private var dismissStarted: Bool = false
     
+    @Binding var childViewHasZoomed: Bool
+    
     let imgurMediaItem: ImgurMediaItem
     let imgurMedia: ImgurMedia
     let post: Post?
@@ -171,19 +175,7 @@ struct ImgurImageView: View {
                 handleImageTapGesture: false
             )
             .tabItemMediaGesture(
-                onDragEnded: { transform in
-                    if transform.scaleX == 1 && transform.scaleY == 1 && abs(transform.ty) > 100 {
-                        return true
-                    }
-                    return false
-                },
-                onStartDismiss: {
-                    dismissStarted = true
-                    withAnimation {
-                        isToolbarVisible = false
-                    }
-                },
-                onDismiss: onDismiss
+                childViewHasZoomed: $childViewHasZoomed
             )
             .onTapGesture {
                 if !dismissStarted {

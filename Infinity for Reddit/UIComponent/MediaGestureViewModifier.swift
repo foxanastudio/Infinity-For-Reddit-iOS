@@ -212,10 +212,110 @@ struct MediaGestureViewModifier: ViewModifier {
     }
 }
 
+struct TabViewGestureViewModifier: ViewModifier {
+    @State private var lastTransform: CGAffineTransform = .identity
+    @State private var transform: CGAffineTransform = .identity
+    @State private var containerSize: CGSize = .zero
+    
+    @Binding var dismissStarted: Bool
+    
+    let childViewHasZoomed: Bool
+    let onDismiss: () -> Void
+    
+    func body(content: Content) -> some View {
+        ZStack {
+            Color.black
+                .opacity(opacityForBackground(maxYDistance: 300))
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .edgesIgnoringSafeArea(.all)
+                .ignoresSafeArea()
+            
+            GeometryReader { proxy in
+                content
+                    .onAppear {
+                        containerSize = proxy.size
+                    }
+                    .animatableTransformEffect(transform)
+                    .simultaneousGesture(
+                        DragGesture(minimumDistance: 10)
+                            .onChanged { value in
+                                withAnimation(.interactiveSpring) {
+                                    if abs(value.translation.width) < abs(value.translation.height) || childViewHasZoomed {
+                                        transform = lastTransform.translatedBy(
+                                            x: value.translation.width,
+                                            y: value.translation.height
+                                        )
+                                    }
+                                }
+                            }
+                            .onEnded { value in
+                                if onDragEnded(transform) {
+                                    handleDragEnded(predictedEndTranslation: value.predictedEndTranslation, velocity: value.velocity, frameSize: containerSize)
+                                } else {
+                                    onEndGesture()
+                                }
+                            },
+                        isEnabled: !childViewHasZoomed
+                    )
+            }
+        }
+    }
+    
+    private func handleDragEnded(predictedEndTranslation: CGSize, velocity: CGSize, frameSize: CGSize) {
+        let dismissDistance = Swift.max(frameSize.width, frameSize.height) * 1.5
+        
+        let animation: Animation
+        let endTranslation: CGSize
+        
+        if #available(iOS 17, *) {
+            endTranslation = predictedEndTranslation.normalized * dismissDistance
+            let initialVelocity = velocity.magnitude / dismissDistance
+            animation = .interpolatingSpring(duration: 0.2, bounce: 0, initialVelocity: initialVelocity)
+        } else {
+            animation = .spring(duration: 0.2)
+            endTranslation = predictedEndTranslation.normalized * dismissDistance
+        }
+        
+        dismissStarted = true
+        withAnimation(animation) {
+            transform = lastTransform.translatedBy(
+                x: endTranslation.width,
+                y: endTranslation.height
+            )
+        }
+        
+        Task {
+            try? await Task.sleep(for: .seconds(0.3))
+            onDismiss()
+            dismissStarted = false
+            transform = .identity
+            lastTransform = .identity
+        }
+    }
+    
+    private func onDragEnded(_ transform: CGAffineTransform) -> Bool {
+        if transform.scaleX == 1 && transform.scaleY == 1 && abs(transform.ty) > 100 {
+            return true
+        }
+        return false
+    }
+    
+    private func onEndGesture() {
+        withAnimation(.snappy(duration: 0.1)) {
+            transform = .identity
+            lastTransform = .identity
+        }
+    }
+    
+    private func opacityForBackground(maxYDistance: CGFloat) -> Double {
+        let yDistance = min(abs(transform.ty), maxYDistance)
+        return Double(1 - (yDistance / maxYDistance))
+    }
+}
+
 struct TabItemMediaGestureViewModifier: ViewModifier {
     let minZoomScale: CGFloat
     let doubleTapZoomScale: CGFloat
-    let outOfBoundsColor: Color
     
     @State private var lastTransform: CGAffineTransform = .identity
     @State private var transform: CGAffineTransform = .identity
@@ -223,15 +323,13 @@ struct TabItemMediaGestureViewModifier: ViewModifier {
     @State private var contentSize: CGSize = .zero
     @State private var dismissStarted: Bool = false
     
-    let onDragEnded: (CGAffineTransform) -> Bool
-    let onStartDismiss: () -> Void
-    let onDismiss: () -> Void
+    @Binding var childViewHasZoomed: Bool
     
     func body(content: Content) -> some View {
         GeometryReader { proxy in
             ZStack {
-                outOfBoundsColor
-                    .opacity(opacityForBackground(maxYDistance: 300))
+                Color.clear
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .edgesIgnoringSafeArea(.all)
                     .ignoresSafeArea()
                 
@@ -248,9 +346,7 @@ struct TabItemMediaGestureViewModifier: ViewModifier {
                         }
                     }
                     .animatableTransformEffect(transform)
-                    // This is a placeholder gesture that prevents the stupid as hell TabView from getting the gesture
-                    .gesture(DragGesture(), isEnabled: hasZoomed)
-                    .simultaneousGesture(simultaneousDragGesture, isEnabled: !dismissStarted)
+                    .gesture(zoomedDragGesture, isEnabled: hasZoomed)
                     .modify { view in
                         if #available(iOS 17.0, *) {
                             view.gesture(magnificationGesture, isEnabled: !dismissStarted)
@@ -260,11 +356,12 @@ struct TabItemMediaGestureViewModifier: ViewModifier {
                     }
                     .gesture(doubleTapGesture, isEnabled: !dismissStarted)
             }
-            // This is a placeholder gesture that prevents the stupid as hell TabView from getting the gesture
-            .gesture(DragGesture(), isEnabled: hasZoomed)
-            .simultaneousGesture(simultaneousDragGesture, isEnabled: !dismissStarted)
+            .gesture(zoomedDragGesture, isEnabled: hasZoomed)
             .onAppear {
                 containerSize = proxy.size
+            }
+            .onChange(of: hasZoomed) { _, newValue in
+                childViewHasZoomed = hasZoomed
             }
         }
         .edgesIgnoringSafeArea(.all)
@@ -323,7 +420,7 @@ struct TabItemMediaGestureViewModifier: ViewModifier {
             }
     }
     
-    private var simultaneousDragGesture: some Gesture {
+    private var zoomedDragGesture: some Gesture {
         DragGesture(minimumDistance: 10)
             .onChanged { value in
                 withAnimation(.interactiveSpring) {
@@ -336,45 +433,8 @@ struct TabItemMediaGestureViewModifier: ViewModifier {
                 }
             }
             .onEnded { value in
-                if onDragEnded(transform) {
-                    handleDragEnded(predictedEndTranslation: value.predictedEndTranslation, velocity: value.velocity, frameSize: containerSize)
-                } else {
-                    onEndGesture()
-                }
+                onEndGesture()
             }
-    }
-    
-    func handleDragEnded(predictedEndTranslation: CGSize, velocity: CGSize, frameSize: CGSize) {
-        let dismissDistance = Swift.max(frameSize.width, frameSize.height) * 1.5
-        
-        let animation: Animation
-        let endTranslation: CGSize
-        
-        if #available(iOS 17, *) {
-            endTranslation = predictedEndTranslation.normalized * dismissDistance
-            let initialVelocity = velocity.magnitude / dismissDistance
-            animation = .interpolatingSpring(duration: 0.2, bounce: 0, initialVelocity: initialVelocity)
-        } else {
-            animation = .spring(duration: 0.2)
-            endTranslation = predictedEndTranslation.normalized * dismissDistance
-        }
-        
-        dismissStarted = true
-        onStartDismiss()
-        withAnimation(animation) {
-            transform = lastTransform.translatedBy(
-                x: endTranslation.width,
-                y: endTranslation.height
-            )
-        }
-        
-        Task {
-            try? await Task.sleep(for: .seconds(0.3))
-            onDismiss()
-            dismissStarted = false
-            transform = .identity
-            lastTransform = .identity
-        }
     }
     
     private func onEndGesture() {
@@ -418,15 +478,6 @@ struct TabItemMediaGestureViewModifier: ViewModifier {
         }
         
         return transform
-    }
-    
-    private func opacityForBackground(maxYDistance: CGFloat) -> Double {
-        if transform.scaleX != minZoomScale || transform.scaleY != minZoomScale {
-            return 1
-        }
-        
-        let yDistance = min(abs(transform.ty), maxYDistance)
-        return Double(1 - (yDistance / maxYDistance))
     }
 }
 

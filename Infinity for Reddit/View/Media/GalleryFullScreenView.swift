@@ -18,6 +18,8 @@ struct GalleryFullScreenView: View {
     @State private var hasStartedDragging: Bool = false
     @State private var isAnimatingBack: Bool = false
     @State private var sheetGalleryItem: GalleryItem?
+    @State private var dismissStarted: Bool = false
+    @State private var childViewHasZoomed: Bool = false
     
     let post: Post?
     var items: [GalleryItem]
@@ -32,64 +34,58 @@ struct GalleryFullScreenView: View {
     }
     
     var body: some View {
-        ZStack {
-            Color.black
-                .opacity(opacityForBackground())
-                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-                .edgesIgnoringSafeArea(.all)
-                .ignoresSafeArea()
-            
-            TabView(selection: $galleryScrollState.scrollId) {
-                ForEach(Array(items.enumerated()), id: \.offset) { index, item in
-                    if item.mediaType != .video {
-                        GalleryImageView(
-                            item: item,
-                            items: items,
-                            post: post,
-                            onShowDescription: {
-                                sheetGalleryItem = item
-                            }
-                        ) {
-                            tabViewDismissalViewModel.isDismissed = true
-                            onDismiss()
+        TabView(selection: $galleryScrollState.scrollId) {
+            ForEach(Array(items.enumerated()), id: \.offset) { index, item in
+                if item.mediaType != .video {
+                    GalleryImageView(
+                        childViewHasZoomed: $childViewHasZoomed,
+                        item: item,
+                        items: items,
+                        post: post,
+                        dismissStarted: dismissStarted,
+                        onShowDescription: {
+                            sheetGalleryItem = item
                         }
-                        .containerRelativeFrame(.horizontal, count: 1, span: 1, spacing: 0, alignment: .center)
-                        .tag(index)
-                    } else {
-                        TabVideoView(
-                            urlString: item.urlString,
-                            galleryItems: items,
-                            post: nil,
-                            videoType: .direct,
-                            downloadMediaType: item.toDownloadMediaType(post: post),
-                            isSelected: galleryScrollState.scrollId == index,
-                            tabViewDismissalViewModel: tabViewDismissalViewModel,
-                            hasDescription: !item.caption.isEmpty || !item.captionUrl.isEmpty,
-                            onShowDescription: {
-                                sheetGalleryItem = item
-                            }
-                        ) {
-                            tabViewDismissalViewModel.isDismissed = true
-                            onDismiss()
-                        }
-                        .tag(index)
+                    ) {
+                        tabViewDismissalViewModel.isDismissed = true
+                        onDismiss()
                     }
+                    .containerRelativeFrame(.horizontal, count: 1, span: 1, spacing: 0, alignment: .center)
+                    .tag(index)
+                } else {
+                    TabVideoView(
+                        urlString: item.urlString,
+                        galleryItems: items,
+                        post: nil,
+                        videoType: .direct,
+                        downloadMediaType: item.toDownloadMediaType(post: post),
+                        isSelected: galleryScrollState.scrollId == index,
+                        tabViewDismissalViewModel: tabViewDismissalViewModel,
+                        hasDescription: !item.caption.isEmpty || !item.captionUrl.isEmpty,
+                        childViewHasZoomed: $childViewHasZoomed,
+                        onShowDescription: {
+                            sheetGalleryItem = item
+                        }
+                    ) {
+                        tabViewDismissalViewModel.isDismissed = true
+                        onDismiss()
+                    }
+                    .tag(index)
                 }
             }
-            .edgesIgnoringSafeArea(.all)
-            .ignoresSafeArea()
-            .tabViewStyle(.page(indexDisplayMode: .never))
         }
+        .edgesIgnoringSafeArea(.all)
+        .ignoresSafeArea()
+        .tabViewStyle(.page(indexDisplayMode: .never))
+        .tabItemMediaGesture(
+            dismissStarted: $dismissStarted,
+            childViewHasZoomed: childViewHasZoomed,
+            onDismiss: onDismiss
+        )
         .sheet(item: $sheetGalleryItem) { item in
             GalleryOrImgurDescriptionSheet(title: nil, description: item.caption, link: item.captionUrl)
                 .presentationDetents([.medium, .large])
         }
-    }
-    
-    private func opacityForBackground() -> Double {
-        let maxOffset: CGFloat = UIScreen.main.bounds.height
-        let offset = min(abs(currentDragOffset), maxOffset)
-        return Double(1 - (offset / maxOffset))
     }
 }
 
@@ -100,11 +96,13 @@ struct GalleryImageView: View {
     @State private var hasStartedDragging: Bool = false
     @State private var isAnimatingBack: Bool = false
     @State private var isToolbarVisible: Bool = true
-    @State private var dismissStarted: Bool = false
+    
+    @Binding var childViewHasZoomed: Bool
     
     let item: GalleryItem
     let items: [GalleryItem]
     let post: Post?
+    let dismissStarted: Bool
     let onShowDescription: () -> Void
     let onDismiss: () -> Void
     
@@ -115,19 +113,7 @@ struct GalleryImageView: View {
                 handleImageTapGesture: false
             )
             .tabItemMediaGesture(
-                onDragEnded: { transform in
-                    if transform.scaleX == 1 && transform.scaleY == 1 && abs(transform.ty) > 100 {
-                        return true
-                    }
-                    return false
-                },
-                onStartDismiss: {
-                    dismissStarted = true
-                    withAnimation {
-                        isToolbarVisible = false
-                    }
-                },
-                onDismiss: onDismiss
+                childViewHasZoomed: $childViewHasZoomed
             )
             .onTapGesture {
                 if !dismissStarted {

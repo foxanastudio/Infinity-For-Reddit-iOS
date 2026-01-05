@@ -296,20 +296,26 @@ extension View {
     }
     
     func tabItemMediaGesture(
+        dismissStarted: Binding<Bool>,
+        childViewHasZoomed: Bool,
+        onDismiss: @escaping () -> Void
+    ) -> some View {
+        self.modifier(TabViewGestureViewModifier(
+            dismissStarted: dismissStarted,
+            childViewHasZoomed: childViewHasZoomed,
+            onDismiss: onDismiss
+        ))
+    }
+    
+    func tabItemMediaGesture(
         minZoomScale: CGFloat = 1,
         doubleTapZoomScale: CGFloat = 2,
-        outOfBoundsColor: Color = .black,
-        onDragEnded: @escaping (CGAffineTransform) -> Bool,
-        onStartDismiss: @escaping () -> Void,
-        onDismiss: @escaping () -> Void
+        childViewHasZoomed: Binding<Bool>
     ) -> some View {
         self.modifier(TabItemMediaGestureViewModifier(
             minZoomScale: minZoomScale,
             doubleTapZoomScale: doubleTapZoomScale,
-            outOfBoundsColor: outOfBoundsColor,
-            onDragEnded: onDragEnded,
-            onStartDismiss: onStartDismiss,
-            onDismiss: onDismiss
+            childViewHasZoomed: childViewHasZoomed
         ))
     }
     
