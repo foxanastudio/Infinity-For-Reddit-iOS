@@ -18,6 +18,7 @@ public class CommentListingViewModel: ObservableObject {
     @Published var isLoadingMore: Bool = false
     @Published var hasMorePages: Bool = true
     @Published var error: Error? = nil
+    @Published var commentLoadingError: Error?
     @Published var sortType: SortType
     @Published var loadCommentsTaskId = UUID()
     
@@ -72,6 +73,8 @@ public class CommentListingViewModel: ObservableObject {
             if isInitialLoad {
                 isInitialLoad = false
             }
+            
+            self.commentLoadingError = nil
         }
         
         do {
@@ -130,7 +133,7 @@ public class CommentListingViewModel: ObservableObject {
             }
         } catch {
             await MainActor.run {
-                self.error = error
+                self.commentLoadingError = error
                 
                 isInitialLoad = isInitailLoadCopy
                 isInitialLoading = false

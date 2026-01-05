@@ -124,7 +124,7 @@ struct PostListingView: View {
                 ZStack {
                     if postListingViewModel.isInitialLoading {
                         ProgressIndicator()
-                    } else if postListingViewModel.isInitialLoad, let error = postListingViewModel.error {
+                    } else if postListingViewModel.isInitialLoad, let error = postListingViewModel.postLoadingError {
                         Text("Unable to load posts. Tap to retry. Error: \(error.localizedDescription)")
                             .primaryText()
                             .padding(16)
@@ -218,15 +218,32 @@ struct PostListingView: View {
                         }
                         
                         if postListingViewModel.hasMorePages {
-                            HStack {
-                                ProgressIndicator()
+                            if postListingViewModel.postLoadingError != nil {
+                                HStack(spacing: 16) {
+                                    SwiftUI.Image(systemName: "exclamationmark.circle")
+                                        .primaryIcon()
+                                    
+                                    Text("Error loading more posts. Tap to retry.")
+                                        .primaryText()
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(16)
+                                .contentShape(Rectangle())
+                                .listPlainItemNoInsets()
+                                .onTapGesture {
+                                    postListingViewModel.postLoadingError = nil
+                                }
+                            } else {
+                                HStack {
+                                    ProgressIndicator()
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(16)
+                                .listPlainItemNoInsets()
+                                .task {
+                                    await postListingViewModel.loadPosts()
+                                }
                             }
-                            .frame(maxWidth: .infinity)
-                            .padding(16)
-                            .listPlainItemNoInsets()
-                            .task {
-                                await postListingViewModel.loadPosts()
-                            } 
                         }
                     }
                     .scrollBounceBehavior(.basedOnSize)

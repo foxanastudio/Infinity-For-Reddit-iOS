@@ -34,6 +34,7 @@ public class PostListingViewModel: ObservableObject {
     @Published var isLoadingMore: Bool = false
     @Published var hasMorePages: Bool = true
     @Published var error: Error?
+    @Published var postLoadingError: Error?
     @Published var sortType: SortType
     @Published var loadPostsTaskId = UUID()
     @Published var postLayout: PostLayout
@@ -71,8 +72,6 @@ public class PostListingViewModel: ObservableObject {
     private let postRepository: PostRepositoryProtocol
     
     private var refreshPostsContinuation: CheckedContinuation<Void, Never>?
-    
-    private var paginationTask: Task<Void, Never>?
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -133,19 +132,6 @@ public class PostListingViewModel: ObservableObject {
         await loadPosts(isRefreshWithContinuation: refreshPostsContinuation != nil)
     }
     
-    public func loadPostsPagination(index: Int) {
-        guard paginationTask == nil else { return }
-        
-        guard index >= posts.count - 3 else { return }
-        
-        paginationTask = Task {
-            defer {
-                paginationTask = nil
-            }
-            await loadPosts()
-        }
-    }
-    
     /// Fetches the next page of posts
     public func loadPosts(isRefreshWithContinuation: Bool = false) async {
         guard !isInitialLoading, !isLoadingMore, hasMorePages else { return }
@@ -162,6 +148,8 @@ public class PostListingViewModel: ObservableObject {
             if isInitialLoad {
                 isInitialLoad = false
             }
+            
+            self.postLoadingError = nil
         }
         
         do {
@@ -329,7 +317,7 @@ public class PostListingViewModel: ObservableObject {
             }
         } catch {
             await MainActor.run {
-                self.error = error
+                self.postLoadingError = error
                 
                 isInitialLoad = isInitailLoadCopy
                 isInitialLoading = false

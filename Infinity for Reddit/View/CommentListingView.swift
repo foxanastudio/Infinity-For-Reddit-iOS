@@ -117,15 +117,32 @@ struct CommentListingView: View {
                     }
                     
                     if commentListingViewModel.hasMorePages {
-                        HStack {
-                            ProgressIndicator()
+                        if commentListingViewModel.commentLoadingError != nil {
+                            HStack(spacing: 16) {
+                                SwiftUI.Image(systemName: "exclamationmark.circle")
+                                    .primaryIcon()
+                                
+                                Text("Error loading more comments. Tap to retry.")
+                                    .primaryText()
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(16)
+                            .contentShape(Rectangle())
+                            .listPlainItemNoInsets()
+                            .onTapGesture {
+                                commentListingViewModel.commentLoadingError = nil
+                            }
+                        } else {
+                            HStack {
+                                ProgressIndicator()
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(16)
+                            .task {
+                                await commentListingViewModel.loadComments()
+                            }
+                            .listPlainItemNoInsets()
                         }
-                        .frame(maxWidth: .infinity)
-                        .padding(16)
-                        .task {
-                            await commentListingViewModel.loadComments()
-                        }
-                        .listPlainItem()
                     }
                 }
                 .scrollBounceBehavior(.basedOnSize)
