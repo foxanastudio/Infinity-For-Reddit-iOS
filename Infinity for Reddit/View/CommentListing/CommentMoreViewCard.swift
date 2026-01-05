@@ -11,14 +11,14 @@ struct CommentMoreViewCard: View {
     @AppStorage(InterfaceCommentUserDefaultsUtils.showCommentDividerKey, store: .interfaceComment)
     private var showCommentDivider: Bool = false
     
-    let commentMore: CommentMore
+    @ObservedObject var commentMore: CommentMore
     
     var body: some View {
         HStack(spacing: 0) {
             CommentIndentationView(depth: commentMore.depth)
             
             VStack(spacing: 0) {
-                Text(commentMore.children.count > 0 ? "Load more comments" : "Continue Thread")
+                Text(text)
                     .commentText()
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
@@ -30,5 +30,19 @@ struct CommentMoreViewCard: View {
             .frame(maxWidth: .infinity)
         }
         .contentShape(Rectangle())
+    }
+    
+    var text: String {
+        switch commentMore.loadState {
+        case .idle:
+            return commentMore.commentMoreType == .normal ? "Load more comments" : "Continue Thread"
+        case .loading:
+            return "Loading..."
+        case .loaded:
+            // CommentMoreViewCard will be removed at this point. So we don't care about it.
+            return ""
+        case .failed(_):
+            return "Failed to load more comments. Tap to retry."
+        }
     }
 }

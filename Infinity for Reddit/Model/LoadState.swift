@@ -28,4 +28,13 @@ enum LoadState {
             return false
         }
     }
+    
+    var loadFailed: Bool {
+        switch self {
+        case .failed:
+            return true
+        default:
+            return false
+        }
+    }
 }

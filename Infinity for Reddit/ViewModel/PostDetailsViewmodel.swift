@@ -22,7 +22,9 @@ public class PostDetailsViewModel: ObservableObject {
     @Published var isInitialLoading: Bool = false
     @Published var isLoadingMore: Bool = false
     @Published var hasMoreComments: Bool = true
+    @Published var commentMore: CommentMore?
     @Published var error: Error?
+    @Published var contentLoadingError: Error?
     @Published var sortTypeKind: SortType.Kind
     @Published var loadPostAndCommentsTaskId = UUID()
     @Published var postDetailsInput: PostDetailsInput
@@ -35,8 +37,7 @@ public class PostDetailsViewModel: ObservableObject {
     @Published var showAllGalleryMediaDownloadFinishedMessageTrigger: Bool = false
     
     @Published var showSensitiveContentWarningTrigger: Bool = false
-    
-    private var commentMore: CommentMore?
+
     private var lastLoadedSortTypeKind: SortType.Kind? = nil
     private var commentFilter: CommentFilter?
     private var hasUsedRecommendedSort: Bool = false
@@ -146,6 +147,8 @@ public class PostDetailsViewModel: ObservableObject {
             if isInitialLoad {
                 isInitialLoad = false
             }
+            
+            self.contentLoadingError = nil
         }
         
         do {
@@ -251,7 +254,7 @@ public class PostDetailsViewModel: ObservableObject {
             }
         } catch {
             await MainActor.run {
-                self.error = error
+                self.contentLoadingError = error
                 
                 self.isInitialLoad = isInitailLoadCopy
                 self.isInitialLoading = false
@@ -320,6 +323,10 @@ public class PostDetailsViewModel: ObservableObject {
         guard let post else { return false }
         guard let commentMore else { return false }
         
+        await MainActor.run {
+            commentMore.loadState = .loading
+        }
+        
         do {
             try Task.checkCancellation()
             
@@ -353,7 +360,7 @@ public class PostDetailsViewModel: ObservableObject {
             return true
         } catch {
             await MainActor.run {
-                self.error = error
+                commentMore.loadState = .failed(error)
             }
             print("Error fetching more comments for CommentMore: \(error)")
             

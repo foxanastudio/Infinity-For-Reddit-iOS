@@ -146,12 +146,16 @@ struct PostDetailsView: View {
                                     }
                                     
                                     if postDetailsViewModel.visibleComments.isEmpty {
-                                        if postDetailsViewModel.isInitialLoading || postDetailsViewModel.isInitialLoad {
-                                            ProgressIndicator()
-                                                .frame(maxWidth: .infinity)
-                                                .listPlainItem()
-                                        } else {
-                                            ZStack {
+                                        ZStack {
+                                            if postDetailsViewModel.isInitialLoading {
+                                                ProgressIndicator()
+                                            } else if postDetailsViewModel.isInitialLoad, let error = postDetailsViewModel.contentLoadingError {
+                                                Text("Failed to load comments. Tap to retry. Error: \(error.localizedDescription)")
+                                                    .primaryText()
+                                                    .onTapGesture {
+                                                        postDetailsViewModel.refreshPostAndComments()
+                                                    }
+                                            } else {
                                                 VStack(spacing: 8) {
                                                     SwiftUI.Image(systemName: "plus.circle")
                                                         .primaryIcon()
@@ -165,10 +169,10 @@ struct PostDetailsView: View {
                                                     sendComment()
                                                 }
                                             }
-                                            .frame(maxWidth: .infinity)
-                                            .padding(16)
-                                            .listPlainItemNoInsets()
                                         }
+                                        .frame(maxWidth: .infinity)
+                                        .padding(16)
+                                        .listPlainItemNoInsets()
                                     } else {
                                         ForEach(postDetailsViewModel.visibleComments, id: \.id) { commentItem in
                                             switch commentItem {
@@ -286,39 +290,39 @@ struct PostDetailsView: View {
                                                     }
                                                 }
                                             case .more(let commentMore):
-                                                CommentMoreViewCard(commentMore: commentMore)
-                                                    .listPlainItemNoInsets()
-                                                    .id(ObjectIdentifier(commentMore))
-                                                    .onTapGesture {
-                                                        if commentMore.children.count > 0 {
-                                                            Task {
-                                                                await postDetailsViewModel.fetchMoreCommentsInCommentMore(commentMore: commentMore)
-                                                            }
-                                                        } else {
-                                                            // Continue thread
-                                                            if let postId = postDetailsViewModel.post?.id {
-                                                                navigationManager.append(
-                                                                    AppNavigation.postDetailsWithId(
-                                                                        postId: postId,
-                                                                        commentId: commentMore.parentFullname.substring(from: 3),
-                                                                        isContinueThread: true
+                                                if commentMore.depth > 0 {
+                                                    CommentMoreViewCard(commentMore: commentMore)
+                                                        .listPlainItemNoInsets()
+                                                        .id(ObjectIdentifier(commentMore))
+                                                        .onTapGesture {
+                                                            if commentMore.commentMoreType == .normal {
+                                                                guard commentMore.loadState.canLoad else {
+                                                                    return
+                                                                }
+                                                                
+                                                                Task {
+                                                                    await postDetailsViewModel.fetchMoreCommentsInCommentMore(commentMore: commentMore)
+                                                                }
+                                                            } else {
+                                                                // Continue thread
+                                                                if let postId = postDetailsViewModel.post?.id {
+                                                                    navigationManager.append(
+                                                                        AppNavigation.postDetailsWithId(
+                                                                            postId: postId,
+                                                                            commentId: commentMore.parentFullname.substring(from: 3),
+                                                                            isContinueThread: true
+                                                                        )
                                                                     )
-                                                                )
+                                                                }
                                                             }
                                                         }
-                                                    }
-                                            }
-                                        }
-                                        
-                                        if postDetailsViewModel.hasMoreComments {
-                                            HStack {
-                                                ProgressIndicator()
-                                            }
-                                            .frame(maxWidth: .infinity)
-                                            .padding(16)
-                                            .listPlainItemNoInsets()
-                                            .task {
-                                                await postDetailsViewModel.fetchCommentsPagination()
+                                                } else {
+                                                    PaginationView(postDetailsViewModel: postDetailsViewModel, commentMore: commentMore)
+                                                        .frame(maxWidth: .infinity)
+                                                        .padding(16)
+                                                        .listPlainItemNoInsets()
+                                                        .id(ObjectIdentifier(commentMore))
+                                                }
                                             }
                                         }
                                     }
@@ -494,7 +498,7 @@ struct PostDetailsView: View {
                 ZStack {
                     if postDetailsViewModel.isInitialLoading {
                         ProgressIndicator()
-                    } else if postDetailsViewModel.isInitialLoad, let error = postDetailsViewModel.error {
+                    } else if postDetailsViewModel.isInitialLoad, let error = postDetailsViewModel.contentLoadingError {
                         Text("Unable to load post and comments. Tap to retry. Error: \(error.localizedDescription)")
                             .primaryText()
                             .padding(16)
@@ -1082,6 +1086,32 @@ private struct PostDetailsItemView: View {
                     .foregroundStyle(.white)
             }
             .tint(Color(hex: customThemeViewModel.currentCustomTheme.downvoted))
+        }
+    }
+}
+
+struct PaginationView: View {
+    @ObservedObject var postDetailsViewModel: PostDetailsViewModel
+    @ObservedObject var commentMore: CommentMore
+    
+    var body: some View {
+        HStack(spacing: 16) {
+            if commentMore.loadState.loadFailed {
+                Text("Failed to load more comments. Tap to retry.")
+                    .primaryText()
+            } else {
+                ProgressIndicator()
+                    .task {
+                        await postDetailsViewModel.fetchCommentsPagination()
+                    }
+            }
+            
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            if commentMore.loadState.canLoad {
+                commentMore.loadState = .idle
+            }
         }
     }
 }

@@ -295,7 +295,7 @@ public class Comment : NSObject, Validatable, Identifiable, ObservableObject {
     }
 }
 
-public class CommentMore: NSObject, Validatable, Identifiable {
+public class CommentMore: NSObject, Validatable, Identifiable, ObservableObject {
     var children : [String]!
     var count : Int!
     var depth : Int!
@@ -303,15 +303,13 @@ public class CommentMore: NSObject, Validatable, Identifiable {
     var name : String!
     var parentFullname : String!
     var commentMoreType: CommentMoreType = .normal
+    @Published var loadState: LoadState = .idle
     
     enum CommentMoreType {
         case normal
         case continueThread
     }
 
-    /**
-     * Instantiate the instance using the passed json values to set the properties values
-     */
     init(fromJson json: JSON!) throws {
         try Self.validate(json: json)
         
@@ -330,6 +328,7 @@ public class CommentMore: NSObject, Validatable, Identifiable {
         id = json["id"].stringValue
         name = json["name"].stringValue
         parentFullname = json["parent_id"].stringValue
+        commentMoreType = !children.isEmpty ? .normal : .continueThread
     }
 }
 

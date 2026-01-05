@@ -117,9 +117,6 @@
     "Comments will be filtered out if they contain the following keywords." : {
 
     },
-    "Continue Thread" : {
-
-    },
     "Copy" : {
 
     },
@@ -153,6 +150,9 @@
     "Expand" : {
 
     },
+    "Failed to load comments. Tap to retry. Error: %@" : {
+
+    },
     "Failed to load custom feed. Tap to try again. Error: %@" : {
 
     },
@@ -160,6 +160,9 @@
 
     },
     "Failed to load imgur media. Error: %@" : {
+
+    },
+    "Failed to load more comments. Tap to retry." : {
 
     },
     "Failed to load wiki: %@. Tap to retry" : {
@@ -208,9 +211,6 @@
 
     },
     "Link posts that have the following urls will be filtered out." : {
-
-    },
-    "Load more comments" : {
 
     },
     "Manage Subscription" : {
