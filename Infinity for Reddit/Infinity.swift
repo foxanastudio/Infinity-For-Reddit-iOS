@@ -29,16 +29,7 @@ struct Infinity: App {
     @AppStorage(CustomThemeUserDefaultsUtils.themeKey, store: .theme) private var theme: Int = CustomThemeUserDefaultsUtils.themeDeviceDefault
     @AppStorage(InternalStateUserDefaultsUtils.onboardingFinishedKey, store: .internalState) private var onboardingFinished: Bool = false
     
-    let container: Container = {
-        let container = Container()
-        return container
-    }()
-    
     init() {
-        guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
-            fatalError("Failed to resolve DatabasePool")
-        }
-        
         AccountViewModel.initializeShared(using: DependencyManager.shared.container)
         _accountViewModel = StateObject(wrappedValue: AccountViewModel.shared)
         _customThemeViewModel = StateObject(wrappedValue: CustomThemeViewModel())
