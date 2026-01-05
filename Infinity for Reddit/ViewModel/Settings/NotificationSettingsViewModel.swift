@@ -12,7 +12,7 @@ class NotificationSettingsViewModel {
     func enableNotification(enable: Bool) {
         if enable {
             print("Notifications enabled — scheduling background refresh.")
-            PullNotificationBackgroundTaskManager.shared.registerAndScheduleBackgroundTaskIfNecessary()
+            PullNotificationBackgroundTaskManager.shared.scheduleBackgroundTask()
         } else {
             print("Notifications disabled — cancelling background refresh.")
             PullNotificationBackgroundTaskManager.shared.cancelBackgroundTask()
