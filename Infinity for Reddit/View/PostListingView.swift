@@ -222,6 +222,7 @@ struct PostListingView: View {
                                 ProgressIndicator()
                             }
                             .frame(maxWidth: .infinity)
+                            .padding(16)
                             .listPlainItemNoInsets()
                             .task {
                                 await postListingViewModel.loadPosts()

@@ -115,12 +115,17 @@ struct CommentListingView: View {
                         .listPlainItemNoInsets()
                         .id(ObjectIdentifier(comment))
                     }
+                    
                     if commentListingViewModel.hasMorePages {
-                        ProgressIndicator()
-                            .task {
-                                await commentListingViewModel.loadComments()
-                            }
-                            .listPlainItem()
+                        HStack {
+                            ProgressIndicator()
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(16)
+                        .task {
+                            await commentListingViewModel.loadComments()
+                        }
+                        .listPlainItem()
                     }
                 }
                 .scrollBounceBehavior(.basedOnSize)

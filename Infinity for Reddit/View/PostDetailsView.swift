@@ -315,6 +315,7 @@ struct PostDetailsView: View {
                                                 ProgressIndicator()
                                             }
                                             .frame(maxWidth: .infinity)
+                                            .padding(16)
                                             .listPlainItemNoInsets()
                                             .task {
                                                 await postDetailsViewModel.fetchCommentsPagination()
