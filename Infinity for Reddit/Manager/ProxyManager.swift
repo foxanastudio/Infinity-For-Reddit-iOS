@@ -45,7 +45,7 @@ final class ProxyManager {
         }
     }
 
-    private let controlQueue = DispatchQueue(label: "com.docilealligator.infinityforreddit.proxymanager.control", qos: .default)
+    private let controlQueue = DispatchQueue(label: "com.foxanastudio.infinity.proxymanager.control", qos: .default)
     private var configuration: ProxyConfiguration?
     private var proxyServer: ProxyServer?
     

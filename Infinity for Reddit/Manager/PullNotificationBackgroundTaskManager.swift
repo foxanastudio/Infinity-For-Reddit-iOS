@@ -13,7 +13,7 @@ import Alamofire
 class PullNotificationBackgroundTaskManager {
     static let shared = PullNotificationBackgroundTaskManager()
     
-    private let taskIdentifier = "com.docilealligator.infinityforreddit.bg.refresh.inbox"
+    private let taskIdentifier = "com.foxanastudio.infinity.bg.refresh.inbox"
     
     private let accountDao: AccountDao
     private let inboxListingRepository: InboxListingRepositoryProtocol
@@ -118,7 +118,7 @@ class PullNotificationBackgroundTaskManager {
                 
                 let (title, subtitle) = getTitleAndSubtitle(inbox)
                 
-                let notificationId = "com.docilealligator.infinityforreddit-\(account.username)-\(inbox.id ?? Utils.randomString())"
+                let notificationId = "com.foxanastudio.infinity-\(account.username)-\(inbox.id ?? Utils.randomString())"
                 let threadId = "inbox.\(account.username.lowercased())"
                 
                 var info: [String: Any] = [

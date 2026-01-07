@@ -30,7 +30,7 @@ final class ProxyServer {
     private let originURLKey = ProxyUtils.serverOriginURLKey
     private let port: UInt = ProxyUtils.serverDefaultPort
     private var cancellables = Set<AnyCancellable>()
-    private let workerQueue = DispatchQueue(label: "com.docilealligator.infinityforreddit.proxyserver.worker", qos: .userInteractive)
+    private let workerQueue = DispatchQueue(label: "com.foxanastudio.infinity.proxyserver.worker", qos: .userInteractive)
 
     init(service: ProxyService) {
         self.service = service

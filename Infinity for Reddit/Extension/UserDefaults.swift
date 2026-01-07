@@ -8,27 +8,27 @@
 import Foundation
 
 extension UserDefaults {
-    static let contentSensitivityFilter = UserDefaults(suiteName: "com.docilealligator.infinityforreddit.content_sensitivity_filter")!
-    static let interfaceComment = UserDefaults(suiteName: "com.docilealligator.infinityforreddit.interface_comment")!
+    static let contentSensitivityFilter = UserDefaults(suiteName: "com.foxanastudio.infinity.content_sensitivity_filter")!
+    static let interfaceComment = UserDefaults(suiteName: "com.foxanastudio.infinity.interface_comment")!
     static let postHistory = UserDefaults.standard
-    static let sortType = UserDefaults(suiteName: "com.docilealligator.infinityforreddit.sort_type")
+    static let sortType = UserDefaults(suiteName: "com.foxanastudio.infinity.sort_type")
     static let sortTypeSettings = UserDefaults.standard
     static let theme = UserDefaults.standard
     static let video = UserDefaults.standard
     static let notification = UserDefaults.standard
     static let interfacePost = UserDefaults.standard
-    static let interfacePostDetails = UserDefaults(suiteName: "com.docilealligator.infinityforreddit.interface_post_details")!
+    static let interfacePostDetails = UserDefaults(suiteName: "com.foxanastudio.infinity.interface_post_details")!
     static let interfaceTimeFormat = UserDefaults.standard
     static let interface = UserDefaults.standard
-    static let token = UserDefaults(suiteName: "com.docilealligator.infinityforreddit.token")!
-    static let postLayout = UserDefaults(suiteName: "com.docilealligator.infinityforreddit.post_layout")
+    static let token = UserDefaults(suiteName: "com.foxanastudio.infinity.token")!
+    static let postLayout = UserDefaults(suiteName: "com.foxanastudio.infinity.post_layout")
     static let interfaceFont = UserDefaults.standard
     static let dataSavingMode = UserDefaults.standard
     static let miscellaneous = UserDefaults.standard
     static let proxy = UserDefaults.standard
-    static let security = UserDefaults(suiteName: "com.docilealligator.infinityforreddit.security")
+    static let security = UserDefaults(suiteName: "com.foxanastudio.infinity.security")
     static let gesturesButtons = UserDefaults.standard
-    static let internalState = UserDefaults(suiteName: "com.docilealligator.infinityforreddit.internal_state")
+    static let internalState = UserDefaults(suiteName: "com.foxanastudio.infinity.internal_state")
 }
 
 extension UserDefaults {
