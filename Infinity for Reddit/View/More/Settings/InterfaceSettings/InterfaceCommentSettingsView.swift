@@ -28,8 +28,8 @@ struct InterfaceCommentSettingsView: View {
     @AppStorage(InterfaceCommentUserDefaultsUtils.showAuthorAvatarKey, store: .interfaceComment)
     private var showAuthorAvatar: Bool = false
 
-    @AppStorage(InterfaceCommentUserDefaultsUtils.alwaysShowNChildCommentsKey, store: .interfaceComment)
-    private var alwaysShowNChildComments: Bool = false
+//    @AppStorage(InterfaceCommentUserDefaultsUtils.alwaysShowNChildCommentsKey, store: .interfaceComment)
+//    private var alwaysShowNChildComments: Bool = false
 
     @AppStorage(InterfaceCommentUserDefaultsUtils.hideNVotesKey, store: .interfaceComment)
     private var hideNVotes: Bool = false
@@ -61,8 +61,8 @@ struct InterfaceCommentSettingsView: View {
                 TogglePreference(isEnabled: $showAuthorAvatar, title: "Show Author Avatar")
                     .listPlainItemNoInsets()
 
-                TogglePreference(isEnabled: $alwaysShowNChildComments, title: "Always Show the Number of Child Comments")
-                    .listPlainItemNoInsets()
+//                TogglePreference(isEnabled: $alwaysShowNChildComments, title: "Always Show the Number of Child Comments")
+//                    .listPlainItemNoInsets()
 
                 TogglePreference(isEnabled: $hideNVotes, title: "Hide the Number of Votes")
                     .listPlainItemNoInsets()
