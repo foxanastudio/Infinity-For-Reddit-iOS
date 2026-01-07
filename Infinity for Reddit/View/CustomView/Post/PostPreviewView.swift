@@ -26,36 +26,39 @@ struct PostPreviewView: View {
     var body: some View {
         if let url = previewUrlString {
             ZStack(alignment: isInCompactLayout ? .center : .topLeading) {
-                CustomWebImage(
-                    url,
-                    width: isInCompactLayout ? 60 : nil,
-                    height: limitMediaHeight && inPostListing && !isInCompactLayout ? 200 : (isInCompactLayout ? 60 : nil),
-                    aspectRatio: (limitMediaHeight && inPostListing) || isInCompactLayout ? nil : aspectRatio,
-                    handleImageTapGesture: !(isInCompactLayout && post.postType == .gallery),
-                    centerCrop: true,
-                    matchedGeometryEffectId: UUID().uuidString,
-                    post: post,
-                    blur: (post.over18 && blurSensitiveImages) || (post.spoiler && blurSpoilerImages)
-                )
-                .applyIf(inPostListing) {
-                    $0.simultaneousGesture(
-                        TapGesture()
-                            .onEnded {
-                                onReadPost?()
-                            }
+                GeometryReader { proxy in
+                    CustomWebImage(
+                        url,
+                        width: isInCompactLayout ? 60 : proxy.size.width,
+                        height: limitMediaHeight && inPostListing && !isInCompactLayout ? 200 : (isInCompactLayout ? 60 : nil),
+                        limitMediaHeight: limitMediaHeight && inPostListing && !isInCompactLayout,
+                        aspectRatio: (limitMediaHeight && inPostListing) || isInCompactLayout ? nil : aspectRatio,
+                        handleImageTapGesture: !(isInCompactLayout && post.postType == .gallery),
+                        centerCrop: true,
+                        matchedGeometryEffectId: UUID().uuidString,
+                        post: post,
+                        blur: (post.over18 && blurSensitiveImages) || (post.spoiler && blurSpoilerImages)
                     )
-                }
-                .applyIf(isInCompactLayout && post.postType == .gallery) {
-                    $0.onTapGesture {
-                        if let url = previewUrlString {
-                            fullScreenMediaViewModel.show(
-                                .gallery(
-                                    currentUrlString: url,
-                                    post: post,
-                                    items: post.galleryData?.items ?? [],
-                                    galleryScrollState: GalleryScrollState(scrollId: 0)
+                    .applyIf(inPostListing) {
+                        $0.simultaneousGesture(
+                            TapGesture()
+                                .onEnded {
+                                    onReadPost?()
+                                }
+                        )
+                    }
+                    .applyIf(isInCompactLayout && post.postType == .gallery) {
+                        $0.onTapGesture {
+                            if let url = previewUrlString {
+                                fullScreenMediaViewModel.show(
+                                    .gallery(
+                                        currentUrlString: url,
+                                        post: post,
+                                        items: post.galleryData?.items ?? [],
+                                        galleryScrollState: GalleryScrollState(scrollId: 0)
+                                    )
                                 )
-                            )
+                            }
                         }
                     }
                 }

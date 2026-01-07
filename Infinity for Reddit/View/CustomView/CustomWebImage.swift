@@ -17,6 +17,7 @@ struct CustomWebImage<Placeholder: View, Fallback: View>: View {
     var urlString: String?
     var width: CGFloat?
     var height: CGFloat?
+    var limitMediaHeight: Bool
     var imageAspectRatio: CGSize?
     var circleClipped: Bool
     var handleImageTapGesture: Bool
@@ -36,6 +37,7 @@ struct CustomWebImage<Placeholder: View, Fallback: View>: View {
         _ urlString: String? = nil,
         width: CGFloat? = nil,
         height: CGFloat? = nil,
+        limitMediaHeight: Bool = false,
         aspectRatio: CGSize? = nil,
         circleClipped: Bool = false,
         handleImageTapGesture: Bool = true,
@@ -51,6 +53,7 @@ struct CustomWebImage<Placeholder: View, Fallback: View>: View {
         self.urlString = urlString
         self.width = width
         self.height = height
+        self.limitMediaHeight = limitMediaHeight
         self.imageAspectRatio = aspectRatio
         self.circleClipped = circleClipped
         self.handleImageTapGesture = handleImageTapGesture
@@ -64,20 +67,20 @@ struct CustomWebImage<Placeholder: View, Fallback: View>: View {
         self.fallbackViewBuilder = fallbackView     // Assign the closures
     }
 
-    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, matchedGeometryEffectId: String? = nil, post: Post? = nil, blur: Bool = false, shouldShowRetryView: Bool = true, customOnTapGesture: (() -> Void)? = nil) where Placeholder == EmptyView, Fallback == EmptyView {
-        self.init(urlString, width: width, height: height, aspectRatio: aspectRatio, circleClipped: circleClipped, handleImageTapGesture: handleImageTapGesture, centerCrop: centerCrop, matchedGeometryEffectId: matchedGeometryEffectId, post: post, blur: blur, shouldShowRetryView: shouldShowRetryView, customOnTapGesture: customOnTapGesture,
+    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, limitMediaHeight: Bool = false, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, matchedGeometryEffectId: String? = nil, post: Post? = nil, blur: Bool = false, shouldShowRetryView: Bool = true, customOnTapGesture: (() -> Void)? = nil) where Placeholder == EmptyView, Fallback == EmptyView {
+        self.init(urlString, width: width, height: height, limitMediaHeight: limitMediaHeight, aspectRatio: aspectRatio, circleClipped: circleClipped, handleImageTapGesture: handleImageTapGesture, centerCrop: centerCrop, matchedGeometryEffectId: matchedGeometryEffectId, post: post, blur: blur, shouldShowRetryView: shouldShowRetryView, customOnTapGesture: customOnTapGesture,
                   placeholderView: { EmptyView() }, fallbackView: nil)
     }
     
-    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, matchedGeometryEffectId: String? = nil, post: Post? = nil, blur: Bool = false, shouldShowRetryView: Bool = true, customOnTapGesture: (() -> Void)? = nil,
+    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, limitMediaHeight: Bool = false, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, matchedGeometryEffectId: String? = nil, post: Post? = nil, blur: Bool = false, shouldShowRetryView: Bool = true, customOnTapGesture: (() -> Void)? = nil,
          @ViewBuilder placeholderView: @escaping () -> Placeholder) where Fallback == EmptyView {
-        self.init(urlString, width: width, height: height, aspectRatio: aspectRatio, circleClipped: circleClipped, handleImageTapGesture: handleImageTapGesture, centerCrop: centerCrop, matchedGeometryEffectId: matchedGeometryEffectId, post: post, blur: blur, shouldShowRetryView: shouldShowRetryView, customOnTapGesture: customOnTapGesture,
+        self.init(urlString, width: width, height: height, limitMediaHeight: limitMediaHeight, aspectRatio: aspectRatio, circleClipped: circleClipped, handleImageTapGesture: handleImageTapGesture, centerCrop: centerCrop, matchedGeometryEffectId: matchedGeometryEffectId, post: post, blur: blur, shouldShowRetryView: shouldShowRetryView, customOnTapGesture: customOnTapGesture,
                   placeholderView: placeholderView, fallbackView: nil)
     }
     
-    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, matchedGeometryEffectId: String? = nil, post: Post? = nil, blur: Bool = false, shouldShowRetryView: Bool = true, customOnTapGesture: (() -> Void)? = nil,
+    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, limitMediaHeight: Bool = false, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, matchedGeometryEffectId: String? = nil, post: Post? = nil, blur: Bool = false, shouldShowRetryView: Bool = true, customOnTapGesture: (() -> Void)? = nil,
          @ViewBuilder fallbackView: @escaping () -> Fallback) where Placeholder == EmptyView {
-        self.init(urlString, width: width, height: height, aspectRatio: aspectRatio, circleClipped: circleClipped, handleImageTapGesture: handleImageTapGesture, centerCrop: centerCrop, matchedGeometryEffectId: matchedGeometryEffectId, post: post, blur: blur, shouldShowRetryView: shouldShowRetryView, customOnTapGesture: customOnTapGesture,
+        self.init(urlString, width: width, height: height, limitMediaHeight: limitMediaHeight, aspectRatio: aspectRatio, circleClipped: circleClipped, handleImageTapGesture: handleImageTapGesture, centerCrop: centerCrop, matchedGeometryEffectId: matchedGeometryEffectId, post: post, blur: blur, shouldShowRetryView: shouldShowRetryView, customOnTapGesture: customOnTapGesture,
                   placeholderView: { EmptyView() },
                   fallbackView: fallbackView)
     }
@@ -125,10 +128,20 @@ struct CustomWebImage<Placeholder: View, Fallback: View>: View {
                             }
                         }
                     }
-                    .applyIf(width != nil && height != nil) {
-                        $0.setProcessor(DownsamplingImageProcessor(size: CGSize(width: width!, height: height!)))
-                            .cacheOriginalImage()
-                            .scaleFactor(UIScreen.main.scale)
+                    .modify {
+                        if (width != nil && height != nil) || limitMediaHeight {
+                            if width != nil && height != nil {
+                                $0.setProcessor(DownsamplingImageProcessor(size: CGSize(width: width!, height: height!)))
+                                    .cacheOriginalImage()
+                                    .scaleFactor(UIScreen.main.scale)
+                            }
+                            
+                            if limitMediaHeight {
+                                $0.setProcessor(CroppingImageProcessor(size: CGSize(width: width ?? UIScreen.main.bounds.size.width, height: height ?? 200), anchor: CGPoint(x: 0.5, y: 0.5)))
+                            }
+                        } else {
+                            $0
+                        }
                     }
                     .applyIf(blur) {
                         $0.blur(radius: 72)

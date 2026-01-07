@@ -93,24 +93,28 @@ struct PostVideoView: View {
             } else {
                 if !shouldHideVideoPreview, let preview = post.preview, preview.images.count > 0 {
                     ZStack(alignment: .topLeading) {
-                        CustomWebImage(
-                            getPreviewUrl(preview),
-                            height: limitMediaHeight && inPostListing ? 200 : nil,
-                            aspectRatio: limitMediaHeight && inPostListing ? nil : preview.images[0].source.aspectRatio,
-                            centerCrop: true,
-                            matchedGeometryEffectId: UUID().uuidString,
-                            post: post,
-                            blur: (post.over18 && blurSensitiveImages) || (post.spoiler && blurSpoilerImages)
-                        )
-                        .applyIf(inPostListing) {
-                            $0.simultaneousGesture(
-                                TapGesture()
-                                    .onEnded {
-                                        onReadPost?()
-                                    }
+                        GeometryReader { proxy in
+                            CustomWebImage(
+                                getPreviewUrl(preview),
+                                width: proxy.size.width,
+                                height: limitMediaHeight && inPostListing ? 200 : nil,
+                                limitMediaHeight: limitMediaHeight && inPostListing,
+                                aspectRatio: limitMediaHeight && inPostListing ? nil : preview.images[0].source.aspectRatio,
+                                centerCrop: true,
+                                matchedGeometryEffectId: UUID().uuidString,
+                                post: post,
+                                blur: (post.over18 && blurSensitiveImages) || (post.spoiler && blurSpoilerImages)
                             )
+                            .applyIf(inPostListing) {
+                                $0.simultaneousGesture(
+                                    TapGesture()
+                                        .onEnded {
+                                            onReadPost?()
+                                        }
+                                )
+                            }
                         }
-
+                        
                         SwiftUI.Image(systemName: "play.circle")
                             .resizable()
                             .mediaIndicator()
