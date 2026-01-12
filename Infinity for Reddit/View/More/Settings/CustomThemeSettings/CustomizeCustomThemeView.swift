@@ -56,6 +56,7 @@ struct CustomizeCustomThemeView: View {
                                 
                                 CustomDivider()
                             }
+                            .limitedWidthListItem()
                             
                             ForEach(customizeCustomThemeViewModel.customThemeFields, id: \.self) { fieldName in
                                 if customizeCustomThemeViewModel.customThemeFieldsBoolType.contains(fieldName) {
@@ -65,18 +66,19 @@ struct CustomizeCustomThemeView: View {
                                             title: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.title ?? "",
                                             isEnabled: binding
                                         )
+                                        .limitedWidthListItem()
                                     }
                                 } else {
-                                    let colorIntBinding = getColorIntBinding(for: fieldName)!
-                                    let colorBinding = getColorBinding(for: fieldName)!
-                                    
-                                    ColorEntry(
-                                        colorInt: colorIntBinding,
-                                        color: colorBinding,
-                                        fieldName: fieldName,
-                                        title: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.title ?? "",
-                                        description: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.description ?? ""
-                                    )
+                                    if let colorIntBinding = getColorIntBinding(for: fieldName), let colorBinding = getColorBinding(for: fieldName) {
+                                        ColorEntry(
+                                            colorInt: colorIntBinding,
+                                            color: colorBinding,
+                                            fieldName: fieldName,
+                                            title: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.title ?? "",
+                                            description: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.description ?? ""
+                                        )
+                                        .limitedWidthListItem()
+                                    }
                                 }
                             }
                         }
