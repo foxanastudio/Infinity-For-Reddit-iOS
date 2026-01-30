@@ -43,7 +43,8 @@ struct OnboardingView: View {
                         geoWidth: proxy.size.width,
                         geoHeight: proxy.size.height,
                         primaryTextColor: primaryTextColor,
-                        secondaryTextColor: secondaryTextColor
+                        secondaryTextColor: secondaryTextColor,
+                        largeFontSize: proxy.size.width > 500
                     )
                     .padding(.top, 32)
                     .padding(.bottom, 16)
@@ -54,8 +55,10 @@ struct OnboardingView: View {
                         OnboardingPageView(
                             page: pages[index],
                             horizontalLayout: proxy.size.width > proxy.size.height || proxy.size.width > 1400,
+                            geoHeight: proxy.size.height,
                             primaryTextColor: primaryTextColor,
-                            secondaryTextColor: secondaryTextColor
+                            secondaryTextColor: secondaryTextColor,
+                            largeFontSize: proxy.size.width > 500
                         )
                         .padding(.top, 32)
                         .padding(.bottom, 16)
@@ -90,14 +93,11 @@ struct OnboardingView: View {
             .background(.ultraThinMaterial)
         }
         .animation(.default, value: currentIndex)
-        //.background(colorScheme == .light ? .white : .black)
-        //.background(Color(hex: "#faf3dd"))
         .background {
             SwiftUI.Image("onboarding_background")
                 .resizable()
                 .scaledToFill()
                 .ignoresSafeArea()
-                //.opacity(animate ? 0.5 : 0.1)
         }
         .onAppear {
             animate = true
@@ -120,6 +120,7 @@ struct OnboardingView: View {
         let geoHeight: CGFloat
         let primaryTextColor: Color
         let secondaryTextColor: Color
+        let largeFontSize: Bool
         
         var body: some View {
             if horizontalLayout && geoHeight < 500 {
@@ -173,7 +174,7 @@ struct OnboardingView: View {
                             .animation(.easeOut(duration: 0.4).delay(0.15), value: animate)
                         
                         RowText("The infinitely better Reddit experience.")
-                            .font(.system(size: geoWidth > 500 ? 72 : 48, weight: .bold))
+                            .font(.system(size: largeFontSize ? 72 : 48, weight: .bold))
                             .foregroundStyle(primaryTextColor)
                             .opacity(animate ? 1 : 0)
                             .offset(y: animate ? 0 : 10)
@@ -194,11 +195,13 @@ struct OnboardingView: View {
     struct OnboardingPageView: View {
         let page: OnboardingPage
         let horizontalLayout: Bool
+        let geoHeight: CGFloat
         let primaryTextColor: Color
         let secondaryTextColor: Color
+        let largeFontSize: Bool
 
         var body: some View {
-            if horizontalLayout {
+            if horizontalLayout && geoHeight < 500 {
                 HStack(spacing: 24) {
                     LottieView(animation: .named(page.animation))
                         .playing()
@@ -212,7 +215,6 @@ struct OnboardingView: View {
                             .multilineTextAlignment(.center)
 
                         Text(page.subtitle)
-                            .font(.body)
                             .foregroundStyle(secondaryTextColor)
                             .multilineTextAlignment(.center)
                     }
@@ -230,12 +232,12 @@ struct OnboardingView: View {
                     Spacer()
 
                     Text(page.title)
-                        .font(.system(size: 32, weight: .bold))
+                        .font(.system(size: largeFontSize ? 56 : 32, weight: .bold))
                         .foregroundStyle(primaryTextColor)
                         .multilineTextAlignment(.center)
 
                     Text(page.subtitle)
-                        .font(.body)
+                        .font(.system(size: largeFontSize ? 32 : 17))
                         .foregroundStyle(secondaryTextColor)
                         .multilineTextAlignment(.center)
                 }
