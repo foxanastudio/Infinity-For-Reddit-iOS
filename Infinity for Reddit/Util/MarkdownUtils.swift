@@ -141,7 +141,7 @@ class MarkdownUtils {
                 id = String(markdownString[idStartIndex..<idEndIndex])
                 
                 let captionStartIndex = markdownString.index(matchRange.lowerBound, offsetBy: 1)
-                caption = String(markdownString[captionStartIndex..<urlStartIndex])
+                caption = String(markdownString[captionStartIndex..<markdownString.index(urlStartIndex, offsetBy: -2)])
             } else {
                 return matchRange.upperBound.utf16Offset(in: markdownString)
             }
