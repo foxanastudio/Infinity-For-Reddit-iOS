@@ -549,8 +549,12 @@ struct PostDetailsView: View {
             await postDetailsViewModel.initialLoadPostAndComments()
         }
         .themedNavigationBar()
+        .addTitleToInlineNavigationBar("Post")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            NavigationBarMenu()
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationBarMenu()
+            }
         }
         .onAppear {
             setUpMenu()
