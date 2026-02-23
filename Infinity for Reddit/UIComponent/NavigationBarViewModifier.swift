@@ -34,6 +34,7 @@ struct InlineNavigationBarWithTitle: ViewModifier {
     func body(content: Content) -> some View {
         if #available(iOS 26, *) {
             content
+                .navigationTitle(title)
                 .toolbar {
                     ToolbarItem(placement: .principal) {
                         Text(title)
@@ -44,6 +45,7 @@ struct InlineNavigationBarWithTitle: ViewModifier {
                 .navigationBarTitleDisplayMode(.inline)
         } else {
             content
+                .navigationTitle(title)
                 .toolbar {
                     ToolbarItem(placement: .principal) {
                         Text(title)

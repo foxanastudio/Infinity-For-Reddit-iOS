@@ -25,6 +25,10 @@ struct UserDetailsView: View {
     
     private let userIconSize: CGFloat = 80
     
+    private var navigationTitleText: String {
+        "u/\(userDetailsViewModel.userData?.name ?? userDetailsViewModel.username)"
+    }
+    
     init(username: String) {
         _userDetailsViewModel = StateObject(
             wrappedValue: UserDetailsViewModel(
@@ -202,10 +206,11 @@ struct UserDetailsView: View {
             }
         }
         .toolbarBackground(.hidden, for: .navigationBar)
+        .navigationTitle(navigationTitleText)
         .toolbar {
             ToolbarItem(placement: .principal) {
                 HStack(spacing: 4) {
-                    Text("u/\(userDetailsViewModel.userData?.name ?? userDetailsViewModel.username)")
+                    Text(navigationTitleText)
                         .navigationBarPrimaryText()
                     
                     SwiftUI.Image(systemName: "chevron.down.circle")

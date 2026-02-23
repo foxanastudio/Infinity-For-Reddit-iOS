@@ -24,6 +24,10 @@ struct SubredditDetailsView: View {
     private let subredditIconSize: CGFloat = 80
     private let bannerMaxHeight: CGFloat = 150
     
+    private var navigationTitleText: String {
+        "r/\(subredditDetailsViewModel.subredditData?.name ?? subredditDetailsViewModel.subredditName)"
+    }
+    
     init(subredditName: String) {
         _subredditDetailsViewModel = StateObject(
             wrappedValue: SubredditDetailsViewModel(
@@ -158,10 +162,11 @@ struct SubredditDetailsView: View {
             }
         }
         .toolbarBackground(.hidden, for: .navigationBar)
+        .navigationTitle(navigationTitleText)
         .toolbar {
             ToolbarItem(placement: .principal) {
                 HStack(spacing: 4) {
-                    Text("u/\(subredditDetailsViewModel.subredditData?.name ?? subredditDetailsViewModel.subredditName)")
+                    Text(navigationTitleText)
                         .navigationBarPrimaryText()
                     
                     SwiftUI.Image(systemName: "chevron.down.circle")
