@@ -57,11 +57,16 @@ struct PostVideoView: View {
     
     var body: some View {
         Group {
-            if !isDataSavingModeActive && VideoUserDefaultsUtils.canAutoplayVideo(videoAutoplay: videoAutoplay, isWifiConnected: networkManager.isWifiConnected) && ((post.over18 && autoplaySensitiveVideo) || !post.over18) {
+            if !isDataSavingModeActive
+                && VideoUserDefaultsUtils.canAutoplayVideo(
+                    videoAutoplay: videoAutoplay,
+                    isWifiConnected: networkManager.isWifiConnected
+                )
+                && ((post.over18 && autoplaySensitiveVideo) || !post.over18) {
                 if let preview = post.preview, preview.images.count > 0, !(limitMediaHeight && inPostListing) {
                     InlineVideoPlayer(
                         videoURL: URL(string: videoUrlString)!,
-                        aspectRatio: preview.images[0].source.aspectRatio,
+                        aspectRatio: preview.images[0].source?.aspectRatio,
                         muteVideo: muteAutoplayingVideo,
                         canPlay: canPlay,
                         isSensitive: post.over18,
@@ -91,15 +96,15 @@ struct PostVideoView: View {
                     .frame(height: 200)
                 }
             } else {
-                if !shouldHideVideoPreview, let preview = post.preview, preview.images.count > 0 {
+                if !shouldHideVideoPreview, let preview = post.preview, preview.images.count > 0, let imageUrlString = getPreviewUrl(preview) {
                     ZStack(alignment: .topLeading) {
                         GeometryReader { proxy in
                             CustomWebImage(
-                                getPreviewUrl(preview),
+                                imageUrlString,
                                 width: proxy.size.width,
                                 height: limitMediaHeight && inPostListing ? 200 : nil,
                                 limitMediaHeight: limitMediaHeight && inPostListing,
-                                aspectRatio: limitMediaHeight && inPostListing ? nil : preview.images[0].source.aspectRatio,
+                                aspectRatio: limitMediaHeight && inPostListing ? nil : (preview.images[0].source?.aspectRatio ?? preview.images[0].resolutions.first?.aspectRatio),
                                 centerCrop: true,
                                 matchedGeometryEffectId: UUID().uuidString,
                                 post: post,
@@ -122,8 +127,8 @@ struct PostVideoView: View {
                             .frame(width: 64, height: 64)
                     }
                     .frame(maxWidth: .infinity)
-                    .applyIf(!limitMediaHeight || !inPostListing) {
-                        $0.aspectRatio(preview.images[0].source.aspectRatio, contentMode: .fit)
+                    .applyIf(!limitMediaHeight || !inPostListing && preview.images[0].source != nil) {
+                        $0.aspectRatio(preview.images[0].source!.aspectRatio, contentMode: .fit)
                     }
                     .applyIf(limitMediaHeight && inPostListing) {
                         $0.frame(height: 200)
@@ -143,10 +148,10 @@ struct PostVideoView: View {
         }
     }
     
-    private func getPreviewUrl(_ preview: Preview) -> String {
+    private func getPreviewUrl(_ preview: Preview) -> String? {
         return isDataSavingModeActive
-        ? (preview.images[0].resolutions.first?.url ?? preview.images[0].source.url)
-        : preview.images[0].source.url
+        ? (preview.images[0].resolutions.first?.url ?? preview.images[0].source?.url)
+        : (preview.images[0].source?.url ?? preview.images[0].resolutions.first?.url)
     }
     
     private func showFullScreenVideo() {

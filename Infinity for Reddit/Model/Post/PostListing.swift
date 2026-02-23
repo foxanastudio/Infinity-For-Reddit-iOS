@@ -285,7 +285,9 @@ public class Post : NSObject, ObservableObject, Identifiable {
                     // Ignore
                 }
             }
-            mediaMetadata = parsedMediaMetadata
+            if !parsedMediaMetadata.isEmpty {
+                mediaMetadata = parsedMediaMetadata
+            }
         }
         let galleryDataJson = json["gallery_data"]
         if !galleryDataJson.isEmpty {
@@ -344,7 +346,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
         pinned = json["pinned"].boolValue
         let previewJson = json["preview"]
         if !previewJson.isEmpty {
-            preview = Preview(fromJson: previewJson)
+            preview = try? Preview(fromJson: previewJson)
         }
         pwls = json["pwls"].intValue
         quarantine = json["quarantine"].boolValue
@@ -405,14 +407,14 @@ public class Post : NSObject, ObservableObject, Identifiable {
                               permalink: String,
                               isCrosspost: Bool = false
     ) -> PostType {
-        if galleryData != nil {
+        if galleryData != nil && galleryData?.items.isEmpty == false {
             return PostType.gallery
         }
         
         let realUrl = URL(string: url)
         let path = realUrl?.path ?? ""
         let host = realUrl?.host ?? ""
-        if preview == nil || preview?.images?.isEmpty ?? true {
+        if preview == nil || preview?.images.isEmpty ?? true {
             if url.contains(permalink) {
                 return PostType.text
             } else {
@@ -520,50 +522,58 @@ public class Post : NSObject, ObservableObject, Identifiable {
 class Preview : NSObject {
     
     var enabled : Bool!
-    var images : [Image]!
+    var images : [Image]
 
-    init(fromJson json: JSON!) {
+    init(fromJson json: JSON!) throws {
         if json.isEmpty {
-            return
+            throw JSONError.invalidData
         }
         enabled = json["enabled"].boolValue
         images = [Image]()
         let imagesArray = json["images"].arrayValue
-        for imagesJson in imagesArray{
-            let value = Image(fromJson: imagesJson)
-            images.append(value)
+        for imagesJson in imagesArray {
+            do {
+                let value = try Image(fromJson: imagesJson)
+                images.append(value)
+            } catch {
+                // Ignore
+            }
         }
     }
 }
 
 class Image : NSObject {
     
-    var resolutions : [Resolution]! = [Resolution]()
-    var source : Resolution!
-    var gifVariant: Image!
-    var mp4Variant: Image!
+    var resolutions : [Resolution] = [Resolution]()
+    var source : Resolution?
+    var gifVariant: Image?
+    var mp4Variant: Image?
 
-    init(fromJson json: JSON!) {
+    init(fromJson json: JSON!) throws {
         if json.isEmpty {
-            return
+            throw JSONError.invalidData
         }
         resolutions = [Resolution]()
         let resolutionsArray = json["resolutions"].arrayValue
-        for resolutionsJson in resolutionsArray{
-            let value = Resolution(fromJson: resolutionsJson)
-            resolutions.append(value)
+        for resolutionsJson in resolutionsArray {
+            do {
+                let value = try Resolution(fromJson: resolutionsJson)
+                resolutions.append(value)
+            } catch {
+                // Ignore
+            }
         }
         let sourceJson = json["source"]
         if !sourceJson.isEmpty {
-            source = Resolution(fromJson: sourceJson)
+            source = try? Resolution(fromJson: sourceJson)
         }
         let variantsJson = json["variants"]
         if !variantsJson.isEmpty {
             if variantsJson["gif"].exists() {
-                gifVariant = Image(fromJson: variantsJson["gif"])
+                gifVariant = try? Image(fromJson: variantsJson["gif"])
             }
             if variantsJson["mp4"].exists() {
-                mp4Variant = Image(fromJson: variantsJson["mp4"])
+                mp4Variant = try? Image(fromJson: variantsJson["mp4"])
             }
         }
     }
@@ -574,17 +584,16 @@ class Resolution : NSObject {
     var height : Int!
     var url : String!
     var width : Int!
-    var aspectRatio : CGSize {
-        return CGSize(width: width, height: height)
-    }
+    var aspectRatio : CGSize
 
-    init(fromJson json: JSON!) {
+    init(fromJson json: JSON!) throws {
         if json.isEmpty {
-            return
+            throw JSONError.invalidData
         }
         height = json["height"].intValue
         url = json["url"].stringValue
         width = json["width"].intValue
+        aspectRatio = CGSize(width: width, height: height)
     }
 }
 

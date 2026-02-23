@@ -120,41 +120,32 @@ struct PostPreviewView: View {
     }
     
     private var previewUrlString: String? {
-        let isDataSavingModeActive = DataSavingModeUserDefaultsUtils.isDataSavingModeActive(dataSavingMode: dataSavingMode, isWifiConnected: networkManager.isWifiConnected)
+        let isDataSavingModeActive = DataSavingModeUserDefaultsUtils.isDataSavingModeActive(
+            dataSavingMode: dataSavingMode,
+            isWifiConnected: networkManager.isWifiConnected
+        )
 
         if isDataSavingModeActive && (disableImagePreview || (onlyDisablePreviewInVideoAndGIF && post.postType.isVideoOrGif)){
             return nil
         }
 
         if isInCompactLayout || isDataSavingModeActive {
-            if let url = post.preview?.images.first?.resolutions.first?.url {
-                return url
-            } else if let url = post.preview?.images.first?.source.url {
-                return url
-            } else if let url = post.galleryData?.items.first?.urlString {
-                return url
-            }
+            return post.preview?.images.first?.resolutions.first?.url
+            ?? post.preview?.images.first?.source?.url
+            ?? post.galleryData?.items.first?.urlString
         } else {
-            if let url = post.preview?.images.first?.source.url {
-                return url
-            }
+            return post.preview?.images.first?.source?.url
+            ?? post.preview?.images.first?.resolutions.first?.url
         }
-        
-        return nil
     }
     
     private var aspectRatio: CGSize? {
         if isInCompactLayout {
-            if let ratio = post.preview?.images.first?.resolutions.first?.aspectRatio {
-                return ratio
-            } else if let ratio = post.preview?.images.first?.source.aspectRatio {
-                return ratio
-            }
+            return post.preview?.images.first?.resolutions.first?.aspectRatio
+            ?? post.preview?.images.first?.source?.aspectRatio
         } else {
-            if let ratio = post.preview?.images.first?.source.aspectRatio {
-                return ratio
-            }
+            return post.preview?.images.first?.source?.aspectRatio
+            ?? post.preview?.images.first?.resolutions.first?.aspectRatio
         }
-        return nil
     }
 }

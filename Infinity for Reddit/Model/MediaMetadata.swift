@@ -38,18 +38,29 @@ class MediaMetadata : NSObject, ObservableObject, Identifiable {
         if json.isEmpty {
             throw JSONError.invalidData
         }
+        status = json["status"].stringValue
+        if status == "failed" {
+            throw JSONError.invalidData
+        }
         
         e = json["e"].stringValue
         id = json["id"].stringValue
         m = json["m"].stringValue
         let pArray = json["p"].arrayValue
         for pJson in pArray {
-            let value = MediaMetadataPreview(fromJson: pJson)
-            p.append(value)
+            do {
+                let value = try MediaMetadataPreview(fromJson: pJson)
+                p.append(value)
+            } catch {
+                // Ignore
+            }
         }
         
-        s = MediaMetadataSource(fromJson: json["s"])
-        status = json["status"].stringValue
+        s = try? MediaMetadataSource(fromJson: json["s"])
+        if s == nil && p.isEmpty {
+            throw JSONError.invalidData
+        }
+        
         x = json["x"].intValue
         y = json["y"].intValue
         dashUrl = json["dashUrl"].stringValue
@@ -66,17 +77,16 @@ class MediaMetadataPreview : NSObject, ObservableObject, Identifiable {
     var x : Int!
     //Height
     var y : Int!
-    var aspectRatio : CGSize {
-        return CGSize(width: x, height: y)
-    }
+    var aspectRatio : CGSize
 
-    init(fromJson json: JSON!) {
+    init(fromJson json: JSON!) throws {
         if json.isEmpty {
-            return
+            throw JSONError.invalidData
         }
         u = json["u"].stringValue
         x = json["x"].intValue
         y = json["y"].intValue
+        aspectRatio = CGSize(width: x, height: y)
     }
 }
 
@@ -90,19 +100,18 @@ class MediaMetadataSource : NSObject {
     var x : Int!
     // Height
     var y : Int!
-    var aspectRatio : CGSize {
-        return CGSize(width: x, height: y)
-    }
+    var aspectRatio : CGSize
 
-    init(fromJson json: JSON!) {
+    init(fromJson json: JSON!) throws {
         if json.isEmpty {
-            return
+            throw JSONError.invalidData
         }
         u = json["u"].stringValue
         gif = json["gif"].stringValue
         mp4 = json["mp4"].stringValue
         x = json["x"].intValue
         y = json["y"].intValue
+        aspectRatio = CGSize(width: x, height: y)
     }
     
     // Fallback for invalid giphy gifs
@@ -111,5 +120,6 @@ class MediaMetadataSource : NSObject {
         self.mp4 = mp4
         self.x = 480
         self.y = 480
+        aspectRatio = CGSize(width: x, height: y)
     }
 }

@@ -53,10 +53,12 @@ struct MediaTapGestureHandlerViewModifer: ViewModifier {
                                 case .gif:
                                     if post.preview.images.isEmpty == false {
                                         if let previewImage = post.preview.images.first {
-                                            if let mp4 = previewImage.mp4Variant {
-                                                fullScreenMediaViewModel.show(.video(urlString: mp4.source.url, post: post))
-                                            } else if let gif = previewImage.gifVariant {
-                                                fullScreenMediaViewModel.show(.gif(urlString: gif.source.url, post: post, fileName: "\(post.fileNameWithoutExtension).gif"))
+                                            if let mp4 = previewImage.mp4Variant, let urlString = mp4.source?.url {
+                                                fullScreenMediaViewModel.show(.video(urlString: urlString, post: post))
+                                            } else if let gif = previewImage.gifVariant, let urlString = gif.source?.url {
+                                                fullScreenMediaViewModel.show(.gif(urlString: urlString, post: post, fileName: "\(post.fileNameWithoutExtension).gif"))
+                                            } else {
+                                                navigationManager.openLink(post.url)
                                             }
                                         } else {
                                             fullScreenMediaViewModel.show(.gif(urlString: post.url, post: post, fileName: "\(post.fileNameWithoutExtension).gif"))
