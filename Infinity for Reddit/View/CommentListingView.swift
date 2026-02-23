@@ -297,4 +297,3 @@ struct CommentListingView: View {
         let isPresented: Bool
     }
 }
-

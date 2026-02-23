@@ -77,27 +77,15 @@ struct InboxListingView: View {
                 .showErrorUsingSnackbar(inboxListingViewModel.$error)
             }
         }
-        .task(id: inboxListingViewModel.loadInboxFlag) {
+        .task(id: taskKey) {
+            guard isPresented else {
+                return
+            }
+            
             await inboxListingViewModel.initialLoadInboxes()
         }
-        .onChange(of: isPresented, initial: true) { _, presented in
-            if presented {
-                if let key = navigationBarMenuKey {
-                    navigationBarMenuManager.pop(key: key)
-                }
-
-                navigationBarMenuKey = navigationBarMenuManager.push([
-                    NavigationBarMenuItem(title: "Refresh") {
-                        hasReadAllMessages = false
-                        inboxListingViewModel.refreshInboxes()
-                    }
-                ])
-            } else {
-                guard let navigationBarMenuKey else {
-                    return
-                }
-                navigationBarMenuManager.pop(key: navigationBarMenuKey)
-            }
+        .onAppear {
+            setUpMenu()
         }
         .onDisappear {
             guard let navigationBarMenuKey else {
@@ -105,7 +93,42 @@ struct InboxListingView: View {
             }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
+        .onChange(of: isPresented) { _, newValue in
+            setUpMenu()
+        }
     }
+    
+    private func setUpMenu() {
+        if isPresented {
+            if let key = navigationBarMenuKey {
+                navigationBarMenuManager.pop(key: key)
+            }
+
+            navigationBarMenuKey = navigationBarMenuManager.push([
+                NavigationBarMenuItem(title: "Refresh") {
+                    hasReadAllMessages = false
+                    inboxListingViewModel.refreshInboxes()
+                }
+            ])
+        } else {
+            guard let navigationBarMenuKey else {
+                return
+            }
+            navigationBarMenuManager.pop(key: navigationBarMenuKey)
+        }
+    }
+    
+    private var taskKey: LoadInboxTaskKey {
+        LoadInboxTaskKey(
+            loadInboxFlag: inboxListingViewModel.loadInboxFlag,
+            isPresented: isPresented
+        )
+    }
+}
+
+struct LoadInboxTaskKey: Hashable {
+    let loadInboxFlag: Bool
+    let isPresented: Bool
 }
 
 struct InboxMessageItemView: View {
