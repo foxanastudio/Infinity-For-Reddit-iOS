@@ -40,34 +40,12 @@ struct SearchView: View {
                         SwiftUI.Image(systemName: "magnifyingglass")
                             .foregroundColor(.gray)
                         
-                        CustomTextField("Search",
-                                        text: $searchViewModel.query,
-                                        singleLine: true,
-                                        autocapitalization: .never,
-                                        showBorder: false,
-                                        showBackground: false,
-                                        fieldType: .search,
-                                        focusedField: $focusedField)
-                        .padding(16)
-                        .submitLabel(.search)
-                        .onSubmit {
-                            if !accountViewModel.account.isAnonymous() {
-                                searchViewModel.saveSearchQuery()
-                            }
-                            if let onSearch = onSearchCustomAction {
-                                onSearch(searchViewModel.query)
-                            } else {
-                                navigationManager.append(
-                                    AppNavigation.searchResults(
-                                        query: searchViewModel.query,
-                                        searchInSubredditOrUserName: searchViewModel.searchInSubredditOrUserName,
-                                        searchInMultiReddit: searchViewModel.searchInCustomFeed,
-                                        searchInThingType: searchViewModel.searchInThingType,
-                                        searchResultTab: defaultSearchResultTab
-                                    )
-                                )
-                            }
-                        }
+                        SearchTextField(
+                            searchViewModel: searchViewModel,
+                            focusedField: $focusedField,
+                            defaultSearchResultTab: defaultSearchResultTab,
+                            onSearchCustomAction: onSearchCustomAction
+                        )
                     }
                     .padding(.leading, 12)
                     .background(Color(hex: customThemeViewModel.currentCustomTheme.filledCardViewBackgroundColor))
@@ -200,34 +178,12 @@ struct SearchView: View {
                             SwiftUI.Image(systemName: "magnifyingglass")
                                 .padding(4)
                             
-                            CustomTextField("Search",
-                                            text: $searchViewModel.query,
-                                            singleLine: true,
-                                            autocapitalization: .never,
-                                            showBorder: false,
-                                            showBackground: false,
-                                            fieldType: .search,
-                                            focusedField: $focusedField)
-                            .padding(16)
-                            .submitLabel(.search)
-                            .onSubmit {
-                                if !accountViewModel.account.isAnonymous() {
-                                    searchViewModel.saveSearchQuery()
-                                }
-                                if let onSearch = onSearchCustomAction {
-                                    onSearch(searchViewModel.query)
-                                } else {
-                                    navigationManager.append(
-                                        AppNavigation.searchResults(
-                                            query: searchViewModel.query,
-                                            searchInSubredditOrUserName: searchViewModel.searchInSubredditOrUserName,
-                                            searchInMultiReddit: searchViewModel.searchInCustomFeed,
-                                            searchInThingType: searchViewModel.searchInThingType,
-                                            searchResultTab: defaultSearchResultTab
-                                        )
-                                    )
-                                }
-                            }
+                            SearchTextField(
+                                searchViewModel: searchViewModel,
+                                focusedField: $focusedField,
+                                defaultSearchResultTab: defaultSearchResultTab,
+                                onSearchCustomAction: onSearchCustomAction
+                            )
                             .frame(maxWidth: .infinity)
                         }
                     }
@@ -247,8 +203,54 @@ struct SearchView: View {
             focusedField = .search
         }
     }
+}
+
+private struct SearchTextField: View {
+    @EnvironmentObject private var accountViewModel: AccountViewModel
+    @EnvironmentObject private var navigationManager: NavigationManager
     
-    enum FieldType: Hashable {
-        case search
+    @ObservedObject var searchViewModel: SearchViewModel
+    
+    var focusedField: FocusState<FieldType?>.Binding
+    let defaultSearchResultTab: Int
+    let onSearchCustomAction: ((String) -> Void)?
+    
+    var body: some View {
+        CustomTextField("Search",
+                        text: $searchViewModel.query,
+                        singleLine: true,
+                        autocapitalization: .never,
+                        showBorder: false,
+                        showBackground: false,
+                        fieldType: FieldType.search,
+                        focusedField: focusedField)
+        .padding(16)
+        .submitLabel(.search)
+        .onSubmit {
+            guard !searchViewModel.query.isEmpty else {
+                return
+            }
+            
+            if !accountViewModel.account.isAnonymous() {
+                searchViewModel.saveSearchQuery()
+            }
+            if let onSearch = onSearchCustomAction {
+                onSearch(searchViewModel.query)
+            } else {
+                navigationManager.append(
+                    AppNavigation.searchResults(
+                        query: searchViewModel.query,
+                        searchInSubredditOrUserName: searchViewModel.searchInSubredditOrUserName,
+                        searchInMultiReddit: searchViewModel.searchInCustomFeed,
+                        searchInThingType: searchViewModel.searchInThingType,
+                        searchResultTab: defaultSearchResultTab
+                    )
+                )
+            }
+        }
     }
+}
+
+enum FieldType: Hashable {
+    case search
 }
