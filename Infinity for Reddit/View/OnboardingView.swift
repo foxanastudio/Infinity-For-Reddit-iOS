@@ -68,28 +68,39 @@ struct OnboardingView: View {
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 
-                PageIndicator(
-                    count: pages.count + 1,
-                    currentIndex: currentIndex,
-                    primaryIndicatorColor: primaryTextColor,
-                    secondaryIndicatorColor: secondaryTextColor
-                )
-                
-                Button(action: advance) {
-                    Text(currentIndex == 0 ? "Take a Quick Tour" : currentIndex == pages.count ? "Get Started" : "Next")
-                        .frame(maxWidth: 500)
-                        .font(.system(size: !((proxy.size.width > proxy.size.height || proxy.size.width > 1400) && proxy.size.height < 500) && proxy.size.width > 500 ? 24 : 17))
+                VStack(spacing: 0) {
+                    PageIndicator(
+                        count: pages.count + 1,
+                        currentIndex: currentIndex,
+                        primaryIndicatorColor: primaryTextColor,
+                        secondaryIndicatorColor: secondaryTextColor
+                    )
+                    
+                    Button(action: advance) {
+                        Text(currentIndex == 0 ? "Take a Quick Tour" : currentIndex == pages.count ? "Get Started" : "Next")
+                            .frame(maxWidth: 500)
+                            .font(.system(size: !((proxy.size.width > proxy.size.height || proxy.size.width > 1400) && proxy.size.height < 500) && proxy.size.width > 500 ? 24 : 17))
+                    }
+                    .foregroundColor(.white)
+                    .tint(Color(hex: "#0336FF"))
+                    .buttonStyle(.borderedProminent)
+                    .buttonBorderShape(.capsule)
+                    .padding(.horizontal, 32)
+                    .padding(.top, 16)
+                    .opacity(animate ? 1 : 0)
+                    .offset(y: animate ? 0 : 20)
+                    .animation(.easeOut(duration: 0.4).delay(0.25), value: animate)
+                    
+                    Text(makeAttributedString())
+                        .foregroundStyle(secondaryTextColor)
+                        .font(.system(size: 13))
+                        .padding(.horizontal, 32)
+                        .padding(.top, 8)
+                        .opacity(animate ? 1 : 0)
+                        .offset(y: animate ? 0 : 20)
+                        .animation(.easeOut(duration: 0.4).delay(0.25), value: animate)
                 }
-                .foregroundColor(.white)
-                .tint(Color(hex: "#0336FF"))
-                .buttonStyle(.borderedProminent)
-                .buttonBorderShape(.capsule)
-                .padding(.horizontal, 32)
-                .padding(.top, 16)
                 .padding(.bottom, proxy.size.height > 1000 ? 120 : 16)
-                .opacity(animate ? 1 : 0)
-                .offset(y: animate ? 0 : 20)
-                .animation(.easeOut(duration: 0.4).delay(0.25), value: animate)
             }
             .background(.ultraThinMaterial)
         }
@@ -103,6 +114,22 @@ struct OnboardingView: View {
         .onAppear {
             animate = true
         }
+    }
+    
+    private func makeAttributedString() -> AttributedString {
+        var text = AttributedString("By continuing, you agree to the Terms of Use and Privacy Policy.")
+        
+        if let termsRange = text.range(of: "Terms of Use") {
+            text[termsRange].link = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula")
+            text[termsRange].foregroundColor = Color(hex: "#0336FF")
+        }
+        
+        if let privacyRange = text.range(of: "Privacy Policy") {
+            text[privacyRange].link = URL(string: "https://foxanastudio.com/infinity-privacy")
+            text[privacyRange].foregroundColor = Color(hex: "#0336FF")
+        }
+        
+        return text
     }
     
     private func advance() {
