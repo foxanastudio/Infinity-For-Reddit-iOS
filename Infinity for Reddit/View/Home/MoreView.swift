@@ -167,6 +167,9 @@ struct MoreView: View {
                     )
                     .submitLabel(.go)
                     .onSubmit {
+                        guard !subredditName.isEmpty else {
+                            return
+                        }
                         navigationManager.append(AppNavigation.subredditDetails(subredditName: subredditName))
                         activeAlert = nil
                     }
@@ -190,6 +193,9 @@ struct MoreView: View {
                     )
                     .submitLabel(.go)
                     .onSubmit {
+                        guard !username.isEmpty else {
+                            return
+                        }
                         navigationManager.append(AppNavigation.userDetails(username: username))
                         activeAlert = nil
                     }
@@ -204,9 +210,15 @@ struct MoreView: View {
                         focusedField = nil
                     case .goToSubreddit:
                         previouslyActiveAlertForAnimationCompletion = nil
+                        guard !subredditName.isEmpty else {
+                            return
+                        }
                         navigationManager.append(AppNavigation.subredditDetails(subredditName: subredditName))
                     case .goToUser:
                         previouslyActiveAlertForAnimationCompletion = nil
+                        guard !username.isEmpty else {
+                            return
+                        }
                         navigationManager.append(AppNavigation.userDetails(username: username))
                     }
                 }
