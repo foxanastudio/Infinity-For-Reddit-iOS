@@ -16,11 +16,15 @@ struct SubscriptionsView: View {
     @EnvironmentObject private var accountViewModel: AccountViewModel
     @EnvironmentObject private var navigationBarMenuManager: NavigationBarMenuManager
     @EnvironmentObject private var navigationManager: NavigationManager
+    @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
     
     @StateObject var subscriptionListingViewModel: SubscriptionListingViewModel
+    
+    @FocusState private var focusedField: FieldType?
 
     @State private var selectedOption = 0
     @State private var navigationBarMenuKey: UUID?
+    @State private var searchQuery: String = ""
     
     init(subscriptionSelectionMode: ThingSelectionMode = .noSelection) {
         _subscriptionListingViewModel = StateObject(
@@ -52,6 +56,26 @@ struct SubscriptionsView: View {
                     )
                     .padding(4)
                 }
+                
+                HStack(spacing: 8) {
+                    SwiftUI.Image(systemName: "magnifyingglass")
+                        .foregroundColor(.gray)
+                    
+                    CustomTextField("Search",
+                                    text: $searchQuery,
+                                    singleLine: true,
+                                    autocapitalization: .never,
+                                    showBorder: false,
+                                    showBackground: false,
+                                    fieldType: FieldType.search,
+                                    focusedField: $focusedField)
+                    .padding(16)
+                    .submitLabel(.search)
+                }
+                .padding(.leading, 12)
+                .background(Color(hex: customThemeViewModel.currentCustomTheme.filledCardViewBackgroundColor))
+                .cornerRadius(10)
+                .padding(.horizontal, 16)
                 
                 ZStack {
                     switch subscriptionListingViewModel.subscriptionSelectionMode {
@@ -142,6 +166,13 @@ struct SubscriptionsView: View {
                 default:
                     EmptyView()
                 }
+                
+                KeyboardToolbar {
+                    focusedField = nil
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+
+                    searchQuery = ""
+                }
             }
         }
         .task(id: subscriptionListingViewModel.subscriptionAndCustomFeedLoadingTaskFlag) {
@@ -168,6 +199,13 @@ struct SubscriptionsView: View {
             }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
+        .onChange(of: searchQuery) { _, newValue in
+            subscriptionListingViewModel.setSearchQuery(newValue)
+        }
         .showErrorUsingSnackbar(subscriptionListingViewModel.$error)
     }
+}
+
+private enum FieldType: Hashable {
+    case search
 }

@@ -13,10 +13,10 @@ struct SearchView: View {
     @EnvironmentObject var customThemeViewModel: CustomThemeViewModel
     
     @StateObject private var searchViewModel: SearchViewModel
-    @FocusState var focusedField: FieldType?
+    
+    @FocusState private var focusedField: FieldType?
     
     @State private var showSelectSearchInThingSheet: Bool = false
-    
     @State private var showSubredditAndUserSearchResultView: Bool = false
     @State private var searchThingQuery: String = ""
     
@@ -251,6 +251,6 @@ private struct SearchTextField: View {
     }
 }
 
-enum FieldType: Hashable {
+private enum FieldType: Hashable {
     case search
 }
