@@ -92,7 +92,12 @@ public class AccountViewModel: ObservableObject {
                     }
                 }
             } else if let error {
-                self.error = AccountError.failedToLogin
+                if let errorCode = (error as? NSError)?.code {
+                    if errorCode != ASWebAuthenticationSessionError.Code.canceledLogin.rawValue {
+                        print(error.localizedDescription)
+                        self.error = AccountError.failedToLogin
+                    }
+                }
             }
         }
     }
@@ -109,6 +114,7 @@ public class AccountViewModel: ObservableObject {
         }
         do {
             try accountDao.markAccountCurrent(username: newAccount.username)
+            self.error = nil
         } catch {
             print("Failed to mark account as current: \(error)")
             self.error = AccountError.failedToMarkNewAccountCurrent
@@ -117,10 +123,12 @@ public class AccountViewModel: ObservableObject {
     
     public func switchToAnonymous() throws {
         try accountDao.markAllAccountsNonCurrent()
+        self.error = nil
     }
     
     public func logout() throws {
         try accountDao.deleteCurrentAccount()
+        self.error = nil
     }
     
     public func updateSubscriptionSyncTime() async throws {
