@@ -30,7 +30,7 @@ struct Infinity: App {
     @AppStorage(InternalStateUserDefaultsUtils.onboardingFinishedKey, store: .internalState) private var onboardingFinished: Bool = false
     
     init() {
-        AccountViewModel.initializeShared(using: DependencyManager.shared.container)
+        AccountViewModel.initializeShared(container: DependencyManager.shared.container, accountRepository: AccountRepository())
         _accountViewModel = StateObject(wrappedValue: AccountViewModel.shared)
         _customThemeViewModel = StateObject(wrappedValue: CustomThemeViewModel())
         _fullScreenMediaViewModel = StateObject(wrappedValue: FullScreenMediaViewModel())

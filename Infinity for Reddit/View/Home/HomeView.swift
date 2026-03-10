@@ -73,7 +73,9 @@ struct HomeView: View {
                             ),
                             handleToolbarMenu: false
                         )
-                        .setUpHomeTabViewChildNavigationBar()
+                        .setUpHomeTabViewChildNavigationBar(onLogin: {
+                            accountViewModel.startLogin()
+                        })
                         .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
                     }
                     
@@ -96,11 +98,15 @@ struct HomeView: View {
                         Group {
                             if accountViewModel.account.isAnonymous() {
                                 AnonymousSubscriptionsView()
-                                    .setUpHomeTabViewChildNavigationBar()
+                                    .setUpHomeTabViewChildNavigationBar(onLogin: {
+                                        accountViewModel.startLogin()
+                                    })
                                     .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
                             } else {
                                 SubscriptionsView()
-                                    .setUpHomeTabViewChildNavigationBar()
+                                    .setUpHomeTabViewChildNavigationBar(onLogin: {
+                                        accountViewModel.startLogin()
+                                    })
                                     .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
                             }
                         }
@@ -124,7 +130,9 @@ struct HomeView: View {
                     ZStack {
                         CustomNavigationStack(navigationManager: tab3NavigationManager) {
                             NewPostTypeChooserView()
-                                .setUpHomeTabViewChildNavigationBar()
+                                .setUpHomeTabViewChildNavigationBar(onLogin: {
+                                    accountViewModel.startLogin()
+                                })
                                 .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
                         }
                         
@@ -148,7 +156,9 @@ struct HomeView: View {
                             InboxView(
                                 account: accountViewModel.account
                             )
-                            .setUpHomeTabViewChildNavigationBar()
+                            .setUpHomeTabViewChildNavigationBar(onLogin: {
+                                accountViewModel.startLogin()
+                            })
                             .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
                         }
                         
@@ -171,7 +181,9 @@ struct HomeView: View {
                     ZStack {
                         CustomNavigationStack(navigationManager: tab4NavigationManager) {
                             SearchView()
-                                .setUpHomeTabViewChildNavigationBar()
+                                .setUpHomeTabViewChildNavigationBar(onLogin: {
+                                    accountViewModel.startLogin()
+                                })
                         }
                         
                         Snackbar()
@@ -192,7 +204,9 @@ struct HomeView: View {
                 ZStack {
                     CustomNavigationStack(navigationManager: tab5NavigationManager) {
                         MoreView()
-                            .setUpHomeTabViewChildNavigationBar()
+                            .setUpHomeTabViewChildNavigationBar(onLogin: {
+                                accountViewModel.startLogin()
+                            })
                             .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
                     }
                     

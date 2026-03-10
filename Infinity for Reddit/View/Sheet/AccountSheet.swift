@@ -17,12 +17,14 @@ struct AccountSheet: View {
     @StateObject var accountListingViewModel: AccountListingViewModel
     
     private let profileImageSize: CGFloat = 86
+    private let onLogin: () -> Void
     
-    init() {
+    init(onLogin: @escaping () -> Void) {
         guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
             fatalError("Failed to resolve DatabasePool")
         }
         
+        self.onLogin = onLogin
         _accountListingViewModel = StateObject(wrappedValue: AccountListingViewModel(dbPool: resolvedDBPool))
     }
     
@@ -91,8 +93,7 @@ struct AccountSheet: View {
                         }
                         
                         SimpleTouchItemRow(text: "Add account", icon: "person.crop.circle.badge.plus") {
-                            dismiss()
-                            navigationManager.append(AppNavigation.login)
+                            onLogin()
                         }
                         
                         if accountViewModel.account.isAnonymous() == false {

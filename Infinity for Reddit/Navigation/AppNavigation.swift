@@ -6,7 +6,6 @@
 //
 
 enum AppNavigation: Hashable {
-    case login
     case postDetails(postDetailsInput: PostDetailsInput, videoPlaybackTime: Double = 0)
     case postDetailsWithId(postId: String, commentId: String? = nil, isContinueThread: Bool = false)
     case subredditDetails(subredditName: String)

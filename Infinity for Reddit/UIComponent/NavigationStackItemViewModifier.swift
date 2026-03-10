@@ -12,6 +12,8 @@ struct NavigationStackItemViewModifier: ViewModifier {
     
     @State private var showProfile: Bool = false
     
+    let onLogin: () -> Void
+    
     private let userIconSize: CGFloat = 24
     
     func body(content: Content) -> some View {
@@ -48,7 +50,7 @@ struct NavigationStackItemViewModifier: ViewModifier {
             }
             .themedNavigationBar()
             .wrapContentSheet(isPresented: $showProfile) {
-                AccountSheet()
+                AccountSheet(onLogin: onLogin)
             }
     }
 }

@@ -9,6 +9,7 @@ import Foundation
 import GRDB
 import Combine
 import Swinject
+import AuthenticationServices
 
 public class AccountViewModel: ObservableObject {
     // Static shared instance
@@ -30,16 +31,23 @@ public class AccountViewModel: ObservableObject {
     @Published var pendingContextAfterNotificationClicked: String?
     @Published var pendingInboxFullname: String?
     
+    @Published var loginFetchAccountDataTask: Task<Void, Never>?
+    
+    private let accountRepository: AccountRepositoryProtocol
     private let accountDao: AccountDao
+    private let contextProvider: AuthPresentationContextProvider
     private var cancellables: Set<AnyCancellable> = []
     
     enum AccountError: LocalizedError {
+        case failedToLogin
         case failedToUnmarkCurrentAccount
         case failedToMarkNewAccountCurrent
         case failedToObserveCurrentAccount
         
         var errorDescription: String? {
             switch self {
+            case .failedToLogin:
+                return "Failed to log in."
             case .failedToUnmarkCurrentAccount:
                 return "Failed to remove the current account."
             case .failedToMarkNewAccountCurrent:
@@ -50,7 +58,8 @@ public class AccountViewModel: ObservableObject {
         }
     }
     
-    private init(dbPool: DatabasePool) {
+    private init(dbPool: DatabasePool, accountRepository: AccountRepositoryProtocol) {
+        self.accountRepository = accountRepository
         self.accountDao = AccountDao(dbPool: dbPool)
         do {
             if let account = try accountDao.getCurrentAccount() {
@@ -62,8 +71,30 @@ public class AccountViewModel: ObservableObject {
             account = Account.ANONYMOUS_ACCOUNT
             print(error.localizedDescription)
         }
+        self.contextProvider = AuthPresentationContextProvider()
         
         subscribeToCurrentAccount()
+    }
+    
+    func startLogin() {
+        accountRepository.startRedditLogin(contextProvider: contextProvider) { callbackURL, error in
+            if let callbackURL {
+                if let code = self.accountRepository.extractCode(callbackURL: callbackURL) {
+                    self.loginFetchAccountDataTask?.cancel()
+                    self.loginFetchAccountDataTask = Task {
+                        do {
+                            try await self.accountRepository.setUpAccount(code: code)
+                        } catch {
+                            await MainActor.run {
+                                self.error = error
+                            }
+                        }
+                    }
+                }
+            } else if let error {
+                self.error = AccountError.failedToLogin
+            }
+        }
     }
     
     public func switchAccount(newAccount: Account) {
@@ -127,7 +158,7 @@ public class AccountViewModel: ObservableObject {
         }
     }
     
-    public static func initializeShared(using container: Container) {
+    static func initializeShared(container: Container, accountRepository: AccountRepositoryProtocol) {
         guard _shared == nil else {
             fatalError("AccountViewModel.shared has already been initialized.")
         }
@@ -136,7 +167,7 @@ public class AccountViewModel: ObservableObject {
             fatalError("Failed to resolve AccountViewModel in AccountViewModel")
         }
         
-        _shared = AccountViewModel(dbPool: resolvedDBPool)
+        _shared = AccountViewModel(dbPool: resolvedDBPool, accountRepository: accountRepository)
     }
     
     @MainActor
@@ -156,4 +187,12 @@ public class AccountViewModel: ObservableObject {
 
 struct InboxNavigationTarget: Equatable {
     let viewMessage: Bool
+}
+
+class AuthPresentationContextProvider: NSObject, ASWebAuthenticationPresentationContextProviding {
+    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        return UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first!.windows.first!
+    }
 }

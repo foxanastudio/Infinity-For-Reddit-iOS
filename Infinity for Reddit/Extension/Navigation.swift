@@ -8,7 +8,7 @@
 import SwiftUI
 
 extension View {
-    func setUpHomeTabViewChildNavigationBar() -> some View {
-        self.modifier(NavigationStackItemViewModifier())
+    func setUpHomeTabViewChildNavigationBar(onLogin: @escaping () -> Void) -> some View {
+        self.modifier(NavigationStackItemViewModifier(onLogin: onLogin))
     }
 }

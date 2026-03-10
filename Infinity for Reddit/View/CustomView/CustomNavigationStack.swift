@@ -31,9 +31,6 @@ struct CustomNavigationStack<Content: View>: View {
             content()
                 .navigationDestination(for: AppNavigation.self) { destination in
                     switch destination {
-                    case .login:
-                        LoginView()
-                            .environmentObject(navigationManager)
                     case .postDetails(let postDetailsInput, let videoPlaybackTime):
                         PostDetailsView(postDetailsInput: postDetailsInput, videoPlaybackTime: videoPlaybackTime)
                             .environmentObject(navigationManager)
