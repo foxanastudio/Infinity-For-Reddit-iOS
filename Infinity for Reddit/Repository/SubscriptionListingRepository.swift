@@ -90,7 +90,7 @@ class SubscriptionListingRepository: SubscriptionListingRepositoryProtocol {
         let params = ["multipath": myCustomFeed.path, "make_favorite": String(myCustomFeed.isFavorite), "api_type": "json"]
         _ = try await self.session.request(RedditOAuthAPI.favoriteCustomFeed(params: params))
             .validate()
-            .serializingDecodable(Empty.self, automaticallyCancelling: true)
+            .serializingDecodable(Empty.self, automaticallyCancelling: true, emptyResponseCodes: [200, 204, 205])
             .value
         
         try await myCustomFeedDao.insert(myCustomFeed: myCustomFeed)
