@@ -28,6 +28,15 @@ struct PostHistorySettingsView: View {
     @AppStorage(PostHistoryUserDefaultsUtils.hideReadPostsAutomaticallyKey, store: .postHistory)
     private var hideReadPostsAutomatically: Bool = false
     
+    @AppStorage(PostHistoryUserDefaultsUtils.hideReadPostsAutomaticallyInSubredditsKey, store: .postHistory)
+    private var hideReadPostsAutomaticallyInSubreddits: Bool = false
+    
+    @AppStorage(PostHistoryUserDefaultsUtils.hideReadPostsAutomaticallyInUsersKey, store: .postHistory)
+    private var hideReadPostsAutomaticallyInUsers: Bool = false
+    
+    @AppStorage(PostHistoryUserDefaultsUtils.hideReadPostsAutomaticallyInSearchKey, store: .postHistory)
+    private var hideReadPostsAutomaticallyInSearch: Bool = false
+    
     @FocusState private var focusedField: FieldType?
     
     var body: some View {
@@ -65,10 +74,19 @@ struct PostHistorySettingsView: View {
                             TogglePreference(isEnabled: $markPostsAsReadAfterVoting, title: "Mark Posts as Read After Voting")
                                 .listPlainItemNoInsets()
 
-                            TogglePreference(isEnabled: $markPostsAsReadOnScroll, title: "Mark Posts As Read on Scroll")
+                            TogglePreference(isEnabled: $markPostsAsReadOnScroll, title: "Mark Posts as Read on Scroll")
                                 .listPlainItemNoInsets()
 
                             TogglePreference(isEnabled: $hideReadPostsAutomatically, title: "Hide Read Posts Automatically")
+                                .listPlainItemNoInsets()
+                            
+                            TogglePreference(isEnabled: $hideReadPostsAutomaticallyInSubreddits, title: "Hide Read Posts Automatically in Subreddits")
+                                .listPlainItemNoInsets()
+                            
+                            TogglePreference(isEnabled: $hideReadPostsAutomaticallyInUsers, title: "Hide Read Posts Automatically in Users")
+                                .listPlainItemNoInsets()
+                            
+                            TogglePreference(isEnabled: $hideReadPostsAutomaticallyInSearch, title: "Hide Read Posts Automatically in Search")
                                 .listPlainItemNoInsets()
                         }
                     }

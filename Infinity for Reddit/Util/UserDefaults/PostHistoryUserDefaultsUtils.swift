@@ -37,4 +37,19 @@ enum PostHistoryUserDefaultsUtils {
     static var hideReadPostsAutomatically: Bool {
         return UserDefaults.postHistory.bool(forKey: hideReadPostsAutomaticallyKey)
     }
+    
+    static let hideReadPostsAutomaticallyInSubredditsKey = "hide_read_posts_automatically_in_subreddits"
+    static var hideReadPostsAutomaticallyInSubreddits: Bool {
+        return UserDefaults.postHistory.bool(forKey: hideReadPostsAutomaticallyInSubredditsKey)
+    }
+    
+    static let hideReadPostsAutomaticallyInUsersKey = "hide_read_posts_automatically_in_users"
+    static var hideReadPostsAutomaticallyInUsers: Bool {
+        return UserDefaults.postHistory.bool(forKey: hideReadPostsAutomaticallyInUsersKey)
+    }
+    
+    static let hideReadPostsAutomaticallyInSearchKey = "hide_read_posts_automatically_in_search"
+    static var hideReadPostsAutomaticallyInSearch: Bool {
+        return UserDefaults.postHistory.bool(forKey: hideReadPostsAutomaticallyInSearchKey)
+    }
 }
