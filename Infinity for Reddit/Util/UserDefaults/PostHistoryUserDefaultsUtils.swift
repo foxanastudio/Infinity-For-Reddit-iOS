@@ -8,19 +8,19 @@
 import Foundation
 
 enum PostHistoryUserDefaultsUtils {
-    static let markPostsAsReadKey = "mark_posts_as_read"
-    static var markPostsAsRead: Bool {
-        return UserDefaults.postHistory.bool(forKey: markPostsAsReadKey)
+    static let saveReadPostsKey = "save_read_posts"
+    static var saveReadPosts: Bool {
+        return UserDefaults.postHistory.bool(forKey: saveReadPostsKey)
     }
     
-    static let limitReadPostsKey = "limit_read_posts"
-    static var limitReadPosts: Bool {
-        return UserDefaults.postHistory.bool(forKey: limitReadPostsKey)
+    static let limitHistorySizeKey = "limit_history_size"
+    static var limitHistorySize: Bool {
+        return UserDefaults.postHistory.bool(forKey: limitHistorySizeKey)
     }
     
-    static let readPostsLimitKey = "read_posts_limit"
-    static var readPostsLimit: Int {
-        return UserDefaults.postHistory.integer(forKey: readPostsLimitKey)
+    static let historyLimitKey = "history_limit"
+    static var historyLimit: Int {
+        return UserDefaults.postHistory.integer(forKey: historyLimitKey)
     }
     
     static let markPostsAsReadAfterVotingKey = "mark_posts_as_read_after_voting"

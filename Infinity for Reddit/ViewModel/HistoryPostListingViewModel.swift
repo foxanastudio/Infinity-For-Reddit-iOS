@@ -594,7 +594,7 @@ public class HistoryPostListingViewModel: ObservableObject {
     }
     
     @MainActor
-    func readPost(post: Post, markPostsAsRead: Bool, limitReadPosts: Bool, readPostsLimit: Int) async {
+    func readPost(post: Post, markPostsAsRead: Bool, limitHistorySize: Bool, historyLimit: Int) async {
         guard !post.isRead, markPostsAsRead else {
             return
         }
@@ -603,8 +603,8 @@ public class HistoryPostListingViewModel: ObservableObject {
             try await postRepository.readPost(
                 post: post,
                 account: AccountViewModel.shared.account,
-                limitReadPosts: limitReadPosts,
-                readPostsLimit: readPostsLimit
+                limitHistorySize: limitHistorySize,
+                historyLimit: historyLimit
             )
             
             post.isRead = true

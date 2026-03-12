@@ -10,14 +10,14 @@ import Swinject
 import GRDB
 
 struct PostHistorySettingsView: View {
-    @AppStorage(PostHistoryUserDefaultsUtils.markPostsAsReadKey, store: .postHistory)
-    private var markPostsAsRead: Bool = false
+    @AppStorage(PostHistoryUserDefaultsUtils.saveReadPostsKey, store: .postHistory)
+    private var saveReadPosts: Bool = false
     
-    @AppStorage(PostHistoryUserDefaultsUtils.limitReadPostsKey, store: .postHistory)
-    private var limitReadPosts: Bool = true
+    @AppStorage(PostHistoryUserDefaultsUtils.limitHistorySizeKey, store: .postHistory)
+    private var limitHistorySize: Bool = true
     
-    @AppStorage(PostHistoryUserDefaultsUtils.readPostsLimitKey, store: .postHistory)
-    private var readPostsLimit: Int = 500
+    @AppStorage(PostHistoryUserDefaultsUtils.historyLimitKey, store: .postHistory)
+    private var historyLimit: Int = 500
     
     @AppStorage(PostHistoryUserDefaultsUtils.markPostsAsReadAfterVotingKey, store: .postHistory)
     private var markPostsAsReadAfterVoting: Bool = false
@@ -35,40 +35,40 @@ struct PostHistorySettingsView: View {
             VStack(spacing: 0) {
                 ScrollViewReader { proxy in
                     List {
-                        TogglePreference(isEnabled: $markPostsAsRead, title: "Mark Posts as Read")
+                        TogglePreference(isEnabled: $saveReadPosts, title: "Save Read Posts")
                             .listPlainItemNoInsets()
                         
-                        if markPostsAsRead {
-                            TogglePreference(isEnabled: $limitReadPosts, title: "Limit Read Posts")
-                                .listPlainItemNoInsets()
-                            
-                            if limitReadPosts {
-                                CustomTextField(
-                                    "Read Posts Limit",
-                                    text: Binding(
-                                        get: { String(self.readPostsLimit) },
-                                        set: { self.readPostsLimit = Int($0) ?? 500 }
-                                    ),
-                                    singleLine: true,
-                                    keyboardType: .numberPad,
-                                    fieldType: .readPostsLimit,
-                                    focusedField: $focusedField
-                                )
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 8)
-                                .listPlainItemNoInsets()
-                                .limitedWidth()
-                                .transition(.move(edge: .trailing).combined(with: .opacity))
-                                .id(FieldType.readPostsLimit)
-                            }
-
+                        TogglePreference(isEnabled: $limitHistorySize, title: "Limit History Size")
+                            .listPlainItemNoInsets()
+                        
+                        if limitHistorySize {
+                            CustomTextField(
+                                "History Limit",
+                                text: Binding(
+                                    get: { String(self.historyLimit) },
+                                    set: { self.historyLimit = Int($0) ?? 500 }
+                                ),
+                                singleLine: true,
+                                keyboardType: .numberPad,
+                                fieldType: .historyLimit,
+                                focusedField: $focusedField
+                            )
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .listPlainItemNoInsets()
+                            .limitedWidth()
+                            .transition(.move(edge: .trailing).combined(with: .opacity))
+                            .id(FieldType.historyLimit)
+                        }
+                        
+                        if saveReadPosts {
                             TogglePreference(isEnabled: $markPostsAsReadAfterVoting, title: "Mark Posts as Read After Voting")
                                 .listPlainItemNoInsets()
 
                             TogglePreference(isEnabled: $markPostsAsReadOnScroll, title: "Mark Posts As Read on Scroll")
                                 .listPlainItemNoInsets()
 
-                            TogglePreference(isEnabled: $hideReadPosts, title: "Hide Read Posts")
+                            TogglePreference(isEnabled: $hideReadPosts, title: "Hide Read Posts Automatically")
                                 .listPlainItemNoInsets()
                         }
                     }
@@ -82,7 +82,7 @@ struct PostHistorySettingsView: View {
                         }
                     }
                 }
-                .animation(.easeInOut, value: markPostsAsRead)
+                .animation(.easeInOut, value: saveReadPosts)
                 
                 KeyboardToolbar {
                     focusedField = nil
@@ -94,6 +94,6 @@ struct PostHistorySettingsView: View {
     }
     
     private enum FieldType: Hashable {
-        case readPostsLimit
+        case historyLimit
     }
 }

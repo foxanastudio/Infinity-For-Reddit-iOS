@@ -12,9 +12,9 @@ struct PostView: View {
     
     @StateObject private var postViewModel: PostViewModel
     
-    @AppStorage(PostHistoryUserDefaultsUtils.markPostsAsReadKey, store: .postHistory) private var markPostsAsRead: Bool = false
-    @AppStorage(PostHistoryUserDefaultsUtils.limitReadPostsKey, store: .postHistory) private var limitReadPosts: Bool = true
-    @AppStorage(PostHistoryUserDefaultsUtils.readPostsLimitKey, store: .postHistory) private var readPostsLimit: Int = 500
+    @AppStorage(PostHistoryUserDefaultsUtils.saveReadPostsKey, store: .postHistory) private var saveReadPosts: Bool = false
+    @AppStorage(PostHistoryUserDefaultsUtils.limitHistorySizeKey, store: .postHistory) private var limitHistorySize: Bool = true
+    @AppStorage(PostHistoryUserDefaultsUtils.historyLimitKey, store: .postHistory) private var historyLimit: Int = 500
     
     let post: Post
     let postLayout: PostLayout
@@ -111,7 +111,7 @@ struct PostView: View {
     
     private func onPostTap(_ videoPlaybackTime: Double) {
         Task {
-            await postViewModel.readPost(markPostsAsRead: markPostsAsRead, limitReadPosts: limitReadPosts, readPostsLimit: readPostsLimit)
+            await postViewModel.readPost(markPostsAsRead: saveReadPosts, limitHistorySize: limitHistorySize, historyLimit: historyLimit)
         }
         
         navigationManager.append(
@@ -154,7 +154,7 @@ struct PostView: View {
     private func openLink(_ url: URL) {
         navigationManager.openLink(url)
         Task {
-            await postViewModel.readPost(markPostsAsRead: markPostsAsRead, limitReadPosts: limitReadPosts, readPostsLimit: readPostsLimit)
+            await postViewModel.readPost(markPostsAsRead: saveReadPosts, limitHistorySize: limitHistorySize, historyLimit: historyLimit)
         }
     }
 }

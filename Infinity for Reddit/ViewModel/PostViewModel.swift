@@ -28,7 +28,7 @@ class PostViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
-    func readPost(markPostsAsRead: Bool, limitReadPosts: Bool, readPostsLimit: Int) async {
+    func readPost(markPostsAsRead: Bool, limitHistorySize: Bool, historyLimit: Int) async {
         guard !post.isRead, markPostsAsRead else {
             return
         }
@@ -37,8 +37,8 @@ class PostViewModel: ObservableObject {
             try await postRepository.readPost(
                 post: post,
                 account: AccountViewModel.shared.account,
-                limitReadPosts: limitReadPosts,
-                readPostsLimit: readPostsLimit
+                limitHistorySize: limitHistorySize,
+                historyLimit: historyLimit
             )
             
             await MainActor.run {

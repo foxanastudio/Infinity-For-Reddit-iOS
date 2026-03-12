@@ -1002,7 +1002,7 @@ public class PostDetailsViewModel: ObservableObject {
     }
 
     func readPost(post: Post) async {
-        guard PostHistoryUserDefaultsUtils.markPostsAsRead else {
+        guard PostHistoryUserDefaultsUtils.saveReadPosts else {
             return
         }
         
@@ -1010,8 +1010,8 @@ public class PostDetailsViewModel: ObservableObject {
             try await postRepository.readPost(
                 post: post,
                 account: AccountViewModel.shared.account,
-                limitReadPosts: PostHistoryUserDefaultsUtils.limitReadPosts,
-                readPostsLimit: PostHistoryUserDefaultsUtils.readPostsLimit
+                limitHistorySize: PostHistoryUserDefaultsUtils.limitHistorySize,
+                historyLimit: PostHistoryUserDefaultsUtils.historyLimit
             )
         } catch {
             print("Mark post as read failed with error: \(error)")
