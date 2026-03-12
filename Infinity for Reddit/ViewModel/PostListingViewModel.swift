@@ -67,7 +67,6 @@ public class PostListingViewModel: ObservableObject {
     // UserDefaults
     private var sensitiveContent: Bool
     private var spoilerContent: Bool
-    private var readPostEnabled: Bool = true
     
     private let postListingRepository: PostListingRepositoryProtocol
     private let historyPostsRepository: HistoryPostsRepositoryProtocol
@@ -368,7 +367,7 @@ public class PostListingViewModel: ObservableObject {
     
     func postProcessPosts(_ posts: [Post]) async -> [Post] {
         let readPostIds = await historyPostsRepository.getReadPostsIdsByIds(
-            readPostEnabled: readPostEnabled,
+            saveReadPosts: PostHistoryUserDefaultsUtils.saveReadPosts,
             account: AccountViewModel.shared.account,
             postIds: posts.map { $0.id }
         )
@@ -389,12 +388,12 @@ public class PostListingViewModel: ObservableObject {
             postHistoryType: .saved
         ) : Set<String>()
         
-        let hideReadPostsAutomatically = PostHistoryUserDefaultsUtils.hideReadPostsAutomatically
+        let hideReadPosts = PostHistoryUserDefaultsUtils.saveReadPosts && PostHistoryUserDefaultsUtils.hideReadPostsAutomatically
         
         return posts.filter { post in
             return PostFilter.isPostAllowed(post: post, postFilter: postFilter)
             && !(AccountViewModel.shared.account.isAnonymous() && hiddenPostIdsAnonymous.contains(post.id))
-            && !(hideReadPostsAutomatically && readPostIds.contains(post.id))
+            && !(hideReadPosts && readPostIds.contains(post.id))
         }.map {
             if !$0.selftext.isEmpty {
                 modifyPostBody($0)

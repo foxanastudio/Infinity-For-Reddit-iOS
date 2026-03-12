@@ -8,23 +8,19 @@
 import GRDB
 
 class HistoryPostsRepository: HistoryPostsRepositoryProtocol {
-    private let readPostDao: PostHistoryDao
+    private let postHistoryDao: PostHistoryDao
     
     init() {
         guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
             fatalError("Failed to resolve DatabasePool")
         }
         
-        self.readPostDao = PostHistoryDao(dbPool: resolvedDBPool)
+        self.postHistoryDao = PostHistoryDao(dbPool: resolvedDBPool)
     }
     
-    func getReadPostsIdsByIds(readPostEnabled: Bool, account: Account, postIds: [String]) async -> Set<String> {
-        guard !account.isAnonymous() else {
-            return Set<String>()
-        }
-        
+    func getReadPostsIdsByIds(saveReadPosts: Bool, account: Account, postIds: [String]) async -> Set<String> {
         do {
-            return readPostEnabled ? Set(try await readPostDao.getHistoryPostsIdsByIds(ids: postIds, username: account.username, postHistoryType: .readPosts)) : Set<String>()
+            return saveReadPosts ? Set(try await postHistoryDao.getHistoryPostsIdsByIds(ids: postIds, username: account.username, postHistoryType: .readPosts)) : Set<String>()
         } catch {
             print("getReadPostsIdsByIds failed with error: \(error)")
             return Set<String>()
@@ -33,7 +29,7 @@ class HistoryPostsRepository: HistoryPostsRepositoryProtocol {
     
     func getHistoryPostsIdsByIdsAnonymous(postIds: [String], postHistoryType: PostHistoryType) async -> Set<String> {
         do {
-            return Set(try await readPostDao.getHistoryPostsIdsByIds(ids: postIds, username: Account.ANONYMOUS_ACCOUNT.username, postHistoryType: postHistoryType))
+            return Set(try await postHistoryDao.getHistoryPostsIdsByIds(ids: postIds, username: Account.ANONYMOUS_ACCOUNT.username, postHistoryType: postHistoryType))
         } catch {
             print("getHistoryPostsIdsByIdsAnonymous failed with error: \(error)")
             return Set<String>()
@@ -42,7 +38,7 @@ class HistoryPostsRepository: HistoryPostsRepositoryProtocol {
     
     func getIfExistInHistoryPostsAnonymous(postId: String, postHistoryType: PostHistoryType) async -> Bool {
         do {
-            return try await !readPostDao.getHistoryPostsIdsByIds(ids: [postId], username: Account.ANONYMOUS_ACCOUNT.username, postHistoryType: postHistoryType).isEmpty
+            return try await !postHistoryDao.getHistoryPostsIdsByIds(ids: [postId], username: Account.ANONYMOUS_ACCOUNT.username, postHistoryType: postHistoryType).isEmpty
         } catch {
             print("getIfExistInHistoryPostsAnonymous failed with error: \(error)")
             return false
