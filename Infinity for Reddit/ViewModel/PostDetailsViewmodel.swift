@@ -267,7 +267,7 @@ public class PostDetailsViewModel: ObservableObject {
         }
     }
     
-    private func fetchPost() async throws {
+    private func updatePostAfterChangingFlair() async throws {
         let postDetails: PostDetailsRootClass
         switch postDetailsInput {
         case .post(let post):
@@ -291,7 +291,8 @@ public class PostDetailsViewModel: ObservableObject {
         await postProcessPost(post)
         
         await MainActor.run {
-            self.post = post
+            self.post?.linkFlairRichtext = post.linkFlairRichtext
+            self.post?.linkFlairText = post.linkFlairText
         }
     }
     
@@ -895,12 +896,8 @@ public class PostDetailsViewModel: ObservableObject {
         selectFlairTask = Task {
             do {
                 try await postDetailsRepository.selectFlair(post: post, flair: flair)
-                do {
-                    try Task.checkCancellation()
-                    try await fetchPost()
-                } catch {
-                    // Ignore
-                }
+                try? Task.checkCancellation()
+                try? await updatePostAfterChangingFlair()
             } catch {
                 await MainActor.run {
                     self.error = error
