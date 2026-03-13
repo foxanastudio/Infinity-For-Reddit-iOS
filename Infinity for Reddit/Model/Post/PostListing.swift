@@ -84,8 +84,8 @@ public class Post : NSObject, ObservableObject, Identifiable {
     var isSelf : Bool!
     var isVideo : Bool!
     @Published var likes: Int!
-    var linkFlairRichtext : [FlairRichtext]! = [FlairRichtext]()
-    var linkFlairText : String!
+    @Published var linkFlairRichtext : [FlairRichtext]! = [FlairRichtext]()
+    @Published var linkFlairText : String!
     var linkFlairType : String!
     @Published var locked : Bool
     var media : PostMedia!
@@ -305,13 +305,17 @@ public class Post : NSObject, ObservableObject, Identifiable {
         let likes = json["likes"] == JSON.null ? 0 : json["likes"].boolValue == true ? 1 : -1
         self.likes = likes
         let linkFlairRichtextArray = json["link_flair_richtext"].arrayValue
-        for linkFlairRichtextJson in linkFlairRichtextArray {
-            do {
-                let richtext = try FlairRichtext(fromJson: linkFlairRichtextJson)
-                linkFlairRichtext.append(richtext)
-            } catch {
-                //Ignore
+        if !linkFlairRichtextArray.isEmpty {
+            var linkFlairRichtextTemp: [FlairRichtext] = []
+            for linkFlairRichtextJson in linkFlairRichtextArray {
+                do {
+                    let richtext = try FlairRichtext(fromJson: linkFlairRichtextJson)
+                    linkFlairRichtextTemp.append(richtext)
+                } catch {
+                    //Ignore
+                }
             }
+            linkFlairRichtext = linkFlairRichtextTemp
         }
         linkFlairText = json["link_flair_text"].stringValue
         linkFlairType = json["link_flair_type"].stringValue

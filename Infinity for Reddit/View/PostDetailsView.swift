@@ -585,10 +585,12 @@ struct PostDetailsView: View {
                 postDetailsViewModel.changeSortTypeKind(sortTypeKind: sortTypeKind)
             }
         }
-        .wrapContentSheet(isPresented: $showSelectFlairSheet) {
+        .sheet(isPresented: $showSelectFlairSheet) {
             SelectPostFlairSheet(flairs: postDetailsViewModel.flairs) { flair in
                 postDetailsViewModel.selectFlair(flair)
             }
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
         }
         .wrapContentSheet(isPresented: $showPostOptionsSheet) {
             if let post = postDetailsViewModel.post {
