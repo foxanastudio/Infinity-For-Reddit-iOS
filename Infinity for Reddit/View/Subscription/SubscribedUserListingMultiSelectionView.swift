@@ -34,22 +34,9 @@ struct SubscribedUserListingMultiSelectionView: View {
             } else {
                 List {
                     if !subscriptionListingViewModel.favoriteUserSubscriptions.isEmpty {
-                        CustomListSection("Favorite") {
-                            ForEach(subscriptionListingViewModel.favoriteUserSubscriptions, id: \.name) { subscription in
-                                SubscriptionItemMultiSelectionView(
-                                    text: subscription.name,
-                                    iconUrl: subscription.iconUrl,
-                                    isSelected: isUserSelected(subscription)
-                                ) {
-                                    toggleSelection(subscription)
-                                }
-                                .listPlainItemNoInsets()
-                            }
-                        }
-                    }
-                    
-                    CustomListSection("All") {
-                        ForEach(subscriptionListingViewModel.userSubscriptions, id: \.name) { subscription in
+                        StaticListSection("Favorite")
+                        
+                        ForEach(subscriptionListingViewModel.favoriteUserSubscriptions, id: \.name) { subscription in
                             SubscriptionItemMultiSelectionView(
                                 text: subscription.name,
                                 iconUrl: subscription.iconUrl,
@@ -59,6 +46,21 @@ struct SubscribedUserListingMultiSelectionView: View {
                             }
                             .listPlainItemNoInsets()
                         }
+                    }
+                    
+                    if !subscriptionListingViewModel.favoriteUserSubscriptions.isEmpty {
+                        StaticListSection("All")
+                    }
+                    
+                    ForEach(subscriptionListingViewModel.userSubscriptions, id: \.name) { subscription in
+                        SubscriptionItemMultiSelectionView(
+                            text: subscription.name,
+                            iconUrl: subscription.iconUrl,
+                            isSelected: isUserSelected(subscription)
+                        ) {
+                            toggleSelection(subscription)
+                        }
+                        .listPlainItemNoInsets()
                     }
                 }
                 .scrollBounceBehavior(.basedOnSize)

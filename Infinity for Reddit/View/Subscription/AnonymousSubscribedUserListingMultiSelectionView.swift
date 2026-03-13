@@ -20,31 +20,33 @@ struct AnonymousSubscribedUserListingMultiSelectionView: View {
             } else {
                 List {
                     if !anonymousSubscriptionListingViewModel.favoriteUserSubscriptions.isEmpty {
-                        CustomListSection("Favorite") {
-                            ForEach(anonymousSubscriptionListingViewModel.favoriteUserSubscriptions, id: \.name) { subscription in
-                                SubscriptionItemMultiSelectionView(
-                                    text: subscription.name,
-                                    iconUrl: subscription.iconUrl,
-                                    isSelected: anonymousSubscriptionListingViewModel.selectedSubscribedUsers.index(id: subscription.id) != nil
-                                ) {
-                                    toggleSelection(subscription)
-                                }
-                                .listPlainItemNoInsets()
-                            }
-                        }
-                    }
-                    
-                    CustomListSection("All") {
-                        ForEach(anonymousSubscriptionListingViewModel.userSubscriptions, id: \.name) { subscription in
+                        StaticListSection("Favorite")
+                        
+                        ForEach(anonymousSubscriptionListingViewModel.favoriteUserSubscriptions, id: \.name) { subscription in
                             SubscriptionItemMultiSelectionView(
                                 text: subscription.name,
                                 iconUrl: subscription.iconUrl,
-                                isSelected: isUserSelected(subscription)
+                                isSelected: anonymousSubscriptionListingViewModel.selectedSubscribedUsers.index(id: subscription.id) != nil
                             ) {
                                 toggleSelection(subscription)
                             }
                             .listPlainItemNoInsets()
                         }
+                    }
+                    
+                    if !anonymousSubscriptionListingViewModel.favoriteUserSubscriptions.isEmpty {
+                        StaticListSection("All")
+                    }
+                    
+                    ForEach(anonymousSubscriptionListingViewModel.userSubscriptions, id: \.name) { subscription in
+                        SubscriptionItemMultiSelectionView(
+                            text: subscription.name,
+                            iconUrl: subscription.iconUrl,
+                            isSelected: isUserSelected(subscription)
+                        ) {
+                            toggleSelection(subscription)
+                        }
+                        .listPlainItemNoInsets()
                     }
                 }
                 .scrollBounceBehavior(.basedOnSize)

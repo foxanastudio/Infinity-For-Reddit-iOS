@@ -35,42 +35,9 @@ struct CustomFeedListingView: View {
             } else {
                 List {
                     if !subscriptionListingViewModel.favoriteMyCustomFeeds.isEmpty {
-                        CustomListSection("Favorite") {
-                            ForEach(subscriptionListingViewModel.favoriteMyCustomFeeds, id: \.path) { customFeed in
-                                SubscriptionItemView(text: customFeed.displayName, iconUrl: customFeed.iconUrl, isFavorite: customFeed.isFavorite, action: {
-                                    if let onSelectCustomAction {
-                                        onSelectCustomAction(Thing.myCustomFeed(customFeed))
-                                    } else {
-                                        navigationManager.append(AppNavigation.customFeed(customFeed: .myCustomFeed(customFeed)))
-                                    }
-                                }) {
-                                    customFeed.isFavorite.toggle()
-                                    Task {
-                                        await subscriptionListingViewModel.toggleFavoriteCustomFeed(customFeed)
-                                    }
-                                }
-                                .limitedWidth()
-                                .id(ObjectIdentifier(customFeed))
-                                .listPlainItemNoInsets()
-                                .applyIf(onSelectCustomAction == nil) {
-                                    $0.swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                        Button(role: .destructive) {
-                                            Task {
-                                                await subscriptionListingViewModel.deleteCustomFeed(customFeed)
-                                            }
-                                        } label: {
-                                            Text("Delete")
-                                                .foregroundStyle(.white)
-                                        }
-                                        .tint(.red)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    
-                    CustomListSection("All") {
-                        ForEach(subscriptionListingViewModel.myCustomFeeds, id: \.path) { customFeed in
+                        StaticListSection("Favorite")
+                        
+                        ForEach(subscriptionListingViewModel.favoriteMyCustomFeeds, id: \.path) { customFeed in
                             SubscriptionItemView(text: customFeed.displayName, iconUrl: customFeed.iconUrl, isFavorite: customFeed.isFavorite, action: {
                                 if let onSelectCustomAction {
                                     onSelectCustomAction(Thing.myCustomFeed(customFeed))
@@ -98,6 +65,41 @@ struct CustomFeedListingView: View {
                                     }
                                     .tint(.red)
                                 }
+                            }
+                        }
+                    }
+                    
+                    if !subscriptionListingViewModel.favoriteMyCustomFeeds.isEmpty {
+                        StaticListSection("All")
+                    }
+                    
+                    ForEach(subscriptionListingViewModel.myCustomFeeds, id: \.path) { customFeed in
+                        SubscriptionItemView(text: customFeed.displayName, iconUrl: customFeed.iconUrl, isFavorite: customFeed.isFavorite, action: {
+                            if let onSelectCustomAction {
+                                onSelectCustomAction(Thing.myCustomFeed(customFeed))
+                            } else {
+                                navigationManager.append(AppNavigation.customFeed(customFeed: .myCustomFeed(customFeed)))
+                            }
+                        }) {
+                            customFeed.isFavorite.toggle()
+                            Task {
+                                await subscriptionListingViewModel.toggleFavoriteCustomFeed(customFeed)
+                            }
+                        }
+                        .limitedWidth()
+                        .id(ObjectIdentifier(customFeed))
+                        .listPlainItemNoInsets()
+                        .applyIf(onSelectCustomAction == nil) {
+                            $0.swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                Button(role: .destructive) {
+                                    Task {
+                                        await subscriptionListingViewModel.deleteCustomFeed(customFeed)
+                                    }
+                                } label: {
+                                    Text("Delete")
+                                        .foregroundStyle(.white)
+                                }
+                                .tint(.red)
                             }
                         }
                     }

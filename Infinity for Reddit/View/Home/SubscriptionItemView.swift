@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct SubscriptionItemView: View {
-    var text: String
-    var iconUrl: String?
-    var iconSize: CGFloat = 24
+    let text: String
+    let iconUrl: String?
+    let iconSize: CGFloat = 24
     @State var isFavorite: Bool = false
-    var allowToggleFavorite: Bool = true
-    var action: () -> Void
+    let allowToggleFavorite: Bool = true
+    let action: () -> Void
     var toggleFavorite: (() -> Void)?
     
     var body: some View {

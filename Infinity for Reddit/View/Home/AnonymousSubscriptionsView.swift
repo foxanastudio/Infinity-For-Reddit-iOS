@@ -206,34 +206,9 @@ struct AnonymousSubscriptionsView: View {
                 } else {
                     List {
                         if !anonymousSubscriptionListingViewModel.favoriteMyCustomFeeds.isEmpty {
-                            CustomListSection("Favorite") {
-                                ForEach(anonymousSubscriptionListingViewModel.favoriteMyCustomFeeds, id: \.path) { customFeed in
-                                    SubscriptionItemView(text: customFeed.displayName, iconUrl: customFeed.iconUrl, isFavorite: customFeed.isFavorite, action: {
-                                        navigationManager.append(AppNavigation.customFeed(customFeed: .myCustomFeed(customFeed)))
-                                    }) {
-                                        customFeed.isFavorite.toggle()
-                                        anonymousSubscriptionListingViewModel.toggleFavoriteCustomFeed(customFeed)
-                                    }
-                                    .limitedWidth()
-                                    .id(ObjectIdentifier(customFeed))
-                                    .listPlainItemNoInsets()
-                                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                        Button(role: .destructive) {
-                                            Task {
-                                                await anonymousSubscriptionListingViewModel.deleteCustomFeed(customFeed)
-                                            }
-                                        } label: {
-                                            Text("Delete")
-                                                .foregroundStyle(.white)
-                                        }
-                                        .tint(.red)
-                                    }
-                                }
-                            }
-                        }
-                        
-                        CustomListSection("All") {
-                            ForEach(anonymousSubscriptionListingViewModel.myCustomFeeds, id: \.path) { customFeed in
+                            StaticListSection("Favorite")
+                            
+                            ForEach(anonymousSubscriptionListingViewModel.favoriteMyCustomFeeds, id: \.path) { customFeed in
                                 SubscriptionItemView(text: customFeed.displayName, iconUrl: customFeed.iconUrl, isFavorite: customFeed.isFavorite, action: {
                                     navigationManager.append(AppNavigation.customFeed(customFeed: .myCustomFeed(customFeed)))
                                 }) {
@@ -254,6 +229,33 @@ struct AnonymousSubscriptionsView: View {
                                     }
                                     .tint(.red)
                                 }
+                            }
+                        }
+                        
+                        if !anonymousSubscriptionListingViewModel.favoriteMyCustomFeeds.isEmpty {
+                            StaticListSection("All")
+                        }
+                        
+                        ForEach(anonymousSubscriptionListingViewModel.myCustomFeeds, id: \.path) { customFeed in
+                            SubscriptionItemView(text: customFeed.displayName, iconUrl: customFeed.iconUrl, isFavorite: customFeed.isFavorite, action: {
+                                navigationManager.append(AppNavigation.customFeed(customFeed: .myCustomFeed(customFeed)))
+                            }) {
+                                customFeed.isFavorite.toggle()
+                                anonymousSubscriptionListingViewModel.toggleFavoriteCustomFeed(customFeed)
+                            }
+                            .limitedWidth()
+                            .id(ObjectIdentifier(customFeed))
+                            .listPlainItemNoInsets()
+                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                Button(role: .destructive) {
+                                    Task {
+                                        await anonymousSubscriptionListingViewModel.deleteCustomFeed(customFeed)
+                                    }
+                                } label: {
+                                    Text("Delete")
+                                        .foregroundStyle(.white)
+                                }
+                                .tint(.red)
                             }
                         }
                     }

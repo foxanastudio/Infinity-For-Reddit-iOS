@@ -32,22 +32,9 @@ struct SubscribedSubredditListingMultiSelectionView: View {
             } else {
                 List {
                     if !subscriptionListingViewModel.favoriteSubredditSubscriptions.isEmpty {
-                        CustomListSection("Favorite") {
-                            ForEach(subscriptionListingViewModel.favoriteSubredditSubscriptions, id: \.fullName) { subscription in
-                                SubscriptionItemMultiSelectionView(
-                                    text: subscription.name,
-                                    iconUrl: subscription.iconUrl,
-                                    isSelected: isSubredditSelected(subscription)
-                                ) {
-                                    toggleSelection(subscription)
-                                }
-                                .listPlainItemNoInsets()
-                            }
-                        }
-                    }
-                    
-                    CustomListSection("All") {
-                        ForEach(subscriptionListingViewModel.subredditSubscriptions, id: \.fullName) { subscription in
+                        StaticListSection("Favorite")
+                        
+                        ForEach(subscriptionListingViewModel.favoriteSubredditSubscriptions, id: \.fullName) { subscription in
                             SubscriptionItemMultiSelectionView(
                                 text: subscription.name,
                                 iconUrl: subscription.iconUrl,
@@ -57,6 +44,21 @@ struct SubscribedSubredditListingMultiSelectionView: View {
                             }
                             .listPlainItemNoInsets()
                         }
+                    }
+                    
+                    if !subscriptionListingViewModel.favoriteSubredditSubscriptions.isEmpty {
+                        StaticListSection("All")
+                    }
+                    
+                    ForEach(subscriptionListingViewModel.subredditSubscriptions, id: \.fullName) { subscription in
+                        SubscriptionItemMultiSelectionView(
+                            text: subscription.name,
+                            iconUrl: subscription.iconUrl,
+                            isSelected: isSubredditSelected(subscription)
+                        ) {
+                            toggleSelection(subscription)
+                        }
+                        .listPlainItemNoInsets()
                     }
                 }
                 .scrollBounceBehavior(.basedOnSize)
