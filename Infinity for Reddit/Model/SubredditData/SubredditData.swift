@@ -40,7 +40,7 @@ public struct SubredditData: Codable, FetchableRecord, PersistableRecord, Identi
         self.createdUTC = createdUTC
         self.suggestedCommentSort = suggestedCommentSort
         self.isSensitive = isSensitive
-        self.syncTimeInSecond = Utils.getCurrentTimeEpochInSecond()
+        self.syncTimeInSecond = syncTimeInSecond
     }
     
     private enum CodingKeys: String, CodingKey, ColumnExpression, CaseIterable {

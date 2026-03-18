@@ -140,11 +140,11 @@ struct RedditGRDBDatabase {
                 t.column("total_karma", .integer)
                 t.column("cakeday", .integer)
                 t.column("is_gold", .boolean)
-                t.column("can_follow", .boolean)
-                t.column("is_nsfw", .boolean)
+                t.column("can_be_followed", .boolean)
+                t.column("is_sensitive", .boolean)
                 t.column("description", .text)
                 t.column("title", .text)
-                t.column("is_selected", .boolean)
+                t.column("sync_time_in_second", .integer)
                 t.primaryKey(["id"])
             }
             

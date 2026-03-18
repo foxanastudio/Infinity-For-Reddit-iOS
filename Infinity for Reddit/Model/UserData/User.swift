@@ -92,9 +92,10 @@ public class User: NSObject, Identifiable {
             cakeday : createdUtc,
             isGold : isGold,
             canBeFollowed : acceptFollowers,
-            isNSFW : subreddit?.over18,
+            isSensitive : subreddit?.over18,
             description : subreddit?.publicDescription,
-            title : subreddit?.title
+            title : subreddit?.title,
+            syncTimeInSecond: Utils.getCurrentTimeEpochInSecond()
         )
     }
 }

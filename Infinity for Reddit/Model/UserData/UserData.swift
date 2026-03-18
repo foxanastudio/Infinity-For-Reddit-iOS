@@ -26,12 +26,31 @@ public struct UserData: Codable, FetchableRecord, PersistableRecord, Identifiabl
     var cakeday: Int64?
     var isGold: Bool?
     var canBeFollowed: Bool?
-    var isNSFW: Bool?
+    var isSensitive: Bool?
     var description: String?
     var title: String?
     var isSubscribed: Bool = false
     
-    init(id: String, name: String, iconUrl: String? = nil, banner: String? = nil, commentKarma: Int? = nil, linkKarma: Int? = nil, awarderKarma: Int? = nil, awardeeKarma: Int? = nil, totalKarma: Int? = nil, cakeday: Int64? = nil, isGold: Bool? = nil, canBeFollowed: Bool? = nil, isNSFW: Bool? = nil, description: String? = nil, title: String? = nil) {
+    var syncTimeInSecond: Int
+    
+    init(
+        id: String,
+        name: String,
+        iconUrl: String? = nil,
+        banner: String? = nil,
+        commentKarma: Int? = nil,
+        linkKarma: Int? = nil,
+        awarderKarma: Int? = nil,
+        awardeeKarma: Int? = nil,
+        totalKarma: Int? = nil,
+        cakeday: Int64? = nil,
+        isGold: Bool? = nil,
+        canBeFollowed: Bool? = nil,
+        isSensitive: Bool? = nil,
+        description: String? = nil,
+        title: String? = nil,
+        syncTimeInSecond: Int
+    ) {
         self.idInReddit = id
         self.name = name
         self.iconUrl = iconUrl
@@ -44,9 +63,10 @@ public struct UserData: Codable, FetchableRecord, PersistableRecord, Identifiabl
         self.cakeday = cakeday
         self.isGold = isGold
         self.canBeFollowed = canBeFollowed
-        self.isNSFW = isNSFW
+        self.isSensitive = isSensitive
         self.description = description
         self.title = title
+        self.syncTimeInSecond = syncTimeInSecond
     }
     
     private enum CodingKeys: String, CodingKey, ColumnExpression, CaseIterable {
@@ -61,10 +81,11 @@ public struct UserData: Codable, FetchableRecord, PersistableRecord, Identifiabl
         case totalKarma = "total_karma"
         case cakeday = "cakeday"
         case isGold = "is_gold"
-        case canBeFollowed = "can_follow"
-        case isNSFW = "is_nsfw"
+        case canBeFollowed = "can_be_followed"
+        case isSensitive = "is_sensitive"
         case description = "description"
         case title = "title"
+        case syncTimeInSecond = "sync_time_in_second"
     }
     
     func toSubscribedUserData() -> SubscribedUserData {
