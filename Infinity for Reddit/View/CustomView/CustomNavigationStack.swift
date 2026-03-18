@@ -277,6 +277,9 @@ struct CustomNavigationStack<Content: View>: View {
                     case .acknowledgement:
                         AcknowledgementView()
                             .environmentObject(navigationManager)
+                    case .credits:
+                        CreditsView()
+                            .environmentObject(navigationManager)
                     }
                 }
                 .navigationDestination(for: FontSettingsViewNavigation.self) { destination in

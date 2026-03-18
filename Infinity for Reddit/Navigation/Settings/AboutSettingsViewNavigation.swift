@@ -7,4 +7,5 @@
 
 enum AboutSettingsViewNavigation: Hashable {
     case acknowledgement
+    case credits
 }

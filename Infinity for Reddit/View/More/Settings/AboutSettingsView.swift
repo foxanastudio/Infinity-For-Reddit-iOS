@@ -21,6 +21,12 @@ struct AboutSettingsView: View {
                     }
                     
                     PreferenceEntry(
+                        title: "Credits"
+                    ) {
+                        navigationManager.append(AboutSettingsViewNavigation.credits)
+                    }
+                    
+                    PreferenceEntry(
                         title: "Open Source",
                         subtitle: "Star it on Github if you like this app"
                     ) {
@@ -44,7 +50,7 @@ struct AboutSettingsView: View {
                     }
                     
                     PreferenceEntry(
-                        title: "Reddit Account",
+                        title: "Developer Reddit Account",
                         subtitle: "u/Hostilenemy"
                     ) {
                         navigationManager.append(AppNavigation.userDetails(username: "Hostilenemy"))
