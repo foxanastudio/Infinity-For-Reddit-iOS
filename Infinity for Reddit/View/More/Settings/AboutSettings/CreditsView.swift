@@ -25,6 +25,21 @@ struct CreditsView: View {
             name: "Rocket Icon",
             description: "Icon made by Freepik from www.flaticon.com",
             url: "https://www.flaticon.com/free-icon/spring-swing-rocket_2929322?term=space%20ship&page=1&position=18"
+        ),
+        Credit(
+            name: "Onboarding Animtaion 1",
+            description: "Free Loading #20 Animation",
+            url: "https://lottiefiles.com/free-animation/loading-20-UPbevBUQ7N"
+        ),
+        Credit(
+            name: "Onboarding Animtaion 2",
+            description: "Free Done Animation",
+            url: "https://lottiefiles.com/free-animation/done-mxnPGfBzFJ"
+        ),
+        Credit(
+            name: "Onboarding Animtaion 3",
+            description: "Free Globe world map loader searching Animation",
+            url: "https://lottiefiles.com/free-animation/globe-world-map-loader-searching-t5OSfEDBpp"
         )
     ]
     
