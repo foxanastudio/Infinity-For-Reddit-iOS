@@ -25,6 +25,7 @@ struct SubscriptionsView: View {
     @State private var selectedOption = 0
     @State private var navigationBarMenuKey: UUID?
     @State private var searchQuery: String = ""
+    @State private var keyboardId: UUID = UUID()
     
     init(subscriptionSelectionMode: ThingSelectionMode = .noSelection) {
         _subscriptionListingViewModel = StateObject(
@@ -69,6 +70,7 @@ struct SubscriptionsView: View {
                                     showBackground: false,
                                     fieldType: FieldType.search,
                                     focusedField: $focusedField)
+                    .id(keyboardId)
                     .padding(16)
                     .submitLabel(.search)
                 }
@@ -194,6 +196,8 @@ struct SubscriptionsView: View {
             ])
         }
         .onDisappear {
+            keyboardId = UUID()
+            
             guard let navigationBarMenuKey else {
                 return
             }
