@@ -23,9 +23,20 @@ class SubredditDetailsViewModel: ObservableObject {
     private let subredditDetailsRepository: SubredditDetailsRepositoryProtocol
     private var subscribeSubredditTask: Task<Void, Never>?
     
+    private var cancellables = Set<AnyCancellable>()
+    
     init(subredditName: String, subredditDetailsRepository: SubredditDetailsRepositoryProtocol) {
         self.subredditName = subredditName
         self.subredditDetailsRepository = subredditDetailsRepository
+        
+        NotificationCenter.default.publisher(for: Notification.Name.accountAllowSensitiveChanged)
+            .sink { [weak self] notification in
+                guard let self, let subredditData else {
+                    return
+                }
+                self.showSensitiveSubredditWarningTrigger = subredditData.isSensitive && !AccountAllowSensitiveNotification.isAllowSensitive(notification)
+            }
+            .store(in: &cancellables)
     }
     
     func fetchSubredditDetails() async {
