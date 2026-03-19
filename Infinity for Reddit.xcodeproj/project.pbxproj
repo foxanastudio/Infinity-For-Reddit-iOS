@@ -493,7 +493,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Infinity-for-Reddit-Info.plist";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
-				INFOPLIST_KEY_NSCameraUsageDescription = "We need access to your camera to let you capture photos and videos.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need access to your camera so you can take photos and record videos directly within the app to share on Reddit.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "We use Face ID to confirm it’s you before entering the app.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "We need access to your microphone to record audio while capturing videos.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Infinity needs access to save media to your Photos library.";
@@ -530,7 +530,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Infinity-for-Reddit-Info.plist";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
-				INFOPLIST_KEY_NSCameraUsageDescription = "We need access to your camera to let you capture photos and videos.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need access to your camera so you can take photos and record videos directly within the app to share on Reddit.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "We use Face ID to confirm it’s you before entering the app.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "We need access to your microphone to record audio while capturing videos.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Infinity needs access to save media to your Photos library.";
