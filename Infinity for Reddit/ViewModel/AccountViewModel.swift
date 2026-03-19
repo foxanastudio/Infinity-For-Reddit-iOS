@@ -144,6 +144,20 @@ public class AccountViewModel: ObservableObject {
         }
         try accountDao.updateCustomFeedSyncTime(username: account.username, customFeedSyncTime: account.customFeedSyncTime)
     }
+    
+    @MainActor
+    func setSensitiveContentFromRedditSettings() async {
+        do {
+            let redditSettings = try await accountRepository.getRedditSettings()
+            if account.allowSensitive != redditSettings.over18 {
+                try await accountDao.updateAllowSensitive(account: account, allowSensitive: redditSettings.over18)
+                
+                AccountAllowSensitiveNotification.post(allowSensitive: redditSettings.over18)
+            }
+        } catch {
+            self.error = error
+        }
+    }
 
     private func subscribeToCurrentAccount() {
         do {

@@ -15,8 +15,6 @@ struct SubredditAutoCompleteView: View {
     
     @Binding var query: String
     
-    @AppStorage(ContentSensitivityFilterUserDetailsUtils.sensitiveContentKey, store: .contentSensitivityFilter) private var sensitiveContent: Bool = false
-    
     private let iconSize: CGFloat = 28
     private let itemPadding: CGFloat
     private let onGoToSubreddit: (Subreddit) -> Void
@@ -105,7 +103,7 @@ struct SubredditAutoCompleteView: View {
             if newValue.trimmingCharacters(in: .whitespaces).isEmpty {
                 subredditAutoCompleteViewModel.clearSubreddits()
             } else {
-                subredditAutoCompleteViewModel.fetchSubreddits(query: query, over18: sensitiveContent)
+                subredditAutoCompleteViewModel.fetchSubreddits(query: query, over18: AccountViewModel.shared.account.allowSensitive)
             }
         }
     }

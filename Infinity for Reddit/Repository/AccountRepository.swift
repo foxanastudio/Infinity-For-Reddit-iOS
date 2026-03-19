@@ -12,11 +12,12 @@ import GRDB
 import SwiftyJSON
 
 class AccountRepository: AccountRepositoryProtocol {
+    private let sessionForLogin: Session
     private let session: Session
     private let accountDao: AccountDao
     private var authenticationSession: ASWebAuthenticationSession?
     
-    enum LoginError: LocalizedError {
+    enum AccountError: LocalizedError {
         case internalError
         case failedToGetAccessTokenNetworkError
         case failedToGetAccessTokenEmptyResponse
@@ -28,6 +29,7 @@ class AccountRepository: AccountRepositoryProtocol {
         case failedToGetMyInfo
         case failedToParseAccountInfo
         case failedToSaveAccountInfo
+        case failedToGetRedditSettings
         
         var errorDescription: String? {
             switch self {
@@ -53,6 +55,8 @@ class AccountRepository: AccountRepositoryProtocol {
                 return "Failed to parse account info."
             case .failedToSaveAccountInfo:
                 return "Failed to save account info."
+            case .failedToGetRedditSettings:
+                return "Failed to get Reddit settings."
             }
         }
     }
@@ -61,8 +65,12 @@ class AccountRepository: AccountRepositoryProtocol {
         guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
             fatalError("Failed to resolve DatabasePool")
         }
+        guard let resolvedSession = DependencyManager.shared.container.resolve(Session.self) else {
+            fatalError("Failed to resolve Session")
+        }
         
-        self.session = ProxyUtils.makeSession()
+        self.sessionForLogin = ProxyUtils.makeSession()
+        self.session = resolvedSession
         self.accountDao = AccountDao(dbPool: resolvedDBPool)
     }
     
@@ -115,7 +123,7 @@ class AccountRepository: AccountRepositoryProtocol {
         let credentials = "\(APIUtils.CLIENT_ID):"
         
         guard let encodedData = credentials.data(using: .utf8) else {
-            throw LoginError.internalError
+            throw AccountError.internalError
         }
         
         let base64Credentials = encodedData.base64EncodedString()
@@ -124,32 +132,32 @@ class AccountRepository: AccountRepositoryProtocol {
         
         let accessTokenResponse: String
         do {
-            accessTokenResponse = try await session.request(
+            accessTokenResponse = try await sessionForLogin.request(
                 RedditAPI.getAccessToken(queries: nil, headers: headers, params: params)
             )
                 .validate()
                 .serializingString(automaticallyCancelling: true)
                 .value
         } catch {
-            throw LoginError.failedToGetAccessTokenNetworkError
+            throw AccountError.failedToGetAccessTokenNetworkError
         }
         
         guard !accessTokenResponse.isEmpty else {
-            throw LoginError.failedToGetAccessTokenEmptyResponse
+            throw AccountError.failedToGetAccessTokenEmptyResponse
         }
         
         guard let data = accessTokenResponse.data(using: .utf8) else {
-            throw LoginError.failedToGetAccessToken
+            throw AccountError.failedToGetAccessToken
         }
         
         guard let responseJSON = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
-            throw LoginError.failedToParseAccessToken
+            throw AccountError.failedToParseAccessToken
         }
         
         guard let accessToken = responseJSON["access_token"] as? String,
            let refreshToken = responseJSON["refresh_token"] as? String else {
             printInDebugOnly("Error: Tokens not found in response")
-            throw LoginError.noAccessTokenInResponse
+            throw AccountError.noAccessTokenInResponse
         }
         
         printInDebugOnly("Access Token: \(accessToken)")
@@ -161,31 +169,31 @@ class AccountRepository: AccountRepositoryProtocol {
     private func getAccountInfo(accessToken: String, refreshToken: String, code: String) async throws {
         let response: String
         do {
-            response = try await session.request(RedditOAuthAPI.getMyInfo(headers: APIUtils.getOAuthHeader(accessToken: accessToken)))
+            response = try await sessionForLogin.request(RedditOAuthAPI.getMyInfo(headers: APIUtils.getOAuthHeader(accessToken: accessToken)))
                 .validate()
                 .serializingString(automaticallyCancelling: true)
                 .value
         } catch {
             printInDebugOnly("Error: \(error.localizedDescription)")
-            throw LoginError.failedToGetMyInfoNetworkError
+            throw AccountError.failedToGetMyInfoNetworkError
         }
         
         guard !response.isEmpty else {
             printInDebugOnly("Error: Empty response from Reddit")
-            throw LoginError.failedToGetMyInfoEmptyResponse
+            throw AccountError.failedToGetMyInfoEmptyResponse
         }
         
         guard let myInfo = response.data(using: .utf8) else {
-            throw LoginError.failedToGetMyInfo
+            throw AccountError.failedToGetMyInfo
         }
         
         guard let jsonResponse = try? JSON(data: myInfo) else {
-            throw LoginError.failedToParseAccountInfo
+            throw AccountError.failedToParseAccountInfo
         }
         
         let name = jsonResponse[JSONUtils.NAME_KEY].stringValue
         let profileImageUrl = jsonResponse[JSONUtils.ICON_IMG_KEY].stringValue
-        var bannerImageUrl = jsonResponse[JSONUtils.SUBREDDIT_KEY][JSONUtils.BANNER_IMG_KEY].string
+        let bannerImageUrl = jsonResponse[JSONUtils.SUBREDDIT_KEY][JSONUtils.BANNER_IMG_KEY].string
         let karma = jsonResponse[JSONUtils.TOTAL_KARMA_KEY].intValue
         let isMod = jsonResponse[JSONUtils.IS_MOD_KEY].boolValue
         let createdUTC = jsonResponse[JSONUtils.CREATED_UTC_KEY].doubleValue
@@ -208,7 +216,27 @@ class AccountRepository: AccountRepositoryProtocol {
             try RedditAccessTokenKeychainManager.shared.saveRefreshToken(accountName: name, refreshToken: refreshToken)
         } catch {
             printInDebugOnly("Error: Failed to insert account - \(error.localizedDescription)")
-            throw LoginError.failedToSaveAccountInfo
+            throw AccountError.failedToSaveAccountInfo
         }
+    }
+    
+    func getRedditSettings() async throws -> RedditSettings {
+        let data: Data
+        do {
+            data = try await session.request(RedditOAuthAPI.getRedditSettings)
+                .validate()
+                .serializingData(automaticallyCancelling: true)
+                .value
+        } catch {
+            printInDebugOnly("Error: \(error.localizedDescription)")
+            throw AccountError.failedToGetRedditSettings
+        }
+        
+        let json = JSON(data)
+        if let error = json.error {
+            throw APIError.jsonDecodingError(error.localizedDescription)
+        }
+        
+        return RedditSettings(fromJson: json)
     }
 }

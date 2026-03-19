@@ -11,4 +11,5 @@ extension Notification.Name {
     static let contextDeepLink = Notification.Name("contextDeepLink")
     static let notificationIntervalChanged = Notification.Name("notificationIntervalChanged")
     static let notificationToggleChanged = Notification.Name("notificationToggleChanged")
+    static let accountAllowSensitiveChanged = Notification.Name("accountAllowSensitiveChanged")
 }

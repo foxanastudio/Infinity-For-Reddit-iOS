@@ -65,7 +65,6 @@ public class PostListingViewModel: ObservableObject {
     private var lastSeenFrontPagePost: Post? = nil
     
     // UserDefaults
-    private var sensitiveContent: Bool
     private var spoilerContent: Bool
     
     private let postListingRepository: PostListingRepositoryProtocol
@@ -94,7 +93,6 @@ public class PostListingViewModel: ObservableObject {
         self.thingModerationRepository = thingModerationRepository
         self.postRepository = postRepository
         
-        self.sensitiveContent = ContentSensitivityFilterUserDetailsUtils.sensitiveContent
         self.spoilerContent = ContentSensitivityFilterUserDetailsUtils.spoilerContent
         self.postLayout = postListingMetadata.postListingType.savedPostLayout
         
@@ -103,7 +101,6 @@ public class PostListingViewModel: ObservableObject {
                 guard let self else {
                     return
                 }
-                self.setSensitiveContent(UserDefaults.contentSensitivityFilter.bool(forKey: ContentSensitivityFilterUserDetailsUtils.sensitiveContentKey))
                 self.setSpoilerContent(UserDefaults.contentSensitivityFilter.bool(forKey: ContentSensitivityFilterUserDetailsUtils.spoilerContentKey))
                 
                 let postLayout = postListingMetadata.postListingType.savedPostLayout
@@ -112,6 +109,12 @@ public class PostListingViewModel: ObservableObject {
                         self.postLayout = postLayout
                     }
                 }
+            }
+            .store(in: &cancellables)
+        
+        NotificationCenter.default.publisher(for: Notification.Name.accountAllowSensitiveChanged)
+            .sink { [weak self] notification in
+                self?.sensitiveContentChanged(AccountAllowSensitiveNotification.isAllowSensitive(notification))
             }
             .store(in: &cancellables)
     }
@@ -229,7 +232,7 @@ public class PostListingViewModel: ObservableObject {
                     queries = ["limit": "100", "after": self.after ?? ""]
                 }
                 if postListingMetadata.postListingType.canQuerySensitiveInAPICall {
-                    queries["include_over_18"] = sensitiveContent ? "1" : "0"
+                    queries["include_over_18"] = AccountViewModel.shared.account.allowSensitive ? "1" : "0"
                 }
                 postListing = try await postListingRepository.fetchPosts(
                     postListingType: postListingMetadata.postListingType,
@@ -245,7 +248,7 @@ public class PostListingViewModel: ObservableObject {
                     queries = [key: sortType.type.rawValue, "limit": "100", "after": self.after ?? ""]
                 }
                 if postListingMetadata.postListingType.canQuerySensitiveInAPICall {
-                    queries["include_over_18"] = sensitiveContent ? "1" : "0"
+                    queries["include_over_18"] = AccountViewModel.shared.account.allowSensitive ? "1" : "0"
                 }
                 postListing = try await postListingRepository.fetchPosts(
                     postListingType: postListingMetadata.postListingType,
@@ -256,7 +259,7 @@ public class PostListingViewModel: ObservableObject {
             case .none:
                 var queries = ["limit": "100", "after": self.after ?? ""]
                 if postListingMetadata.postListingType.canQuerySensitiveInAPICall {
-                    queries["include_over_18"] = sensitiveContent ? "1" : "0"
+                    queries["include_over_18"] = AccountViewModel.shared.account.allowSensitive ? "1" : "0"
                 }
                 postListing = try await postListingRepository.fetchPosts(
                     postListingType: postListingMetadata.postListingType,
@@ -425,7 +428,7 @@ public class PostListingViewModel: ObservableObject {
             postListingType: postListingMetadata.postListingType,
             externalPostFilter: externalPostFilter
         )
-        self.postFilter?.allowSensitive = sensitiveContent
+        self.postFilter?.allowSensitive = AccountViewModel.shared.account.allowSensitive
         self.postFilter?.allowSpoiler = spoilerContent
     }
     
@@ -478,12 +481,9 @@ public class PostListingViewModel: ObservableObject {
         }
     }
     
-    func setSensitiveContent(_ sensitiveContent: Bool) {
-        if sensitiveContent != self.sensitiveContent {
-            self.sensitiveContent = sensitiveContent
-            self.postFilter?.allowSensitive = sensitiveContent
-            refreshPosts()
-        }
+    func sensitiveContentChanged(_ sensitiveContent: Bool) {
+        self.postFilter?.allowSensitive = sensitiveContent
+        refreshPosts()
     }
     
     func setSpoilerContent(_ spoilerContent: Bool) {

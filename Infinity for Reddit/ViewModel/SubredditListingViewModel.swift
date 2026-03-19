@@ -30,9 +30,6 @@ public class SubredditListingViewModel: ObservableObject {
     private var after: String? = nil
     private var lastLoadedSortType: SortType.Kind? = nil
     
-    // UserDefaults
-    private var sensitiveContent: Bool
-    
     let thingSelectionMode: ThingSelectionMode
     
     public let subredditListingRepository: SubredditListingRepositoryProtocol
@@ -79,10 +76,9 @@ public class SubredditListingViewModel: ObservableObject {
         self.sortType = SortTypeUserDetailsUtils.subredditListing
         self.subredditListingRepository = subredditListingRepository
         
-        self.sensitiveContent = ContentSensitivityFilterUserDetailsUtils.sensitiveContent
-        NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
+        NotificationCenter.default.publisher(for: Notification.Name.accountAllowSensitiveChanged)
             .sink { [weak self] _ in
-                self?.setSensitiveContent(UserDefaults.contentSensitivityFilter.bool(forKey: ContentSensitivityFilterUserDetailsUtils.sensitiveContentKey))
+                self?.sensitiveContentChanged()
             }
             .store(in: &cancellables)
     }
@@ -120,13 +116,19 @@ public class SubredditListingViewModel: ObservableObject {
             try Task.checkCancellation()
             
             let subredditListing = try await subredditListingRepository.fetchSubredditListing(
-                queries: ["q": query, "sort": sortType.rawValue, "limit": "100", "after": after ?? "", "include_over_18": sensitiveContent ? "1" : "0"]
+                queries: [
+                    "q": query,
+                    "sort": sortType.rawValue,
+                    "limit": "100",
+                    "after": after ?? "",
+                    "include_over_18": AccountViewModel.shared.account.allowSensitive ? "1" : "0"
+                ]
             )
             
             try Task.checkCancellation()
             
             let allowedSubreddits = subredditListing.subreddits.filter {
-                !($0.over18 && !sensitiveContent)
+                !($0.over18 && !AccountViewModel.shared.account.allowSensitive)
             }
             
             if (allowedSubreddits.isEmpty) {
@@ -199,11 +201,8 @@ public class SubredditListingViewModel: ObservableObject {
         }
     }
     
-    func setSensitiveContent(_ sensitiveContent: Bool) {
-        if sensitiveContent != self.sensitiveContent {
-            self.sensitiveContent = sensitiveContent
-            refreshSubreddits()
-        }
+    func sensitiveContentChanged() {
+        refreshSubreddits()
     }
     
     func toggleSelection(subreddit: Subreddit) {

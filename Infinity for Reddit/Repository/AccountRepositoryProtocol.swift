@@ -11,4 +11,5 @@ protocol AccountRepositoryProtocol {
     func startRedditLogin(contextProvider: AuthPresentationContextProvider, onCallback: @escaping (URL?, Error?) -> Void)
     func extractCode(callbackURL: URL) -> String?
     func setUpAccount(code: String) async throws
+    func getRedditSettings() async throws -> RedditSettings
 }

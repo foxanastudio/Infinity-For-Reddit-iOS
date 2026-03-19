@@ -30,9 +30,6 @@ public class UserListingViewModel: ObservableObject {
     private var after: String? = nil
     private var lastLoadedSortType: SortType.Kind? = nil
     
-    // UserDefaults
-    private var sensitiveContent: Bool
-    
     let thingSelectionMode: ThingSelectionMode
     
     public let userListingRepository: UserListingRepositoryProtocol
@@ -79,10 +76,9 @@ public class UserListingViewModel: ObservableObject {
         self.sortType = SortTypeUserDetailsUtils.userListing
         self.userListingRepository = userListingRepository
         
-        self.sensitiveContent = ContentSensitivityFilterUserDetailsUtils.sensitiveContent
-        NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
+        NotificationCenter.default.publisher(for: Notification.Name.accountAllowSensitiveChanged)
             .sink { [weak self] _ in
-                self?.setSensitiveContent(UserDefaults.contentSensitivityFilter.bool(forKey: ContentSensitivityFilterUserDetailsUtils.sensitiveContentKey))
+                self?.sensitiveContentChanged()
             }
             .store(in: &cancellables)
     }
@@ -120,7 +116,14 @@ public class UserListingViewModel: ObservableObject {
             try Task.checkCancellation()
             
             let userListing = try await userListingRepository.fetchUserListing(
-                queries: ["q": query, "type": "user", "sort": sortType.rawValue, "limit": "100", "after": after ?? "", "include_over_18": sensitiveContent ? "1" : "0"]
+                queries: [
+                    "q": query,
+                    "type": "user",
+                    "sort": sortType.rawValue,
+                    "limit": "100",
+                    "after": after ?? "",
+                    "include_over_18": AccountViewModel.shared.account.allowSensitive ? "1" : "0"
+                ]
             )
             
             try Task.checkCancellation()
@@ -195,11 +198,8 @@ public class UserListingViewModel: ObservableObject {
         }
     }
     
-    func setSensitiveContent(_ sensitiveContent: Bool) {
-        if sensitiveContent != self.sensitiveContent {
-            self.sensitiveContent = sensitiveContent
-            refreshUsers()
-        }
+    func sensitiveContentChanged() {
+        refreshUsers()
     }
     
     func toggleSelection(user: User) {

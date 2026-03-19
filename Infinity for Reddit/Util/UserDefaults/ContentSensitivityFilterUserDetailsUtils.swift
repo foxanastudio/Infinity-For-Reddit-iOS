@@ -8,11 +8,6 @@
 import Foundation
 
 enum ContentSensitivityFilterUserDetailsUtils {
-    static let sensitiveContentKey = "sensitive_content"
-    static var sensitiveContent: Bool {
-        return UserDefaults.contentSensitivityFilter.bool(forKey: sensitiveContentKey, false)
-    }
-    
     static let blurSensitiveImagesKey = "blur_sensitive_images"
     static var blurSensitiveImages: Bool {
         return UserDefaults.contentSensitivityFilter.bool(forKey: blurSensitiveImagesKey, true)

@@ -147,4 +147,13 @@ struct AccountDao {
             .publisher(in: dbPool)
             .eraseToAnyPublisher()
     }
+    
+    func updateAllowSensitive(account: Account, allowSensitive: Bool) async throws {
+        try await dbPool.write { db in
+            try db.execute(
+                sql: "UPDATE accounts SET allow_sensitive = ? WHERE username = ?",
+                arguments: [allowSensitive, account.username]
+            )
+        }
+    }
 }

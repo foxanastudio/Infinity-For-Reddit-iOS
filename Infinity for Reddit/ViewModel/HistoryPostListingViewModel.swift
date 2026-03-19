@@ -35,7 +35,6 @@ public class HistoryPostListingViewModel: ObservableObject {
     private var before: Int64? = nil
     
     // UserDefaults
-    private var sensitiveContent: Bool
     private var spoilerContent: Bool
     
     private let historyPostListingRepository: HistoryPostListingRepositoryProtocol
@@ -64,16 +63,13 @@ public class HistoryPostListingViewModel: ObservableObject {
         self.historyPostsRepository = historyPostsRepository
         self.thingModerationRepository = thingModerationRepository
         self.postRepository = postRepository
-        
-        self.sensitiveContent = ContentSensitivityFilterUserDetailsUtils.sensitiveContent
+
         self.spoilerContent = ContentSensitivityFilterUserDetailsUtils.spoilerContent
         self.postLayout = PostLayoutUserDefaultsUtils.history
         
         NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
             .sink { [weak self] _ in
-                let sensitiveContent = UserDefaults.contentSensitivityFilter.bool(forKey: ContentSensitivityFilterUserDetailsUtils.sensitiveContentKey)
                 let spoilerContent = UserDefaults.contentSensitivityFilter.bool(forKey: ContentSensitivityFilterUserDetailsUtils.spoilerContentKey)
-                self?.setSensitiveContent(sensitiveContent)
                 self?.setSpoilerContent(spoilerContent)
                 
                 let postLayout = historyPostListingMetadata.historyPostListingType.savedPostLayout
@@ -82,6 +78,12 @@ public class HistoryPostListingViewModel: ObservableObject {
                         self?.postLayout = postLayout
                     }
                 }
+            }
+            .store(in: &cancellables)
+        
+        NotificationCenter.default.publisher(for: Notification.Name.accountAllowSensitiveChanged)
+            .sink { [weak self] notification in
+                self?.sensitiveContentChanged(AccountAllowSensitiveNotification.isAllowSensitive(notification))
             }
             .store(in: &cancellables)
     }
@@ -270,7 +272,7 @@ public class HistoryPostListingViewModel: ObservableObject {
             historyPostListingType: historyPostListingMetadata.historyPostListingType,
             externalPostFilter: externalPostFilter
         )
-        self.postFilter?.allowSensitive = sensitiveContent
+        self.postFilter?.allowSensitive = AccountViewModel.shared.account.allowSensitive
         self.postFilter?.allowSpoiler = spoilerContent
     }
     
@@ -300,12 +302,9 @@ public class HistoryPostListingViewModel: ObservableObject {
         resolvedIconStringUrlCache.removeAll()
     }
     
-    func setSensitiveContent(_ sensitiveContent: Bool) {
-        if sensitiveContent != self.sensitiveContent {
-            self.sensitiveContent = sensitiveContent
-            self.postFilter?.allowSensitive = sensitiveContent
-            refreshPosts()
-        }
+    func sensitiveContentChanged(_ sensitiveContent: Bool) {
+        self.postFilter?.allowSensitive = sensitiveContent
+        refreshPosts()
     }
     
     func setSpoilerContent(_ spoilerContent: Bool) {

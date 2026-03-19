@@ -10,9 +10,11 @@ import Swinject
 import GRDB
 
 struct ContentSensitivityFilterSettingsView: View {
-    @AppStorage(ContentSensitivityFilterUserDetailsUtils.sensitiveContentKey, store: .contentSensitivityFilter) private var sensitiveContent: Bool = false
+    @EnvironmentObject private var accountViewModel: AccountViewModel
+    @EnvironmentObject private var navigationManager: NavigationManager
+
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSensitiveImagesKey, store: .contentSensitivityFilter) private var blurSensitiveImages: Bool = true
-    @AppStorage(ContentSensitivityFilterUserDetailsUtils.doNotBlurSensitiveImagesInSensitiveSubredditsKey, store: .contentSensitivityFilter) private var doNotBlurSensitiveImagesInSensitiveSubreddits: Bool = false
+    //@AppStorage(ContentSensitivityFilterUserDetailsUtils.doNotBlurSensitiveImagesInSensitiveSubredditsKey, store: .contentSensitivityFilter) private var doNotBlurSensitiveImagesInSensitiveSubreddits: Bool = false
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.spoilerContentKey, store: .contentSensitivityFilter) private var spoilerContent: Bool = true
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSpoilerImagesKey, store: .contentSensitivityFilter) private var blurSpoilerImages: Bool = false
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.disableSensitiveContentForeverKey, store: .contentSensitivityFilter) private var disableSensitiveContentForever: Bool = false
@@ -22,17 +24,17 @@ struct ContentSensitivityFilterSettingsView: View {
     var body: some View {
         RootView {
             List {
-                if !disableSensitiveContentForever {
-                    TogglePreference(isEnabled: $sensitiveContent, title: "Sensitive Content", icon: "figure.child.and.lock")
+                if !accountViewModel.account.isAnonymous() && !disableSensitiveContentForever {
+                    PreferenceEntry(title: "Reddit Settings") {
+                        navigationManager.openLink("https://www.reddit.com/settings/preferences")
+                    }
+                    .listPlainItemNoInsets()
+                    
+                    TogglePreference(isEnabled: $blurSensitiveImages, title: "Blur Sensitive Images")
                         .listPlainItemNoInsets()
                     
-                    if sensitiveContent {
-                        TogglePreference(isEnabled: $blurSensitiveImages, title: "Blur Sensitive Images")
-                            .listPlainItemNoInsets()
-                        
-                        TogglePreference(isEnabled: $doNotBlurSensitiveImagesInSensitiveSubreddits, title: "Don't Blur Senstive Images in Sensitive Subreddits")
-                            .listPlainItemNoInsets()
-                    }
+//                    TogglePreference(isEnabled: $doNotBlurSensitiveImagesInSensitiveSubreddits, title: "Don't Blur Senstive Images in Sensitive Subreddits")
+//                        .listPlainItemNoInsets()
                 }
                 
                 TogglePreference(isEnabled: $spoilerContent, title: "Spoiler Content")
@@ -43,24 +45,39 @@ struct ContentSensitivityFilterSettingsView: View {
                         .listPlainItemNoInsets()
                 }
                 
-                if sensitiveContent || disableSensitiveContentForever {
-                    CustomDivider()
-                        .listPlainItemNoInsets()
-                    
-                    CustomListSection("Dangerous Action") {
-                        TogglePreference(isEnabled: $disableSensitiveContentForever, title: "Disable Sensitive Content Forever")
-                            .listPlainItemNoInsets()
-                            .disabled(disableSensitiveContentForever)
-                    }
-                    .listPlainItemNoInsets()
-                }
+//                if !accountViewModel.account.isAnonymous() || disableSensitiveContentForever {
+//                    CustomDivider()
+//                        .listPlainItemNoInsets()
+//                    
+//                    CustomListSection("Dangerous Action") {
+//                        TogglePreference(isEnabled: $disableSensitiveContentForever, title: "Disable Sensitive Content Forever")
+//                            .listPlainItemNoInsets()
+//                            .disabled(disableSensitiveContentForever)
+//                    }
+//                    .listPlainItemNoInsets()
+//                }
             }
-            .animation(.easeInOut, value: sensitiveContent)
             .animation(.easeInOut, value: spoilerContent)
             .themedList()
         }
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Content Sensitivity Filter")
+        .task {
+            guard !accountViewModel.account.isAnonymous() else {
+                return
+            }
+            
+            await accountViewModel.setSensitiveContentFromRedditSettings()
+        }
+        .appForegroundBackgroundListener(onAppEntersForeground: {
+            guard !accountViewModel.account.isAnonymous() else {
+                return
+            }
+            
+            Task {
+                await accountViewModel.setSensitiveContentFromRedditSettings()
+            }
+        })
         .onChange(of: disableSensitiveContentForever) { _, newValue in
             if newValue {
                 withAnimation {
@@ -86,7 +103,6 @@ struct ContentSensitivityFilterSettingsView: View {
             } onDismiss: {
                 disableSensitiveContentForever = false
             } onConfirm: {
-                sensitiveContent = true
                 disableSensitiveContentForever = true
             }
         )

@@ -20,11 +20,12 @@ public struct Account: Codable, FetchableRecord, PersistableRecord, Sendable, Eq
     var karma: Int
     var isMod: Bool
     var code: String?
+    var allowSensitive: Bool
     var subscriptionSyncTime: Int64
     var customFeedSyncTime: Int64
     var createdUTC: TimeInterval
     
-    init(username: String, isCurrentUser: Bool, profileImageUrl: String? = nil, bannerImageUrl: String? = nil, karma: Int, isMod: Bool, code: String? = nil, createdUTC: TimeInterval) {
+    init(username: String, isCurrentUser: Bool, profileImageUrl: String? = nil, bannerImageUrl: String? = nil, karma: Int, isMod: Bool, code: String? = nil, allowSensitive: Bool = false, createdUTC: TimeInterval) {
         self.username = username
         self.isCurrentUser = isCurrentUser
         self.profileImageUrl = profileImageUrl
@@ -32,6 +33,7 @@ public struct Account: Codable, FetchableRecord, PersistableRecord, Sendable, Eq
         self.karma = karma
         self.isMod = isMod
         self.code = code
+        self.allowSensitive = allowSensitive
         self.subscriptionSyncTime = 0
         self.customFeedSyncTime = 0
         self.createdUTC = createdUTC
@@ -49,6 +51,7 @@ public struct Account: Codable, FetchableRecord, PersistableRecord, Sendable, Eq
         case karma
         case isMod = "is_mod"
         case code
+        case allowSensitive = "allow_sensitive"
         case subscriptionSyncTime = "subscription_sync_time"
         case customFeedSyncTime = "custom_feed_sync_time"
         case createdUTC = "created_utc"
