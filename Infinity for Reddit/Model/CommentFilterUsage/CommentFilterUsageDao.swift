@@ -46,7 +46,7 @@ struct CommentFilterUsageDao {
     
     func getAllCommentFilterUsage(name: String) async throws -> [CommentFilterUsage] {
         try await dbPool.read { db in
-            try CommentFilterUsage.fetchAll(db, sql: "SELECT * FROM comment_filter_usage WHERE name = ?", arguments: [name])
+            try CommentFilterUsage.fetchAll(db, sql: "SELECT * FROM comment_filter_usage WHERE name_of_usage = ?", arguments: [name])
         }
     }
     

@@ -98,7 +98,7 @@ struct CommentFilterDao {
                     try CommentFilter.fetchAll(db, sql: "SELECT * FROM comment_filter ORDER BY name")
                         .map { commentFilter in
                             let commentFilterUsages = try CommentFilterUsage
-                                .fetchAll(db, sql: "SELECT * FROM comment_filter_usage WHERE name = ?", arguments: [commentFilter.name])
+                                .fetchAll(db, sql: "SELECT * FROM comment_filter_usage WHERE name_of_usage = ?", arguments: [commentFilter.name])
                             return CommentFilterWithUsage(commentFilter: commentFilter, commentFilterUsageList: commentFilterUsages)
                         }
                 }

@@ -40,7 +40,7 @@ struct PostFilterUsageDao {
     
     func getAllPostFilterUsage(postFilterId: Int) async throws -> [PostFilterUsage] {
         try await dbPool.read { db in
-            try PostFilterUsage.fetchAll(db, sql: "SELECT * FROM post_filter_usage WHERE postFilterId = ?", arguments: [postFilterId])
+            try PostFilterUsage.fetchAll(db, sql: "SELECT * FROM post_filter_usage WHERE post_filter_id = ?", arguments: [postFilterId])
         }
     }
 
