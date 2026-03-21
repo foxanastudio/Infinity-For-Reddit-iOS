@@ -97,43 +97,8 @@ struct Infinity: App {
                         }
                     
                     if showAppLockScreen {
-                        GeometryReader { geo in
-                            ZStack {
-                                VStack(spacing: 24) {
-                                    RowText("Let’s make sure you’re really you!")
-                                        .primaryText(.f56)
-                                    
-                                    RowText("We will use Face ID to verify your identity.")
-                                        .secondaryText(.f24)
-                                    
-                                    Spacer()
-                                }
-                                
-                                VStack(spacing: 0) {
-                                    Spacer()
-                                        .frame(height: geo.size.height / 3 * 2)
-                                    
-                                    Button {
-                                        authenticate()
-                                    } label: {
-                                        Text("Yep, That’s Me!")
-                                            .buttonText(.f24)
-                                    }
-                                    .filledButton()
-                                    
-                                    Spacer()
-                                }
-                            }
+                        AppLockView(authenticate: authenticate)
                             .zIndex(1)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .padding(32)
-                            .background(.ultraThinMaterial)
-                        }
-                        .transition(.opacity)
-                        .task {
-                            try? await Task.sleep(for: .seconds(1))
-                            authenticate()
-                        }
                     }
                 }
             }
@@ -189,6 +154,49 @@ struct Infinity: App {
             context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, authenticationError in
                 authenticationSuccess = success
             }
+        }
+    }
+}
+
+struct AppLockView: View {
+    let authenticate: () -> Void
+    
+    var body: some View {
+        GeometryReader { geo in
+            ZStack {
+                VStack(spacing: 24) {
+                    RowText("Let’s make sure you’re really you!")
+                        .primaryText(.f56)
+                    
+                    RowText("We will use Face ID to verify your identity.")
+                        .secondaryText(.f24)
+                    
+                    Spacer()
+                }
+                
+                VStack(spacing: 0) {
+                    Spacer()
+                        .frame(height: geo.size.height / 3 * 2)
+                    
+                    Button {
+                        authenticate()
+                    } label: {
+                        Text("Yep, That’s Me!")
+                            .buttonText(.f24)
+                    }
+                    .filledButton()
+                    
+                    Spacer()
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(32)
+            .background(.ultraThinMaterial)
+        }
+        .transition(.opacity)
+        .task {
+            try? await Task.sleep(for: .seconds(1))
+            authenticate()
         }
     }
 }
