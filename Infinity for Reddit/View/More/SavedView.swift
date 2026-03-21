@@ -63,7 +63,6 @@ struct SavedView: View {
         }
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Saved")
-        .id(accountViewModel.account.username)
         .toolbar {
             NavigationBarMenu()
         }

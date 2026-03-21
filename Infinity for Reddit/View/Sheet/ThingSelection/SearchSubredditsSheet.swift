@@ -30,7 +30,6 @@ struct SearchSubredditsSheet: View {
                 $0.addTitleToInlineNavigationBar("Search Subreddits")
             }
         }
-        .id(accountViewModel.account.username)
         .sheet(item: $queryItem) { queryItem in
             NavigationStack {
                 SubredditSearchResultSheet(query: queryItem.query) { thing in

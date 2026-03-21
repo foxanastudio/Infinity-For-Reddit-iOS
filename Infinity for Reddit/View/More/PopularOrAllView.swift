@@ -21,7 +21,6 @@ struct PopularOrAllView: View {
                 params: nil
             )
         )
-        .id(accountViewModel.account.username)
         .themedNavigationBar()
         .addTitleToInlineNavigationBar(subredditName.capitalized, 1.0)
     }

@@ -98,7 +98,6 @@ struct CopyCustomFeedView: View {
                 }
             }
         }
-        .id(accountViewModel.account.username)
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Copy Custom Feed")
         .toolbar {

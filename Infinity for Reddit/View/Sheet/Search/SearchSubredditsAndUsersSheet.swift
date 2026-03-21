@@ -22,7 +22,6 @@ struct SearchSubredditsAndUsersSheet: View {
                 queryItem = Item(query: query)
             }
         }
-        .id(accountViewModel.account.username)
         .modify {
             if #available(iOS 26, *) {
                 $0

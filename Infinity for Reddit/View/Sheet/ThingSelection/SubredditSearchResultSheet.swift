@@ -36,7 +36,6 @@ struct SubredditSearchResultSheet: View {
         )
             .themedNavigationBar()
             .addTitleToInlineNavigationBar("Subreddits")
-            .id(accountViewModel.account.username)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {

@@ -213,7 +213,6 @@ struct SubredditDetailsView: View {
                 NavigationBarMenu()
             }
         }
-        .id(accountViewModel.account.username)
         .onAppear {
             if let key = navigationBarMenuKey {
                 navigationBarMenuManager.pop(key: key)

@@ -126,7 +126,6 @@ struct CreateOrEditCustomFeedView: View {
                 }
             }
         }
-        .id(accountViewModel.account.username)
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("\(createOrEditCustomFeedViewModel.customFeedToEdit != nil ? "Edit" : "Create") Custom Feed")
         .toolbar {

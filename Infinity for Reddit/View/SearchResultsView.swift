@@ -84,7 +84,6 @@ struct SearchResultsView: View {
         }
         .themedNavigationBar()
         .addTitleToInlineNavigationBar(searchResultsViewModel.query)
-        .id(accountViewModel.account.username)
         .toolbar {
             NavigationBarMenu()
         }

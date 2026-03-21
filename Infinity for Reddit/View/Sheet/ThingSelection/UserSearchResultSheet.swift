@@ -34,7 +34,6 @@ struct UserSearchResultSheet: View {
         UserListingView(account: accountViewModel.account, userListingViewModel: userListingViewModel)
             .themedNavigationBar()
             .addTitleToInlineNavigationBar("Users")
-            .id(accountViewModel.account.username)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {

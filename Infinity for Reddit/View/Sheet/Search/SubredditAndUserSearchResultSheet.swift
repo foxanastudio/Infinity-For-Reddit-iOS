@@ -143,7 +143,6 @@ struct SubredditAndUserSearchResultSheet: View {
                 }
             }
         }
-        .id(accountViewModel.account.username)
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Select")
         .toolbar {

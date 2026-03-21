@@ -18,6 +18,5 @@ struct HistoryView: View {
         ))
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("History")
-        .id(accountViewModel.account.username)
     }
 }

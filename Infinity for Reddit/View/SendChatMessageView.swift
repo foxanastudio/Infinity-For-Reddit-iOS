@@ -87,7 +87,6 @@ struct SendChatMessageView: View {
                 }
             }
         }
-        .id(accountViewModel.account.username)
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Send Chat Message")
         .toolbar {

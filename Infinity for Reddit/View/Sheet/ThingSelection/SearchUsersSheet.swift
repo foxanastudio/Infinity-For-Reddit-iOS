@@ -31,7 +31,6 @@ struct SearchUsersSheet: View {
                 $0.addTitleToInlineNavigationBar("Search Users")
             }
         }
-        .id(accountViewModel.account.username)
         .sheet(item: $queryItem) { queryItem in
             NavigationStack {
                 UserSearchResultSheet(query: queryItem.query) { thing in
