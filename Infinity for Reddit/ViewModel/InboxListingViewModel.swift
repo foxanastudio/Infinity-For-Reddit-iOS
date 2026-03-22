@@ -75,13 +75,14 @@ public class InboxListingViewModel: ObservableObject {
             self.isInitialLoading = false
             self.isLoadingMore = false
         } catch {
-            self.error = error
+            if !(error is CancellationError) {
+                self.error = error
+                printInDebugOnly("Error fetching inboxes: \(error)")
+            }
             
             self.isInitialLoad = isInitailLoadCopy
             self.isInitialLoading = false
             self.isLoadingMore = false
-            
-            printInDebugOnly("Error fetching inboxes: \(error)")
         }
     }
     
