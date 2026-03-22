@@ -14,32 +14,18 @@ struct AnonymousSubscribedSubredditListingMultiSelectionView: View {
 
     
     var body: some View {
-        Group {
-            if anonymousSubscriptionListingViewModel.subredditSubscriptions.isEmpty {
+        if anonymousSubscriptionListingViewModel.subredditSubscriptions.isEmpty {
+            ZStack {
                 Text("No subscribed subreddits")
                     .primaryText()
-            } else {
-                List {
-                    if !anonymousSubscriptionListingViewModel.favoriteSubredditSubscriptions.isEmpty {
-                        StaticListSection("Favorite")
-                        
-                        ForEach(anonymousSubscriptionListingViewModel.favoriteSubredditSubscriptions, id: \.fullName) { subscription in
-                            SubscriptionItemMultiSelectionView(
-                                text: subscription.name,
-                                iconUrl: subscription.iconUrl,
-                                isSelected: isSubredditSelected(subscription)
-                            ) {
-                                toggleSelection(subscription)
-                            }
-                            .listPlainItemNoInsets()
-                        }
-                    }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            List {
+                if !anonymousSubscriptionListingViewModel.favoriteSubredditSubscriptions.isEmpty {
+                    StaticListSection("Favorite")
                     
-                    if !anonymousSubscriptionListingViewModel.favoriteSubredditSubscriptions.isEmpty {
-                        StaticListSection("All")
-                    }
-                    
-                    ForEach(anonymousSubscriptionListingViewModel.subredditSubscriptions, id: \.fullName) { subscription in
+                    ForEach(anonymousSubscriptionListingViewModel.favoriteSubredditSubscriptions, id: \.fullName) { subscription in
                         SubscriptionItemMultiSelectionView(
                             text: subscription.name,
                             iconUrl: subscription.iconUrl,
@@ -47,12 +33,29 @@ struct AnonymousSubscribedSubredditListingMultiSelectionView: View {
                         ) {
                             toggleSelection(subscription)
                         }
+                        .limitedWidth()
                         .listPlainItemNoInsets()
                     }
                 }
-                .scrollBounceBehavior(.basedOnSize)
-                .themedList()
+                
+                if !anonymousSubscriptionListingViewModel.favoriteSubredditSubscriptions.isEmpty {
+                    StaticListSection("All")
+                }
+                
+                ForEach(anonymousSubscriptionListingViewModel.subredditSubscriptions, id: \.fullName) { subscription in
+                    SubscriptionItemMultiSelectionView(
+                        text: subscription.name,
+                        iconUrl: subscription.iconUrl,
+                        isSelected: isSubredditSelected(subscription)
+                    ) {
+                        toggleSelection(subscription)
+                    }
+                    .limitedWidth()
+                    .listPlainItemNoInsets()
+                }
             }
+            .scrollBounceBehavior(.basedOnSize)
+            .themedList()
         }
     }
     

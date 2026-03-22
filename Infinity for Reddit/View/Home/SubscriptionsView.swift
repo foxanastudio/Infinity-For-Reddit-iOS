@@ -47,9 +47,11 @@ struct SubscriptionsView: View {
                     )
                     .padding(4)
                 case .subredditMultiSelection:
-                    EmptyView()
+                    Spacer()
+                        .frame(height: 16)
                 case .userMultiSelection:
-                    EmptyView()
+                    Spacer()
+                        .frame(height: 16)
                 default:
                     SegmentedPicker(
                         selectedValue: $selectedOption,
@@ -77,7 +79,9 @@ struct SubscriptionsView: View {
                 .padding(.leading, 12)
                 .background(Color(hex: customThemeViewModel.currentCustomTheme.filledCardViewBackgroundColor))
                 .cornerRadius(10)
+                .limitedWidth()
                 .padding(.horizontal, 16)
+                .padding(.bottom, 16)
                 
                 ZStack {
                     switch subscriptionListingViewModel.subscriptionSelectionMode {
@@ -137,8 +141,9 @@ struct SubscriptionsView: View {
                         HStack {
                             Text("Done")
                         }
-                        .frame(maxWidth: .infinity)
+                        .limitedWidth()
                     }
+                    .limitedWidth()
                     .padding(16)
                     .filledButton()
                 case .subredditMultiSelection(_, let onConfirmSelection):
@@ -149,8 +154,9 @@ struct SubscriptionsView: View {
                         HStack {
                             Text("Done")
                         }
-                        .frame(maxWidth: .infinity)
+                        .limitedWidth()
                     }
+                    .limitedWidth()
                     .padding(16)
                     .filledButton()
                 case .userMultiSelection(_, let onConfirmSelection):
@@ -161,8 +167,9 @@ struct SubscriptionsView: View {
                         HStack {
                             Text("Done")
                         }
-                        .frame(maxWidth: .infinity)
+                        .limitedWidth()
                     }
+                    .limitedWidth()
                     .padding(16)
                     .filledButton()
                 default:

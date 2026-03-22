@@ -13,46 +13,29 @@ struct SubscribedUserListingMultiSelectionView: View {
     @ObservedObject var subscriptionListingViewModel: SubscriptionListingViewModel
     
     var body: some View {
-        RootView {
-            if subscriptionListingViewModel.userSubscriptions.isEmpty {
-                ZStack {
-                    if subscriptionListingViewModel.isLoadingSubscriptions {
-                        ProgressIndicator()
-                    } else if let error = subscriptionListingViewModel.subscribedThingListingError {
-                        Text("Unable to load subscribed users. Tap to retry. Error: \(error.localizedDescription)")
-                            .primaryText()
-                            .padding(16)
-                            .onTapGesture {
-                                subscriptionListingViewModel.refreshSubscriptions()
-                            }
-                    } else {
-                        Text("No subscribed users")
-                            .primaryText()
-                    }
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                List {
-                    if !subscriptionListingViewModel.favoriteUserSubscriptions.isEmpty {
-                        StaticListSection("Favorite")
-                        
-                        ForEach(subscriptionListingViewModel.favoriteUserSubscriptions, id: \.name) { subscription in
-                            SubscriptionItemMultiSelectionView(
-                                text: subscription.name,
-                                iconUrl: subscription.iconUrl,
-                                isSelected: isUserSelected(subscription)
-                            ) {
-                                toggleSelection(subscription)
-                            }
-                            .listPlainItemNoInsets()
+        if subscriptionListingViewModel.userSubscriptions.isEmpty {
+            ZStack {
+                if subscriptionListingViewModel.isLoadingSubscriptions {
+                    ProgressIndicator()
+                } else if let error = subscriptionListingViewModel.subscribedThingListingError {
+                    Text("Unable to load subscribed users. Tap to retry. Error: \(error.localizedDescription)")
+                        .primaryText()
+                        .padding(16)
+                        .onTapGesture {
+                            subscriptionListingViewModel.refreshSubscriptions()
                         }
-                    }
+                } else {
+                    Text("No subscribed users")
+                        .primaryText()
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            List {
+                if !subscriptionListingViewModel.favoriteUserSubscriptions.isEmpty {
+                    StaticListSection("Favorite")
                     
-                    if !subscriptionListingViewModel.favoriteUserSubscriptions.isEmpty {
-                        StaticListSection("All")
-                    }
-                    
-                    ForEach(subscriptionListingViewModel.userSubscriptions, id: \.name) { subscription in
+                    ForEach(subscriptionListingViewModel.favoriteUserSubscriptions, id: \.name) { subscription in
                         SubscriptionItemMultiSelectionView(
                             text: subscription.name,
                             iconUrl: subscription.iconUrl,
@@ -60,12 +43,29 @@ struct SubscribedUserListingMultiSelectionView: View {
                         ) {
                             toggleSelection(subscription)
                         }
+                        .limitedWidth()
                         .listPlainItemNoInsets()
                     }
                 }
-                .scrollBounceBehavior(.basedOnSize)
-                .themedList()
+                
+                if !subscriptionListingViewModel.favoriteUserSubscriptions.isEmpty {
+                    StaticListSection("All")
+                }
+                
+                ForEach(subscriptionListingViewModel.userSubscriptions, id: \.name) { subscription in
+                    SubscriptionItemMultiSelectionView(
+                        text: subscription.name,
+                        iconUrl: subscription.iconUrl,
+                        isSelected: isUserSelected(subscription)
+                    ) {
+                        toggleSelection(subscription)
+                    }
+                    .limitedWidth()
+                    .listPlainItemNoInsets()
+                }
             }
+            .scrollBounceBehavior(.basedOnSize)
+            .themedList()
         }
     }
     

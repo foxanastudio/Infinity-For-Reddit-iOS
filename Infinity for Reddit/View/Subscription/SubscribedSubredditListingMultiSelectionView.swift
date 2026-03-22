@@ -11,46 +11,29 @@ struct SubscribedSubredditListingMultiSelectionView: View {
     @ObservedObject var subscriptionListingViewModel: SubscriptionListingViewModel
 
     var body: some View {
-        RootView {
-            if subscriptionListingViewModel.subredditSubscriptions.isEmpty {
-                ZStack {
-                    if subscriptionListingViewModel.isLoadingSubscriptions {
-                        ProgressIndicator()
-                    } else if let error = subscriptionListingViewModel.subscribedThingListingError {
-                        Text("Unable to load subscribed subreddits. Tap to retry. Error: \(error.localizedDescription)")
-                            .primaryText()
-                            .padding(16)
-                            .onTapGesture {
-                                subscriptionListingViewModel.refreshSubscriptions()
-                            }
-                    } else {
-                        Text("No subscribed subreddits")
-                            .primaryText()
-                    }
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                List {
-                    if !subscriptionListingViewModel.favoriteSubredditSubscriptions.isEmpty {
-                        StaticListSection("Favorite")
-                        
-                        ForEach(subscriptionListingViewModel.favoriteSubredditSubscriptions, id: \.fullName) { subscription in
-                            SubscriptionItemMultiSelectionView(
-                                text: subscription.name,
-                                iconUrl: subscription.iconUrl,
-                                isSelected: isSubredditSelected(subscription)
-                            ) {
-                                toggleSelection(subscription)
-                            }
-                            .listPlainItemNoInsets()
+        if subscriptionListingViewModel.subredditSubscriptions.isEmpty {
+            ZStack {
+                if subscriptionListingViewModel.isLoadingSubscriptions {
+                    ProgressIndicator()
+                } else if let error = subscriptionListingViewModel.subscribedThingListingError {
+                    Text("Unable to load subscribed subreddits. Tap to retry. Error: \(error.localizedDescription)")
+                        .primaryText()
+                        .padding(16)
+                        .onTapGesture {
+                            subscriptionListingViewModel.refreshSubscriptions()
                         }
-                    }
+                } else {
+                    Text("No subscribed subreddits")
+                        .primaryText()
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            List {
+                if !subscriptionListingViewModel.favoriteSubredditSubscriptions.isEmpty {
+                    StaticListSection("Favorite")
                     
-                    if !subscriptionListingViewModel.favoriteSubredditSubscriptions.isEmpty {
-                        StaticListSection("All")
-                    }
-                    
-                    ForEach(subscriptionListingViewModel.subredditSubscriptions, id: \.fullName) { subscription in
+                    ForEach(subscriptionListingViewModel.favoriteSubredditSubscriptions, id: \.fullName) { subscription in
                         SubscriptionItemMultiSelectionView(
                             text: subscription.name,
                             iconUrl: subscription.iconUrl,
@@ -58,12 +41,29 @@ struct SubscribedSubredditListingMultiSelectionView: View {
                         ) {
                             toggleSelection(subscription)
                         }
+                        .limitedWidth()
                         .listPlainItemNoInsets()
                     }
                 }
-                .scrollBounceBehavior(.basedOnSize)
-                .themedList()
+                
+                if !subscriptionListingViewModel.favoriteSubredditSubscriptions.isEmpty {
+                    StaticListSection("All")
+                }
+                
+                ForEach(subscriptionListingViewModel.subredditSubscriptions, id: \.fullName) { subscription in
+                    SubscriptionItemMultiSelectionView(
+                        text: subscription.name,
+                        iconUrl: subscription.iconUrl,
+                        isSelected: isSubredditSelected(subscription)
+                    ) {
+                        toggleSelection(subscription)
+                    }
+                    .limitedWidth()
+                    .listPlainItemNoInsets()
+                }
             }
+            .scrollBounceBehavior(.basedOnSize)
+            .themedList()
         }
     }
     

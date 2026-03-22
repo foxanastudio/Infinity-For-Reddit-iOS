@@ -22,53 +22,18 @@ struct AnonymousSubscribedSubredditListingView: View {
     }
     
     var body: some View {
-        RootView {
-            if anonymousSubscriptionListingViewModel.subredditSubscriptions.isEmpty {
-                ZStack {
-                    Text("No subscribed subreddits")
-                        .primaryText()
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                List {
-                    if !anonymousSubscriptionListingViewModel.favoriteSubredditSubscriptions.isEmpty {
-                        StaticListSection("Favorite")
-                        
-                        ForEach(anonymousSubscriptionListingViewModel.favoriteSubredditSubscriptions, id: \.fullName) { subscription in
-                            SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
-                                if let onSelectCustomAction {
-                                    onSelectCustomAction(subscription)
-                                } else {
-                                    navigationManager.append(AppNavigation.subredditDetails(subredditName: subscription.name))
-                                }
-                            }) {
-                                subscription.isFavorite.toggle()
-                                anonymousSubscriptionListingViewModel.toggleFavoriteSubreddit(subscription)
-                            }
-                            .limitedWidth()
-                            .id(ObjectIdentifier(subscription))
-                            .listPlainItemNoInsets()
-                            .applyIf(onSelectCustomAction == nil) {
-                                $0.swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                    Button(role: .destructive) {
-                                        Task {
-                                            await anonymousSubscriptionListingViewModel.unsubscribeFromSubreddit(subscription)
-                                        }
-                                    } label: {
-                                        Text("Unsubscribe")
-                                            .foregroundStyle(.white)
-                                    }
-                                    .tint(.red)
-                                }
-                            }
-                        }
-                    }
+        if anonymousSubscriptionListingViewModel.subredditSubscriptions.isEmpty {
+            ZStack {
+                Text("No subscribed subreddits")
+                    .primaryText()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            List {
+                if !anonymousSubscriptionListingViewModel.favoriteSubredditSubscriptions.isEmpty {
+                    StaticListSection("Favorite")
                     
-                    if !anonymousSubscriptionListingViewModel.favoriteSubredditSubscriptions.isEmpty {
-                        StaticListSection("All")
-                    }
-                    
-                    ForEach(anonymousSubscriptionListingViewModel.subredditSubscriptions, id: \.fullName) { subscription in
+                    ForEach(anonymousSubscriptionListingViewModel.favoriteSubredditSubscriptions, id: \.fullName) { subscription in
                         SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
                             if let onSelectCustomAction {
                                 onSelectCustomAction(subscription)
@@ -97,9 +62,42 @@ struct AnonymousSubscribedSubredditListingView: View {
                         }
                     }
                 }
-                .scrollBounceBehavior(.basedOnSize)
-                .themedList()
+                
+                if !anonymousSubscriptionListingViewModel.favoriteSubredditSubscriptions.isEmpty {
+                    StaticListSection("All")
+                }
+                
+                ForEach(anonymousSubscriptionListingViewModel.subredditSubscriptions, id: \.fullName) { subscription in
+                    SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
+                        if let onSelectCustomAction {
+                            onSelectCustomAction(subscription)
+                        } else {
+                            navigationManager.append(AppNavigation.subredditDetails(subredditName: subscription.name))
+                        }
+                    }) {
+                        subscription.isFavorite.toggle()
+                        anonymousSubscriptionListingViewModel.toggleFavoriteSubreddit(subscription)
+                    }
+                    .limitedWidth()
+                    .id(ObjectIdentifier(subscription))
+                    .listPlainItemNoInsets()
+                    .applyIf(onSelectCustomAction == nil) {
+                        $0.swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button(role: .destructive) {
+                                Task {
+                                    await anonymousSubscriptionListingViewModel.unsubscribeFromSubreddit(subscription)
+                                }
+                            } label: {
+                                Text("Unsubscribe")
+                                    .foregroundStyle(.white)
+                            }
+                            .tint(.red)
+                        }
+                    }
+                }
             }
+            .scrollBounceBehavior(.basedOnSize)
+            .themedList()
         }
     }
 }

@@ -22,53 +22,18 @@ struct AnonymousSubscribedUserListingView: View {
     }
     
     var body: some View {
-        RootView {
-            if anonymousSubscriptionListingViewModel.userSubscriptions.isEmpty {
-                ZStack {
-                    Text("No subscribed users")
-                        .primaryText()
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                List {
-                    if !anonymousSubscriptionListingViewModel.favoriteUserSubscriptions.isEmpty {
-                        StaticListSection("Favorite")
-                        
-                        ForEach(anonymousSubscriptionListingViewModel.favoriteUserSubscriptions, id: \.name) { subscription in
-                            SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
-                                if let onSelectCustomAction {
-                                    onSelectCustomAction(subscription)
-                                } else {
-                                    navigationManager.append(AppNavigation.userDetails(username: subscription.name))
-                                }
-                            }) {
-                                subscription.isFavorite.toggle()
-                                anonymousSubscriptionListingViewModel.toggleFavoriteUser(subscription)
-                            }
-                            .limitedWidth()
-                            .id(ObjectIdentifier(subscription))
-                            .listPlainItemNoInsets()
-                            .applyIf(onSelectCustomAction == nil) {
-                                $0.swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                    Button(role: .destructive) {
-                                        Task {
-                                            await anonymousSubscriptionListingViewModel.unfollowUser(subscription)
-                                        }
-                                    } label: {
-                                        Text("Unfollow")
-                                            .foregroundStyle(.white)
-                                    }
-                                    .tint(.red)
-                                }
-                            }
-                        }
-                    }
+        if anonymousSubscriptionListingViewModel.userSubscriptions.isEmpty {
+            ZStack {
+                Text("No subscribed users")
+                    .primaryText()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            List {
+                if !anonymousSubscriptionListingViewModel.favoriteUserSubscriptions.isEmpty {
+                    StaticListSection("Favorite")
                     
-                    if !anonymousSubscriptionListingViewModel.favoriteUserSubscriptions.isEmpty {
-                        StaticListSection("All")
-                    }
-                    
-                    ForEach(anonymousSubscriptionListingViewModel.userSubscriptions, id: \.name) { subscription in
+                    ForEach(anonymousSubscriptionListingViewModel.favoriteUserSubscriptions, id: \.name) { subscription in
                         SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
                             if let onSelectCustomAction {
                                 onSelectCustomAction(subscription)
@@ -97,9 +62,42 @@ struct AnonymousSubscribedUserListingView: View {
                         }
                     }
                 }
-                .scrollBounceBehavior(.basedOnSize)
-                .themedList()
+                
+                if !anonymousSubscriptionListingViewModel.favoriteUserSubscriptions.isEmpty {
+                    StaticListSection("All")
+                }
+                
+                ForEach(anonymousSubscriptionListingViewModel.userSubscriptions, id: \.name) { subscription in
+                    SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
+                        if let onSelectCustomAction {
+                            onSelectCustomAction(subscription)
+                        } else {
+                            navigationManager.append(AppNavigation.userDetails(username: subscription.name))
+                        }
+                    }) {
+                        subscription.isFavorite.toggle()
+                        anonymousSubscriptionListingViewModel.toggleFavoriteUser(subscription)
+                    }
+                    .limitedWidth()
+                    .id(ObjectIdentifier(subscription))
+                    .listPlainItemNoInsets()
+                    .applyIf(onSelectCustomAction == nil) {
+                        $0.swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button(role: .destructive) {
+                                Task {
+                                    await anonymousSubscriptionListingViewModel.unfollowUser(subscription)
+                                }
+                            } label: {
+                                Text("Unfollow")
+                                    .foregroundStyle(.white)
+                            }
+                            .tint(.red)
+                        }
+                    }
+                }
             }
+            .scrollBounceBehavior(.basedOnSize)
+            .themedList()
         }
     }
 }

@@ -46,9 +46,11 @@ struct AnonymousSubscriptionsView: View {
                     )
                     .padding(4)
                 case .subredditMultiSelection:
-                    EmptyView()
+                    Spacer()
+                        .frame(height: 16)
                 case .userMultiSelection:
-                    EmptyView()
+                    Spacer()
+                        .frame(height: 16)
                 default:
                     SegmentedPicker(
                         selectedValue: $selectedOption,
@@ -76,7 +78,9 @@ struct AnonymousSubscriptionsView: View {
                 .padding(.leading, 12)
                 .background(Color(hex: customThemeViewModel.currentCustomTheme.filledCardViewBackgroundColor))
                 .cornerRadius(10)
+                .limitedWidth()
                 .padding(.horizontal, 16)
+                .padding(.bottom, 16)
                 
                 ZStack {
                     switch anonymousSubscriptionListingViewModel.subscriptionSelectionMode {
@@ -132,8 +136,9 @@ struct AnonymousSubscriptionsView: View {
                         HStack {
                             Text("Done")
                         }
-                        .frame(maxWidth: .infinity)
+                        .limitedWidth()
                     }
+                    .limitedWidth()
                     .padding(16)
                     .filledButton()
                 case .subredditMultiSelection(_, let onConfirmSelection):
@@ -144,8 +149,9 @@ struct AnonymousSubscriptionsView: View {
                         HStack {
                             Text("Done")
                         }
-                        .frame(maxWidth: .infinity)
+                        .limitedWidth()
                     }
+                    .limitedWidth()
                     .padding(16)
                     .filledButton()
                 case .userMultiSelection(_, let onConfirmSelection):
@@ -156,8 +162,9 @@ struct AnonymousSubscriptionsView: View {
                         HStack {
                             Text("Done")
                         }
-                        .frame(maxWidth: .infinity)
+                        .limitedWidth()
                     }
+                    .limitedWidth()
                     .padding(16)
                     .filledButton()
                 default:
@@ -200,47 +207,18 @@ struct AnonymousSubscriptionsView: View {
         @ObservedObject var anonymousSubscriptionListingViewModel: AnonymousSubscriptionListingViewModel
         
         var body: some View {
-            RootView {
-                if anonymousSubscriptionListingViewModel.myCustomFeeds.isEmpty {
-                    ZStack {
-                        Text("No custom feeds")
-                            .primaryText()
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    List {
-                        if !anonymousSubscriptionListingViewModel.favoriteMyCustomFeeds.isEmpty {
-                            StaticListSection("Favorite")
-                            
-                            ForEach(anonymousSubscriptionListingViewModel.favoriteMyCustomFeeds, id: \.path) { customFeed in
-                                SubscriptionItemView(text: customFeed.displayName, iconUrl: customFeed.iconUrl, isFavorite: customFeed.isFavorite, action: {
-                                    navigationManager.append(AppNavigation.customFeed(customFeed: .myCustomFeed(customFeed)))
-                                }) {
-                                    customFeed.isFavorite.toggle()
-                                    anonymousSubscriptionListingViewModel.toggleFavoriteCustomFeed(customFeed)
-                                }
-                                .limitedWidth()
-                                .id(ObjectIdentifier(customFeed))
-                                .listPlainItemNoInsets()
-                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                    Button(role: .destructive) {
-                                        Task {
-                                            await anonymousSubscriptionListingViewModel.deleteCustomFeed(customFeed)
-                                        }
-                                    } label: {
-                                        Text("Delete")
-                                            .foregroundStyle(.white)
-                                    }
-                                    .tint(.red)
-                                }
-                            }
-                        }
+            if anonymousSubscriptionListingViewModel.myCustomFeeds.isEmpty {
+                ZStack {
+                    Text("No custom feeds")
+                        .primaryText()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                List {
+                    if !anonymousSubscriptionListingViewModel.favoriteMyCustomFeeds.isEmpty {
+                        StaticListSection("Favorite")
                         
-                        if !anonymousSubscriptionListingViewModel.favoriteMyCustomFeeds.isEmpty {
-                            StaticListSection("All")
-                        }
-                        
-                        ForEach(anonymousSubscriptionListingViewModel.myCustomFeeds, id: \.path) { customFeed in
+                        ForEach(anonymousSubscriptionListingViewModel.favoriteMyCustomFeeds, id: \.path) { customFeed in
                             SubscriptionItemView(text: customFeed.displayName, iconUrl: customFeed.iconUrl, isFavorite: customFeed.isFavorite, action: {
                                 navigationManager.append(AppNavigation.customFeed(customFeed: .myCustomFeed(customFeed)))
                             }) {
@@ -263,9 +241,36 @@ struct AnonymousSubscriptionsView: View {
                             }
                         }
                     }
-                    .scrollBounceBehavior(.basedOnSize)
-                    .themedList()
+                    
+                    if !anonymousSubscriptionListingViewModel.favoriteMyCustomFeeds.isEmpty {
+                        StaticListSection("All")
+                    }
+                    
+                    ForEach(anonymousSubscriptionListingViewModel.myCustomFeeds, id: \.path) { customFeed in
+                        SubscriptionItemView(text: customFeed.displayName, iconUrl: customFeed.iconUrl, isFavorite: customFeed.isFavorite, action: {
+                            navigationManager.append(AppNavigation.customFeed(customFeed: .myCustomFeed(customFeed)))
+                        }) {
+                            customFeed.isFavorite.toggle()
+                            anonymousSubscriptionListingViewModel.toggleFavoriteCustomFeed(customFeed)
+                        }
+                        .limitedWidth()
+                        .id(ObjectIdentifier(customFeed))
+                        .listPlainItemNoInsets()
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button(role: .destructive) {
+                                Task {
+                                    await anonymousSubscriptionListingViewModel.deleteCustomFeed(customFeed)
+                                }
+                            } label: {
+                                Text("Delete")
+                                    .foregroundStyle(.white)
+                            }
+                            .tint(.red)
+                        }
+                    }
                 }
+                .scrollBounceBehavior(.basedOnSize)
+                .themedList()
             }
         }
     }

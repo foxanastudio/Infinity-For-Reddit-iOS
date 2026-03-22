@@ -27,84 +27,47 @@ struct SubscribedSubredditListingView: View {
     }
     
     var body: some View {
-        RootView {
-            if subscriptionListingViewModel.subredditSubscriptions.isEmpty {
-                VStack {
-                    if showCurrentAccountSubreddit && !accountViewModel.account.isAnonymous() {
-                        CurrentAccountSubredditView(
-                            account: accountViewModel.account,
-                            onSelectCustomAction: onSelectCustomAction
-                        )
-                    }
-                    
-                    Spacer()
-                    
-                    if subscriptionListingViewModel.isLoadingSubscriptions {
-                        ProgressIndicator()
-                    } else if let error = subscriptionListingViewModel.subscribedThingListingError {
-                        Text("Unable to load subscribed subreddits. Tap to retry. Error: \(error.localizedDescription)")
-                            .primaryText()
-                            .padding(16)
-                            .onTapGesture {
-                                subscriptionListingViewModel.refreshSubscriptions()
-                            }
-                    } else {
-                        Text("No subscribed subreddits")
-                            .primaryText()
-                    }
-                    
-                    Spacer()
+        if subscriptionListingViewModel.subredditSubscriptions.isEmpty {
+            VStack {
+                if showCurrentAccountSubreddit && !accountViewModel.account.isAnonymous() {
+                    CurrentAccountSubredditView(
+                        account: accountViewModel.account,
+                        onSelectCustomAction: onSelectCustomAction
+                    )
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                List {
-                    if showCurrentAccountSubreddit && !accountViewModel.account.isAnonymous() {
-                        CurrentAccountSubredditView(
-                            account: accountViewModel.account,
-                            onSelectCustomAction: onSelectCustomAction
-                        )
-                    }
-                    
-                    if !subscriptionListingViewModel.favoriteSubredditSubscriptions.isEmpty {
-                        StaticListSection("Favorite")
-                        
-                        ForEach(subscriptionListingViewModel.favoriteSubredditSubscriptions, id: \.fullName) { subscription in
-                            SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
-                                if let onSelectCustomAction {
-                                    onSelectCustomAction(subscription)
-                                } else {
-                                    navigationManager.append(AppNavigation.subredditDetails(subredditName: subscription.name))
-                                }
-                            }) {
-                                subscription.isFavorite.toggle()
-                                Task {
-                                    await subscriptionListingViewModel.toggleFavoriteSubreddit(subscription)
-                                }
-                            }
-                            .limitedWidth()
-                            .id(ObjectIdentifier(subscription))
-                            .listPlainItemNoInsets()
-                            .applyIf(onSelectCustomAction == nil) {
-                                $0.swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                    Button(role: .destructive) {
-                                        Task {
-                                            await subscriptionListingViewModel.unsubscribeFromSubreddit(subscription)
-                                        }
-                                    } label: {
-                                        Text("Unsubscribe")
-                                            .foregroundStyle(.white)
-                                    }
-                                    .tint(.red)
-                                }
-                            }
+                
+                Spacer()
+                
+                if subscriptionListingViewModel.isLoadingSubscriptions {
+                    ProgressIndicator()
+                } else if let error = subscriptionListingViewModel.subscribedThingListingError {
+                    Text("Unable to load subscribed subreddits. Tap to retry. Error: \(error.localizedDescription)")
+                        .primaryText()
+                        .padding(16)
+                        .onTapGesture {
+                            subscriptionListingViewModel.refreshSubscriptions()
                         }
-                    }
+                } else {
+                    Text("No subscribed subreddits")
+                        .primaryText()
+                }
+                
+                Spacer()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            List {
+                if showCurrentAccountSubreddit && !accountViewModel.account.isAnonymous() {
+                    CurrentAccountSubredditView(
+                        account: accountViewModel.account,
+                        onSelectCustomAction: onSelectCustomAction
+                    )
+                }
+                
+                if !subscriptionListingViewModel.favoriteSubredditSubscriptions.isEmpty {
+                    StaticListSection("Favorite")
                     
-                    if !subscriptionListingViewModel.favoriteSubredditSubscriptions.isEmpty {
-                        StaticListSection("All")
-                    }
-                    
-                    ForEach(subscriptionListingViewModel.subredditSubscriptions, id: \.fullName) { subscription in
+                    ForEach(subscriptionListingViewModel.favoriteSubredditSubscriptions, id: \.fullName) { subscription in
                         SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
                             if let onSelectCustomAction {
                                 onSelectCustomAction(subscription)
@@ -135,9 +98,44 @@ struct SubscribedSubredditListingView: View {
                         }
                     }
                 }
-                .scrollBounceBehavior(.basedOnSize)
-                .themedList()
+                
+                if !subscriptionListingViewModel.favoriteSubredditSubscriptions.isEmpty {
+                    StaticListSection("All")
+                }
+                
+                ForEach(subscriptionListingViewModel.subredditSubscriptions, id: \.fullName) { subscription in
+                    SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
+                        if let onSelectCustomAction {
+                            onSelectCustomAction(subscription)
+                        } else {
+                            navigationManager.append(AppNavigation.subredditDetails(subredditName: subscription.name))
+                        }
+                    }) {
+                        subscription.isFavorite.toggle()
+                        Task {
+                            await subscriptionListingViewModel.toggleFavoriteSubreddit(subscription)
+                        }
+                    }
+                    .limitedWidth()
+                    .id(ObjectIdentifier(subscription))
+                    .listPlainItemNoInsets()
+                    .applyIf(onSelectCustomAction == nil) {
+                        $0.swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button(role: .destructive) {
+                                Task {
+                                    await subscriptionListingViewModel.unsubscribeFromSubreddit(subscription)
+                                }
+                            } label: {
+                                Text("Unsubscribe")
+                                    .foregroundStyle(.white)
+                            }
+                            .tint(.red)
+                        }
+                    }
+                }
             }
+            .scrollBounceBehavior(.basedOnSize)
+            .themedList()
         }
     }
     

@@ -15,66 +15,29 @@ struct SubscribedUserListingView: View {
     let onSelectCustomAction: ((SubscribedUserData) -> Void)?
     
     var body: some View {
-        RootView {
-            if subscriptionListingViewModel.userSubscriptions.isEmpty {
-                ZStack {
-                    if subscriptionListingViewModel.isLoadingSubscriptions {
-                        ProgressIndicator()
-                    } else if let error = subscriptionListingViewModel.subscribedThingListingError {
-                        Text("Unable to load subscribed users. Tap to retry. Error: \(error.localizedDescription)")
-                            .primaryText()
-                            .padding(16)
-                            .onTapGesture {
-                                subscriptionListingViewModel.refreshSubscriptions()
-                            }
-                    } else {
-                        Text("No subscribed users")
-                            .primaryText()
-                    }
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                List {
-                    if !subscriptionListingViewModel.favoriteUserSubscriptions.isEmpty {
-                        StaticListSection("Favorite")
-                        
-                        ForEach(subscriptionListingViewModel.favoriteUserSubscriptions, id: \.name) { subscription in
-                            SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
-                                if let onSelectCustomAction = onSelectCustomAction {
-                                    onSelectCustomAction(subscription)
-                                } else {
-                                    navigationManager.append(AppNavigation.userDetails(username: subscription.name))
-                                }
-                            }) {
-                                subscription.isFavorite.toggle()
-                                Task {
-                                    await subscriptionListingViewModel.toggleFavoriteUser(subscription)
-                                }
-                            }
-                            .limitedWidth()
-                            .id(ObjectIdentifier(subscription))
-                            .listPlainItemNoInsets()
-                            .applyIf(onSelectCustomAction == nil) {
-                                $0.swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                    Button(role: .destructive) {
-                                        Task {
-                                            await subscriptionListingViewModel.unfollowUser(subscription)
-                                        }
-                                    } label: {
-                                        Text("Unfollow")
-                                            .foregroundStyle(.white)
-                                    }
-                                    .tint(.red)
-                                }
-                            }
+        if subscriptionListingViewModel.userSubscriptions.isEmpty {
+            ZStack {
+                if subscriptionListingViewModel.isLoadingSubscriptions {
+                    ProgressIndicator()
+                } else if let error = subscriptionListingViewModel.subscribedThingListingError {
+                    Text("Unable to load subscribed users. Tap to retry. Error: \(error.localizedDescription)")
+                        .primaryText()
+                        .padding(16)
+                        .onTapGesture {
+                            subscriptionListingViewModel.refreshSubscriptions()
                         }
-                    }
+                } else {
+                    Text("No subscribed users")
+                        .primaryText()
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            List {
+                if !subscriptionListingViewModel.favoriteUserSubscriptions.isEmpty {
+                    StaticListSection("Favorite")
                     
-                    if !subscriptionListingViewModel.favoriteUserSubscriptions.isEmpty {
-                        StaticListSection("All")
-                    }
-                    
-                    ForEach(subscriptionListingViewModel.userSubscriptions, id: \.name) { subscription in
+                    ForEach(subscriptionListingViewModel.favoriteUserSubscriptions, id: \.name) { subscription in
                         SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
                             if let onSelectCustomAction = onSelectCustomAction {
                                 onSelectCustomAction(subscription)
@@ -105,9 +68,44 @@ struct SubscribedUserListingView: View {
                         }
                     }
                 }
-                .scrollBounceBehavior(.basedOnSize)
-                .themedList()
+                
+                if !subscriptionListingViewModel.favoriteUserSubscriptions.isEmpty {
+                    StaticListSection("All")
+                }
+                
+                ForEach(subscriptionListingViewModel.userSubscriptions, id: \.name) { subscription in
+                    SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
+                        if let onSelectCustomAction = onSelectCustomAction {
+                            onSelectCustomAction(subscription)
+                        } else {
+                            navigationManager.append(AppNavigation.userDetails(username: subscription.name))
+                        }
+                    }) {
+                        subscription.isFavorite.toggle()
+                        Task {
+                            await subscriptionListingViewModel.toggleFavoriteUser(subscription)
+                        }
+                    }
+                    .limitedWidth()
+                    .id(ObjectIdentifier(subscription))
+                    .listPlainItemNoInsets()
+                    .applyIf(onSelectCustomAction == nil) {
+                        $0.swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button(role: .destructive) {
+                                Task {
+                                    await subscriptionListingViewModel.unfollowUser(subscription)
+                                }
+                            } label: {
+                                Text("Unfollow")
+                                    .foregroundStyle(.white)
+                            }
+                            .tint(.red)
+                        }
+                    }
+                }
             }
+            .scrollBounceBehavior(.basedOnSize)
+            .themedList()
         }
     }
 }
