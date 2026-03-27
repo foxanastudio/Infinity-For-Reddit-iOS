@@ -1,5 +1,5 @@
 <h1 align="center">
-  Infinity For Reddit <a href="https://www.patreon.com/docile_alligator"><img align="center" src="https://img.shields.io/badge/Patreon-F96854?style=for-the-badge&logo=patreon&logoColor=white" alt="Patreon"></a>
+  Infinity For Reddit <a href="https://www.patreon.com/docile_alligator" target="_blank"><img align="center" src="https://img.shields.io/badge/Patreon-F96854?style=for-the-badge&logo=patreon&logoColor=white" alt="Patreon"></a>
 </h1>
 
 <div align="center">
@@ -15,7 +15,7 @@ The infinitely better Reddit experience
 With Infinity, you can browse Reddit completely ad-free and without distractions. Everything stays smooth, organized, and customizable, whether you’re managing dozens of subscriptions, exploring multiple communities, or diving deep into discussions. Infinity for Reddit is open source and built with a focus on performance, privacy, transparency, and user control.
 
 <div align="center">
-  <a href="https://apps.apple.com/us/app/infinity-for-reddit/id6759064642">
+  <a href="https://apps.apple.com/us/app/infinity-for-reddit/id6759064642" target="_blank">
       <img alt="Download on the App Store" width="200" src="images/app_store_badge.svg" />
   </a>
 </div>
@@ -24,7 +24,7 @@ With Infinity, you can browse Reddit completely ad-free and without distractions
 ### 📱 Also available on Android
 Infinity for Reddit has an Android version as well. Check it out here: [Infinity for Reddit](https://github.com/Docile-Alligator/Infinity-For-Reddit)
 
-<a href="https://play.google.com/store/apps/details?id=ml.docilealligator.infinityforreddit.plus">
+<a href="https://play.google.com/store/apps/details?id=ml.docilealligator.infinityforreddit.plus" target="_blank">
   <img alt="Get it on Google Play" height="60" src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" />
 </a>
 
