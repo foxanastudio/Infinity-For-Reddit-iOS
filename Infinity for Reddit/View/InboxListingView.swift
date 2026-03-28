@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct InboxListingView: View {
+    @EnvironmentObject var homeViewModel: HomeViewModel
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     
@@ -61,7 +62,10 @@ struct InboxListingView: View {
                         } else {
                             InboxNotificationItemView(inbox: inbox, hasReadAllMessages: hasReadAllMessages) {
                                 navigationManager.openLink(inbox.context)
-                                inboxListingViewModel.markAsRead(inbox: inbox)
+                                if inbox.isNew {
+                                    inboxListingViewModel.markAsRead(inbox: inbox)
+                                    homeViewModel.inboxCount = max(0, homeViewModel.inboxCount - 1)
+                                }
                             }
                             .limitedWidth()
                         }

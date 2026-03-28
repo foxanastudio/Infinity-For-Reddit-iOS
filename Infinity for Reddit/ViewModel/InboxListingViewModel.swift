@@ -99,9 +99,13 @@ public class InboxListingViewModel: ObservableObject {
     }
     
     func markAsRead(inbox: Inbox) {
+        guard inbox.isNew else {
+            return
+        }
+        inbox.isNew = false
+        
         Task {
             try? await inboxListingRepository.markAsRead(inbox: inbox, interceptor: nil)
-            inbox.isNew = false
         }
     }
 }
