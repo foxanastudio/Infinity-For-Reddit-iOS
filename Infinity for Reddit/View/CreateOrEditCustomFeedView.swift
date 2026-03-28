@@ -74,7 +74,8 @@ struct CreateOrEditCustomFeedView: View {
                                 hint: "Description",
                                 text: $createOrEditCustomFeedViewModel.description,
                                 selectedRange: $descriptionSelectedRange,
-                                canFocus: $descriptionCanFocus
+                                canFocus: $descriptionCanFocus,
+                                minHeight: 100
                             )
                             .contentShape(Rectangle())
                             .padding(16)

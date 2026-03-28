@@ -12,6 +12,7 @@ struct MarkdownTextField: View {
     @Binding var text: String
     @Binding var selectedRange: NSRange
     @Binding var canFocus: Bool
+    var minHeight: CGFloat? = nil
     
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -23,6 +24,7 @@ struct MarkdownTextField: View {
                     .secondaryText()
             }
         }
+        .frame(maxWidth: .infinity, minHeight: minHeight ?? 0, alignment: .topLeading)
     }
 }
 

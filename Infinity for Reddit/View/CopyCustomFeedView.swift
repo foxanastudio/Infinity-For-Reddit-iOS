@@ -75,7 +75,8 @@ struct CopyCustomFeedView: View {
                                 hint: "Description",
                                 text: $copyCustomFeedViewModel.description,
                                 selectedRange: $descriptionSelectedRange,
-                                canFocus: $descriptionCanFocus
+                                canFocus: $descriptionCanFocus,
+                                minHeight: 100
                             )
                             .contentShape(Rectangle())
                             .padding(16)

@@ -104,7 +104,7 @@ struct SubmitCommentView: View {
                                     submitCommentViewModel.selectedAccount = $0
                                 }
                                 
-                                MarkdownTextField(hint: "Your interesting thoughts here", text: $submitCommentViewModel.text, selectedRange: $selectedRange, canFocus: $textViewCanFocus)
+                                MarkdownTextField(hint: "Your interesting thoughts here", text: $submitCommentViewModel.text, selectedRange: $selectedRange, canFocus: $textViewCanFocus, minHeight: 300)
                                     .contentShape(Rectangle())
                                     .padding(16)
                             }
