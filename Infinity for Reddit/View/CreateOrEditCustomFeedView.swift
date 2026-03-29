@@ -74,13 +74,14 @@ struct CreateOrEditCustomFeedView: View {
                                 hint: "Description",
                                 text: $createOrEditCustomFeedViewModel.description,
                                 selectedRange: $descriptionSelectedRange,
-                                canFocus: $descriptionCanFocus,
-                                minHeight: 100
+                                canFocus: $descriptionCanFocus
                             )
                             .contentShape(Rectangle())
                             .padding(16)
                             
                             if !accountViewModel.account.isAnonymous() {
+                                CustomDivider()
+                                
                                 TouchRipple(action: {
                                     createOrEditCustomFeedViewModel.isPrivate.toggle()
                                 }) {

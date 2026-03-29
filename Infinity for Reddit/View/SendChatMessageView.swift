@@ -62,8 +62,7 @@ struct SendChatMessageView: View {
                             hint: "Subject",
                             text: $sendChatMessageViewModel.subject,
                             selectedRange: $subjectSelectedRange,
-                            canFocus: $subjectCanFocus,
-                            minHeight: 48
+                            canFocus: $subjectCanFocus
                         )
                         .contentShape(Rectangle())
                         .padding(16)

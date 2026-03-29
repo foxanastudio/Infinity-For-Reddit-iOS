@@ -92,9 +92,15 @@ struct EditPostView: View {
                             
                             CustomDivider()
                             
-                            MarkdownTextField(hint: "Your new interesting thoughts here", text: $editPostViewModel.text, selectedRange: $selectedRange, canFocus: $textViewCanFocus, minHeight: 300)
-                                .contentShape(Rectangle())
-                                .padding(16)
+                            MarkdownTextField(
+                                hint: "Your new interesting thoughts here",
+                                text: $editPostViewModel.text,
+                                selectedRange: $selectedRange,
+                                canFocus: $textViewCanFocus,
+                                minHeight: 300
+                            )
+                            .contentShape(Rectangle())
+                            .padding(16)
                         }
                     }
                     

@@ -78,9 +78,15 @@ struct SubmitTextPostView: View {
                                 .padding(.horizontal, 16)
                                 .padding(.top, 16)
 
-                                MarkdownTextField(hint: "Content", text: $submitTextPostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus, minHeight: 100)
-                                    .contentShape(Rectangle())
-                                    .padding(16)
+                                MarkdownTextField(
+                                    hint: "Content",
+                                    text: $submitTextPostViewModel.content,
+                                    selectedRange: $bodySelectedRange,
+                                    canFocus: $contentTextViewCanFocus,
+                                    minHeight: 300
+                                )
+                                .contentShape(Rectangle())
+                                .padding(16)
                             }
                         }
                         

@@ -24,7 +24,7 @@ struct MarkdownTextField: View {
                     .secondaryText()
             }
         }
-        .frame(maxWidth: .infinity, minHeight: minHeight ?? 0, alignment: .topLeading)
+        .frame(minHeight: minHeight)
     }
 }
 
