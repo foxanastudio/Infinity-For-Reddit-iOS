@@ -18,43 +18,10 @@ class AccountRepository: AccountRepositoryProtocol {
     private var authenticationSession: ASWebAuthenticationSession?
     
     enum AccountError: LocalizedError {
-        case internalError
-        case failedToGetAccessTokenNetworkError
-        case failedToGetAccessTokenEmptyResponse
-        case failedToGetAccessToken
-        case noAccessTokenInResponse
-        case failedToParseAccessToken
-        case failedToGetMyInfoNetworkError
-        case failedToGetMyInfoEmptyResponse
-        case failedToGetMyInfo
-        case failedToParseAccountInfo
-        case failedToSaveAccountInfo
         case failedToGetRedditSettings
         
         var errorDescription: String? {
             switch self {
-            case .internalError:
-                return "Internal error."
-            case .failedToGetAccessTokenNetworkError:
-                return "Failed to get access token: network error."
-            case .failedToGetAccessTokenEmptyResponse:
-                return "Failed to get access token: empty response."
-            case .failedToGetAccessToken:
-                return "Failed to get access token."
-            case .noAccessTokenInResponse:
-                return "Failed to get access token: invalid response."
-            case .failedToParseAccessToken:
-                return "Failed to parse access token."
-            case .failedToGetMyInfoNetworkError:
-                return "Failed to get my info: network error."
-            case .failedToGetMyInfoEmptyResponse:
-                return "Failed to get my info: empty response."
-            case .failedToGetMyInfo:
-                return "Failed to get my info."
-            case .failedToParseAccountInfo:
-                return "Failed to parse account info."
-            case .failedToSaveAccountInfo:
-                return "Failed to save account info."
             case .failedToGetRedditSettings:
                 return "Failed to get Reddit settings."
             }
@@ -123,7 +90,7 @@ class AccountRepository: AccountRepositoryProtocol {
         let credentials = "\(APIUtils.CLIENT_ID):"
         
         guard let encodedData = credentials.data(using: .utf8) else {
-            throw AccountError.internalError
+            throw LoginError.internalError
         }
         
         let base64Credentials = encodedData.base64EncodedString()
@@ -139,25 +106,25 @@ class AccountRepository: AccountRepositoryProtocol {
                 .serializingString(automaticallyCancelling: true)
                 .value
         } catch {
-            throw AccountError.failedToGetAccessTokenNetworkError
+            throw LoginError.failedToGetAccessTokenNetworkError
         }
         
         guard !accessTokenResponse.isEmpty else {
-            throw AccountError.failedToGetAccessTokenEmptyResponse
+            throw LoginError.failedToGetAccessTokenEmptyResponse
         }
         
         guard let data = accessTokenResponse.data(using: .utf8) else {
-            throw AccountError.failedToGetAccessToken
+            throw LoginError.failedToGetAccessToken
         }
         
         guard let responseJSON = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
-            throw AccountError.failedToParseAccessToken
+            throw LoginError.failedToParseAccessToken
         }
         
         guard let accessToken = responseJSON["access_token"] as? String,
            let refreshToken = responseJSON["refresh_token"] as? String else {
             printInDebugOnly("Error: Tokens not found in response")
-            throw AccountError.noAccessTokenInResponse
+            throw LoginError.noAccessTokenInResponse
         }
         
         printInDebugOnly("Access Token: \(accessToken)")
@@ -175,20 +142,20 @@ class AccountRepository: AccountRepositoryProtocol {
                 .value
         } catch {
             printInDebugOnly("Error: \(error.localizedDescription)")
-            throw AccountError.failedToGetMyInfoNetworkError
+            throw LoginError.failedToGetMyInfoNetworkError
         }
         
         guard !response.isEmpty else {
             printInDebugOnly("Error: Empty response from Reddit")
-            throw AccountError.failedToGetMyInfoEmptyResponse
+            throw LoginError.failedToGetMyInfoEmptyResponse
         }
         
         guard let myInfo = response.data(using: .utf8) else {
-            throw AccountError.failedToGetMyInfo
+            throw LoginError.failedToGetMyInfo
         }
         
         guard let jsonResponse = try? JSON(data: myInfo) else {
-            throw AccountError.failedToParseAccountInfo
+            throw LoginError.failedToParseAccountInfo
         }
         
         let name = jsonResponse[JSONUtils.NAME_KEY].stringValue
@@ -216,7 +183,7 @@ class AccountRepository: AccountRepositoryProtocol {
             try RedditAccessTokenKeychainManager.shared.saveRefreshToken(accountName: name, refreshToken: refreshToken)
         } catch {
             printInDebugOnly("Error: Failed to insert account - \(error.localizedDescription)")
-            throw AccountError.failedToSaveAccountInfo
+            throw LoginError.failedToSaveAccountInfo
         }
     }
     

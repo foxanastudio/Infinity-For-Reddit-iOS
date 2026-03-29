@@ -39,15 +39,12 @@ public class AccountViewModel: ObservableObject {
     private var cancellables: Set<AnyCancellable> = []
     
     enum AccountError: LocalizedError {
-        case failedToLogin
         case failedToUnmarkCurrentAccount
         case failedToMarkNewAccountCurrent
         case failedToObserveCurrentAccount
         
         var errorDescription: String? {
             switch self {
-            case .failedToLogin:
-                return "Failed to log in."
             case .failedToUnmarkCurrentAccount:
                 return "Failed to remove the current account."
             case .failedToMarkNewAccountCurrent:
@@ -90,14 +87,24 @@ public class AccountViewModel: ObservableObject {
                             }
                         }
                     }
+                } else {
+                    printInDebugOnly("No code found in callback URL: \(callbackURL)")
+                    self.error = LoginError.failedToLoginNoCodeInCallbackURL
                 }
             } else if let error {
                 if let errorCode = (error as? NSError)?.code {
                     if errorCode != ASWebAuthenticationSessionError.Code.canceledLogin.rawValue {
                         printInDebugOnly(error.localizedDescription)
-                        self.error = AccountError.failedToLogin
+                        self.error = LoginError.failedToLogin
+                    } else {
+                        // Don't show this error.
+                        //self.error = LoginError.failedToLoginCanceled
                     }
+                } else {
+                    self.error = LoginError.failedToLoginNoNSErrorCode
                 }
+            } else {
+                self.error = LoginError.failedToLoginUnknownError
             }
         }
     }
