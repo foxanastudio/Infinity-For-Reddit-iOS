@@ -29,7 +29,6 @@ struct SearchSubredditsAndUsersSheet: View {
                 $0.addTitleToInlineNavigationBar(navigationBarTitle)
             }
         }
-
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {

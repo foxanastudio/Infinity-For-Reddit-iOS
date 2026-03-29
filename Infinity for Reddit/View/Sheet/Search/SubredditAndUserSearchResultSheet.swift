@@ -43,7 +43,7 @@ struct SubredditAndUserSearchResultSheet: View {
         SheetRootView {
             VStack(spacing: 0) {
                 switch thingSelectionMode {
-                case .subredditAndUserMultiSelection:
+                case .thingSelection, .subredditAndUserMultiSelection:
                     SegmentedPicker(selectedValue: $selectedOption, values: ["Subreddits", "Users"])
                         .padding(4)
                 default:
@@ -52,6 +52,22 @@ struct SubredditAndUserSearchResultSheet: View {
                 
                 ZStack {
                     switch thingSelectionMode {
+                    case .thingSelection:
+                        SubredditListingView(
+                            account: accountViewModel.account,
+                            subredditListingViewModel: subredditListingViewModel,
+                            isPresented: selectedOption == 0
+                        )
+                        .opacity(selectedOption == 0 ? 1 : 0)
+                        .allowsHitTesting(selectedOption == 0)
+                        
+                        UserListingView(
+                            account: accountViewModel.account,
+                            userListingViewModel: userListingViewModel,
+                            isPresented: selectedOption == 1
+                        )
+                        .opacity(selectedOption == 1 ? 1 : 0)
+                        .allowsHitTesting(selectedOption == 1)
                     case .subredditAndUserMultiSelection:
                         SubredditListingView(
                             account: accountViewModel.account,
