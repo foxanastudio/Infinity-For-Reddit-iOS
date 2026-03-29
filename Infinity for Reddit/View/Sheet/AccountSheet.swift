@@ -16,6 +16,8 @@ struct AccountSheet: View {
     
     @StateObject var accountListingViewModel: AccountListingViewModel
     
+    @State private var showLoginHelpMessage: Bool = false
+    
     private let profileImageSize: CGFloat = 86
     private let onLogin: () -> Void
     
@@ -31,7 +33,7 @@ struct AccountSheet: View {
     var body: some View {
         SheetRootView {
             ScrollView {
-                VStack(spacing: 20) {
+                VStack(spacing: 0) {
                     ZStack {
                         CustomWebImage(
                             accountViewModel.account.bannerImageUrl,
@@ -63,57 +65,106 @@ struct AccountSheet: View {
                         )
                     }
                     
-                    VStack(spacing: 0) {
-                        VStack {
-                            Text(accountViewModel.account.isAnonymous() == true ? "Anonymous" : accountViewModel.account.username)
-                                .primaryText(.f24)
-                                .fontWeight(.bold)
-                            
-                            if accountViewModel.account.isAnonymous() != true {
-                                Text("Karma: \(accountViewModel.account.karma)")
-                                    .primaryText()
-                            }
-                            
-                            Spacer()
-                                .frame(height: 8)
-                        }
+                    Spacer()
+                        .frame(height: 20)
+                    
+                    VStack {
+                        Text(accountViewModel.account.isAnonymous() == true ? "Anonymous" : accountViewModel.account.username)
+                            .primaryText(.f24)
+                            .fontWeight(.bold)
                         
                         if accountViewModel.account.isAnonymous() != true {
-                            SimpleTouchItemRow(text: "Profile", icon: "person.crop.circle") {
-                                dismiss()
-                                navigationManager.append(AppNavigation.userDetails(username: accountViewModel.account.username))
+                            Text("Karma: \(accountViewModel.account.karma)")
+                                .primaryText()
+                        }
+                        
+                        Spacer()
+                            .frame(height: 8)
+                    }
+                    
+                    if accountViewModel.account.isAnonymous() != true {
+                        SimpleTouchItemRow(text: "Profile", icon: "person.crop.circle") {
+                            dismiss()
+                            navigationManager.append(AppNavigation.userDetails(username: accountViewModel.account.username))
+                        }
+                    }
+                    
+                    ForEach(accountListingViewModel.otherAccounts, id: \.username) { account in
+                        SimpleWebImageTouchItemRow(text: account.username, iconUrl: account.profileImageUrl ?? "") {
+                            AccountViewModel.shared.switchAccount(newAccount: account)
+                            dismiss()
+                        }
+                    }
+                    
+                    SimpleTouchItemRow(text: "Add account", icon: "person.crop.circle.badge.plus") {
+                        onLogin()
+                    }
+                    
+                    if accountViewModel.account.isAnonymous() == false {
+                        SimpleTouchItemRow(text: "Use Anonymous Mode", icon: "person.fill.questionmark") {
+                            do {
+                                try accountViewModel.switchToAnonymous()
+                            } catch {
+                                printInDebugOnly("Failed to log out: \(error)")
                             }
+                            dismiss()
                         }
                         
-                        ForEach(accountListingViewModel.otherAccounts, id: \.username) { account in
-                            SimpleWebImageTouchItemRow(text: account.username, iconUrl: account.profileImageUrl ?? "") {
-                                AccountViewModel.shared.switchAccount(newAccount: account)
-                                dismiss()
+                        SimpleTouchItemRow(text: "Log out", icon: "rectangle.portrait.and.arrow.right") {
+                            do {
+                                try accountViewModel.logout()
+                            } catch {
+                                printInDebugOnly("Failed to log out: \(error)")
                             }
+                            dismiss()
                         }
-                        
-                        SimpleTouchItemRow(text: "Add account", icon: "person.crop.circle.badge.plus") {
-                            onLogin()
+                    }
+                    
+                    SimpleTouchItemRow(text: "Having trouble signing in?", icon: "info.circle") {
+                        withAnimation {
+                            showLoginHelpMessage = true
                         }
-                        
-                        if accountViewModel.account.isAnonymous() == false {
-                            SimpleTouchItemRow(text: "Use Anonymous Mode", icon: "person.fill.questionmark") {
-                                do {
-                                    try accountViewModel.switchToAnonymous()
-                                } catch {
-                                    printInDebugOnly("Failed to log out: \(error)")
+                    }
+                }
+            }
+        }
+        .overlay {
+            if showLoginHelpMessage {
+                RootView {
+                    VStack(spacing: 16) {
+                        HStack(spacing: 0) {
+                            Text("Contact Us")
+                                .neutralTextButton()
+                                .onTapGesture {
+                                    if let url = URL(string: "mailto:support@foxanastudio.com") {
+                                        UIApplication.shared.open(url)
+                                    }
                                 }
-                                dismiss()
-                            }
                             
-                            SimpleTouchItemRow(text: "Log out", icon: "rectangle.portrait.and.arrow.right") {
-                                do {
-                                    try accountViewModel.logout()
-                                } catch {
-                                    printInDebugOnly("Failed to log out: \(error)")
+                            Spacer()
+                            
+                            Text("Done")
+                                .positiveTextButton()
+                                .onTapGesture {
+                                    withAnimation {
+                                        showLoginHelpMessage = false
+                                    }
                                 }
-                                dismiss()
-                            }
+                        }
+                        .padding(.top, 16)
+                        .padding(.horizontal, 16)
+                        
+                        ScrollView {
+                            RowText(
+                                    """
+                                    If the keyboard isn’t appearing, try zooming out of the webpage. Click the reader icon in the toolbar (next to the refresh button), then tap the zoom control at the bottom and reduce the zoom level.\n
+                                    This should allow the webpage to display the cookie agreement prompt. Please select “Agree” when it appears.\n
+                                    If needed, you can adjust the zoom level back to your preferred size afterward.\n
+                                    If you need further assistance, feel free to contact us by email: support@foxanastudio.com
+                                    """
+                            )
+                            .padding(.bottom, 16)
+                            .padding(.horizontal, 16)
                         }
                     }
                 }
