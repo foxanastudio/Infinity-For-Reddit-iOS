@@ -12,6 +12,7 @@ import GRDB
 struct ContentSensitivityFilterSettingsView: View {
     @EnvironmentObject private var accountViewModel: AccountViewModel
     @EnvironmentObject private var navigationManager: NavigationManager
+    @EnvironmentObject var snackbarManager: SnackbarManager
 
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSensitiveImagesKey, store: .contentSensitivityFilter) private var blurSensitiveImages: Bool = true
     //@AppStorage(ContentSensitivityFilterUserDetailsUtils.doNotBlurSensitiveImagesInSensitiveSubredditsKey, store: .contentSensitivityFilter) private var doNotBlurSensitiveImagesInSensitiveSubreddits: Bool = false
@@ -67,7 +68,11 @@ struct ContentSensitivityFilterSettingsView: View {
                 return
             }
             
-            await accountViewModel.setSensitiveContentFromRedditSettings()
+            if await accountViewModel.setSensitiveContentFromRedditSettings() {
+                snackbarManager.showSnackbar(.info("Content preferences synced."))
+            } else {
+                snackbarManager.showSnackbar(.info("Failed to sync content preferences."))
+            }
         }
         .appForegroundBackgroundListener(onAppEntersForeground: {
             guard !accountViewModel.account.isAnonymous() else {
@@ -75,7 +80,11 @@ struct ContentSensitivityFilterSettingsView: View {
             }
             
             Task {
-                await accountViewModel.setSensitiveContentFromRedditSettings()
+                if await accountViewModel.setSensitiveContentFromRedditSettings() {
+                    snackbarManager.showSnackbar(.info("Content preferences synced."))
+                } else {
+                    snackbarManager.showSnackbar(.info("Failed to sync content preferences."))
+                }
             }
         })
         .onChange(of: disableSensitiveContentForever) { _, newValue in

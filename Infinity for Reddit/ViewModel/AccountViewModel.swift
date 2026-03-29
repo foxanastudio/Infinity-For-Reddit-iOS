@@ -153,7 +153,7 @@ public class AccountViewModel: ObservableObject {
     }
     
     @MainActor
-    func setSensitiveContentFromRedditSettings() async {
+    func setSensitiveContentFromRedditSettings() async -> Bool {
         do {
             let redditSettings = try await accountRepository.getRedditSettings()
             if account.allowSensitive != redditSettings.over18 {
@@ -161,8 +161,10 @@ public class AccountViewModel: ObservableObject {
                 
                 AccountAllowSensitiveNotification.post(allowSensitive: redditSettings.over18)
             }
+            return true
         } catch {
             self.error = error
+            return false
         }
     }
 
