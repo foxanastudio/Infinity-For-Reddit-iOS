@@ -1,5 +1,5 @@
 {
-  "originHash" : "b618980142d5463ceb2e43c34a472016bfd325c4f5522ed2a58d6f367adaaa67",
+  "originHash" : "e6b0b8f5a6528151a2579ad359200aaee6c5082af973823400775ceadc97a8c0",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -142,7 +142,7 @@
       "location" : "https://github.com/Docile-Alligator/swift-markdown-ui.git",
       "state" : {
         "branch" : "main",
-        "revision" : "af0d7f31191cbd4450338364bc8b6f5b723b41b2"
+        "revision" : "00d8c244e9bf7ef0e6797f7ca9b1434aec3c15d2"
       }
     },
     {
