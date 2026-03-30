@@ -193,6 +193,7 @@ struct AccountSheet: View {
                                     If the keyboard isn’t appearing, try zooming out of the webpage. Click the reader icon in the toolbar (next to the refresh button), then tap the zoom control at the bottom and reduce the zoom level.\n
                                     This should allow the webpage to display the cookie agreement prompt. Please select “Agree” when it appears.\n
                                     If needed, you can adjust the zoom level back to your preferred size afterward.\n
+                                    If you don't see any cookie agreement dialog, you can tap the same reader icon and then tap the 3-dot icon next to the zoom control, and select Request Desktop Site. Or you can rotate your phone into landscape mode. Keyboard will now open when you click on the username or password field.\n
                                     If you need further assistance, feel free to contact us by email: support@foxanastudio.com
                                     """
                             )
