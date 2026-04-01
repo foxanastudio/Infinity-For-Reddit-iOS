@@ -112,6 +112,16 @@ struct MoreView: View {
                     .limitedWidth()
                 }
                 
+                if !accountViewModel.account.isAnonymous() {
+                    CustomListSection("Moderating") {
+                        SimpleTouchItemRow(text: "Mod Mail", icon: "envelope.badge.shield.half.filled") {
+                            navigationManager.append(MoreViewNavigation.modmail)
+                        }
+                        .listPlainItemNoInsets()
+                        .limitedWidth()
+                    }
+                }
+                
                 CustomListSection("Preferences") {
                     SimpleTouchItemRow(text: "Settings", icon: "gearshape") {
                         navigationManager.append(MoreViewNavigation.settings)

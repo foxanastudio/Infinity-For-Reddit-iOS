@@ -196,6 +196,9 @@ struct CustomNavigationStack<Content: View>: View {
                     case .test:
                         TestView()
                             .environmentObject(navigationManager)
+                    case .modmail:
+                        ModMailView()
+                            .environmentObject(navigationManager)
                     }
                 }
                 .navigationDestination(for: SettingsViewNavigation.self) { destination in
