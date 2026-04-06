@@ -315,8 +315,8 @@ struct CustomNavigationStack<Content: View>: View {
     }
     
     var homeTabPostListingMetadata: PostListingMetadata {
-        let nameOfHomeTabPostFeed = InterfaceUserDefaultsUtils.nameOfHomeTabPostFeed
-        switch InterfaceUserDefaultsUtils.homeTabPostFeedType {
+        let nameOfHomeTabPostFeed = InterfaceUserDefaultsUtils.getNameOfHomeTabPostFeed(account: accountViewModel.account)
+        switch InterfaceUserDefaultsUtils.getHomeTabPostFeedType(account: accountViewModel.account) {
         case HomeTabPostFeedType.subreddit.rawValue:
             return PostListingMetadata(
                 postListingType:.subreddit(subredditName: nameOfHomeTabPostFeed),

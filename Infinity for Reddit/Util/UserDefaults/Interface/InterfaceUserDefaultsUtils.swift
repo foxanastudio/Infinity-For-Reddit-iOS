@@ -8,20 +8,20 @@
 import Foundation
 
 class InterfaceUserDefaultsUtils {
-    static let homeTabPostFeedTypeKey = "home_tab_post_feed_type"
-    static var homeTabPostFeedType: Int {
-        return UserDefaults.interface.integer(forKey: homeTabPostFeedTypeKey)
+    static let homeTabPostFeedTypeKeyBase = "home_tab_post_feed_type_"
+    static func getHomeTabPostFeedType(account: Account) -> Int {
+        return UserDefaults.interface.integer(forKey: homeTabPostFeedTypeKeyBase + account.username)
     }
-    static func setHomeTabPostFeedType(_ newValue: HomeTabPostFeedType) {
-        UserDefaults.interface.set(newValue.rawValue, forKey: homeTabPostFeedTypeKey)
+    static func setHomeTabPostFeedType(account: Account, _ newValue: HomeTabPostFeedType) {
+        UserDefaults.interface.set(newValue.rawValue, forKey: homeTabPostFeedTypeKeyBase + account.username)
     }
     
-    static let nameOfHomeTabPostFeedKey = "name_of_home_tab_post_feed"
-    static var nameOfHomeTabPostFeed: String {
-        return UserDefaults.interface.string(forKey: nameOfHomeTabPostFeedKey, "")
+    static let nameOfHomeTabPostFeedKeyBase = "name_of_home_tab_post_feed"
+    static func getNameOfHomeTabPostFeed(account: Account) -> String {
+        return UserDefaults.interface.string(forKey: nameOfHomeTabPostFeedKeyBase + account.username, "")
     }
-    static func setNameOfHomeTabPostFeed(_ newValue: String?) {
-        UserDefaults.interface.set(newValue, forKey: nameOfHomeTabPostFeedKey)
+    static func setNameOfHomeTabPostFeed(account: Account, _ newValue: String?) {
+        UserDefaults.interface.set(newValue, forKey: nameOfHomeTabPostFeedKeyBase + account.username)
     }
     
     static let defaultSearchResultTabKey = "default_search_result_tab"

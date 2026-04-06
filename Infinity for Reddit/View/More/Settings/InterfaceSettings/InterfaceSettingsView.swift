@@ -11,14 +11,15 @@ import GRDB
 
 struct InterfaceSettingsView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
-    
-    @AppStorage(InterfaceUserDefaultsUtils.homeTabPostFeedTypeKey, store: .interface) private var homeTabPostFeedType: Int = HomeTabPostFeedType.frontPage.rawValue
-    @AppStorage(InterfaceUserDefaultsUtils.nameOfHomeTabPostFeedKey, store: .interface) private var nameOfHomeTabPostFeed: String = ""
+    @EnvironmentObject private var accountViewModel: AccountViewModel
+
     @AppStorage(InterfaceUserDefaultsUtils.defaultSearchResultTabKey, store: .interface) private var defaultSearchResultTab: Int = 0
     @AppStorage(InterfaceUserDefaultsUtils.voteButtonsOnTheRightKey, store: .interface) private var voteButtonsOnTheRight: Bool = false
     @AppStorage(InterfaceUserDefaultsUtils.lazyModeIntervalKey, store: .interface) private var lazyModeInterval: Double = 2.5
     @AppStorage(InterfaceUserDefaultsUtils.showAbsoluteNumberOfVotesKey, store: .interface) private var showAbsoluteNumberOfVotes: Bool = true
     
+    @State private var homeTabPostFeedType: HomeTabPostFeedType = HomeTabPostFeedType.frontPage
+    @State private var nameOfHomeTabPostFeed: String = ""
     @State private var showHomeTabPostFeedSelectionSheet: Bool = false
     
     var body: some View {
@@ -117,15 +118,20 @@ struct InterfaceSettingsView: View {
         .addTitleToInlineNavigationBar("Interface")
         .wrapContentSheet(isPresented: $showHomeTabPostFeedSelectionSheet) {
             HomeTabPostFeedSelectionSheet { homeTabPostFeedType, nameOfHomeTabPostFeed in
-                InterfaceUserDefaultsUtils.setHomeTabPostFeedType(homeTabPostFeedType)
-                InterfaceUserDefaultsUtils.setNameOfHomeTabPostFeed(nameOfHomeTabPostFeed)
+                InterfaceUserDefaultsUtils.setHomeTabPostFeedType(account: accountViewModel.account, homeTabPostFeedType)
+                InterfaceUserDefaultsUtils.setNameOfHomeTabPostFeed(account: accountViewModel.account, nameOfHomeTabPostFeed)
+                
+                self.homeTabPostFeedType = homeTabPostFeedType
+                self.nameOfHomeTabPostFeed = nameOfHomeTabPostFeed ?? ""
             }
         }
     }
     
     var homeTabPostFeed: String {
         switch homeTabPostFeedType {
-        case HomeTabPostFeedType.subreddit.rawValue:
+        case HomeTabPostFeedType.frontPage:
+            return HomeTabPostFeedType.frontPage.description
+        case HomeTabPostFeedType.subreddit:
             if !nameOfHomeTabPostFeed.isEmpty {
                 if nameOfHomeTabPostFeed == "popular" || nameOfHomeTabPostFeed == "all" {
                     return nameOfHomeTabPostFeed.capitalizedFirst
@@ -134,17 +140,15 @@ struct InterfaceSettingsView: View {
                 return "r/\(nameOfHomeTabPostFeed)"
             }
             return HomeTabPostFeedType.frontPage.description
-        case HomeTabPostFeedType.user.rawValue:
+        case HomeTabPostFeedType.user:
             if !nameOfHomeTabPostFeed.isEmpty {
                 return "u/\(nameOfHomeTabPostFeed)"
             }
             return HomeTabPostFeedType.frontPage.description
-        case HomeTabPostFeedType.customFeed.rawValue:
+        case HomeTabPostFeedType.customFeed:
             if !nameOfHomeTabPostFeed.isEmpty {
                 return "Custom feed: \(nameOfHomeTabPostFeed)"
             }
-            return HomeTabPostFeedType.frontPage.description
-        default:
             return HomeTabPostFeedType.frontPage.description
         }
     }
