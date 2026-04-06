@@ -17,8 +17,8 @@ class InterfaceUserDefaultsUtils {
     }
     
     static let nameOfHomeTabPostFeedKey = "name_of_home_tab_post_feed"
-    static var nameOfHomeTabPostFeed: String? {
-        return UserDefaults.interface.string(forKey: nameOfHomeTabPostFeedKey)
+    static var nameOfHomeTabPostFeed: String {
+        return UserDefaults.interface.string(forKey: nameOfHomeTabPostFeedKey, "")
     }
     static func setNameOfHomeTabPostFeed(_ newValue: String?) {
         UserDefaults.interface.set(newValue, forKey: nameOfHomeTabPostFeedKey)

@@ -114,7 +114,7 @@ struct SubredditDetailsView: View {
                     }
                     
                     PostListingView(
-                        postListingMetadata:PostListingMetadata(
+                        postListingMetadata: PostListingMetadata(
                             postListingType:.subreddit(subredditName: subredditDetailsViewModel.subredditName),
                             pathComponents: ["subreddit": "\(subredditDetailsViewModel.subredditName)"],
                             queries: nil,

@@ -135,7 +135,7 @@ struct UserDetailsView: View {
                     
                     ZStack {
                         PostListingView(
-                            postListingMetadata:PostListingMetadata(
+                            postListingMetadata: PostListingMetadata(
                                 postListingType:.user(username: userDetailsViewModel.username, userWhere: .submitted),
                                 pathComponents: ["username": "\(userDetailsViewModel.username)"],
                                 queries: nil,

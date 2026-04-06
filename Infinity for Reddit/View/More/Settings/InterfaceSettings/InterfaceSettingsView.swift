@@ -13,7 +13,7 @@ struct InterfaceSettingsView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
     
     @AppStorage(InterfaceUserDefaultsUtils.homeTabPostFeedTypeKey, store: .interface) private var homeTabPostFeedType: Int = HomeTabPostFeedType.frontPage.rawValue
-    @AppStorage(InterfaceUserDefaultsUtils.nameOfHomeTabPostFeedKey, store: .interface) private var nameOfHomeTabPostFeed: String?
+    @AppStorage(InterfaceUserDefaultsUtils.nameOfHomeTabPostFeedKey, store: .interface) private var nameOfHomeTabPostFeed: String = ""
     @AppStorage(InterfaceUserDefaultsUtils.defaultSearchResultTabKey, store: .interface) private var defaultSearchResultTab: Int = 0
     @AppStorage(InterfaceUserDefaultsUtils.voteButtonsOnTheRightKey, store: .interface) private var voteButtonsOnTheRight: Bool = false
     @AppStorage(InterfaceUserDefaultsUtils.lazyModeIntervalKey, store: .interface) private var lazyModeInterval: Double = 2.5
@@ -125,10 +125,8 @@ struct InterfaceSettingsView: View {
     
     var homeTabPostFeed: String {
         switch homeTabPostFeedType {
-        case HomeTabPostFeedType.frontPage.rawValue:
-            return HomeTabPostFeedType.frontPage.description
         case HomeTabPostFeedType.subreddit.rawValue:
-            if let nameOfHomeTabPostFeed {
+            if !nameOfHomeTabPostFeed.isEmpty {
                 if nameOfHomeTabPostFeed == "popular" || nameOfHomeTabPostFeed == "all" {
                     return nameOfHomeTabPostFeed.capitalizedFirst
                 }
@@ -137,12 +135,12 @@ struct InterfaceSettingsView: View {
             }
             return HomeTabPostFeedType.frontPage.description
         case HomeTabPostFeedType.user.rawValue:
-            if let nameOfHomeTabPostFeed {
+            if !nameOfHomeTabPostFeed.isEmpty {
                 return "u/\(nameOfHomeTabPostFeed)"
             }
             return HomeTabPostFeedType.frontPage.description
         case HomeTabPostFeedType.customFeed.rawValue:
-            if let nameOfHomeTabPostFeed {
+            if !nameOfHomeTabPostFeed.isEmpty {
                 return "Custom feed: \(nameOfHomeTabPostFeed)"
             }
             return HomeTabPostFeedType.frontPage.description

@@ -31,18 +31,13 @@ struct CustomNavigationStack<Content: View>: View {
                     switch destination {
                     case .frontPage:
                         PostListingView(
-                            postListingMetadata: PostListingMetadata(
-                                // Anonymous subscriptions will be fetched later in PostListingViewModel
-                                postListingType: accountViewModel.account.isAnonymous() ? .anonymousFrontPage(concatenatedSubscriptions: nil) : .frontPage,
-                                queries: nil,
-                                params: nil
-                            ),
+                            postListingMetadata: homeTabPostListingMetadata,
                             handleToolbarMenu: false
                         )
                         .setUpHomeTabViewChildNavigationBar(onLogin: {
                             accountViewModel.startLogin()
                         })
-                        .addTitleToInlineNavigationBar("Home")
+                        .addTitleToInlineNavigationBar(homeTabNavigationBarTitle)
                         .environmentObject(navigationManager)
                         .environmentObject(commentSubmissionShareableViewModel)
                         .environmentObject(postEditingShareableViewModel)
@@ -316,6 +311,89 @@ struct CustomNavigationStack<Content: View>: View {
         .introspect(.navigationStack, on: .iOS(.v16, .v17, .v18, .v26)) {
             // UINavigationController
             $0.hidesBarsOnSwipe = hideNavigationBarOnScrollDown && navigationManager.hideNavigationBarOnScrollDown
+        }
+    }
+    
+    var homeTabPostListingMetadata: PostListingMetadata {
+        let nameOfHomeTabPostFeed = InterfaceUserDefaultsUtils.nameOfHomeTabPostFeed
+        switch InterfaceUserDefaultsUtils.homeTabPostFeedType {
+        case HomeTabPostFeedType.subreddit.rawValue:
+            return PostListingMetadata(
+                postListingType:.subreddit(subredditName: nameOfHomeTabPostFeed),
+                pathComponents: ["subreddit": "\(nameOfHomeTabPostFeed)"],
+                queries: nil,
+                params: nil
+            )
+        case HomeTabPostFeedType.user.rawValue:
+            return PostListingMetadata(
+                postListingType:.user(username: nameOfHomeTabPostFeed, userWhere: .submitted),
+                pathComponents: ["username": "\(nameOfHomeTabPostFeed)"],
+                queries: nil,
+                params: nil
+            )
+        case HomeTabPostFeedType.customFeed.rawValue:
+            if accountViewModel.account.isAnonymous() {
+                return PostListingMetadata(
+                    postListingType: .anonymousCustomFeed(
+                        myCustomFeed: MyCustomFeed(
+                            path: nameOfHomeTabPostFeed,
+                            displayName: nameOfHomeTabPostFeed,
+                            name: nameOfHomeTabPostFeed,
+                            owner: Account.ANONYMOUS_ACCOUNT.username,
+                            nSubscribers: 0,
+                            createdUTC: 0,
+                            over18: true,
+                            isSubscriber: true,
+                            isFavorite: false
+                        ),
+                        concatenatedSubscriptions: nil
+                    ),
+                    pathComponents: ["multipath": nameOfHomeTabPostFeed],
+                    queries: nil,
+                    params: nil
+                )
+            } else {
+                return PostListingMetadata(
+                    postListingType: .customFeed(path: nameOfHomeTabPostFeed),
+                    pathComponents: ["multipath": nameOfHomeTabPostFeed],
+                    queries: nil,
+                    params: nil
+                )
+            }
+        default:
+            return PostListingMetadata(
+                // Anonymous subscriptions will be fetched later in PostListingViewModel
+                postListingType: accountViewModel.account.isAnonymous() ? .anonymousFrontPage(concatenatedSubscriptions: nil) : .frontPage,
+                queries: nil,
+                params: nil
+            )
+        }
+    }
+    
+    var homeTabNavigationBarTitle: String {
+        let nameOfHomeTabPostFeed = InterfaceUserDefaultsUtils.nameOfHomeTabPostFeed
+        switch InterfaceUserDefaultsUtils.homeTabPostFeedType {
+        case HomeTabPostFeedType.subreddit.rawValue:
+            if !nameOfHomeTabPostFeed.isEmpty {
+                if nameOfHomeTabPostFeed == "popular" || nameOfHomeTabPostFeed == "all" {
+                    return nameOfHomeTabPostFeed.capitalizedFirst
+                }
+                
+                return "r/\(nameOfHomeTabPostFeed)"
+            }
+            return HomeTabPostFeedType.frontPage.description
+        case HomeTabPostFeedType.user.rawValue:
+            if !nameOfHomeTabPostFeed.isEmpty {
+                return "u/\(nameOfHomeTabPostFeed)"
+            }
+            return HomeTabPostFeedType.frontPage.description
+        case HomeTabPostFeedType.customFeed.rawValue:
+            if !nameOfHomeTabPostFeed.isEmpty {
+                return "Custom feed: \(nameOfHomeTabPostFeed)"
+            }
+            return HomeTabPostFeedType.frontPage.description
+        default:
+            return HomeTabPostFeedType.frontPage.description
         }
     }
 }
