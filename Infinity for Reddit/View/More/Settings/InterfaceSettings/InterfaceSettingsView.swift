@@ -116,6 +116,22 @@ struct InterfaceSettingsView: View {
         }
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Interface")
+        .onAppear {
+            nameOfHomeTabPostFeed = InterfaceUserDefaultsUtils.getNameOfHomeTabPostFeed(account: accountViewModel.account)
+            switch InterfaceUserDefaultsUtils.getHomeTabPostFeedType(account: accountViewModel.account) {
+            case HomeTabPostFeedType.subreddit.rawValue:
+                homeTabPostFeedType = .subreddit
+                break
+            case HomeTabPostFeedType.user.rawValue:
+                homeTabPostFeedType = .user
+                break
+            case HomeTabPostFeedType.customFeed.rawValue:
+                homeTabPostFeedType = .customFeed
+                break
+            default:
+                homeTabPostFeedType = .frontPage
+            }
+        }
         .wrapContentSheet(isPresented: $showHomeTabPostFeedSelectionSheet) {
             HomeTabPostFeedSelectionSheet { homeTabPostFeedType, nameOfHomeTabPostFeed in
                 InterfaceUserDefaultsUtils.setHomeTabPostFeedType(account: accountViewModel.account, homeTabPostFeedType)
