@@ -73,6 +73,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
     case subredditAutoComplete(queries: [String: String])
     case blockUser(params: [String: String])
     case getRedditSettings
+    case getModMailConversations(queries: [String: String])
     
     private var baseURL: String {
         return "https://oauth.reddit.com"
@@ -80,7 +81,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
     
     var method: HTTPMethod {
         switch self {
-        case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getSearchPostsInSpecificThing, .getCustomFeedPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getUserSavedComments, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox, .getRules, .getFlairs, .getInfo, .getUserFlairs, .getCustomFeedInfo, .getWikiPage, .subredditAutoComplete, .getRedditSettings:
+        case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getSearchPostsInSpecificThing, .getCustomFeedPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getUserSavedComments, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox, .getRules, .getFlairs, .getInfo, .getUserFlairs, .getCustomFeedInfo, .getWikiPage, .subredditAutoComplete, .getRedditSettings, .getModMailConversations:
             return .get
         case .vote, .subsrcribeToSubreddit, .saveThing, .unsaveThing, .getMoreCommentsForCommentMore, .sendCommentOrReplyToMessage, .favoriteThing, .favoriteCustomFeed, .submitPost, .uploadMediaMetadata, .submitGalleryPost, .submitPollPost, .editPostOrComment, .deletePostOrComment, .hidePost, .unhidePost, .readMessage, .readAllMessages, .markSensitive, .unmarkSensitive, .markSpoiler, .unmarkSpoiler, .selectFlair, .selectUserFlair, .composeMessage, .createCustomFeed, .copyCustomFeed, .report, .approveThing, .removeThing, .toggleStickyPost, .lockThing, .unlockThing, .toggleDistinguishedThing, .blockUser:
             return .post
@@ -221,6 +222,8 @@ enum RedditOAuthAPI: URLRequestConvertible {
             return "api/block_user"
         case .getRedditSettings:
             return "/api/v1/me/prefs"
+        case .getModMailConversations:
+            return "/api/mod/conversations"
         }
     }
     
@@ -299,6 +302,8 @@ enum RedditOAuthAPI: URLRequestConvertible {
             return ["raw_json": "1"]
         case .subredditAutoComplete(let queries):
             return ["typeahead_active": "true", "include_profiles": "false", "raw_json": "1"].merging(queries, uniquingKeysWith: { _, new in new })
+        case .getModMailConversations(let queries):
+            return ["limit": "100"].merging(queries, uniquingKeysWith: { _, new in new })
         default:
             return nil
         }
