@@ -112,7 +112,7 @@ struct MoreView: View {
                     .limitedWidth()
                 }
                 
-                if !accountViewModel.account.isAnonymous() {
+                if accountViewModel.account.isMod {
                     CustomListSection("Moderating") {
                         SimpleTouchItemRow(text: "Mod Mail", icon: "envelope.badge.shield.half.filled") {
                             navigationManager.append(MoreViewNavigation.modmail)
