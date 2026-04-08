@@ -162,17 +162,13 @@ public class PostListingViewModel: ObservableObject {
             
             if case .anonymousFrontPage(let concatenatedSubscriptions) = postListingMetadata.postListingType {
                 if let subscriptions = concatenatedSubscriptions {
-                    if subscriptions.isEmpty {
-                        // No anonymous subscriptions
-                    } else {
+                    if !subscriptions.isEmpty {
                         postListingMetadata.pathComponents = ["subreddit": subscriptions]
                     }
                 } else {
                     let fetchedSubscriptions = await postListingRepository.getAnonymousSubscriptionsConcatenated()
                     postListingMetadata.postListingType = .anonymousFrontPage(concatenatedSubscriptions: fetchedSubscriptions)
-                    if fetchedSubscriptions.isEmpty {
-                        // No anonymous subscriptions
-                    } else {
+                    if !fetchedSubscriptions.isEmpty {
                         postListingMetadata.pathComponents = ["subreddit": fetchedSubscriptions]
                     }
                 }

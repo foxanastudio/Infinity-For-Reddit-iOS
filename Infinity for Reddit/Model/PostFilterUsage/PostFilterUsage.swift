@@ -17,7 +17,7 @@ public struct PostFilterUsage: Codable, FetchableRecord, PersistableRecord, Hash
     static let NO_USAGE = "--"
     
     enum UsageType: Int, Codable {
-        case home = 1
+        case frontPage = 1
         case subreddit = 2
         case user = 3
         case customFeed = 4
@@ -26,8 +26,8 @@ public struct PostFilterUsage: Codable, FetchableRecord, PersistableRecord, Hash
         
         var description: String {
             switch self {
-            case .home:
-                return "Home"
+            case .frontPage:
+                return "Front Page"
             case .subreddit:
                 return "Subreddit"
             case .user:
@@ -48,7 +48,7 @@ public struct PostFilterUsage: Codable, FetchableRecord, PersistableRecord, Hash
             case .user:
                 return "Username (Without u/ prefix)"
             case .customFeed:
-                return "MultiReddit Path (/user/yourusername/m/yourmultiredditname) (only lowercase characters)"
+                return "Path (/user/yourusername/m/yourmultiredditname) (only lowercase characters)"
             default:
                 // Really shouldn't happen
                 return ""
@@ -62,8 +62,8 @@ public struct PostFilterUsage: Codable, FetchableRecord, PersistableRecord, Hash
     
     var description: String {
         switch self.usageType {
-        case .home:
-            return "Home"
+        case .frontPage:
+            return UsageType.frontPage.description
         case .subreddit:
             if nameOfUsage == PostFilterUsage.NO_USAGE {
                 return "All subreddits"
@@ -85,7 +85,7 @@ public struct PostFilterUsage: Codable, FetchableRecord, PersistableRecord, Hash
             if nameOfUsage == PostFilterUsage.HISTORY_TYPE_USAGE_READ_POSTS {
                 return "Read posts"
             }
-            return "History"
+            return UsageType.history.description
         }
     }
 

@@ -145,7 +145,7 @@ struct PostViewCard: View {
                 Text(post.title)
                     .padding(.horizontal, 16)
                     .padding(.bottom, 8)
-                    .postTitle()
+                    .postTitle(isRead: post.isRead)
                     .contentShape(Rectangle())
                 
                 if hidePostType && !post.spoiler
@@ -256,7 +256,7 @@ struct PostViewCard: View {
                         .frame(height: 6)
                     
                     Text(selftextTruncated)
-                        .postContent()
+                        .postContent(isRead: post.isRead)
                         .padding(.horizontal, 16)
                         .contentShape(Rectangle())
                 } else if case .redditVideo(let videoUrlString, _) = post.postType {

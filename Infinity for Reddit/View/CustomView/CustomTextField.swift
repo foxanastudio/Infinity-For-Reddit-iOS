@@ -52,15 +52,20 @@ struct CustomTextField<FieldType: Hashable>: View {
         TextField(
             "",
             text: $text,
-            prompt: Text(placeholder)
-                .foregroundStyle(customTextFieldScheme.getHintColor(currentCustomTheme: customThemeViewModel.currentCustomTheme)),
+            prompt: prompt,
             axis: singleLine ? .horizontal : .vertical
         )
-        .foregroundStyle(customTextFieldScheme.getTextColor(currentCustomTheme: customThemeViewModel.currentCustomTheme))
         .keyboardType(keyboardType)
         .textInputAutocapitalization(autocapitalization)
         .autocorrectionDisabled(true)
-        .tint(customTextFieldScheme.getTintColor(currentCustomTheme: customThemeViewModel.currentCustomTheme))
+        .modify {
+            if #available(iOS 26, *) {
+                $0
+            } else {
+                $0.foregroundStyle(customTextFieldScheme.getTextColor(currentCustomTheme: customThemeViewModel.currentCustomTheme))
+                    .tint(customTextFieldScheme.getTintColor(currentCustomTheme: customThemeViewModel.currentCustomTheme))
+            }
+        }
         .applyIf(characterLimit != nil) {
             $0.onReceive(text.publisher.collect()) {
                 if let characterLimit {
@@ -82,6 +87,15 @@ struct CustomTextField<FieldType: Hashable>: View {
                 .cornerRadius(10)
         }
         .focused($focusedField, equals: fieldType)
+    }
+    
+    var prompt: Text {
+        if #available(iOS 26, *) {
+            Text(placeholder)
+        } else {
+            Text(placeholder)
+                .foregroundStyle(customTextFieldScheme.getHintColor(currentCustomTheme: customThemeViewModel.currentCustomTheme))
+        }
     }
 }
 

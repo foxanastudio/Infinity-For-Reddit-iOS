@@ -73,7 +73,7 @@ struct MarkdownEmbeddedImagesSheet: View {
                             .frame(maxWidth: .infinity)
                     }
                     .frame(maxWidth: .infinity)
-                    .filledButton()
+                    .filledButton(elevate: false)
                     
                     Button {
                         onSelectImage()
@@ -83,7 +83,7 @@ struct MarkdownEmbeddedImagesSheet: View {
                             .frame(maxWidth: .infinity)
                     }
                     .frame(maxWidth: .infinity)
-                    .filledButton()
+                    .filledButton(elevate: false)
                 }
                 .padding(.horizontal, 32)
             }

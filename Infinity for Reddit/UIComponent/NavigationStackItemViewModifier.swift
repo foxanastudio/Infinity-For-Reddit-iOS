@@ -31,7 +31,7 @@ struct NavigationStackItemViewModifier: ViewModifier {
                             handleImageTapGesture: false,
                             fallbackView: {
                                 if accountViewModel.account.isAnonymous() {
-                                    SwiftUI.Image(systemName: "questionmark.circle")
+                                    SwiftUI.Image(systemName: anonymousIconName)
                                         .resizable()
                                         .scaledToFit()
                                         .frame(width: userIconSize, height: userIconSize)
@@ -52,5 +52,13 @@ struct NavigationStackItemViewModifier: ViewModifier {
             .wrapContentSheet(isPresented: $showProfile) {
                 AccountSheet(onLogin: onLogin)
             }
+    }
+    
+    var anonymousIconName: String {
+        if #available(iOS 26, *) {
+            return "questionmark"
+        } else {
+            return "questionmark.circle"
+        }
     }
 }

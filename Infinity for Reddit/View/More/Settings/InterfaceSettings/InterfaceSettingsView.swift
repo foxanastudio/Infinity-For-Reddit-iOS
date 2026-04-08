@@ -11,11 +11,16 @@ import GRDB
 
 struct InterfaceSettingsView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
-    
+    @EnvironmentObject private var accountViewModel: AccountViewModel
+
     @AppStorage(InterfaceUserDefaultsUtils.defaultSearchResultTabKey, store: .interface) private var defaultSearchResultTab: Int = 0
     @AppStorage(InterfaceUserDefaultsUtils.voteButtonsOnTheRightKey, store: .interface) private var voteButtonsOnTheRight: Bool = false
     @AppStorage(InterfaceUserDefaultsUtils.lazyModeIntervalKey, store: .interface) private var lazyModeInterval: Double = 2.5
     @AppStorage(InterfaceUserDefaultsUtils.showAbsoluteNumberOfVotesKey, store: .interface) private var showAbsoluteNumberOfVotes: Bool = true
+    
+    @State private var homeTabPostFeedType: HomeTabPostFeedType = HomeTabPostFeedType.frontPage
+    @State private var nameOfHomeTabPostFeed: String = ""
+    @State private var showHomeTabPostFeedSelectionSheet: Bool = false
     
     var body: some View {
         RootView {
@@ -25,6 +30,15 @@ struct InterfaceSettingsView: View {
                     icon: "textformat.size"
                 ) {
                     navigationManager.append(InterfaceSettingsViewNavigation.font)
+                }
+                .listPlainItemNoInsets()
+                
+                PreferenceEntry(
+                    title: "Home Tab Post Feed",
+                    subtitle: homeTabPostFeed,
+                    icon: "house"
+                ) {
+                    showHomeTabPostFeedSelectionSheet = true
                 }
                 .listPlainItemNoInsets()
                 
@@ -102,5 +116,56 @@ struct InterfaceSettingsView: View {
         }
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Interface")
+        .onAppear {
+            nameOfHomeTabPostFeed = InterfaceUserDefaultsUtils.getNameOfHomeTabPostFeed(account: accountViewModel.account)
+            switch InterfaceUserDefaultsUtils.getHomeTabPostFeedType(account: accountViewModel.account) {
+            case HomeTabPostFeedType.subreddit.rawValue:
+                homeTabPostFeedType = .subreddit
+                break
+            case HomeTabPostFeedType.user.rawValue:
+                homeTabPostFeedType = .user
+                break
+            case HomeTabPostFeedType.customFeed.rawValue:
+                homeTabPostFeedType = .customFeed
+                break
+            default:
+                homeTabPostFeedType = .frontPage
+            }
+        }
+        .wrapContentSheet(isPresented: $showHomeTabPostFeedSelectionSheet) {
+            HomeTabPostFeedSelectionSheet { homeTabPostFeedType, nameOfHomeTabPostFeed in
+                InterfaceUserDefaultsUtils.setHomeTabPostFeedType(account: accountViewModel.account, homeTabPostFeedType)
+                InterfaceUserDefaultsUtils.setNameOfHomeTabPostFeed(account: accountViewModel.account, nameOfHomeTabPostFeed)
+                
+                self.homeTabPostFeedType = homeTabPostFeedType
+                self.nameOfHomeTabPostFeed = nameOfHomeTabPostFeed ?? ""
+            }
+        }
+    }
+    
+    var homeTabPostFeed: String {
+        switch homeTabPostFeedType {
+        case HomeTabPostFeedType.frontPage:
+            return HomeTabPostFeedType.frontPage.description
+        case HomeTabPostFeedType.subreddit:
+            if !nameOfHomeTabPostFeed.isEmpty {
+                if nameOfHomeTabPostFeed == "popular" || nameOfHomeTabPostFeed == "all" {
+                    return nameOfHomeTabPostFeed.capitalizedFirst
+                }
+                
+                return "r/\(nameOfHomeTabPostFeed)"
+            }
+            return HomeTabPostFeedType.frontPage.description
+        case HomeTabPostFeedType.user:
+            if !nameOfHomeTabPostFeed.isEmpty {
+                return "u/\(nameOfHomeTabPostFeed)"
+            }
+            return HomeTabPostFeedType.frontPage.description
+        case HomeTabPostFeedType.customFeed:
+            if !nameOfHomeTabPostFeed.isEmpty {
+                return "Custom feed: \(nameOfHomeTabPostFeed)"
+            }
+            return HomeTabPostFeedType.frontPage.description
+        }
     }
 }

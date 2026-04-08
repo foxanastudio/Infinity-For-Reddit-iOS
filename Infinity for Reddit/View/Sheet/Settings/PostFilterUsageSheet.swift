@@ -48,8 +48,8 @@ struct PostFilterUsageSheet: View {
                 
                 switch step {
                     case .selectUsageType:
-                    IconTextButton(startIconUrl: "house", text: "Home") {
-                        onPostFilterUsageSelected(.home, nil)
+                    IconTextButton(startIconUrl: "sparkles", text: "Front Page") {
+                        onPostFilterUsageSelected(.frontPage, nil)
                         dismiss()
                     }
                     

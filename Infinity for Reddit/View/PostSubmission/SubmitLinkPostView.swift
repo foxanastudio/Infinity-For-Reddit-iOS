@@ -71,7 +71,7 @@ struct SubmitLinkPostView: View {
                                     Button("Suggest Title") {
                                         submitLinkPostViewModel.suggestTitle()
                                     }
-                                    .filledButton()
+                                    .filledButton(elevate: false)
                                 }
                                 .padding(.horizontal, 16)
                                 .padding(.top, 16)

@@ -66,7 +66,7 @@ struct PostSubmissionSubredditChooserView: View {
                         showRulesSheet = true
                     }
                 }
-                .filledButton()
+                .filledButton(elevate: false)
             }
             .frame(maxWidth: .infinity)
             .padding(16)

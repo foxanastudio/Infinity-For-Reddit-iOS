@@ -143,24 +143,28 @@ struct SubredditTextViewModifier: ViewModifier {
 }
 
 struct PostTitleTextViewModifier: ViewModifier {
-    @EnvironmentObject var themeViewModel: CustomThemeViewModel
+    @EnvironmentObject private var themeViewModel: CustomThemeViewModel
+    
+    let isRead: Bool
     
     func body(content: Content) -> some View {
         content
             .fixedSize(horizontal: false, vertical: true)
             .customPostTitleFont()
-            .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.postTitleColor))
+            .foregroundColor(Color(hex: isRead ? themeViewModel.currentCustomTheme.readPostTitleColor : themeViewModel.currentCustomTheme.postTitleColor))
     }
 }
 
 struct PostContentTextViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
     
+    let isRead: Bool
+    
     func body(content: Content) -> some View {
         content
             .fixedSize(horizontal: false, vertical: true)
             .customContentFont()
-            .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.postContentColor))
+            .foregroundColor(Color(hex: isRead ? themeViewModel.currentCustomTheme.readPostContentColor : themeViewModel.currentCustomTheme.postContentColor))
     }
 }
 

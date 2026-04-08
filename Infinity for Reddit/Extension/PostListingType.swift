@@ -67,7 +67,7 @@ extension PostListingType {
     var postFilterUsageType: PostFilterUsage.UsageType {
         switch self {
         case .frontPage:
-            return .home
+            return .frontPage
         case .subreddit:
             return .subreddit
         case .user:
@@ -77,7 +77,7 @@ extension PostListingType {
         case .customFeed:
             return .customFeed
         case .anonymousFrontPage:
-            return .home
+            return .frontPage
         case .anonymousCustomFeed:
             return .customFeed
         }

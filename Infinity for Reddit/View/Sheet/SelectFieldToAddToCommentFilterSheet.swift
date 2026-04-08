@@ -18,54 +18,52 @@ struct SelectFieldToAddToCommentFilterSheet: View {
     
     var body: some View {
         SheetRootView {
-            ScrollView {
-                VStack(spacing: 0) {
-                    Spacer()
-                        .frame(height: 20)
-                    
-                    RowText("Select fields to add to comment filter")
-                        .fontWeight(.bold)
-                        .padding(16)
-                    
-                    ForEach(fields != nil && !fields!.isEmpty ? fields! : SelectedFieldToAddToCommentFilter.allCases, id: \.self) { field in
-                        TouchRipple {
-                            Button(action: {
-                                if selections.contains(field) {
-                                    selections.remove(field)
-                                } else {
-                                    selections.insert(field)
-                                }
-                            }, label: {
-                                HStack(spacing: 0) {
-                                    SwiftUI.Image(systemName: selections.contains(field) ? "checkmark.square" : "square")
-                                        .primaryIcon()
-                                    
-                                    Spacer()
-                                        .frame(width: 16)
-                                    
-                                    Text(field.fullName)
-                                        .primaryText()
-                                    
-                                    Spacer()
-                                }
-                                .padding(16)
-                                .contentShape(Rectangle())
-                            })
-                        }
-                    }
-                    
-                    Button {
-                        onConfirm(Array(selections))
-                        dismiss()
-                    } label: {
-                        HStack {
-                            Text("Done")
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
+            VStack(spacing: 0) {
+                Spacer()
+                    .frame(height: 20)
+                
+                RowText("Select fields to add to comment filter")
+                    .fontWeight(.bold)
                     .padding(16)
-                    .filledButton()
+                
+                ForEach(fields != nil && !fields!.isEmpty ? fields! : SelectedFieldToAddToCommentFilter.allCases, id: \.self) { field in
+                    TouchRipple {
+                        Button(action: {
+                            if selections.contains(field) {
+                                selections.remove(field)
+                            } else {
+                                selections.insert(field)
+                            }
+                        }, label: {
+                            HStack(spacing: 0) {
+                                SwiftUI.Image(systemName: selections.contains(field) ? "checkmark.square" : "square")
+                                    .primaryIcon()
+                                
+                                Spacer()
+                                    .frame(width: 16)
+                                
+                                Text(field.fullName)
+                                    .primaryText()
+                                
+                                Spacer()
+                            }
+                            .padding(16)
+                            .contentShape(Rectangle())
+                        })
+                    }
                 }
+                
+                Button {
+                    onConfirm(Array(selections))
+                    dismiss()
+                } label: {
+                    HStack {
+                        Text("Done")
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                .padding(16)
+                .filledButton()
             }
         }
     }

@@ -129,7 +129,7 @@ struct PostViewCompact: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(post.title)
                             .padding(.bottom, 8)
-                            .postTitle()
+                            .postTitle(isRead: post.isRead)
                         
                         if hidePostType && !post.spoiler
                             && !post.over18 && hidePostFlair

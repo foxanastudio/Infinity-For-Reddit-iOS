@@ -189,7 +189,7 @@ struct SubmitImagePostView: View {
                     Button("Close") {
                         showCamera = false
                     }
-                    .filledButton()
+                    .filledButton(elevate: false)
                 }
             }
         }

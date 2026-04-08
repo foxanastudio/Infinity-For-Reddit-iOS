@@ -19,8 +19,13 @@ struct NavigationBarMenu: View {
                     Button(item.title, action: item.action)
                 }
             } label: {
-                SwiftUI.Image(systemName: "ellipsis.circle")
-                    .imageScale(.large)
+                if #available(iOS 26, *) {
+                    SwiftUI.Image(systemName: "ellipsis")
+                        .imageScale(.large)
+                } else {
+                    SwiftUI.Image(systemName: "ellipsis.circle")
+                        .imageScale(.large)
+                }
             }
         }
     }

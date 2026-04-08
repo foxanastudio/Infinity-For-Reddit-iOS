@@ -117,12 +117,12 @@ extension View {
         self.modifier(SubredditTextViewModifier())
     }
     
-    func postTitle() -> some View {
-        self.modifier(PostTitleTextViewModifier())
+    func postTitle(isRead: Bool) -> some View {
+        self.modifier(PostTitleTextViewModifier(isRead: isRead))
     }
     
-    func postContent() -> some View {
-        self.modifier(PostContentTextViewModifier())
+    func postContent(isRead: Bool) -> some View {
+        self.modifier(PostContentTextViewModifier(isRead: isRead))
     }
     
     func commentText() -> some View {
@@ -325,8 +325,8 @@ extension View {
         self.modifier(AuthorFlairTextViewModifier())
     }
     
-    func filledButton() -> some View {
-        self.modifier(FilledButtonViewModifier())
+    func filledButton(elevate: Bool = true) -> some View {
+        self.modifier(FilledButtonViewModifier(elevate: elevate))
     }
     
     func subscribeButton(isSubscribed: Bool) -> some View {

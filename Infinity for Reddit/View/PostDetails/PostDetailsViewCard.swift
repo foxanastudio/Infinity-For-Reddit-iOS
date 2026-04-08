@@ -123,7 +123,7 @@ struct PostDetailsViewCard: View {
             Text(post.title)
                 .padding(.horizontal, 16)
                 .padding(.bottom, 8)
-                .postTitle()
+                .postTitle(isRead: false)
                 .contentShape(Rectangle())
                 .onLongPressGesture {
                     onLongPress()
