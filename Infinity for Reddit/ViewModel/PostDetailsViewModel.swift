@@ -165,6 +165,8 @@ public class PostDetailsViewModel: ObservableObject {
         self.hasMoreComments = cache.hasMoreComments
         
         PostDetailsCommentsCacheManager.shared.removeCache(postId: cache.post.id)
+        
+        self.isInitialLoad = false
     }
     
     public func fetchPostAndComments(isRefreshWithContinuation: Bool = false, shouldLoadPost: Bool = false, forceLoad: Bool = false) async {
@@ -1481,13 +1483,13 @@ public class PostDetailsViewModel: ObservableObject {
         }
     }
     
-    private func getCurrentScrollCommentItem() -> CommentItem? {
+    private func getCurrentScrolledCommentItem() -> CommentItem? {
         if appearedComments.isEmpty {
             return nil
         } else {
             sortAppearedComments()
             
-            return appearedComments[0]
+            return appearedComments[appearedComments.count > 1 ? 1 : 0]
         }
     }
     
@@ -1505,7 +1507,7 @@ public class PostDetailsViewModel: ObservableObject {
             visibleComments: visibleComments,
             allComments: allComments,
             commentFilter: commentFilter,
-            scrolledCommentItem: getCurrentScrollCommentItem(),
+            scrolledCommentItem: getCurrentScrolledCommentItem(),
             lastLoadedSortTypeKind: lastLoadedSortTypeKind,
             hasMoreComments: hasMoreComments
         )
