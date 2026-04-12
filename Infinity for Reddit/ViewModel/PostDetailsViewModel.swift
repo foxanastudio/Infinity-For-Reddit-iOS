@@ -32,6 +32,7 @@ public class PostDetailsViewModel: ObservableObject {
     @Published var flairs: [Flair]?
     @Published var searchQuery: String = ""
     @Published var searchedComment: CommentItem?
+    @Published var scrollToCommentAfterRestoringCacheToggle: Bool = false
     
     @Published var showMediaDownloadFinishedMessageTrigger: Bool = false
     @Published var showAllGalleryMediaDownloadFinishedMessageTrigger: Bool = false
@@ -39,6 +40,7 @@ public class PostDetailsViewModel: ObservableObject {
     @Published var showSensitiveContentWarningTrigger: Bool = false
     
     var isScrollIdle: Bool = true
+    var commentItemToScrollTo: CommentItem?
 
     private var lastLoadedSortTypeKind: SortType.Kind? = nil
     private var commentFilter: CommentFilter?
@@ -130,16 +132,39 @@ public class PostDetailsViewModel: ObservableObject {
         if post == nil {
             switch postDetailsInput {
             case .post(let post):
-                await MainActor.run {
-                    self.post = post
+                if let cache = PostDetailsCommentsCacheManager.shared.getCache(postId: post.id) {
+                    await restoreFromCache(cache)
+                } else {
+                    await MainActor.run {
+                        self.post = post
+                    }
+                    await fetchPostAndComments(isRefreshWithContinuation: refreshPostsContinuation != nil)
                 }
-                await fetchPostAndComments(isRefreshWithContinuation: refreshPostsContinuation != nil)
-            case .postAndCommentId:
-                await fetchPostAndComments(isRefreshWithContinuation: refreshPostsContinuation != nil, shouldLoadPost: true)
+            case .postAndCommentId(let postId, _):
+                if let cache = PostDetailsCommentsCacheManager.shared.getCache(postId: postId) {
+                    await restoreFromCache(cache)
+                } else {
+                    await fetchPostAndComments(isRefreshWithContinuation: refreshPostsContinuation != nil, shouldLoadPost: true)
+                }
             }
         } else {
             await fetchPostAndComments(isRefreshWithContinuation: refreshPostsContinuation != nil)
         }
+    }
+    
+    @MainActor
+    private func restoreFromCache(_ cache: PostDetailsCommentsCache) {
+        self.post = cache.post
+        self.visibleComments = cache.visibleComments
+        self.allComments = cache.allComments
+        self.commentFilter = cache.commentFilter
+        self.commentItemToScrollTo = cache.scrolledCommentItem
+        self.scrollToCommentAfterRestoringCacheToggle.toggle()
+        self.lastLoadedSortTypeKind = cache.lastLoadedSortTypeKind
+        self.sortTypeKind = cache.lastLoadedSortTypeKind
+        self.hasMoreComments = cache.hasMoreComments
+        
+        PostDetailsCommentsCacheManager.shared.removeCache(postId: cache.post.id)
     }
     
     public func fetchPostAndComments(isRefreshWithContinuation: Bool = false, shouldLoadPost: Bool = false, forceLoad: Bool = false) async {
@@ -1454,5 +1479,39 @@ public class PostDetailsViewModel: ObservableObject {
                 self.error = error
             }
         }
+    }
+    
+    private func getCurrentScrollCommentItem() -> CommentItem? {
+        if appearedComments.isEmpty {
+            return nil
+        } else {
+            sortAppearedComments()
+            
+            return appearedComments[0]
+        }
+    }
+    
+    func saveCache() {
+        guard let post else {
+            return
+        }
+        
+        guard let lastLoadedSortTypeKind else {
+            return
+        }
+        
+        let cache = PostDetailsCommentsCache(
+            post: post,
+            visibleComments: visibleComments,
+            allComments: allComments,
+            commentFilter: commentFilter,
+            scrolledCommentItem: getCurrentScrollCommentItem(),
+            lastLoadedSortTypeKind: lastLoadedSortTypeKind,
+            hasMoreComments: hasMoreComments
+        )
+        
+        PostDetailsCommentsCacheManager.shared.setCache(
+            postId: post.id, cache: cache
+        )
     }
 }

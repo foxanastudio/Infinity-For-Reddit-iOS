@@ -1,0 +1,36 @@
+//
+//  PostDetailsCommentsCache.swift
+//  Infinity for Reddit
+//
+//  Created by Docile Alligator on 2026-04-12.
+//
+
+import IdentifiedCollections
+
+class PostDetailsCommentsCache {
+    let post: Post
+    let visibleComments: IdentifiedArrayOf<CommentItem>
+    let allComments: IdentifiedArrayOf<CommentItem>
+    let commentFilter: CommentFilter?
+    let scrolledCommentItem: CommentItem?
+    let lastLoadedSortTypeKind: SortType.Kind
+    let hasMoreComments: Bool
+    
+    init(
+        post: Post,
+        visibleComments: IdentifiedArrayOf<CommentItem>,
+        allComments: IdentifiedArrayOf<CommentItem>,
+        commentFilter: CommentFilter?,
+        scrolledCommentItem: CommentItem?,
+        lastLoadedSortTypeKind: SortType.Kind,
+        hasMoreComments: Bool
+    ) {
+        self.post = post
+        self.visibleComments = visibleComments
+        self.allComments = allComments
+        self.commentFilter = commentFilter
+        self.scrolledCommentItem = scrolledCommentItem
+        self.lastLoadedSortTypeKind = lastLoadedSortTypeKind
+        self.hasMoreComments = hasMoreComments
+    }
+}

@@ -699,12 +699,19 @@ struct PostDetailsView: View {
             showActionBar = true
         }
         .onDisappear {
+            postDetailsViewModel.saveCache()
+            
             guard let navigationBarMenuKey else { return }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
         .onChange(of: postDetailsViewModel.showSensitiveContentWarningTrigger) { _, newValue in
             if newValue {
                 activeAlert = .sensitiveContentWarning
+            }
+        }
+        .onChange(of: postDetailsViewModel.scrollToCommentAfterRestoringCacheToggle) { _, newValue in
+            if let listProxy, let commentItem = postDetailsViewModel.commentItemToScrollTo {
+                scrollToComment(listProxy: listProxy, commentItem: commentItem, animated: false, allowCommentMore: true)
             }
         }
         .wrapContentSheet(isPresented: $showSortTypeSheet) {
@@ -1068,15 +1075,27 @@ struct PostDetailsView: View {
             navigationManager.append(AppNavigation.editPost(post: post))
         }
     }
-    
-    // Don't scroll to CommentMore
-    private func scrollToComment(listProxy: ScrollViewProxy, commentItem: CommentItem) {
+
+    private func scrollToComment(listProxy: ScrollViewProxy, commentItem: CommentItem, anchor: UnitPoint = .top, animated: Bool = true, allowCommentMore: Bool = false) {
         switch commentItem {
         case .comment(let comment):
-            withAnimation {
-                listProxy.scrollTo(ObjectIdentifier(comment), anchor: .top)
+            if animated {
+                withAnimation {
+                    listProxy.scrollTo(ObjectIdentifier(comment), anchor: anchor)
+                }
+            } else {
+                listProxy.scrollTo(ObjectIdentifier(comment), anchor: anchor)
             }
-        case .more:
+        case .more(let commentMore):
+            if allowCommentMore {
+                if animated {
+                    withAnimation {
+                        listProxy.scrollTo(ObjectIdentifier(commentMore), anchor: anchor)
+                    }
+                } else {
+                    listProxy.scrollTo(ObjectIdentifier(commentMore), anchor: anchor)
+                }
+            }
             break
         }
     }
