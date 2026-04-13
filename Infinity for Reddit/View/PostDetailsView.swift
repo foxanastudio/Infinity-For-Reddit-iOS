@@ -44,6 +44,7 @@ struct PostDetailsView: View {
     @State private var showSearchBar: Bool = false
     @State private var listProxy: ScrollViewProxy?
     @State private var commentToBeModerated: Comment?
+    @State private var commentsWithToolbarHidden: Set<String> = []
     @State private var voteTask: Task<Void, Never>?
     
     @AppStorage(InterfacePostDetailsUserDefaultsUtils.separatePostAndCommentsKey, store: .interfacePostDetails)
@@ -56,6 +57,10 @@ struct PostDetailsView: View {
     private var commentLeftSwipeAction: Int = SwipeAction.upvote.rawValue
     @AppStorage(GesturesButtonsUserDefaultsUtils.commentRightSwipeActionKey, store: .gesturesButtons)
     private var commentRightSwipeAction: Int = SwipeAction.downvote.rawValue
+    @AppStorage(GesturesButtonsUserDefaultsUtils.commentTapActionKey, store: .gesturesButtons)
+    private var commentTapAction: Int = CommentTapAction.toggleToolbar.rawValue
+    @AppStorage(GesturesButtonsUserDefaultsUtils.commentLongPressActionKey, store: .gesturesButtons)
+    private var commentLongPressAction: Int = CommentTapAction.expandCollapseComment.rawValue
     
     @Namespace var glassActionBarNamespace
     
@@ -200,6 +205,7 @@ struct PostDetailsView: View {
                                                     comment: comment,
                                                     isInPostDetails: true,
                                                     highlightComment: postDetailsViewModel.postDetailsInput.getHighlightCommentId == comment.id || postDetailsViewModel.searchedComment?.id == comment.id,
+                                                    toolbarVisibilityFlag: commentsWithToolbarHidden.contains(comment.id),
                                                     thingModerationRepository: thingModerationRepository,
                                                     onUpvote: {
                                                         postDetailsViewModel.voteComment(comment, vote: 1)
@@ -211,21 +217,7 @@ struct PostDetailsView: View {
                                                         postDetailsViewModel.toggleSaveComment(comment, save: !comment.saved)
                                                     },
                                                     onToggleExpand: {
-                                                        if fullyCollapseComment {
-                                                            if comment.isCollasped {
-                                                                postDetailsViewModel.expandComments(comment: comment, fullyCollapseComment: fullyCollapseComment)
-                                                            } else {
-                                                                postDetailsViewModel.collapseComments(comment: comment, fullyCollapseComment: fullyCollapseComment)
-                                                            }
-                                                        } else {
-                                                            withAnimation {
-                                                                if comment.isCollasped {
-                                                                    postDetailsViewModel.expandComments(comment: comment, fullyCollapseComment: fullyCollapseComment)
-                                                                } else {
-                                                                    postDetailsViewModel.collapseComments(comment: comment, fullyCollapseComment: fullyCollapseComment)
-                                                                }
-                                                            }
-                                                        }
+                                                        onExpandCollapseComment(comment: comment)
                                                     },
                                                     onReply: {
                                                         let commentParent = CommentParent.comment(parentComment: comment)
@@ -255,20 +247,35 @@ struct PostDetailsView: View {
                                                 )
                                                 .listPlainItemNoInsets()
                                                 .id(ObjectIdentifier(comment))
-                                                .onLongPressGesture {
-                                                    if fullyCollapseComment {
-                                                        if comment.isCollasped {
-                                                            postDetailsViewModel.expandComments(comment: comment, fullyCollapseComment: fullyCollapseComment)
-                                                        } else {
-                                                            postDetailsViewModel.collapseComments(comment: comment, fullyCollapseComment: fullyCollapseComment)
-                                                        }
-                                                    } else {
-                                                        withAnimation {
-                                                            if comment.isCollasped {
-                                                                postDetailsViewModel.expandComments(comment: comment, fullyCollapseComment: fullyCollapseComment)
+                                                .onTapGesture {
+                                                    if let action = CommentTapAction(rawValue: commentTapAction) {
+                                                        switch action {
+                                                        case .toggleToolbar:
+                                                            if commentsWithToolbarHidden.contains(comment.id) {
+                                                                commentsWithToolbarHidden.remove(comment.id)
                                                             } else {
-                                                                postDetailsViewModel.collapseComments(comment: comment, fullyCollapseComment: fullyCollapseComment)
+                                                                commentsWithToolbarHidden.insert(comment.id)
                                                             }
+                                                            break
+                                                        case .expandCollapseComment:
+                                                            onExpandCollapseComment(comment: comment)
+                                                            break
+                                                        }
+                                                    }
+                                                }
+                                                .onLongPressGesture {
+                                                    if let action = CommentTapAction(rawValue: commentLongPressAction) {
+                                                        switch action {
+                                                        case .toggleToolbar:
+                                                            if commentsWithToolbarHidden.contains(comment.id) {
+                                                                commentsWithToolbarHidden.remove(comment.id)
+                                                            } else {
+                                                                commentsWithToolbarHidden.insert(comment.id)
+                                                            }
+                                                            break
+                                                        case .expandCollapseComment:
+                                                            onExpandCollapseComment(comment: comment)
+                                                            break
                                                         }
                                                     }
                                                 }
@@ -1118,6 +1125,24 @@ struct PostDetailsView: View {
         case .downvote:
             postDetailsViewModel.voteComment(comment, vote: -1)
             break
+        }
+    }
+    
+    private func onExpandCollapseComment(comment: Comment) {
+        if fullyCollapseComment {
+            if comment.isCollasped {
+                postDetailsViewModel.expandComments(comment: comment, fullyCollapseComment: fullyCollapseComment)
+            } else {
+                postDetailsViewModel.collapseComments(comment: comment, fullyCollapseComment: fullyCollapseComment)
+            }
+        } else {
+            withAnimation {
+                if comment.isCollasped {
+                    postDetailsViewModel.expandComments(comment: comment, fullyCollapseComment: fullyCollapseComment)
+                } else {
+                    postDetailsViewModel.collapseComments(comment: comment, fullyCollapseComment: fullyCollapseComment)
+                }
+            }
         }
     }
     

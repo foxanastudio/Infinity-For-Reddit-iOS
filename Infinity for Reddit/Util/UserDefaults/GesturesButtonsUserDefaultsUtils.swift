@@ -44,4 +44,16 @@ class GesturesButtonsUserDefaultsUtils {
     }
     
     static let swipeActions: [Int] = [SwipeAction.none.rawValue, SwipeAction.upvote.rawValue, SwipeAction.downvote.rawValue]
+    
+    static let commentTapActionKey = "comment_tap_action"
+    static var commentTapAction: Int {
+        return UserDefaults.gesturesButtons.integer(forKey: commentTapActionKey, CommentTapAction.toggleToolbar.rawValue)
+    }
+    
+    static let commentLongPressActionKey = "comment_long_press_action"
+    static var commentLongPressAction: Int {
+        return UserDefaults.gesturesButtons.integer(forKey: commentLongPressActionKey, CommentTapAction.expandCollapseComment.rawValue)
+    }
+    
+    static let commentTapActions: [Int] = [CommentTapAction.toggleToolbar.rawValue, CommentTapAction.expandCollapseComment.rawValue]
 }

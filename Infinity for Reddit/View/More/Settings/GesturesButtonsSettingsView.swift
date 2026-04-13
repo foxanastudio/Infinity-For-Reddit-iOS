@@ -17,6 +17,8 @@ struct GestureButtonsSettingsView: View {
     @AppStorage(GesturesButtonsUserDefaultsUtils.postDetailsRightSwipeActionKey, store: .gesturesButtons) private var postDetailsRightSwipeAction: Int = SwipeAction.downvote.rawValue
     @AppStorage(GesturesButtonsUserDefaultsUtils.commentLeftSwipeActionKey, store: .gesturesButtons) private var commentLeftSwipeAction: Int = SwipeAction.upvote.rawValue
     @AppStorage(GesturesButtonsUserDefaultsUtils.commentRightSwipeActionKey, store: .gesturesButtons) private var commentRightSwipeAction: Int = SwipeAction.downvote.rawValue
+    @AppStorage(GesturesButtonsUserDefaultsUtils.commentTapActionKey, store: .gesturesButtons) private var commentTapAction: Int = CommentTapAction.toggleToolbar.rawValue
+    @AppStorage(GesturesButtonsUserDefaultsUtils.commentLongPressActionKey, store: .gesturesButtons) private var commentLongPressAction: Int = CommentTapAction.expandCollapseComment.rawValue
     
     var body: some View {
         RootView {
@@ -79,6 +81,24 @@ struct GestureButtonsSettingsView: View {
                     title: "Comment Right Swipe Action"
                 ) { swipeActionRawValue in
                     return (SwipeAction(rawValue: swipeActionRawValue) ?? .downvote).title
+                }
+                .listPlainItemNoInsets()
+                
+                BarebonePickerPreference(
+                    selected: $commentTapAction,
+                    items: GesturesButtonsUserDefaultsUtils.commentTapActions,
+                    title: "Comment Tap Action"
+                ) { tapActionRawValue in
+                    return (CommentTapAction(rawValue: tapActionRawValue) ?? .toggleToolbar).title
+                }
+                .listPlainItemNoInsets()
+                
+                BarebonePickerPreference(
+                    selected: $commentLongPressAction,
+                    items: GesturesButtonsUserDefaultsUtils.commentTapActions,
+                    title: "Comment Long Press Action"
+                ) { longPressActionRawValue in
+                    return (CommentTapAction(rawValue: longPressActionRawValue) ?? .expandCollapseComment).title
                 }
                 .listPlainItemNoInsets()
             }

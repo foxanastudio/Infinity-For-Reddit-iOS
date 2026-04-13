@@ -30,7 +30,10 @@ struct CommentViewCard: View {
     private var showFewerToolbarOptionsThreshold: Int = 5
     @AppStorage(InterfaceUserDefaultsUtils.voteButtonsOnTheRightKey, store: .interface)
     private var voteButtonsOnTheRight: Bool = false
-    @AppStorage(InterfaceCommentUserDefaultsUtils.markdownEmbeddedMediaTypeKey, store: .interfaceComment) private var markdownEmbeddedMediaType: Int = 15
+    @AppStorage(InterfaceCommentUserDefaultsUtils.markdownEmbeddedMediaTypeKey, store: .interfaceComment)
+    private var markdownEmbeddedMediaType: Int = 15
+    @AppStorage(GesturesButtonsUserDefaultsUtils.commentLongPressActionKey, store: .gesturesButtons)
+    private var commentLongPressAction: Int = CommentTapAction.expandCollapseComment.rawValue
     
     //@StateObject var commentViewModel: CommentViewModel
     @ObservedObject private var comment: Comment
@@ -38,6 +41,7 @@ struct CommentViewCard: View {
     @State private var voteTask: Task<Void, Never>? = nil
     @State private var saveTask: Task<Void, Never>? = nil
     @State private var isToolbarHidden: Bool
+    private var toolbarVisibilityFlag: Bool
 
     private let isInPostDetails: Bool
     private let userIconSize: CGFloat = 24
@@ -57,6 +61,7 @@ struct CommentViewCard: View {
         comment: Comment,
         isInPostDetails: Bool,
         highlightComment: Bool = false,
+        toolbarVisibilityFlag: Bool = false,
         thingModerationRepository: ThingModerationRepositoryProtocol,
         onUpvote: @escaping () -> Void,
         onDownvote: @escaping () -> Void,
@@ -72,6 +77,7 @@ struct CommentViewCard: View {
         self.comment = comment
         self.isInPostDetails = isInPostDetails
         self.highlightComment = highlightComment
+        self.toolbarVisibilityFlag = toolbarVisibilityFlag
         self.onUpvote = onUpvote
         self.onDownvote = onDownvote
         self.onToggleSave = onToggleSave
@@ -389,10 +395,22 @@ struct CommentViewCard: View {
         }
         .contentShape(Rectangle())
         .background(backgroundColor)
-        .applyIf(isInPostDetails) {
-            $0.onTapGesture {
-                isToolbarHidden.toggle()
-            }
+//        .applyIf(isInPostDetails) {
+//            $0.onTapGesture {
+//                if let action = CommentTapAction(rawValue: commentLongPressAction) {
+//                    switch action {
+//                    case .toggleToolbar:
+//                        break
+//                    case .expandCollapseComment:
+//                        onExpandCollapseComment(comment: comment)
+//                        break
+//                    }
+//                }
+//                isToolbarHidden.toggle()
+//            }
+//        }
+        .onChange(of: toolbarVisibilityFlag) { _, newValue in
+            isToolbarHidden.toggle()
         }
     }
     
