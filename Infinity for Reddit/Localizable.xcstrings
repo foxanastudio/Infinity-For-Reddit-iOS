@@ -1982,6 +1982,9 @@
     "Unable to load inbox. Tap to retry. Error: %@" : {
 
     },
+    "Unable to load mod mail. Tap to retry. Error: %@" : {
+
+    },
     "Unable to load post and comments. Tap to retry. Error: %@" : {
 
     },
