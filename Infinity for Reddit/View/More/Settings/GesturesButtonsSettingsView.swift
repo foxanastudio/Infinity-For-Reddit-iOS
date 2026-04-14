@@ -30,77 +30,81 @@ struct GestureButtonsSettingsView: View {
                 )
                 .listPlainItemNoInsets()
                 
-                BarebonePickerPreference(
-                    selected: $postLeftSwipeAction,
-                    items: GesturesButtonsUserDefaultsUtils.swipeActions,
-                    title: "Post Left Swipe Action"
-                ) { swipeActionRawValue in
-                    return (SwipeAction(rawValue: swipeActionRawValue) ?? .upvote).title
+                CustomListSection("Swipe Actions") {
+                    BarebonePickerPreference(
+                        selected: $postLeftSwipeAction,
+                        items: GesturesButtonsUserDefaultsUtils.swipeActions,
+                        title: "Post Left Swipe Action"
+                    ) { swipeActionRawValue in
+                        return (SwipeAction(rawValue: swipeActionRawValue) ?? .upvote).title
+                    }
+                    .listPlainItemNoInsets()
+                    
+                    BarebonePickerPreference(
+                        selected: $postRightSwipeAction,
+                        items: GesturesButtonsUserDefaultsUtils.swipeActions,
+                        title: "Post Right Swipe Action"
+                    ) { swipeActionRawValue in
+                        return (SwipeAction(rawValue: swipeActionRawValue) ?? .downvote).title
+                    }
+                    .listPlainItemNoInsets()
+                    
+                    BarebonePickerPreference(
+                        selected: $postDetailsLeftSwipeAction,
+                        items: GesturesButtonsUserDefaultsUtils.swipeActions,
+                        title: "Post Details Left Swipe Action"
+                    ) { swipeActionRawValue in
+                        return (SwipeAction(rawValue: swipeActionRawValue) ?? .upvote).title
+                    }
+                    .listPlainItemNoInsets()
+                    
+                    BarebonePickerPreference(
+                        selected: $postDetailsRightSwipeAction,
+                        items: GesturesButtonsUserDefaultsUtils.swipeActions,
+                        title: "Post Details Right Swipe Action"
+                    ) { swipeActionRawValue in
+                        return (SwipeAction(rawValue: swipeActionRawValue) ?? .downvote).title
+                    }
+                    .listPlainItemNoInsets()
+                    
+                    BarebonePickerPreference(
+                        selected: $commentLeftSwipeAction,
+                        items: GesturesButtonsUserDefaultsUtils.swipeActions,
+                        title: "Comment Left Swipe Action"
+                    ) { swipeActionRawValue in
+                        return (SwipeAction(rawValue: swipeActionRawValue) ?? .upvote).title
+                    }
+                    .listPlainItemNoInsets()
+                    
+                    BarebonePickerPreference(
+                        selected: $commentRightSwipeAction,
+                        items: GesturesButtonsUserDefaultsUtils.swipeActions,
+                        title: "Comment Right Swipe Action"
+                    ) { swipeActionRawValue in
+                        return (SwipeAction(rawValue: swipeActionRawValue) ?? .downvote).title
+                    }
+                    .listPlainItemNoInsets()
                 }
-                .listPlainItemNoInsets()
                 
-                BarebonePickerPreference(
-                    selected: $postRightSwipeAction,
-                    items: GesturesButtonsUserDefaultsUtils.swipeActions,
-                    title: "Post Right Swipe Action"
-                ) { swipeActionRawValue in
-                    return (SwipeAction(rawValue: swipeActionRawValue) ?? .downvote).title
+                CustomListSection("Comment Gestures") {
+                    BarebonePickerPreference(
+                        selected: $commentTapAction,
+                        items: GesturesButtonsUserDefaultsUtils.commentTapActions,
+                        title: "Comment Tap Action"
+                    ) { tapActionRawValue in
+                        return (CommentTapAction(rawValue: tapActionRawValue) ?? .toggleToolbar).title
+                    }
+                    .listPlainItemNoInsets()
+                    
+                    BarebonePickerPreference(
+                        selected: $commentLongPressAction,
+                        items: GesturesButtonsUserDefaultsUtils.commentTapActions,
+                        title: "Comment Long Press Action"
+                    ) { longPressActionRawValue in
+                        return (CommentTapAction(rawValue: longPressActionRawValue) ?? .expandCollapseComment).title
+                    }
+                    .listPlainItemNoInsets()
                 }
-                .listPlainItemNoInsets()
-                
-                BarebonePickerPreference(
-                    selected: $postDetailsLeftSwipeAction,
-                    items: GesturesButtonsUserDefaultsUtils.swipeActions,
-                    title: "Post Details Left Swipe Action"
-                ) { swipeActionRawValue in
-                    return (SwipeAction(rawValue: swipeActionRawValue) ?? .upvote).title
-                }
-                .listPlainItemNoInsets()
-                
-                BarebonePickerPreference(
-                    selected: $postDetailsRightSwipeAction,
-                    items: GesturesButtonsUserDefaultsUtils.swipeActions,
-                    title: "Post Details Right Swipe Action"
-                ) { swipeActionRawValue in
-                    return (SwipeAction(rawValue: swipeActionRawValue) ?? .downvote).title
-                }
-                .listPlainItemNoInsets()
-                
-                BarebonePickerPreference(
-                    selected: $commentLeftSwipeAction,
-                    items: GesturesButtonsUserDefaultsUtils.swipeActions,
-                    title: "Comment Left Swipe Action"
-                ) { swipeActionRawValue in
-                    return (SwipeAction(rawValue: swipeActionRawValue) ?? .upvote).title
-                }
-                .listPlainItemNoInsets()
-                
-                BarebonePickerPreference(
-                    selected: $commentRightSwipeAction,
-                    items: GesturesButtonsUserDefaultsUtils.swipeActions,
-                    title: "Comment Right Swipe Action"
-                ) { swipeActionRawValue in
-                    return (SwipeAction(rawValue: swipeActionRawValue) ?? .downvote).title
-                }
-                .listPlainItemNoInsets()
-                
-                BarebonePickerPreference(
-                    selected: $commentTapAction,
-                    items: GesturesButtonsUserDefaultsUtils.commentTapActions,
-                    title: "Comment Tap Action"
-                ) { tapActionRawValue in
-                    return (CommentTapAction(rawValue: tapActionRawValue) ?? .toggleToolbar).title
-                }
-                .listPlainItemNoInsets()
-                
-                BarebonePickerPreference(
-                    selected: $commentLongPressAction,
-                    items: GesturesButtonsUserDefaultsUtils.commentTapActions,
-                    title: "Comment Long Press Action"
-                ) { longPressActionRawValue in
-                    return (CommentTapAction(rawValue: longPressActionRawValue) ?? .expandCollapseComment).title
-                }
-                .listPlainItemNoInsets()
             }
             .themedList()
         }
