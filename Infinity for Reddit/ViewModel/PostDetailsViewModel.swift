@@ -41,7 +41,7 @@ public class PostDetailsViewModel: ObservableObject {
     
     var isScrollIdle: Bool = true
     var commentItemToScrollTo: CommentItem?
-    var isPostVisible: Bool = false
+    var isPostVisibleInSingleColumnList: Bool = false
 
     private var lastLoadedSortTypeKind: SortType.Kind? = nil
     private var commentFilter: CommentFilter?
@@ -1489,8 +1489,8 @@ public class PostDetailsViewModel: ObservableObject {
         }
     }
     
-    private func getCurrentScrolledCommentItem(needToSeparatePostAndComments: Bool) -> CommentItem? {
-        if appearedComments.isEmpty || (isPostVisible && !needToSeparatePostAndComments) {
+    private func getCurrentScrolledCommentItem() -> CommentItem? {
+        if appearedComments.isEmpty || isPostVisibleInSingleColumnList {
             return nil
         } else {
             sortAppearedComments()
@@ -1499,7 +1499,7 @@ public class PostDetailsViewModel: ObservableObject {
         }
     }
     
-    func saveCache(needToSeparatePostAndComments: Bool) {
+    func saveCache() {
         guard let post else {
             return
         }
@@ -1513,7 +1513,7 @@ public class PostDetailsViewModel: ObservableObject {
             visibleComments: visibleComments,
             allComments: allComments,
             commentFilter: commentFilter,
-            scrolledCommentItem: getCurrentScrolledCommentItem(needToSeparatePostAndComments: needToSeparatePostAndComments),
+            scrolledCommentItem: getCurrentScrolledCommentItem(),
             lastLoadedSortTypeKind: lastLoadedSortTypeKind,
             hasMoreComments: hasMoreComments
         )

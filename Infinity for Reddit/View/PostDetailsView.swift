@@ -152,6 +152,12 @@ struct PostDetailsView: View {
                                                 showCopyContentOptionsSheet = true
                                             }
                                         )
+                                        .onAppear {
+                                            postDetailsViewModel.isPostVisibleInSingleColumnList = true
+                                        }
+                                        .onDisappear {
+                                            postDetailsViewModel.isPostVisibleInSingleColumnList = false
+                                        }
                                     }
                                     
                                     if case .postAndCommentId(_, let commentId) = postDetailsViewModel.postDetailsInput, commentId != nil {
@@ -474,10 +480,8 @@ struct PostDetailsView: View {
                                             .glassEffect(.regular.interactive())
                                             .glassEffectUnion(id: "actionBarOptions", namespace: glassActionBarNamespace)
                                             .onTapGesture {
-                                                if let listProxy {
-                                                    if let commentItem = postDetailsViewModel.getPreviousParentComment() {
-                                                        scrollToComment(listProxy: listProxy, commentItem: commentItem)
-                                                    }
+                                                if let listProxy, let commentItem = postDetailsViewModel.getPreviousParentComment() {
+                                                    scrollToComment(listProxy: listProxy, commentItem: commentItem)
                                                 }
                                             }
                                         
@@ -504,10 +508,8 @@ struct PostDetailsView: View {
                                             .glassEffect(.regular.interactive())
                                             .glassEffectUnion(id: "actionBarOptions", namespace: glassActionBarNamespace)
                                             .onTapGesture {
-                                                if let listProxy {
-                                                    if let commentItem = postDetailsViewModel.getNextParentComment(needToSeparatePostAndComments: needToSeparatePostAndComments) {
-                                                        scrollToComment(listProxy: listProxy, commentItem: commentItem)
-                                                    }
+                                                if let listProxy, let commentItem = postDetailsViewModel.getNextParentComment(needToSeparatePostAndComments: needToSeparatePostAndComments) {
+                                                    scrollToComment(listProxy: listProxy, commentItem: commentItem)
                                                 }
                                             }
                                     }
@@ -600,10 +602,8 @@ struct PostDetailsView: View {
                                         .fabIcon()
                                         .contentShape(Rectangle())
                                         .onTapGesture {
-                                            if let listProxy {
-                                                if let commentItem = postDetailsViewModel.getPreviousParentComment() {
-                                                    scrollToComment(listProxy: listProxy, commentItem: commentItem)
-                                                }
+                                            if let listProxy, let commentItem = postDetailsViewModel.getPreviousParentComment() {
+                                                scrollToComment(listProxy: listProxy, commentItem: commentItem)
                                             }
                                         }
                                     
@@ -628,10 +628,8 @@ struct PostDetailsView: View {
                                         .fabIcon()
                                         .contentShape(Rectangle())
                                         .onTapGesture {
-                                            if let listProxy {
-                                                if let commentItem = postDetailsViewModel.getNextParentComment(needToSeparatePostAndComments: needToSeparatePostAndComments) {
-                                                    scrollToComment(listProxy: listProxy, commentItem: commentItem)
-                                                }
+                                            if let listProxy, let commentItem = postDetailsViewModel.getNextParentComment(needToSeparatePostAndComments: needToSeparatePostAndComments) {
+                                                scrollToComment(listProxy: listProxy, commentItem: commentItem)
                                             }
                                         }
                                 }
@@ -717,7 +715,7 @@ struct PostDetailsView: View {
             showActionBar = true
         }
         .onDisappear {
-            postDetailsViewModel.saveCache(needToSeparatePostAndComments: needToSeparatePostAndComments)
+            postDetailsViewModel.saveCache()
             
             guard let navigationBarMenuKey else { return }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
@@ -1282,12 +1280,6 @@ private struct PostDetailsItemView: View {
         )
         .listPlainItemNoInsets()
         .id(ObjectIdentifier(post))
-        .onAppear {
-            postDetailsViewModel.isPostVisible = true
-        }
-        .onDisappear {
-            postDetailsViewModel.isPostVisible = false
-        }
 //        .onAppear {
 //            if post.subredditOrUserIconInPostDetails == nil {
 //                Task {
