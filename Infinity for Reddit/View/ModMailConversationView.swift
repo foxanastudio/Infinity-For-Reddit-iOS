@@ -8,20 +8,21 @@
 import SwiftUI
 
 struct ModMailConversationView: View {
-    let conversationId: String
     let participantUsername: String
-    private let modMailConversationRepository: ModMailConversationRepositoryProtocol
 
-    @State private var isLoading: Bool = false
-    
+    @StateObject var modMailConversationViewModel: ModMailConversationViewModel
+
     init(
         conversationId: String,
-        participantUsername: String,
-        modMailConversationRepository: ModMailConversationRepositoryProtocol = ModMailConversationRepository()
+        participantUsername: String
     ) {
-        self.conversationId = conversationId
         self.participantUsername = participantUsername
-        self.modMailConversationRepository = modMailConversationRepository
+        _modMailConversationViewModel = StateObject(
+            wrappedValue: ModMailConversationViewModel(
+                conversationId: conversationId,
+                modMailConversationRepository: ModMailConversationRepository()
+            )
+        )
     }
 
     var body: some View {
@@ -29,32 +30,10 @@ struct ModMailConversationView: View {
             Text("ModMailConversationView")
         }
         .task {
-            await loadModMailConversation()
+            await modMailConversationViewModel.initialLoadModMailConversation()
         }
         .themedNavigationBar()
         .addTitleToInlineNavigationBar(participantUsername)
-    }
-    
-    private func loadModMailConversation() async {
-        guard !isLoading else {
-            return
-        }
-        
-        isLoading = true
-        
-        do {
-            let modMailConversationResponse = try await modMailConversationRepository.fetchModMailConversation(
-                conversationId: conversationId,
-                interceptor: nil
-            )
-            printInDebugOnly(modMailConversationResponse)
-            isLoading = false
-        } catch {
-            if !(error is CancellationError) {
-                printInDebugOnly("Cannot fetch mod mail conversation.")
-            }
-            
-            isLoading = false
-        }
+        .showErrorUsingSnackbar(modMailConversationViewModel.$error)
     }
 }
