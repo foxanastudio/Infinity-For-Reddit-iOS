@@ -1,16 +1,16 @@
 //
-//  ModMailListingRepository.swift
+//  ModMailConversationRepository.swift
 //  Infinity for Reddit
 //
-//  Created by joeylr2042 on 2026-04-08.
+//  Created by joeylr2042 on 2026-04-15.
 //
 
 import Alamofire
 import SwiftyJSON
 import Foundation
 
-public class ModMailListingRepository: ModMailListingRepositoryProtocol {
-    enum ModMailListingRepositoryError: LocalizedError {
+public class ModMailConversationRepository: ModMailConversationRepositoryProtocol {
+    enum ModMailConversationRepositoryError: LocalizedError {
         case NetworkError(String)
         case JSONDecodingError(String)
         case AuthRequiredError
@@ -38,15 +38,15 @@ public class ModMailListingRepository: ModMailListingRepositoryProtocol {
         self.session = resolvedSession
     }
     
-    public func fetchModMailListing(queries: [String : String],
-                                    interceptor: RequestInterceptor? = nil
-    ) async throws -> ModMailListing {
+    public func fetchModMailConversation(conversationId: String,
+                                         interceptor: RequestInterceptor? = nil
+    ) async throws -> JSON {
         if self.sessionName == "plain", interceptor == nil {
-            throw ModMailListingRepositoryError.AuthRequiredError
+            throw ModMailConversationRepositoryError.AuthRequiredError
         }
         
         let response = await self.session.request(
-            RedditOAuthAPI.getModMailConversations(queries: queries),
+            RedditOAuthAPI.getModMailConversation(conversationId: conversationId),
             interceptor: interceptor
         )
         .validate()
@@ -54,7 +54,7 @@ public class ModMailListingRepository: ModMailListingRepositoryProtocol {
         .response
         
         if let statusCode = response.response?.statusCode {
-            printInDebugOnly("Status code: \(statusCode) Session: \(self.sessionName)")
+            printInDebugOnly("Status code: \(statusCode) Session: \(self.sessionName ?? "nil")")
         }
         
         let data = response.data
@@ -63,9 +63,9 @@ public class ModMailListingRepository: ModMailListingRepositoryProtocol {
         
         let json = JSON(data)
         if let error = json.error {
-            throw ModMailListingRepositoryError.JSONDecodingError(error.localizedDescription)
+            throw ModMailConversationRepositoryError.JSONDecodingError(error.localizedDescription)
         }
         
-        return try ModMailListing(fromJson: json)
+        return json
     }
 }
