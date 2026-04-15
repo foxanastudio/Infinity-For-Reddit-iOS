@@ -102,7 +102,7 @@ public class HistoryPostListingViewModel: ObservableObject {
     public func loadPosts(isRefreshWithContinuation: Bool = false) async {
         guard !isInitialLoading, !isLoadingMore, hasMorePages else { return }
         
-        let isInitailLoadCopy = isInitialLoad
+        let isInitialLoadCopy = isInitialLoad
         
         await MainActor.run {
             if posts.isEmpty {
@@ -182,7 +182,7 @@ public class HistoryPostListingViewModel: ObservableObject {
             await MainActor.run {
                 self.error = error
                 
-                isInitialLoad = isInitailLoadCopy
+                isInitialLoad = isInitialLoadCopy
                 isInitialLoading = false
                 isLoadingMore = false
             }

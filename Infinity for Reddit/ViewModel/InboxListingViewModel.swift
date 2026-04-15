@@ -39,7 +39,7 @@ public class InboxListingViewModel: ObservableObject {
     public func loadInboxes() async {
         guard !isInitialLoading, !isLoadingMore, hasMorePages else { return }
         
-        let isInitailLoadCopy = isInitialLoad
+        let isInitialLoadCopy = isInitialLoad
         
         if inboxes.isEmpty {
             isInitialLoading = true
@@ -80,7 +80,7 @@ public class InboxListingViewModel: ObservableObject {
                 printInDebugOnly("Error fetching inboxes: \(error)")
             }
             
-            self.isInitialLoad = isInitailLoadCopy
+            self.isInitialLoad = isInitialLoadCopy
             self.isInitialLoading = false
             self.isLoadingMore = false
         }

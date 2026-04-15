@@ -100,7 +100,7 @@ public class UserListingViewModel: ObservableObject {
     public func loadUsers(isRefreshWithContinuation: Bool = false) async {
         guard !isInitialLoading, !isLoadingMore, hasMorePages else { return }
         
-        let isInitailLoadCopy = isInitialLoad
+        let isInitialLoadCopy = isInitialLoad
         
         if users.isEmpty {
             isInitialLoading = true
@@ -152,7 +152,7 @@ public class UserListingViewModel: ObservableObject {
         } catch {
             self.error = error
             
-            isInitialLoad = isInitailLoadCopy
+            isInitialLoad = isInitialLoadCopy
             isInitialLoading = false
             isLoadingMore = false
             

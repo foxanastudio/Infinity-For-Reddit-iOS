@@ -175,7 +175,7 @@ public class PostDetailsViewModel: ObservableObject {
             guard !isInitialLoading, !isLoadingMore else { return }
         }
         
-        let isInitailLoadCopy = isInitialLoad
+        let isInitialLoadCopy = isInitialLoad
         
         await MainActor.run {
             if allComments.isEmpty {
@@ -296,7 +296,7 @@ public class PostDetailsViewModel: ObservableObject {
             await MainActor.run {
                 self.contentLoadingError = error
                 
-                self.isInitialLoad = isInitailLoadCopy
+                self.isInitialLoad = isInitialLoadCopy
                 self.isInitialLoading = false
                 self.isLoadingMore = false
             }

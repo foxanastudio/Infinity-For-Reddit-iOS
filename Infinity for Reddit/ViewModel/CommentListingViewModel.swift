@@ -61,7 +61,7 @@ public class CommentListingViewModel: ObservableObject {
     public func loadComments(isRefreshWithContinuation: Bool = false) async {
         guard !isInitialLoading, !isLoadingMore, hasMorePages else { return }
         
-        let isInitailLoadCopy = isInitialLoad
+        let isInitialLoadCopy = isInitialLoad
         
         await MainActor.run {
             if comments.isEmpty {
@@ -135,7 +135,7 @@ public class CommentListingViewModel: ObservableObject {
             await MainActor.run {
                 self.commentLoadingError = error
                 
-                isInitialLoad = isInitailLoadCopy
+                isInitialLoad = isInitialLoadCopy
                 isInitialLoading = false
                 isLoadingMore = false
             }

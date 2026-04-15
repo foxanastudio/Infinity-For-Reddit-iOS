@@ -141,7 +141,7 @@ public class PostListingViewModel: ObservableObject {
     public func loadPosts(isRefreshWithContinuation: Bool = false) async {
         guard !isInitialLoading, !isLoadingMore, hasMorePages else { return }
         
-        let isInitailLoadCopy = isInitialLoad
+        let isInitialLoadCopy = isInitialLoad
         
         await MainActor.run {
             if posts.isEmpty {
@@ -320,7 +320,7 @@ public class PostListingViewModel: ObservableObject {
             await MainActor.run {
                 self.postLoadingError = error
                 
-                isInitialLoad = isInitailLoadCopy
+                isInitialLoad = isInitialLoadCopy
                 isInitialLoading = false
                 isLoadingMore = false
             }

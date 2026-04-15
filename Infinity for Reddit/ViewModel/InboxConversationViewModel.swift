@@ -10,7 +10,7 @@ import Foundation
 class InboxConversationViewModel: ObservableObject {
     @Published var inbox: Inbox
     @Published var fullNameToReplyTo: String?
-    @Published var recepient: String?
+    @Published var recipient: String?
     @Published var error: Error?
     @Published var listScrollTarget: String?
     
@@ -28,30 +28,30 @@ class InboxConversationViewModel: ObservableObject {
         self.inbox = inbox
         if inbox.author == AccountViewModel.shared.account.username {
             var fullNameTemp: String?
-            var recepientTemp: String?
+            var recipientTemp: String?
             if let inboxes = inbox.replies?.data.inboxes {
                 for i in (0..<inboxes.count).reversed() {
                     if inboxes[i].author != AccountViewModel.shared.account.username {
                         fullNameTemp = inboxes[i].name
                         fullNameToReplyTo = fullNameTemp
-                        recepientTemp = inboxes[i].author
-                        recepient = recepientTemp
+                        recipientTemp = inboxes[i].author
+                        recipient = recipientTemp
                         break
                     } else if inboxes[i].dest != AccountViewModel.shared.account.username {
-                        recepientTemp = inboxes[i].dest
-                        recepient = recepientTemp
+                        recipientTemp = inboxes[i].dest
+                        recipient = recipientTemp
                     }
                 }
             }
             if fullNameTemp == nil {
                 fullNameToReplyTo = inbox.name
             }
-            if recepientTemp == nil {
-                recepient = inbox.dest
+            if recipientTemp == nil {
+                recipient = inbox.dest
             }
         } else {
             fullNameToReplyTo = inbox.name
-            recepient = inbox.author
+            recipient = inbox.author
         }
         self.inboxConversationRepository = inboxConversationRepository
     }

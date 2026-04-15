@@ -49,7 +49,7 @@ public class PostListingScrollViewModel: ObservableObject {
     public func loadPosts() async {
         guard !isInitialLoading, !isLoadingMore, hasMorePages else { return }
         
-        let isInitailLoadCopy = isInitialLoad
+        let isInitialLoadCopy = isInitialLoad
         
         await MainActor.run {
             if posts.isEmpty {
@@ -114,7 +114,7 @@ public class PostListingScrollViewModel: ObservableObject {
             await MainActor.run {
                 self.error = error
                 
-                isInitialLoad = isInitailLoadCopy
+                isInitialLoad = isInitialLoadCopy
                 isInitialLoading = false
                 isLoadingMore = false
             }

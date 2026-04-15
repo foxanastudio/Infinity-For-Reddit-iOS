@@ -96,8 +96,8 @@ struct InboxConversationView: View {
             }
         }
         .themedNavigationBar()
-        .applyIf(inboxConversationViewModel.recepient != nil) {
-            $0.addTitleToInlineNavigationBar(inboxConversationViewModel.recepient!)
+        .applyIf(inboxConversationViewModel.recipient != nil) {
+            $0.addTitleToInlineNavigationBar(inboxConversationViewModel.recipient!)
         }
         .toolbar {
             NavigationBarMenu()
@@ -108,10 +108,10 @@ struct InboxConversationView: View {
             }
             navigationBarMenuKey = navigationBarMenuManager.push([
                 NavigationBarMenuItem(title: "View Profile") {
-                    guard let recepient = inboxConversationViewModel.recepient else {
+                    guard let recipient = inboxConversationViewModel.recipient else {
                         return
                     }
-                    navigationManager.append(AppNavigation.userDetails(username: recepient))
+                    navigationManager.append(AppNavigation.userDetails(username: recipient))
                 }
             ])
         }
