@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ModMailListingView: View {
+    @EnvironmentObject private var navigationManager: NavigationManager
+
     @StateObject var modMailListingViewModel: ModMailListingViewModel
     
     init() {
@@ -41,7 +43,15 @@ struct ModMailListingView: View {
                     ForEach(modMailListingViewModel.conversations, id: \.id) { conversation in
                         ModMailConversationItemView(
                             conversation: conversation,
-                            latestMessagePreview: modMailListingViewModel.latestMessagePreview(for: conversation)
+                            latestMessagePreview: modMailListingViewModel.latestMessagePreview(for: conversation),
+                            onTap: {
+                                navigationManager.append(
+                                    AppNavigation.modMailConversation(
+                                        conversationId: conversation.id,
+                                        participantUsername: conversation.participant.name
+                                    )
+                                )
+                            }
                         )
                         .limitedWidth()
                     }
@@ -69,10 +79,11 @@ struct ModMailConversationItemView: View {
     
     @State var conversation: ModMailConversation
     let latestMessagePreview: String
+    let onTap: () -> Void
     
     var body: some View {
         VStack(spacing: 0) {
-            TouchRipple(action: {}) {
+            TouchRipple(action: onTap) {
                 VStack(spacing: 4) {
                     HStack(alignment: .top, spacing: 8) {
                         RowText("u/\(conversation.participant.name ?? "-"), \(conversation.replyCount) replies")

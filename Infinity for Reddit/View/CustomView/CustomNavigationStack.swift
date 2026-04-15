@@ -80,6 +80,8 @@ struct CustomNavigationStack<Content: View>: View {
                     case .inboxConversation(let inbox):
                         InboxConversationView(inbox: inbox)
                             .environmentObject(navigationManager)
+                    case .modMailConversation(let conversationId, let participantUsername):
+                        ModMailConversationView(conversationId: conversationId, participantUsername: participantUsername)
                     case .submitComment(let commentParent):
                         SubmitCommentView(parent: commentParent)
                             .environmentObject(navigationManager)
