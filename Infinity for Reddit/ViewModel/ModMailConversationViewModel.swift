@@ -54,7 +54,6 @@ class ModMailConversationViewModel: ObservableObject {
 
             let modMailConversationDetail = try ModMailConversationDetail(fromJson: response)
             self.modMailConversationDetail = modMailConversationDetail
-            printInDebugOnly(modMailConversationDetail.orderedMessages.map(\.bodyMarkdown))
             self.isLoading = false
         } catch {
             if !(error is CancellationError) {

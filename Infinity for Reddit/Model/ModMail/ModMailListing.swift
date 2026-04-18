@@ -189,6 +189,15 @@ public class ModMailMessage: NSObject {
         participatingAs = json["participatingAs"].stringValue
         author = try ModMailAuthor(fromJson: json["author"])
     }
+
+    var displayBody: String {
+        let bodyMarkdown = bodyMarkdown.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !bodyMarkdown.isEmpty {
+            return bodyMarkdown
+        }
+
+        return body.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
 }
 
 public class ModMailObjectId: NSObject {

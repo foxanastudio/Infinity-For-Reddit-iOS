@@ -8,10 +8,12 @@
 import SwiftUI
 
 struct ModMailConversationView: View {
-    let participantUsername: String
-
+    @EnvironmentObject private var accountViewModel: AccountViewModel
+    
     @StateObject var modMailConversationViewModel: ModMailConversationViewModel
-
+    
+    let participantUsername: String
+    
     init(
         conversationId: String,
         participantUsername: String
@@ -24,10 +26,26 @@ struct ModMailConversationView: View {
             )
         )
     }
-
+    
     var body: some View {
         RootView {
-            Text("ModMailConversationView")
+            List {
+                let messages = modMailConversationViewModel.modMailConversationDetail?.orderedMessages.reversed() ?? []
+                
+                ForEach(Array(messages.enumerated()), id: \.element.id) { index, message in
+                    let isLastFromSender = index == 0 || messages[index - 1].author.name != message.author.name
+                    
+                    ChatBubble(isSentMessage: message.author.name == accountViewModel.account.username, shouldShowTail: isLastFromSender) {
+                        Text(message.displayBody)
+                    }
+                    .listPlainItemNoInsets()
+                    .rotationEffect(.degrees(180))
+                    .id(message.id)
+                }
+            }
+            .rotationEffect(.degrees(180))
+            .themedList()
+            .scrollIndicators(.hidden)
         }
         .task {
             await modMailConversationViewModel.initialLoadModMailConversation()
