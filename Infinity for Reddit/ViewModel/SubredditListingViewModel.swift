@@ -100,7 +100,7 @@ public class SubredditListingViewModel: ObservableObject {
     public func loadSubreddits(isRefreshWithContinuation: Bool = false) async {
         guard !isInitialLoading, !isLoadingMore, hasMorePages else { return }
         
-        let isInitailLoadCopy = isInitialLoad
+        let isInitialLoadCopy = isInitialLoad
         
         if subreddits.isEmpty {
             isInitialLoading = true
@@ -155,7 +155,7 @@ public class SubredditListingViewModel: ObservableObject {
         } catch {
             self.error = error
             
-            isInitialLoad = isInitailLoadCopy
+            isInitialLoad = isInitialLoadCopy
             isInitialLoading = false
             isLoadingMore = false
             

@@ -67,6 +67,19 @@ class MediaMetadata : NSObject, ObservableObject, Identifiable {
         hlsUrl = json["hlsUrl"].stringValue
         isGif = json["isGif"].boolValue
     }
+    
+    init(e: String, id: String, m: String, isGif: Bool, s: MediaMetadataSource) {
+        self.e = e
+        self.id = id
+        self.m = m
+        self.isGif = isGif
+        self.s = s
+        
+        x = 0
+        y = 0
+        dashUrl = ""
+        hlsUrl = ""
+    }
 }
 
 class MediaMetadataPreview : NSObject, ObservableObject, Identifiable {

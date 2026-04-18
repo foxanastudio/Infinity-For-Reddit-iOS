@@ -52,5 +52,6 @@ struct GenericPickerPreference: View {
             .padding(16)
             .limitedWidth()
         }
+        .compositingGroup()
     }
 }

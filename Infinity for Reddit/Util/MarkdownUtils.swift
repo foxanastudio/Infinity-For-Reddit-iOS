@@ -169,14 +169,17 @@ class MarkdownUtils {
         
         if markdownString[matchRange.lowerBound] == "[" {
             // Has caption
-            if let urlRange = markdownString[matchRange.lowerBound...].range(of: "https://") {
+            if let urlRange = markdownString[matchRange].range(of: "https://", options: .backwards) {
                 let urlStartIndex = urlRange.lowerBound
                 let idStartIndex = markdownString.index(urlStartIndex, offsetBy: baseURLLength)
                 let idEndIndex = markdownString[idStartIndex...].firstIndex(of: ".")!
                 id = String(markdownString[idStartIndex..<idEndIndex])
                 
                 let captionStartIndex = markdownString.index(matchRange.lowerBound, offsetBy: 1)
-                caption = String(markdownString[captionStartIndex..<markdownString.index(urlStartIndex, offsetBy: -2)])
+                let captionEndIndex = markdownString.index(urlStartIndex, offsetBy: -2)
+                if captionEndIndex >= captionStartIndex {
+                    caption = String(markdownString[captionStartIndex..<captionEndIndex])
+                }
             } else {
                 return matchRange.upperBound.utf16Offset(in: markdownString)
             }

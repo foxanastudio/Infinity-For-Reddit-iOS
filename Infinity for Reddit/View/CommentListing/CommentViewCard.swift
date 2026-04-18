@@ -30,7 +30,10 @@ struct CommentViewCard: View {
     private var showFewerToolbarOptionsThreshold: Int = 5
     @AppStorage(InterfaceUserDefaultsUtils.voteButtonsOnTheRightKey, store: .interface)
     private var voteButtonsOnTheRight: Bool = false
-    @AppStorage(InterfaceCommentUserDefaultsUtils.markdownEmbeddedMediaTypeKey, store: .interfaceComment) private var markdownEmbeddedMediaType: Int = 15
+    @AppStorage(InterfaceCommentUserDefaultsUtils.markdownEmbeddedMediaTypeKey, store: .interfaceComment)
+    private var markdownEmbeddedMediaType: Int = 15
+    @AppStorage(GesturesButtonsUserDefaultsUtils.commentLongPressActionKey, store: .gesturesButtons)
+    private var commentLongPressAction: Int = CommentTapAction.expandCollapseComment.rawValue
     
     //@StateObject var commentViewModel: CommentViewModel
     @ObservedObject private var comment: Comment
@@ -38,6 +41,7 @@ struct CommentViewCard: View {
     @State private var voteTask: Task<Void, Never>? = nil
     @State private var saveTask: Task<Void, Never>? = nil
     @State private var isToolbarHidden: Bool
+    private var toolbarVisibilityFlag: Bool
 
     private let isInPostDetails: Bool
     private let userIconSize: CGFloat = 24
@@ -57,6 +61,7 @@ struct CommentViewCard: View {
         comment: Comment,
         isInPostDetails: Bool,
         highlightComment: Bool = false,
+        toolbarVisibilityFlag: Bool = false,
         thingModerationRepository: ThingModerationRepositoryProtocol,
         onUpvote: @escaping () -> Void,
         onDownvote: @escaping () -> Void,
@@ -72,6 +77,7 @@ struct CommentViewCard: View {
         self.comment = comment
         self.isInPostDetails = isInPostDetails
         self.highlightComment = highlightComment
+        self.toolbarVisibilityFlag = toolbarVisibilityFlag
         self.onUpvote = onUpvote
         self.onDownvote = onDownvote
         self.onToggleSave = onToggleSave
@@ -136,7 +142,7 @@ struct CommentViewCard: View {
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
                 
-                if !((comment.isCollasped && fullyCollapseComment && comment.hasExpandedBefore) || (comment.isFilteredOut && !comment.hasExpandedBefore)) {
+                if !((comment.isCollasped && fullyCollapseComment) || (comment.isFilteredOut && !comment.hasExpandedBefore)) {
                     Group {
                         if let processedMarkdown = comment.bodyProcessedMarkdown {
                             Markdown(processedMarkdown)
@@ -389,15 +395,13 @@ struct CommentViewCard: View {
         }
         .contentShape(Rectangle())
         .background(backgroundColor)
-        .applyIf(isInPostDetails) {
-            $0.onTapGesture {
-                isToolbarHidden.toggle()
-            }
+        .onChange(of: toolbarVisibilityFlag) { _, newValue in
+            isToolbarHidden.toggle()
         }
     }
     
     private var backgroundColor: Color {
-        return (comment.isCollasped && fullyCollapseComment && comment.hasExpandedBefore)
+        return (comment.isCollasped && fullyCollapseComment)
         || (comment.isFilteredOut && !comment.hasExpandedBefore) ? Color(hex: customThemeViewModel.currentCustomTheme.fullyCollapsedCommentBackgroundColor)
         : (highlightComment ? Color(hex: customThemeViewModel.currentCustomTheme.singleCommentThreadBackgroundColor) : Color.clear)
     }

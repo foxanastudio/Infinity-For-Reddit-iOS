@@ -51,5 +51,6 @@ struct BarebonePickerPreference<T: Hashable>: View {
             .padding(16)
             .limitedWidth()
         }
+        .compositingGroup()
     }
 }

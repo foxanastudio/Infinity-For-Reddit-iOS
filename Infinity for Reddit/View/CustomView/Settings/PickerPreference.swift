@@ -58,5 +58,6 @@ struct PickerPreference: View {
             .padding(16)
             .limitedWidth()
         }
+        .compositingGroup()
     }
 }

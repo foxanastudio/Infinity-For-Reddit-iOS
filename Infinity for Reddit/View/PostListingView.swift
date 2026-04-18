@@ -45,6 +45,8 @@ struct PostListingView: View {
     @AppStorage(PostHistoryUserDefaultsUtils.historyLimitKey, store: .postHistory) private var historyLimit: Int = 500
     @AppStorage(PostHistoryUserDefaultsUtils.markPostsAsReadAfterVotingKey, store: .postHistory) private var markPostsAsReadAfterVoting: Bool = false
     @AppStorage(PostHistoryUserDefaultsUtils.markPostsAsReadOnScrollKey, store: .postHistory) private var markPostsAsReadOnScroll: Bool = false
+    @AppStorage(GesturesButtonsUserDefaultsUtils.postLeftSwipeActionKey, store: .gesturesButtons) private var postLeftSwipeAction: Int = SwipeAction.upvote.rawValue
+    @AppStorage(GesturesButtonsUserDefaultsUtils.postRightSwipeActionKey, store: .gesturesButtons) private var postRightSwipeAction: Int = SwipeAction.downvote.rawValue
     
     private let postListingMetadata: PostListingMetadata
     private var isSubredditPostListing: Bool = false
@@ -214,40 +216,26 @@ struct PostListingView: View {
                                 }
                             }
                             .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                Button {
-                                    Task {
-                                        await postListingViewModel.votePost(
-                                            post: post,
-                                            vote: 1,
-                                            saveReadPosts: saveReadPosts,
-                                            limitHistorySize: limitHistorySize,
-                                            historyLimit: historyLimit,
-                                            markPostsAsReadAfterVoting: markPostsAsReadAfterVoting
-                                        )
+                                if let action = SwipeAction(rawValue: postLeftSwipeAction), action != .none {
+                                    Button {
+                                        onSwipe(action, post: post)
+                                    } label: {
+                                        SwiftUI.Image(systemName: action.icon)
+                                            .foregroundStyle(.white)
                                     }
-                                } label: {
-                                    SwiftUI.Image(systemName: "arrowshape.up")
-                                        .foregroundStyle(.white)
+                                    .tint(action.getTint(customThemeViewModel: customThemeViewModel))
                                 }
-                                .tint(Color(hex: customThemeViewModel.currentCustomTheme.upvoted))
                             }
                             .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                                Button {
-                                    Task {
-                                        await postListingViewModel.votePost(
-                                            post: post,
-                                            vote: -1,
-                                            saveReadPosts: saveReadPosts,
-                                            limitHistorySize: limitHistorySize,
-                                            historyLimit: historyLimit,
-                                            markPostsAsReadAfterVoting: markPostsAsReadAfterVoting
-                                        )
+                                if let action = SwipeAction(rawValue: postRightSwipeAction), action != .none {
+                                    Button {
+                                        onSwipe(action, post: post)
+                                    } label: {
+                                        SwiftUI.Image(systemName: action.icon)
+                                            .foregroundStyle(.white)
                                     }
-                                } label: {
-                                    SwiftUI.Image(systemName: "arrowshape.down")
-                                        .foregroundStyle(.white)
+                                    .tint(action.getTint(customThemeViewModel: customThemeViewModel))
                                 }
-                                .tint(Color(hex: customThemeViewModel.currentCustomTheme.downvoted))
                             }
                         }
                         
@@ -756,6 +744,37 @@ struct PostListingView: View {
         lazyMode?.cancel()
         lazyMode = nil
         startLazyMode()
+    }
+    
+    private func onSwipe(_ action: SwipeAction, post: Post) {
+        switch action {
+        case .none:
+            break
+        case .upvote:
+            Task {
+                await postListingViewModel.votePost(
+                    post: post,
+                    vote: 1,
+                    saveReadPosts: saveReadPosts,
+                    limitHistorySize: limitHistorySize,
+                    historyLimit: historyLimit,
+                    markPostsAsReadAfterVoting: markPostsAsReadAfterVoting
+                )
+            }
+            break
+        case .downvote:
+            Task {
+                await postListingViewModel.votePost(
+                    post: post,
+                    vote: -1,
+                    saveReadPosts: saveReadPosts,
+                    limitHistorySize: limitHistorySize,
+                    historyLimit: historyLimit,
+                    markPostsAsReadAfterVoting: markPostsAsReadAfterVoting
+                )
+            }
+            break
+        }
     }
     
     struct LoadPostsTaskKey: Hashable {

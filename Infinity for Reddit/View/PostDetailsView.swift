@@ -42,8 +42,10 @@ struct PostDetailsView: View {
     @State private var activeAlert: ActiveAlert? = nil
     @State private var showActionBar: Bool = true
     @State private var showSearchBar: Bool = false
+    @State private var geometryProxy: GeometryProxy?
     @State private var listProxy: ScrollViewProxy?
     @State private var commentToBeModerated: Comment?
+    @State private var commentsWithToolbarHidden: Set<String> = []
     @State private var voteTask: Task<Void, Never>?
     
     @AppStorage(InterfacePostDetailsUserDefaultsUtils.separatePostAndCommentsKey, store: .interfacePostDetails)
@@ -52,6 +54,14 @@ struct PostDetailsView: View {
     private var fullyCollapseComment: Bool = false
     @AppStorage(InterfaceCommentUserDefaultsUtils.showAuthorAvatarKey, store: .interfaceComment)
     private var showAuthorAvatar: Bool = false
+    @AppStorage(GesturesButtonsUserDefaultsUtils.commentLeftSwipeActionKey, store: .gesturesButtons)
+    private var commentLeftSwipeAction: Int = SwipeAction.upvote.rawValue
+    @AppStorage(GesturesButtonsUserDefaultsUtils.commentRightSwipeActionKey, store: .gesturesButtons)
+    private var commentRightSwipeAction: Int = SwipeAction.downvote.rawValue
+    @AppStorage(GesturesButtonsUserDefaultsUtils.commentTapActionKey, store: .gesturesButtons)
+    private var commentTapAction: Int = CommentTapAction.toggleToolbar.rawValue
+    @AppStorage(GesturesButtonsUserDefaultsUtils.commentLongPressActionKey, store: .gesturesButtons)
+    private var commentLongPressAction: Int = CommentTapAction.expandCollapseComment.rawValue
     
     @Namespace var glassActionBarNamespace
     
@@ -90,8 +100,8 @@ struct PostDetailsView: View {
                 GeometryReader { geometryProxy in
                     ZStack(alignment: .bottom) {
                         HStack(spacing: 0) {
-                            if geometryProxy.size.width > 500 && separatePostAndComments {
-                                List {
+                            if needToSeparatePostAndComments {
+                                ScrollView {
                                     PostDetailsItemView(
                                         postDetailsViewModel: postDetailsViewModel,
                                         post: post,
@@ -116,14 +126,13 @@ struct PostDetailsView: View {
                                         .frame(height: 150)
                                         .listPlainItemNoInsets()
                                 }
-                                .themedList()
                                 .scrollIndicators(.hidden)
                                 .scrollBounceBehavior(.basedOnSize)
                             }
                             
                             ScrollViewReader { proxy in
                                 List {
-                                    if geometryProxy.size.width <= 500 || !separatePostAndComments {
+                                    if !needToSeparatePostAndComments {
                                         PostDetailsItemView(
                                             postDetailsViewModel: postDetailsViewModel,
                                             post: post,
@@ -143,6 +152,12 @@ struct PostDetailsView: View {
                                                 showCopyContentOptionsSheet = true
                                             }
                                         )
+                                        .onAppear {
+                                            postDetailsViewModel.isPostVisibleInSingleColumnList = true
+                                        }
+                                        .onDisappear {
+                                            postDetailsViewModel.isPostVisibleInSingleColumnList = false
+                                        }
                                     }
                                     
                                     if case .postAndCommentId(_, let commentId) = postDetailsViewModel.postDetailsInput, commentId != nil {
@@ -196,6 +211,7 @@ struct PostDetailsView: View {
                                                     comment: comment,
                                                     isInPostDetails: true,
                                                     highlightComment: postDetailsViewModel.postDetailsInput.getHighlightCommentId == comment.id || postDetailsViewModel.searchedComment?.id == comment.id,
+                                                    toolbarVisibilityFlag: commentsWithToolbarHidden.contains(comment.id),
                                                     thingModerationRepository: thingModerationRepository,
                                                     onUpvote: {
                                                         postDetailsViewModel.voteComment(comment, vote: 1)
@@ -207,21 +223,7 @@ struct PostDetailsView: View {
                                                         postDetailsViewModel.toggleSaveComment(comment, save: !comment.saved)
                                                     },
                                                     onToggleExpand: {
-                                                        if fullyCollapseComment {
-                                                            if comment.isCollasped {
-                                                                postDetailsViewModel.expandComments(comment: comment)
-                                                            } else {
-                                                                postDetailsViewModel.collapseComments(comment: comment)
-                                                            }
-                                                        } else {
-                                                            withAnimation {
-                                                                if comment.isCollasped {
-                                                                    postDetailsViewModel.expandComments(comment: comment)
-                                                                } else {
-                                                                    postDetailsViewModel.collapseComments(comment: comment)
-                                                                }
-                                                            }
-                                                        }
+                                                        onExpandCollapseComment(comment: comment)
                                                     },
                                                     onReply: {
                                                         let commentParent = CommentParent.comment(parentComment: comment)
@@ -251,20 +253,35 @@ struct PostDetailsView: View {
                                                 )
                                                 .listPlainItemNoInsets()
                                                 .id(ObjectIdentifier(comment))
-                                                .onLongPressGesture {
-                                                    if fullyCollapseComment {
-                                                        if comment.isCollasped {
-                                                            postDetailsViewModel.expandComments(comment: comment)
-                                                        } else {
-                                                            postDetailsViewModel.collapseComments(comment: comment)
-                                                        }
-                                                    } else {
-                                                        withAnimation {
-                                                            if comment.isCollasped {
-                                                                postDetailsViewModel.expandComments(comment: comment)
+                                                .onTapGesture {
+                                                    if let action = CommentTapAction(rawValue: commentTapAction) {
+                                                        switch action {
+                                                        case .toggleToolbar:
+                                                            if commentsWithToolbarHidden.contains(comment.id) {
+                                                                commentsWithToolbarHidden.remove(comment.id)
                                                             } else {
-                                                                postDetailsViewModel.collapseComments(comment: comment)
+                                                                commentsWithToolbarHidden.insert(comment.id)
                                                             }
+                                                            break
+                                                        case .expandCollapseComment:
+                                                            onExpandCollapseComment(comment: comment)
+                                                            break
+                                                        }
+                                                    }
+                                                }
+                                                .onLongPressGesture {
+                                                    if let action = CommentTapAction(rawValue: commentLongPressAction) {
+                                                        switch action {
+                                                        case .toggleToolbar:
+                                                            if commentsWithToolbarHidden.contains(comment.id) {
+                                                                commentsWithToolbarHidden.remove(comment.id)
+                                                            } else {
+                                                                commentsWithToolbarHidden.insert(comment.id)
+                                                            }
+                                                            break
+                                                        case .expandCollapseComment:
+                                                            onExpandCollapseComment(comment: comment)
+                                                            break
                                                         }
                                                     }
                                                 }
@@ -282,26 +299,30 @@ struct PostDetailsView: View {
                                                     if AccountViewModel.shared.account.isAnonymous() {
                                                         EmptyView()
                                                     } else {
-                                                        Button {
-                                                            postDetailsViewModel.voteComment(comment, vote: 1)
-                                                        } label: {
-                                                            SwiftUI.Image(systemName: "arrowshape.up")
-                                                                .foregroundStyle(.white)
+                                                        if let action = SwipeAction(rawValue: commentLeftSwipeAction), action != .none {
+                                                            Button {
+                                                                onSwipe(action, comment: comment)
+                                                            } label: {
+                                                                SwiftUI.Image(systemName: action.icon)
+                                                                    .foregroundStyle(.white)
+                                                            }
+                                                            .tint(action.getTint(customThemeViewModel: customThemeViewModel))
                                                         }
-                                                        .tint(Color(hex: customThemeViewModel.currentCustomTheme.upvoted))
                                                     }
                                                 }
                                                 .swipeActions(edge: .leading, allowsFullSwipe: true) {
                                                     if AccountViewModel.shared.account.isAnonymous() {
                                                         EmptyView()
                                                     } else {
-                                                        Button {
-                                                            postDetailsViewModel.voteComment(comment, vote: -1)
-                                                        } label: {
-                                                            SwiftUI.Image(systemName: "arrowshape.down")
-                                                                .foregroundStyle(.white)
+                                                        if let action = SwipeAction(rawValue: commentRightSwipeAction), action != .none {
+                                                            Button {
+                                                                onSwipe(action, comment: comment)
+                                                            } label: {
+                                                                SwiftUI.Image(systemName: action.icon)
+                                                                    .foregroundStyle(.white)
+                                                            }
+                                                            .tint(action.getTint(customThemeViewModel: customThemeViewModel))
                                                         }
-                                                        .tint(Color(hex: customThemeViewModel.currentCustomTheme.downvoted))
                                                     }
                                                 }
                                             case .more(let commentMore):
@@ -459,10 +480,8 @@ struct PostDetailsView: View {
                                             .glassEffect(.regular.interactive())
                                             .glassEffectUnion(id: "actionBarOptions", namespace: glassActionBarNamespace)
                                             .onTapGesture {
-                                                if let listProxy {
-                                                    if let commentItem = postDetailsViewModel.getPreviousParentComment() {
-                                                        scrollToComment(listProxy: listProxy, commentItem: commentItem)
-                                                    }
+                                                if let listProxy, let commentItem = postDetailsViewModel.getPreviousParentComment() {
+                                                    scrollToComment(listProxy: listProxy, commentItem: commentItem)
                                                 }
                                             }
                                         
@@ -489,10 +508,8 @@ struct PostDetailsView: View {
                                             .glassEffect(.regular.interactive())
                                             .glassEffectUnion(id: "actionBarOptions", namespace: glassActionBarNamespace)
                                             .onTapGesture {
-                                                if let listProxy {
-                                                    if let commentItem = postDetailsViewModel.getNextParentComment() {
-                                                        scrollToComment(listProxy: listProxy, commentItem: commentItem)
-                                                    }
+                                                if let listProxy, let commentItem = postDetailsViewModel.getNextParentComment(needToSeparatePostAndComments: needToSeparatePostAndComments) {
+                                                    scrollToComment(listProxy: listProxy, commentItem: commentItem)
                                                 }
                                             }
                                     }
@@ -585,10 +602,8 @@ struct PostDetailsView: View {
                                         .fabIcon()
                                         .contentShape(Rectangle())
                                         .onTapGesture {
-                                            if let listProxy {
-                                                if let commentItem = postDetailsViewModel.getPreviousParentComment() {
-                                                    scrollToComment(listProxy: listProxy, commentItem: commentItem)
-                                                }
+                                            if let listProxy, let commentItem = postDetailsViewModel.getPreviousParentComment() {
+                                                scrollToComment(listProxy: listProxy, commentItem: commentItem)
                                             }
                                         }
                                     
@@ -613,10 +628,8 @@ struct PostDetailsView: View {
                                         .fabIcon()
                                         .contentShape(Rectangle())
                                         .onTapGesture {
-                                            if let listProxy {
-                                                if let commentItem = postDetailsViewModel.getNextParentComment() {
-                                                    scrollToComment(listProxy: listProxy, commentItem: commentItem)
-                                                }
+                                            if let listProxy, let commentItem = postDetailsViewModel.getNextParentComment(needToSeparatePostAndComments: needToSeparatePostAndComments) {
+                                                scrollToComment(listProxy: listProxy, commentItem: commentItem)
                                             }
                                         }
                                 }
@@ -631,6 +644,9 @@ struct PostDetailsView: View {
                                 .zIndex(1)
                             }
                         }
+                    }
+                    .onAppear {
+                        self.geometryProxy = geometryProxy
                     }
                     .showErrorUsingSnackbar(postDetailsViewModel.$error)
                 }
@@ -699,12 +715,19 @@ struct PostDetailsView: View {
             showActionBar = true
         }
         .onDisappear {
+            postDetailsViewModel.saveCache()
+            
             guard let navigationBarMenuKey else { return }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
         .onChange(of: postDetailsViewModel.showSensitiveContentWarningTrigger) { _, newValue in
             if newValue {
                 activeAlert = .sensitiveContentWarning
+            }
+        }
+        .onChange(of: postDetailsViewModel.scrollToCommentAfterRestoringCacheToggle) { _, newValue in
+            if let listProxy, let commentItem = postDetailsViewModel.commentItemToScrollTo {
+                scrollToComment(listProxy: listProxy, commentItem: commentItem, animated: false, allowCommentMore: true)
             }
         }
         .wrapContentSheet(isPresented: $showSortTypeSheet) {
@@ -892,6 +915,13 @@ struct PostDetailsView: View {
         )
     }
     
+    private var needToSeparatePostAndComments: Bool {
+        guard let geometryProxy else {
+            return false
+        }
+        return geometryProxy.size.width > 500 && separatePostAndComments
+    }
+    
     private func setUpMenu() {
         if let key = navigationBarMenuKey {
             navigationBarMenuManager.pop(key: key)
@@ -1068,16 +1098,59 @@ struct PostDetailsView: View {
             navigationManager.append(AppNavigation.editPost(post: post))
         }
     }
-    
-    // Don't scroll to CommentMore
-    private func scrollToComment(listProxy: ScrollViewProxy, commentItem: CommentItem) {
+
+    private func scrollToComment(listProxy: ScrollViewProxy, commentItem: CommentItem, anchor: UnitPoint = .top, animated: Bool = true, allowCommentMore: Bool = false) {
         switch commentItem {
         case .comment(let comment):
-            withAnimation {
-                listProxy.scrollTo(ObjectIdentifier(comment), anchor: .top)
+            if animated {
+                withAnimation {
+                    listProxy.scrollTo(ObjectIdentifier(comment), anchor: anchor)
+                }
+            } else {
+                listProxy.scrollTo(ObjectIdentifier(comment), anchor: anchor)
             }
-        case .more:
+        case .more(let commentMore):
+            if allowCommentMore {
+                if animated {
+                    withAnimation {
+                        listProxy.scrollTo(ObjectIdentifier(commentMore), anchor: anchor)
+                    }
+                } else {
+                    listProxy.scrollTo(ObjectIdentifier(commentMore), anchor: anchor)
+                }
+            }
             break
+        }
+    }
+    
+    private func onSwipe(_ action: SwipeAction, comment: Comment) {
+        switch action {
+        case .none:
+            break
+        case .upvote:
+            postDetailsViewModel.voteComment(comment, vote: 1)
+            break
+        case .downvote:
+            postDetailsViewModel.voteComment(comment, vote: -1)
+            break
+        }
+    }
+    
+    private func onExpandCollapseComment(comment: Comment) {
+        if fullyCollapseComment {
+            if comment.isCollasped {
+                postDetailsViewModel.expandComments(comment: comment, fullyCollapseComment: fullyCollapseComment)
+            } else {
+                postDetailsViewModel.collapseComments(comment: comment, fullyCollapseComment: fullyCollapseComment)
+            }
+        } else {
+            withAnimation {
+                if comment.isCollasped {
+                    postDetailsViewModel.expandComments(comment: comment, fullyCollapseComment: fullyCollapseComment)
+                } else {
+                    postDetailsViewModel.collapseComments(comment: comment, fullyCollapseComment: fullyCollapseComment)
+                }
+            }
         }
     }
     
@@ -1165,6 +1238,9 @@ private struct PostDetailsItemView: View {
     
     @State var voteTask: Task<Void, Never>?
     
+    @AppStorage(GesturesButtonsUserDefaultsUtils.postDetailsLeftSwipeActionKey, store: .gesturesButtons) private var postDetailsLeftSwipeAction: Int = SwipeAction.upvote.rawValue
+    @AppStorage(GesturesButtonsUserDefaultsUtils.postDetailsRightSwipeActionKey, store: .gesturesButtons) private var postDetailsRightSwipeAction: Int = SwipeAction.downvote.rawValue
+    
     let post: Post
     //let isFromSubredditPostListing: Bool
     let playbackTimeToSeekToInitially: Double
@@ -1212,28 +1288,45 @@ private struct PostDetailsItemView: View {
 //            }
 //        }
         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-            Button {
-                voteTask?.cancel()
-                voteTask = Task {
-                    await postDetailsViewModel.votePost(vote: 1)
+            if let action = SwipeAction(rawValue: postDetailsLeftSwipeAction), action != .none {
+                Button {
+                    onSwipe(action)
+                } label: {
+                    SwiftUI.Image(systemName: action.icon)
+                        .foregroundStyle(.white)
                 }
-            } label: {
-                SwiftUI.Image(systemName: "arrowshape.up")
-                    .foregroundStyle(.white)
+                .tint(action.getTint(customThemeViewModel: customThemeViewModel))
             }
-            .tint(Color(hex: customThemeViewModel.currentCustomTheme.upvoted))
         }
         .swipeActions(edge: .leading, allowsFullSwipe: true) {
-            Button {
-                voteTask?.cancel()
-                voteTask = Task {
-                    await postDetailsViewModel.votePost(vote: -1)
+            if let action = SwipeAction(rawValue: postDetailsRightSwipeAction), action != .none {
+                Button {
+                    onSwipe(action)
+                } label: {
+                    SwiftUI.Image(systemName: action.icon)
+                        .foregroundStyle(.white)
                 }
-            } label: {
-                SwiftUI.Image(systemName: "arrowshape.down")
-                    .foregroundStyle(.white)
+                .tint(action.getTint(customThemeViewModel: customThemeViewModel))
             }
-            .tint(Color(hex: customThemeViewModel.currentCustomTheme.downvoted))
+        }
+    }
+    
+    private func onSwipe(_ action: SwipeAction) {
+        switch action {
+        case .none:
+            break
+        case .upvote:
+            voteTask?.cancel()
+            voteTask = Task {
+                await postDetailsViewModel.votePost(vote: 1)
+            }
+            break
+        case .downvote:
+            voteTask?.cancel()
+            voteTask = Task {
+                await postDetailsViewModel.votePost(vote: -1)
+            }
+            break
         }
     }
 }

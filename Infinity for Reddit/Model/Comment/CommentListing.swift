@@ -154,7 +154,7 @@ public class Comment : NSObject, Validatable, Identifiable, ObservableObject {
     var ups : Int!
     var userReports : [[Any]]! = [[Any]]()
     
-    var isCollasped: Bool = false
+    @Published var isCollasped: Bool = false
     var hasExpandedBefore: Bool = false
     var isFilteredOut: Bool = false
     @Published var authorIconUrlString: String? = nil
@@ -166,8 +166,6 @@ public class Comment : NSObject, Validatable, Identifiable, ObservableObject {
     }
     
     init(fromJson json: JSON!) throws {
-        try Self.validate(json: json)
-        
         if json.isEmpty {
             id = UUID().uuidString
             return
@@ -233,8 +231,23 @@ public class Comment : NSObject, Validatable, Identifiable, ObservableObject {
             var parsedMediaMetadata = [String: MediaMetadata]()
             
             for (key, value) in mediaMetaData {
-                let media = try MediaMetadata(fromJson: value)
-                if media.status == "invalid" && key.starts(with: "giphy|") {
+                let media = try? MediaMetadata(fromJson: value)
+                if let media {
+                    if media.status == "invalid" && key.starts(with: "giphy|") {
+                        let parts = key.components(separatedBy: "|")
+                        guard parts.count >= 2 else {
+                            continue
+                        }
+                        let giphyId = parts[1]
+                        let gifUrl = "https://media.giphy.com/media/\(giphyId)/giphy.gif"
+                        let mp4Url = "https://media.giphy.com/media/\(giphyId)/giphy.mp4"
+                        media.e = "AnimatedImage"
+                        media.id = giphyId
+                        media.isGif = true
+                        media.s = MediaMetadataSource(gif: gifUrl, mp4: mp4Url)
+                    }
+                    parsedMediaMetadata[key] = media
+                } else if value["status"].stringValue == "invalid" && key.starts(with: "giphy|") {
                     let parts = key.components(separatedBy: "|")
                     guard parts.count >= 2 else {
                         continue
@@ -242,12 +255,14 @@ public class Comment : NSObject, Validatable, Identifiable, ObservableObject {
                     let giphyId = parts[1]
                     let gifUrl = "https://media.giphy.com/media/\(giphyId)/giphy.gif"
                     let mp4Url = "https://media.giphy.com/media/\(giphyId)/giphy.mp4"
-                    media.e = "AnimatedImage"
-                    media.id = giphyId
-                    media.isGif = true
-                    media.s = MediaMetadataSource(gif: gifUrl, mp4: mp4Url)
+                    parsedMediaMetadata[key] = MediaMetadata(
+                        e: "AnimatedImage",
+                        id: giphyId,
+                        m: "image/gif",
+                        isGif: true,
+                        s: MediaMetadataSource(gif: gifUrl, mp4: mp4Url)
+                    )
                 }
-                parsedMediaMetadata[key] = media
             }
             mediaMetadata = parsedMediaMetadata
         }
