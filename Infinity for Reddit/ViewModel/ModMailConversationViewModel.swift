@@ -6,11 +6,10 @@
 //
 
 import Foundation
-import SwiftyJSON
 
 @MainActor
 class ModMailConversationViewModel: ObservableObject {
-    @Published var modMailConversationResponse: JSON?
+    @Published var modMailConversationDetail: ModMailConversationDetail?
     @Published var isLoading: Bool = false
     @Published var isInitialLoad: Bool = true
     @Published var error: Error?
@@ -46,15 +45,16 @@ class ModMailConversationViewModel: ObservableObject {
         do {
             try Task.checkCancellation()
 
-            let modMailConversationResponse = try await modMailConversationRepository.fetchModMailConversation(
+            let response = try await modMailConversationRepository.fetchModMailConversation(
                 conversationId: conversationId,
                 interceptor: nil
             )
 
             try Task.checkCancellation()
 
-            self.modMailConversationResponse = modMailConversationResponse
-            printInDebugOnly(modMailConversationResponse)
+            let modMailConversationDetail = try ModMailConversationDetail(fromJson: response)
+            self.modMailConversationDetail = modMailConversationDetail
+            printInDebugOnly(modMailConversationDetail.orderedMessages.map(\.bodyMarkdown))
             self.isLoading = false
         } catch {
             if !(error is CancellationError) {
