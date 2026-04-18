@@ -6,8 +6,9 @@
 //
 
 import Alamofire
-import SwiftyJSON
 
 public protocol ModMailConversationRepositoryProtocol {
-    func fetchModMailConversation(conversationId: String, interceptor: RequestInterceptor?) async throws -> JSON
+    func fetchModMailConversation(conversationId: String, interceptor: RequestInterceptor?) async throws -> ModMailConversationDetail
+    
+    func sendMessage(message: String, conversationId: String, isAuthorHidden: Bool, isInternal: Bool) async throws -> ModMailConversationDetail
 }

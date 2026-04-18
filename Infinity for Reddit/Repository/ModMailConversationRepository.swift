@@ -13,6 +13,7 @@ public class ModMailConversationRepository: ModMailConversationRepositoryProtoco
     enum ModMailConversationRepositoryError: LocalizedError {
         case NetworkError(String)
         case JSONDecodingError(String)
+        case sendMessageError(String)
         case AuthRequiredError
         
         var errorDescription: String? {
@@ -20,6 +21,8 @@ public class ModMailConversationRepository: ModMailConversationRepositoryProtoco
             case .NetworkError(let message):
                 return message
             case .JSONDecodingError(let message):
+                return message
+            case .sendMessageError(let message):
                 return message
             case .AuthRequiredError:
                 return "Authentication required"
@@ -40,7 +43,7 @@ public class ModMailConversationRepository: ModMailConversationRepositoryProtoco
     
     public func fetchModMailConversation(conversationId: String,
                                          interceptor: RequestInterceptor? = nil
-    ) async throws -> JSON {
+    ) async throws -> ModMailConversationDetail {
         if self.sessionName == "plain", interceptor == nil {
             throw ModMailConversationRepositoryError.AuthRequiredError
         }
@@ -65,7 +68,40 @@ public class ModMailConversationRepository: ModMailConversationRepositoryProtoco
         if let error = json.error {
             throw ModMailConversationRepositoryError.JSONDecodingError(error.localizedDescription)
         }
-        
-        return json
+
+        return try ModMailConversationDetail(fromJson: json)
+    }
+
+    public func sendMessage(message: String,
+                            conversationId: String,
+                            isAuthorHidden: Bool = true,
+                            isInternal: Bool = false
+    ) async throws -> ModMailConversationDetail {
+        if self.sessionName == "plain" {
+            throw ModMailConversationRepositoryError.AuthRequiredError
+        }
+
+        let params = [
+            "body": message,
+            "isAuthorHidden": isAuthorHidden ? "true" : "false",
+            "isInternal": isInternal ? "true" : "false"
+        ]
+
+        let data = try await
+            self.session.request(
+                RedditOAuthAPI.sendModMailMessage(conversationId: conversationId, params: params)
+            )
+            .validate()
+            .serializingData(automaticallyCancelling: true)
+            .value
+
+        try Task.checkCancellation()
+
+        let json = JSON(data)
+        if let error = json.error {
+            throw APIError.jsonDecodingError(error.localizedDescription)
+        }
+
+        return try ModMailConversationDetail(fromJson: json)
     }
 }

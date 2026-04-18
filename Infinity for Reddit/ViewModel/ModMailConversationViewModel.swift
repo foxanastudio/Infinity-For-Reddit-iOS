@@ -45,14 +45,13 @@ class ModMailConversationViewModel: ObservableObject {
         do {
             try Task.checkCancellation()
 
-            let response = try await modMailConversationRepository.fetchModMailConversation(
+            let modMailConversationDetail = try await modMailConversationRepository.fetchModMailConversation(
                 conversationId: conversationId,
                 interceptor: nil
             )
 
             try Task.checkCancellation()
 
-            let modMailConversationDetail = try ModMailConversationDetail(fromJson: response)
             self.modMailConversationDetail = modMailConversationDetail
             self.isLoading = false
         } catch {
