@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct InitialLetterAvatarImageFallbackView: View {
+    @AppStorage(InterfaceFontUserDefaultsUtils.fontFamilyKey, store: .interfaceFont) private var fontFamily: Int = 0
+    @AppStorage(InterfaceFontUserDefaultsUtils.fontScaleKey, store: .interfaceFont) private var fontScale: Int = 2
+    
     let name: String?
     var size: CGFloat
     
@@ -21,7 +24,8 @@ struct InitialLetterAvatarImageFallbackView: View {
     
     var body: some View {
         Text(initial)
-            .font(.system(size: size * 0.6, weight: .bold, design: .monospaced))
+            .font((FontFamily(rawValue: fontFamily) ?? .system).font(size: size * 0.6))
+            .fontWeight(.bold)
             .frame(width: size, height: size)
             .foregroundColor(.white)
             .background(Color.gray)

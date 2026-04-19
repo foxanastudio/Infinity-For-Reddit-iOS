@@ -18,7 +18,6 @@ struct MarkdownViewerSheet: View {
             ScrollView {
                 VStack(alignment: .leading) {
                     Markdown(markdown)
-                        .font(.system(size: 24))
                         .padding(16)
                         .themedCommentMarkdown()
                         .markdownLinkHandler { url in

@@ -19,7 +19,8 @@ struct GalleryOrImgurDescriptionSheet: View {
                 VStack(spacing: 16) {
                     if let title, !title.isEmpty {
                         RowText(title)
-                            .font(.system(size: 24, weight: .bold))
+                            .primaryText(.f24)
+                            .fontWeight(.bold)
                     }
                     
                     if !description.isEmpty {
