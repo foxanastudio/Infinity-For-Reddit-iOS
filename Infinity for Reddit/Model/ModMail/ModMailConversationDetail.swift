@@ -42,4 +42,22 @@ public class ModMailConversationDetail: NSObject {
             return messages[objectId.id]
         }
     }
+
+    func appendMessage(body: String, isInternal: Bool, authorName: String) -> ModMailMessage {
+        let messageId = "local-\(UUID().uuidString)"
+        let message = ModMailMessage(
+            localId: messageId,
+            body: body,
+            isInternal: isInternal,
+            authorName: authorName
+        )
+
+        messages[messageId] = message
+        conversation.objIds.append(ModMailObjectId(localMessageId: messageId))
+        conversation.numMessages += 1
+        conversation.lastUpdatedUtc = message.dateUtc
+        conversation.lastUpdated = message.date
+
+        return message
+    }
 }

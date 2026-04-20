@@ -163,6 +163,18 @@ public class ModMailAuthor: NSObject {
         isMod = json["isMod"].boolValue
         isOp = json["isOp"].boolValue
     }
+
+    init(localName: String) {
+        id = 0
+        name = localName
+        isAdmin = false
+        isDeleted = false
+        isHidden = false
+        isApproved = false
+        isParticipant = false
+        isMod = true
+        isOp = false
+    }
 }
 
 public class ModMailMessage: NSObject {
@@ -190,6 +202,17 @@ public class ModMailMessage: NSObject {
         author = try ModMailAuthor(fromJson: json["author"])
     }
 
+    init(localId: String, body: String, isInternal: Bool, authorName: String) {
+        id = localId
+        self.body = body
+        bodyMarkdown = body
+        date = ISO8601DateFormatter().string(from: Date())
+        dateUtc = Int64(Date().timeIntervalSince1970)
+        self.isInternal = isInternal
+        participatingAs = "moderator"
+        author = ModMailAuthor(localName: authorName)
+    }
+
     var displayBody: String {
         let bodyMarkdown = bodyMarkdown.trimmingCharacters(in: .whitespacesAndNewlines)
         if !bodyMarkdown.isEmpty {
@@ -211,6 +234,11 @@ public class ModMailObjectId: NSObject {
         
         id = json["id"].stringValue
         key = json["key"].stringValue
+    }
+
+    init(localMessageId: String) {
+        id = localMessageId
+        key = "messages"
     }
 }
 

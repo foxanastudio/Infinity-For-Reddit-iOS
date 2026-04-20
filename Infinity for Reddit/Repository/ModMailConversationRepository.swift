@@ -74,8 +74,8 @@ public class ModMailConversationRepository: ModMailConversationRepositoryProtoco
 
     public func sendMessage(message: String,
                             conversationId: String,
-                            isAuthorHidden: Bool = true,
-                            isInternal: Bool = false
+                            isAuthorHidden: Bool,
+                            isInternal: Bool
     ) async throws -> ModMailConversationDetail {
         if self.sessionName == "plain" {
             throw ModMailConversationRepositoryError.AuthRequiredError

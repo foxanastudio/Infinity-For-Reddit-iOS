@@ -13,6 +13,7 @@ class ModMailConversationViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var isInitialLoad: Bool = true
     @Published var error: Error?
+    @Published var listScrollTarget: String?
 
     private let conversationId: String
     private let modMailConversationRepository: ModMailConversationRepositoryProtocol
@@ -62,6 +63,37 @@ class ModMailConversationViewModel: ObservableObject {
             self.isInitialLoad = isInitialLoadCopy
 
             self.isLoading = false
+        }
+    }
+    
+    func sendMessage(message: String, authorName: String, isAuthorHidden: Bool, isInternal: Bool) async {
+        do {
+            let previousMessageCount = modMailConversationDetail?.orderedMessages.count ?? 0
+            let modMailConversationDetail = try await modMailConversationRepository.sendMessage(
+                message: message,
+                conversationId: conversationId,
+                isAuthorHidden: isAuthorHidden,
+                isInternal: isInternal
+            )
+
+            let sentMessage = message.trimmingCharacters(in: .whitespacesAndNewlines)
+            let latestMessage = modMailConversationDetail.orderedMessages.last
+            let latestBody = latestMessage?.displayBody.trimmingCharacters(in: .whitespacesAndNewlines)
+            let shouldAppendMessage = modMailConversationDetail.orderedMessages.count <= previousMessageCount || latestBody != sentMessage
+            let messageToScrollTo = shouldAppendMessage
+                ? modMailConversationDetail.appendMessage(body: message, isInternal: isInternal, authorName: authorName)
+                : latestMessage
+
+            self.modMailConversationDetail = modMailConversationDetail
+            
+            Task { @MainActor in
+                await Task.yield()
+                self.listScrollTarget = messageToScrollTo?.id
+            }
+        } catch {
+            self.error = error
+            
+            printInDebugOnly("Error sending message: \(error)")
         }
     }
 }
