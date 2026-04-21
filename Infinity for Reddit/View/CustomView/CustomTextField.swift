@@ -91,6 +91,7 @@ struct CustomTextField<FieldType: Hashable>: View {
                 .background(Color(hex: customThemeViewModel.currentCustomTheme.filledCardViewBackgroundColor))
                 .cornerRadius(10)
         }
+        .customFont()
         .focused($focusedField, equals: fieldType)
     }
     
