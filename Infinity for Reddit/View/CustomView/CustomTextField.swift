@@ -8,11 +8,16 @@
 import SwiftUI
 
 struct CustomTextField<FieldType: Hashable>: View {
+    @Environment(\.sizeCategory) var sizeCategory
     @EnvironmentObject var customThemeViewModel: CustomThemeViewModel
     
     @FocusState.Binding private var focusedField: FieldType?
     
     @Binding private var text: String
+    
+    @AppStorage(InterfaceFontUserDefaultsUtils.fontFamilyKey, store: .interfaceFont) private var fontFamily: Int = 0
+    @AppStorage(InterfaceFontUserDefaultsUtils.fontScaleKey, store: .interfaceFont) private var fontScale: Int = 2
+    
     private var placeholder: String
     private let singleLine: Bool
     private let keyboardType: UIKeyboardType
@@ -92,9 +97,27 @@ struct CustomTextField<FieldType: Hashable>: View {
     var prompt: Text {
         if #available(iOS 26, *) {
             Text(placeholder)
+                .font(
+                    (FontFamily(rawValue: fontFamily) ?? .system)
+                        .font(
+                            size: AppFontSize.f17.scaledInterfaceFontSize(
+                                FontScale(rawValue: fontScale),
+                                uiFontMetrics: UIFontMetrics(forTextStyle: .body)
+                            )
+                        )
+                    )
         } else {
             Text(placeholder)
                 .foregroundStyle(customTextFieldScheme.getHintColor(currentCustomTheme: customThemeViewModel.currentCustomTheme))
+                .font(
+                    (FontFamily(rawValue: fontFamily) ?? .system)
+                        .font(
+                            size: AppFontSize.f17.scaledInterfaceFontSize(
+                                FontScale(rawValue: fontScale),
+                                uiFontMetrics: UIFontMetrics(forTextStyle: .body)
+                            )
+                        )
+                    )
         }
     }
 }
