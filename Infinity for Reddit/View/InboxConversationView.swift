@@ -35,6 +35,11 @@ struct InboxConversationView: View {
     var body: some View {
         RootView {
             VStack(spacing: 0) {
+                if #available(iOS 26, *) {
+                    Spacer()
+                        .frame(height: 8)
+                }
+
                 ScrollViewReader { proxy in
                     List {
                         let conversations = inboxConversationViewModel.conversations
