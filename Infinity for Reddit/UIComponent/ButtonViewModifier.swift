@@ -55,6 +55,7 @@ struct SubscribeButtonViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.buttonTextColor))
+            .customFont()
             .tint(Color(hex: isSubscribed ? themeViewModel.currentCustomTheme.subscribed : themeViewModel.currentCustomTheme.unsubscribed))
             .buttonStyle(.borderedProminent)
             .buttonBorderShape(.capsule)

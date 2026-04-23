@@ -466,6 +466,7 @@ struct VideoController<Content: View>: View {
                 if let title {
                     RowText(title)
                         .foregroundStyle(.white)
+                        .customFont()
                 }
                 
                 ZStack(alignment: .bottom) {
