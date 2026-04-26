@@ -9,6 +9,8 @@ import SwiftUI
 import MarkdownUI
 
 struct ModMailConversationView: View {
+    @EnvironmentObject private var navigationManager: NavigationManager
+    @EnvironmentObject private var navigationBarMenuManager: NavigationBarMenuManager
     @EnvironmentObject private var accountViewModel: AccountViewModel
     @EnvironmentObject private var snackbarManager: SnackbarManager
     @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
@@ -17,6 +19,7 @@ struct ModMailConversationView: View {
     
     @State private var messageText: String = ""
     @State private var sendMessageTask: Task<Void, Never>?
+    @State private var navigationBarMenuKey: UUID?
     @FocusState private var focusedField: FieldType?
     
     let participantUsername: String
@@ -49,6 +52,9 @@ struct ModMailConversationView: View {
                                     .themedChatMessageMarkdown(
                                         isSentMessage: message.author.name == accountViewModel.account.username
                                     )
+                                    .markdownLinkHandler { url in
+                                        navigationManager.openLink(url)
+                                    }
                             }
                             .listPlainItemNoInsets()
                             .rotationEffect(.degrees(180))
@@ -68,33 +74,35 @@ struct ModMailConversationView: View {
                     }
                 }
                 
-                HStack(spacing: 12) {
-                    CustomTextField(
-                        "Type a message...",
-                        text: $messageText,
-                        showBackground: false,
-                        fieldType: .message,
-                        focusedField: $focusedField
-                    )
-                    .submitLabel(.send)
-                    .lineLimit(3)
-                    .onSubmit {
-                        sendMessage()
+                if modMailConversationViewModel.modMailConversationDetail?.conversation.isRepliable == true {
+                    HStack(spacing: 12) {
+                        CustomTextField(
+                            "Type a message...",
+                            text: $messageText,
+                            showBackground: false,
+                            fieldType: .message,
+                            focusedField: $focusedField
+                        )
+                        .submitLabel(.send)
+                        .lineLimit(3)
+                        .onSubmit {
+                            sendMessage()
+                        }
+                        
+                        Button(action: {
+                            sendMessage()
+                        }) {
+                            SwiftUI.Image(systemName: "paperplane.fill")
+                                .foregroundColor(Color(hex: messageText.isEmpty ? customThemeViewModel.currentCustomTheme.secondaryTextColor : customThemeViewModel.currentCustomTheme.colorPrimaryLightTheme))
+                        }
+                        .disabled(messageText.isEmpty || sendMessageTask != nil)
                     }
-                    
-                    Button(action: {
-                        sendMessage()
-                    }) {
-                        SwiftUI.Image(systemName: "paperplane.fill")
-                            .foregroundColor(Color(hex: messageText.isEmpty ? customThemeViewModel.currentCustomTheme.secondaryTextColor : customThemeViewModel.currentCustomTheme.colorPrimaryLightTheme))
-                    }
-                    .disabled(messageText.isEmpty || sendMessageTask != nil)
+                    .padding(12)
+                    .background(Color(hex: customThemeViewModel.currentCustomTheme.filledCardViewBackgroundColor))
+                    .clipShape(RoundedRectangle(cornerRadius: 24))
+                    .clipped()
+                    .padding(8)
                 }
-                .padding(12)
-                .background(Color(hex: customThemeViewModel.currentCustomTheme.filledCardViewBackgroundColor))
-                .clipShape(RoundedRectangle(cornerRadius: 24))
-                .clipped()
-                .padding(8)
             }
         }
         .task {
@@ -103,6 +111,23 @@ struct ModMailConversationView: View {
         .themedNavigationBar()
         .addTitleToInlineNavigationBar(participantUsername)
         .showErrorUsingSnackbar(modMailConversationViewModel.$error)
+        .toolbar {
+            NavigationBarMenu()
+        }
+        .onAppear {
+            if let key = navigationBarMenuKey {
+                navigationBarMenuManager.pop(key: key)
+            }
+            navigationBarMenuKey = navigationBarMenuManager.push([
+                NavigationBarMenuItem(title: "View Profile") {
+                    navigationManager.append(AppNavigation.userDetails(username: participantUsername))
+                }
+            ])
+        }
+        .onDisappear {
+            guard let navigationBarMenuKey else { return }
+            navigationBarMenuManager.pop(key: navigationBarMenuKey)
+        }
     }
     
     private func sendMessage() {
