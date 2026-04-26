@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MarkdownUI
 
 struct ModMailConversationView: View {
     @EnvironmentObject private var accountViewModel: AccountViewModel
@@ -44,7 +45,10 @@ struct ModMailConversationView: View {
                             let isLastFromSender = index == 0 || messages[index - 1].author.name != message.author.name
                             
                             ChatBubble(isSentMessage: message.author.name == accountViewModel.account.username, shouldShowTail: isLastFromSender) {
-                                Text(message.displayBody)
+                                Markdown(message.displayBody)
+                                    .themedChatMessageMarkdown(
+                                        isSentMessage: message.author.name == accountViewModel.account.username
+                                    )
                             }
                             .listPlainItemNoInsets()
                             .rotationEffect(.degrees(180))
