@@ -5,7 +5,6 @@
 // Created by joeylr2042 on 2025-08-21
 
 import SwiftUI
-import MarkdownUI
 import MijickCamera
 import PhotosUI
 
@@ -185,6 +184,7 @@ struct SubmitImagePostView: View {
                 VStack {
                     Text("Camera not available")
                         .padding(.bottom, 60)
+                        .customFont()
                     
                     Button("Close") {
                         showCamera = false

@@ -171,7 +171,7 @@ struct PostViewCompact: View {
                                 }
                                 
                                 if post.crosspostParent != nil {
-                                    CrosspostTag()
+                                    CrosspostTag(parentPost: nil)
                                 }
                                 
                                 switch post.postType {

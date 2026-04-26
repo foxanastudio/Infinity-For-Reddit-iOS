@@ -16,7 +16,7 @@ extension View {
         modifier(CustomPostTitleFontModifier(fontSize: fontSize))
     }
 
-    func customContentFont(fontSize: AppFontSize = .f15) -> some View {
-        modifier(CustomContentFontModifier(fontSize: fontSize))
+    func customContentFont(fontSize: AppFontSize = .f15, respectFontMetrics: Bool = false) -> some View {
+        modifier(CustomContentFontModifier(fontSize: fontSize, respectFontMetrics: respectFontMetrics))
     }
 }

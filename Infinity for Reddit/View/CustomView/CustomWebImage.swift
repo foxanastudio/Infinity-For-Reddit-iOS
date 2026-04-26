@@ -94,6 +94,7 @@ struct CustomWebImage<Placeholder: View, Fallback: View>: View {
                             
                             Text("Failed to load image — tap to retry.")
                                 .frame(alignment: .center)
+                                .primaryText()
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .contentShape(Rectangle())

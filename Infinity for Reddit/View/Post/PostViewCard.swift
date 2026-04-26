@@ -188,7 +188,7 @@ struct PostViewCard: View {
                         }
                         
                         if post.crosspostParent != nil {
-                            CrosspostTag()
+                            CrosspostTag(parentPost: nil)
                         }
                         
                         switch post.postType {
@@ -433,6 +433,7 @@ private struct NoPreviewLinkView: View {
         Text(domain)
             .noPreviewPostTypeIndicatorBackground()
             .noPreviewPostTypeIndicator()
+            .customFont()
             .onTapGesture {
                 onTap()
             }

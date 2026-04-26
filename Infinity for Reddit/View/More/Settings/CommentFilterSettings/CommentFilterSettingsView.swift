@@ -42,7 +42,7 @@ struct CommentFilterSettingsView: View {
                             .primaryIcon()
                         
                         Text("Start by creating a comment filter")
-                            .primaryIcon()
+                            .primaryText()
                         
                         Spacer()
                     }

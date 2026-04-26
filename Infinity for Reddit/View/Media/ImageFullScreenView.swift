@@ -164,7 +164,7 @@ struct ImageFullScreenToolbar: View {
                         VStack {
                             Text("Downloading...")
                                 .foregroundStyle(.white)
-                                .customFont(fontSize: .f17)
+                                .customFont()
                             
                             ProgressView(value: fullScreenMediaToolbarViewModel.downloadProgress)
                                 .tint(.white)
@@ -184,7 +184,7 @@ struct ImageFullScreenToolbar: View {
                             
                             Text("Image downloaded")
                                 .foregroundStyle(.white)
-                                .customFont(fontSize: .f17)
+                                .customFont()
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
@@ -201,7 +201,7 @@ struct ImageFullScreenToolbar: View {
                             
                             Text("Download failed: \(fullScreenMediaToolbarViewModel.error?.localizedDescription ?? "Unknown error")")
                                 .foregroundStyle(.white)
-                                .customFont(fontSize: .f17)
+                                .customFont()
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)

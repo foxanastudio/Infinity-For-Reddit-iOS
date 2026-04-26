@@ -108,6 +108,7 @@ struct UsernameTextViewModifier: ViewModifier {
             .fixedSize(horizontal: false, vertical: true)
             .customFont()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.username))
+            .lineLimit(1)
     }
 }
 
@@ -128,6 +129,7 @@ struct UsernameOnPostTextViewModifier: ViewModifier {
             .fixedSize(horizontal: false, vertical: true)
             .customFont()
             .foregroundColor(usernameColor)
+            .lineLimit(1)
     }
 }
 
@@ -139,6 +141,7 @@ struct SubredditTextViewModifier: ViewModifier {
             .fixedSize(horizontal: false, vertical: true)
             .customFont()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.subreddit))
+            .lineLimit(1)
     }
 }
 
@@ -163,7 +166,7 @@ struct PostContentTextViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .fixedSize(horizontal: false, vertical: true)
-            .customContentFont()
+            .customContentFont(respectFontMetrics: true)
             .foregroundColor(Color(hex: isRead ? themeViewModel.currentCustomTheme.readPostContentColor : themeViewModel.currentCustomTheme.postContentColor))
     }
 }
@@ -174,7 +177,7 @@ struct CommentTextViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .fixedSize(horizontal: false, vertical: true)
-            .customContentFont()
+            .customContentFont(respectFontMetrics: true)
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.commentColor))
     }
 }

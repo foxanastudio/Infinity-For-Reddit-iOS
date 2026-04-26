@@ -161,6 +161,10 @@ extension View {
         self.modifier(CommentMarkdownViewModifier(fontSize: fontSize))
     }
     
+    func themedChatMessageMarkdown(_ fontSize: AppFontSize = .f17, isSentMessage: Bool) -> some View {
+        self.modifier(ChatMessageMarkdownViewModifier(fontSize: fontSize, isSentMessage: isSentMessage))
+    }
+    
     func galleryIndexIndicator() -> some View {
         self.modifier(GalleryIndexIndicatorViewModifier())
     }

@@ -218,6 +218,10 @@ struct SubredditDetailsView: View {
                 navigationBarMenuManager.pop(key: key)
             }
             navigationBarMenuKey = navigationBarMenuManager.push([
+                NavigationBarMenuItem(title: "Search") {
+                    navigationManager.append(AppNavigation.search(searchInSubreddit: subredditDetailsViewModel.subredditData))
+                },
+                
                 NavigationBarMenuItem(title: "Select User Flair") {
                     subredditDetailsViewModel.fetchUserFlairs()
                     showUserFlairSheet = true

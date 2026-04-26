@@ -35,6 +35,9 @@ private struct MarkdownUITextField: UIViewRepresentable {
     @Binding var selectedRange: NSRange
     @Binding var canFocus: Bool
     
+    @AppStorage(InterfaceFontUserDefaultsUtils.fontFamilyKey, store: .interfaceFont) private var fontFamily: Int = 0
+    @AppStorage(InterfaceFontUserDefaultsUtils.fontScaleKey, store: .interfaceFont) private var fontScale: Int = 2
+    
     class GrowingTextView: UITextView {
         override var intrinsicContentSize: CGSize {
             let safeWidth = max(bounds.width, 1)
@@ -78,7 +81,8 @@ private struct MarkdownUITextField: UIViewRepresentable {
 
     func makeUIView(context: Context) -> UITextView {
         let textView = GrowingTextView()
-        textView.font = UIFont.preferredFont(forTextStyle: .body)
+        
+        setFont(textView: textView)
         textView.isScrollEnabled = false
         textView.delegate = context.coordinator
         textView.borderStyle = .none
@@ -89,6 +93,18 @@ private struct MarkdownUITextField: UIViewRepresentable {
         textView.backgroundColor = .clear
         return textView
     }
+    
+    private func setFont(textView: UITextView) {
+        textView.font = (FontFamily(rawValue: fontFamily) ?? .system)
+            .uiFont(
+                size: UIFontMetrics.default.scaledValue(
+                    for: AppFontSize.f17.scaledInterfaceFontSize(
+                        FontScale(rawValue: fontScale),
+                        uiFontMetrics: UIFontMetrics(forTextStyle: .body)
+                    )
+                )
+            )
+    }
 
     func updateUIView(_ uiView: UITextView, context: Context) {
         if uiView.text != text {
@@ -98,6 +114,7 @@ private struct MarkdownUITextField: UIViewRepresentable {
             uiView.selectedRange = selectedRange
         }
         uiView.textColor = UIColor(Color(hex: customThemeViewModel.currentCustomTheme.primaryTextColor))
+        setFont(textView: uiView)
         
 //        DispatchQueue.main.async {
 //            if uiView.isFirstResponder && !canFocus {

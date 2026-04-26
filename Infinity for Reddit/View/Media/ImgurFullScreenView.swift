@@ -327,7 +327,7 @@ struct ImgurImageToolbar: View {
                         VStack {
                             Text("Downloading...")
                                 .foregroundStyle(.white)
-                                .customFont(fontSize: .f17)
+                                .customFont()
                             
                             ProgressView(value: fullScreenMediaToolbarViewModel.downloadProgress)
                                 .tint(.white)
@@ -347,7 +347,7 @@ struct ImgurImageToolbar: View {
                             
                             Text("Image downloaded")
                                 .foregroundStyle(.white)
-                                .customFont(fontSize: .f17)
+                                .customFont()
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
@@ -364,7 +364,7 @@ struct ImgurImageToolbar: View {
                             
                             Text("Download failed: \(fullScreenMediaToolbarViewModel.error?.localizedDescription ?? "Unknown error")")
                                 .foregroundStyle(.white)
-                                .customFont(fontSize: .f17)
+                                .customFont()
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
@@ -379,7 +379,7 @@ struct ImgurImageToolbar: View {
                         VStack {
                             Text("Downloading all media...")
                                 .foregroundStyle(.white)
-                                .customFont(fontSize: .f17)
+                                .customFont()
                             
                             ProgressView(value: fullScreenMediaToolbarViewModel.downloadImgurAllMediaProgress)
                                 .tint(.white)
@@ -399,7 +399,7 @@ struct ImgurImageToolbar: View {
                             
                             Text("All media downloaded")
                                 .foregroundStyle(.white)
-                                .customFont(fontSize: .f17)
+                                .customFont()
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
@@ -416,7 +416,7 @@ struct ImgurImageToolbar: View {
                             
                             Text("Some media couldn’t be downloaded.")
                                 .foregroundStyle(.white)
-                                .customFont(fontSize: .f17)
+                                .customFont()
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)

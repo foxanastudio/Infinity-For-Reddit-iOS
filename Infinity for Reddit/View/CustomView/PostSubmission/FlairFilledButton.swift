@@ -23,7 +23,7 @@ struct FlairFilledButton: View {
                 textColor: Color(hex: isSelected ? customThemeViewModel.currentCustomTheme.flairTextColor : customThemeViewModel.currentCustomTheme.primaryTextColor),
                 borderColor: Color(hex: isSelected ? customThemeViewModel.currentCustomTheme.flairBackgroundColor : customThemeViewModel.currentCustomTheme.primaryTextColor)
             )
-            .font(.system(size: 12))
+            .customFont(fontSize: .f12)
             .onTapGesture {
                 onTap()
             }

@@ -108,6 +108,48 @@ enum FontFamily: Int {
             return .system(size: size)
         }
     }
+    
+    func uiFont(size: CGFloat) -> UIFont {
+        switch self {
+        case .system:
+            return UIFont.systemFont(ofSize: size)
+        case .atkinsonHyperlegibleRegular:
+            return UIFont(name: "AtkinsonHyperlegible-Regular", size: size) ?? UIFont.systemFont(ofSize: size)
+        case .atkinsonHyperlegibleBold:
+            return UIFont(name: "AtkinsonHyperlegible-Bold", size: size) ?? UIFont.systemFont(ofSize: size)
+        case .balsamiqSansRegular:
+            return UIFont(name: "BalsamiqSans-Regular", size: size) ?? UIFont.systemFont(ofSize: size)
+        case .balsamiqSansBold:
+            return UIFont(name: "BalsamiqSans-Bold", size: size) ?? UIFont.systemFont(ofSize: size)
+        case .harmoniaSansRegular:
+            return UIFont(name: "HarmoniaSansW01-Regular", size: size) ?? UIFont.systemFont(ofSize: size)
+        case .harmoniaSansBold:
+            return UIFont(name: "HarmoniaSansW01-Bold", size: size) ?? UIFont.systemFont(ofSize: size)
+        case .interRegular:
+            return UIFont(name: "Inter18pt-Regular", size: size) ?? UIFont.systemFont(ofSize: size)
+        case .interBold:
+            return UIFont(name: "Inter18pt-Bold", size: size) ?? UIFont.systemFont(ofSize: size)
+        case .manropeRegular:
+            return UIFont(name: "Manrope-Regular", size: size) ?? UIFont.systemFont(ofSize: size)
+        case .manropeBold:
+            return UIFont(name: "Manrope-Bold", size: size) ?? UIFont.systemFont(ofSize: size)
+        case .notoSansRegular:
+            return UIFont(name: "NotoSans-Regular", size: size) ?? UIFont.systemFont(ofSize: size)
+        case .notoSansBold:
+            return UIFont(name: "NotoSans-Bold", size: size) ?? UIFont.systemFont(ofSize: size)
+        case .robotoCondensedRegular:
+            return UIFont(name: "RobotoCondensed-Regular", size: size) ?? UIFont.systemFont(ofSize: size)
+        case .robotoCondensedBold:
+            return UIFont(name: "RobotoCondensed-Bold", size: size) ?? UIFont.systemFont(ofSize: size)
+        case .srirachaRegular:
+            return UIFont(name: "Sriracha-Regular", size: size) ?? UIFont.systemFont(ofSize: size)
+        case .customFontFamily:
+            if let postScriptName = InterfaceFontUserDefaultsUtils.customFontPostScriptName {
+                return UIFont(name: postScriptName, size: size) ?? UIFont.systemFont(ofSize: size)
+            }
+            return UIFont.systemFont(ofSize: size)
+        }
+    }
 
     var markdownFontFamily: MarkdownUI.FontProperties.Family {
         switch self {

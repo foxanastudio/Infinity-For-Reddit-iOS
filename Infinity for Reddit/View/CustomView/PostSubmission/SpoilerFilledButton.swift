@@ -19,7 +19,7 @@ struct SpoilerFilledButton: View {
                 textColor: Color(hex: isSpoiler ? customThemeViewModel.currentCustomTheme.spoilerTextColor : customThemeViewModel.currentCustomTheme.primaryTextColor),
                 borderColor: Color(hex: isSpoiler ? customThemeViewModel.currentCustomTheme.spoilerBackgroundColor : customThemeViewModel.currentCustomTheme.primaryTextColor)
             )
-            .font(.system(size: 12))
+            .customFont(fontSize: .f12)
             .onTapGesture {
                 isSpoiler.toggle()
             }

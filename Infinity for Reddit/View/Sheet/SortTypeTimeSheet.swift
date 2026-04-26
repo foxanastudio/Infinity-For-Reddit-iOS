@@ -20,6 +20,7 @@ struct SortTypeTimeSheet: View {
                 VStack(spacing: 0) {
                     Text("Select Sort Time")
                         .padding(.bottom, 16)
+                        .customFont()
                     
                     ForEach(sortTypeTimeSource.availableSortTypeTimes, id: \.self) { sortTime in
                         IconTextButton(endIconUrl: sortTime == currentSortTypeTime ? "checkmark.seal" : nil, text: sortTime.fullName) {

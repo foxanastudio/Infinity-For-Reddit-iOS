@@ -62,8 +62,8 @@ struct CustomNavigationStack<Content: View>: View {
                         UserDetailsView(username: username)
                             .environmentObject(navigationManager)
                             .environmentObject(commentSubmissionShareableViewModel)
-                    case .search:
-                        SearchView()
+                    case .search(let searchInSubreddit):
+                        SearchView(searchInSubreddit: searchInSubreddit)
                             .environmentObject(navigationManager)
                     case .searchResults(let query, let searchInSubredditOrUserName, let searchInMultiReddit, let searchInThingType, let searchResultTab):
                         SearchResultsView(

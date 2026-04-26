@@ -50,7 +50,9 @@ struct CommentAuthorView: View {
             
             Text("u/\(comment.author ?? "")")
                 .fixedSize(horizontal: false, vertical: true)
+                .customFont()
                 .foregroundColor(textColor)
+                .lineLimit(1)
         }
     }
 }

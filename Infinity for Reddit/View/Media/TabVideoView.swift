@@ -75,6 +75,7 @@ struct TabVideoView: View {
                     VStack {
                         Text("Downloading all media...")
                             .foregroundStyle(.white)
+                            .customFont()
                         
                         ProgressView(value: fullScreenMediaToolbarViewModel.downloadImgurAllMediaProgress)
                             .tint(.white)
@@ -93,6 +94,7 @@ struct TabVideoView: View {
                         
                         Text("All media downloaded")
                             .foregroundStyle(.white)
+                            .customFont()
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)

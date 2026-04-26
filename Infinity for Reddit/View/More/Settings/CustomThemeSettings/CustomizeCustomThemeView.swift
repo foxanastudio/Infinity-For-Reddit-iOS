@@ -142,8 +142,7 @@ struct CustomizeCustomThemeView: View {
                             .frame(height: 8)
                         
                         Text(description)
-                            .font(.system(size: 14))
-                            .secondaryText()
+                            .secondaryText(.f15)
                     }
                     .padding(16)
                     

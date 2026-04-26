@@ -96,7 +96,7 @@ struct PostTypeTagViewModifier: ViewModifier {
             .background(Color(hex: themeViewModel.currentCustomTheme.postTypeBackgroundColor))
             .cornerRadius(4)
             .foregroundStyle(Color(hex: themeViewModel.currentCustomTheme.postTypeTextColor))
-            .font(.system(size: 12))
+            .customFont(fontSize: .f12)
     }
 }
 
@@ -109,7 +109,7 @@ struct SpoilerTagViewModifier: ViewModifier {
             .background(Color(hex: themeViewModel.currentCustomTheme.spoilerBackgroundColor))
             .cornerRadius(6)
             .foregroundStyle(Color(hex: themeViewModel.currentCustomTheme.spoilerTextColor))
-            .font(.system(size: 12))
+            .customFont(fontSize: .f12)
     }
 }
 
@@ -122,7 +122,7 @@ struct SensitiveTagViewModifier: ViewModifier {
             .background(Color(hex: themeViewModel.currentCustomTheme.nsfwBackgroundColor))
             .cornerRadius(4)
             .foregroundStyle(Color(hex: themeViewModel.currentCustomTheme.nsfwTextColor))
-            .font(.system(size: 12))
+            .customFont(fontSize: .f12)
     }
 }
 
@@ -143,7 +143,7 @@ struct PostFlairTextViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .foregroundStyle(Color(hex: themeViewModel.currentCustomTheme.flairTextColor))
-            .font(.system(size: 12))
+            .customFont(fontSize: .f12)
     }
 }
 
@@ -153,7 +153,7 @@ struct UpvoteRatioTextViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .foregroundStyle(Color(hex: themeViewModel.currentCustomTheme.secondaryTextColor))
-            .font(.system(size: 12))
+            .customFont(fontSize: .f12)
     }
 }
 
@@ -254,7 +254,7 @@ struct AuthorFlairTextViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .foregroundStyle(Color(hex: themeViewModel.currentCustomTheme.authorFlairTextColor))
-            .font(.system(size: 12))
+            .customFont(fontSize: .f12)
     }
 }
 

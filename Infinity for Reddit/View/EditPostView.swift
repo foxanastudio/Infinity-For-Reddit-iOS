@@ -196,6 +196,7 @@ struct EditPostView: View {
                 VStack {
                     Text("Camera not available")
                         .padding(.bottom, 60)
+                        .customFont()
                     
                     Button("Close") {
                         showCamera = false

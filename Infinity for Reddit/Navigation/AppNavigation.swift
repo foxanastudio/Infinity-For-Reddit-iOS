@@ -11,7 +11,7 @@ enum AppNavigation: Hashable {
     case postDetailsWithId(postId: String, commentId: String? = nil, isContinueThread: Bool = false)
     case subredditDetails(subredditName: String)
     case userDetails(username: String)
-    case search
+    case search(searchInSubreddit: SubredditData? = nil)
     case searchResults(query: String, searchInSubredditOrUserName: String?, searchInMultiReddit: String?, searchInThingType: SearchInThingType, searchResultTab: Int)
     case customFeed(customFeed: CustomFeedWrapper)
     case inboxConversation(inbox: Inbox)

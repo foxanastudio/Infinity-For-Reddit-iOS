@@ -187,9 +187,10 @@ struct GalleryImageToolbar: View {
                     Text("\(index + 1)/\(items.count)")
                         .padding(10)
                         .foregroundColor(Color.white)
+                        .customFont()
                         .background(
                             Capsule()
-                                .fill(Color(hex: "#6B6B6B", opacity: 0.5))
+                                .fill(Color(hex: "#2E2E2E"))
                         )
                 }
                 .padding(16)
@@ -273,7 +274,7 @@ struct GalleryImageToolbar: View {
                         VStack {
                             Text("Downloading...")
                                 .foregroundStyle(.white)
-                                .customFont(fontSize: .f17)
+                                .customFont()
                             
                             ProgressView(value: fullScreenMediaToolbarViewModel.downloadProgress)
                                 .tint(.white)
@@ -293,7 +294,7 @@ struct GalleryImageToolbar: View {
                             
                             Text("Image downloaded")
                                 .foregroundStyle(.white)
-                                .customFont(fontSize: .f17)
+                                .customFont()
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
@@ -310,7 +311,7 @@ struct GalleryImageToolbar: View {
                             
                             Text("Download failed: \(fullScreenMediaToolbarViewModel.error?.localizedDescription ?? "Unknown error")")
                                 .foregroundStyle(.white)
-                                .customFont(fontSize: .f17)
+                                .customFont()
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
@@ -325,10 +326,10 @@ struct GalleryImageToolbar: View {
                         VStack {
                             Text("Downloading all media...")
                                 .foregroundStyle(.white)
+                                .customFont()
                             
                             ProgressView(value: fullScreenMediaToolbarViewModel.downloadGalleryAllMediaProgress)
                                 .tint(.white)
-                                .customFont(fontSize: .f17)
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
@@ -345,7 +346,7 @@ struct GalleryImageToolbar: View {
                             
                             Text("All media downloaded")
                                 .foregroundStyle(.white)
-                                .customFont(fontSize: .f17)
+                                .customFont()
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
@@ -362,7 +363,7 @@ struct GalleryImageToolbar: View {
                             
                             Text("Some media couldn’t be downloaded.")
                                 .foregroundStyle(.white)
-                                .customFont(fontSize: .f17)
+                                .customFont()
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)

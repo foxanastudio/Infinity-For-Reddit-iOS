@@ -45,6 +45,7 @@ struct InboxListingView: View {
                             }
                     } else {
                         Text("No items")
+                            .primaryText()
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)

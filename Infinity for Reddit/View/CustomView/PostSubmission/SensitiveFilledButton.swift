@@ -19,7 +19,7 @@ struct SensitiveFilledButton: View {
                 textColor: Color(hex: isSensitive ? customThemeViewModel.currentCustomTheme.nsfwTextColor : customThemeViewModel.currentCustomTheme.primaryTextColor),
                 borderColor: Color(hex: isSensitive ? customThemeViewModel.currentCustomTheme.nsfwBackgroundColor : customThemeViewModel.currentCustomTheme.primaryTextColor)
             )
-            .font(.system(size: 12))
+            .customFont(fontSize: .f12)
             .onTapGesture {
                 isSensitive.toggle()
             }

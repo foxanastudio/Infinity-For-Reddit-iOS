@@ -33,6 +33,7 @@ struct Snackbar: View {
                         }) {
                             Text(actionText)
                                 .foregroundStyle(Color(hex: customThemeViewModel.currentCustomTheme.snackbarActionTextColor))
+                                .customFont()
                         }
                     }
                 }

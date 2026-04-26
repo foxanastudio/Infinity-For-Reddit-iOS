@@ -38,7 +38,7 @@ struct MoreView: View {
                     
                     if !accountViewModel.account.isAnonymous() {
                         SimpleTouchItemRow(text: "Search", icon: "magnifyingglass") {
-                            navigationManager.append(AppNavigation.search)
+                            navigationManager.append(AppNavigation.search())
                         }
                         .listPlainItemNoInsets()
                         .limitedWidth()

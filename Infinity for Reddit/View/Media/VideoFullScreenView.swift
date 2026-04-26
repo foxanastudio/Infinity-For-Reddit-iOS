@@ -78,7 +78,7 @@ struct VideoFullScreenView<Content: View>: View {
                     Text(error.localizedDescription)
                         .frame(alignment: .leading)
                         .foregroundStyle(.white)
-                        .customFont(fontSize: .f17)
+                        .customFont()
                 }
                 .padding(32)
             }
@@ -415,7 +415,7 @@ struct VideoController<Content: View>: View {
                     VStack {
                         Text(downloadProgressTitle)
                             .foregroundStyle(.white)
-                            .customFont(fontSize: .f17)
+                            .customFont()
                         
                         ProgressView(value: downloadProgress)
                             .tint(.white)
@@ -435,7 +435,7 @@ struct VideoController<Content: View>: View {
                         
                         Text("Video downloaded")
                             .foregroundStyle(.white)
-                            .customFont(fontSize: .f17)
+                            .customFont()
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
@@ -452,7 +452,7 @@ struct VideoController<Content: View>: View {
                         
                         Text("Download failed: \(downloadError?.localizedDescription ?? "Unknown error")")
                             .foregroundStyle(.white)
-                            .customFont(fontSize: .f17)
+                            .customFont()
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
@@ -466,6 +466,7 @@ struct VideoController<Content: View>: View {
                 if let title {
                     RowText(title)
                         .foregroundStyle(.white)
+                        .customFont()
                 }
                 
                 ZStack(alignment: .bottom) {

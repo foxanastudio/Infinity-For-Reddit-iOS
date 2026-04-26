@@ -24,9 +24,11 @@ struct SearchView: View {
     
     private let onSearchCustomAction: ((String) -> Void)?
     
-    init(onSearchCustomAction: ((String) -> Void)? = nil) {
+    init(searchInSubreddit: SubredditData? = nil,  onSearchCustomAction: ((String) -> Void)? = nil) {
         self.onSearchCustomAction = onSearchCustomAction
-        _searchViewModel = StateObject(wrappedValue: SearchViewModel())
+        let searchViewModel = SearchViewModel()
+        searchViewModel.searchInThing = searchInSubreddit == nil ? nil : .subreddit(searchInSubreddit!)
+        _searchViewModel = StateObject(wrappedValue: searchViewModel)
     }
     
     var body: some View {

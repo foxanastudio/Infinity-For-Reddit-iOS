@@ -24,7 +24,14 @@ struct InterfaceFontFontPreviewSettingsView: View {
 
                             VStack(spacing: 4) {
                                 RowText(fontFamily.displayName)
-                                    .font(fontFamily.font(size: AppFontSize.f17.scaledInterfaceFontSize(FontScale(rawValue: fontScale))))
+                                    .font(
+                                        fontFamily.font(
+                                            size: AppFontSize.f17.scaledInterfaceFontSize(
+                                                FontScale(rawValue: fontScale),
+                                                uiFontMetrics: UIFontMetrics(forTextStyle: .body)
+                                            )
+                                        )
+                                    )
                                     .primaryText()
                             }
                         }
