@@ -9,8 +9,10 @@ import SwiftUI
 
 struct ModMailListingView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
+    @EnvironmentObject private var navigationBarMenuManager: NavigationBarMenuManager
 
     @StateObject var modMailListingViewModel: ModMailListingViewModel
+    @State private var navigationBarMenuKey: UUID?
     
     init() {
         _modMailListingViewModel = StateObject(
@@ -71,6 +73,30 @@ struct ModMailListingView: View {
         .task(id: modMailListingViewModel.loadModMailFlag) {
             await modMailListingViewModel.initialLoadModMailListing()
         }
+        .toolbar {
+            NavigationBarMenu()
+        }
+        .onAppear {
+            setUpMenu()
+        }
+        .onDisappear {
+            guard let navigationBarMenuKey else {
+                return
+            }
+            navigationBarMenuManager.pop(key: navigationBarMenuKey)
+        }
+    }
+
+    private func setUpMenu() {
+        if let key = navigationBarMenuKey {
+            navigationBarMenuManager.pop(key: key)
+        }
+
+        navigationBarMenuKey = navigationBarMenuManager.push([
+            NavigationBarMenuItem(title: "Refresh") {
+                modMailListingViewModel.refreshModMailListing()
+            }
+        ])
     }
 }
 
