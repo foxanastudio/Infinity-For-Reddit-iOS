@@ -74,6 +74,9 @@ struct InboxListingView: View {
                     if inboxListingViewModel.hasMorePages {
                         ProgressIndicator()
                             .task {
+                                guard !inboxListingViewModel.isPullToRefreshing else {
+                                    return
+                                }
                                 await inboxListingViewModel.loadInboxes()
                             }
                             .listPlainItem()
@@ -82,6 +85,9 @@ struct InboxListingView: View {
                 .scrollBounceBehavior(.basedOnSize)
                 .themedList()
                 .showErrorUsingSnackbar(inboxListingViewModel.$error)
+                .refreshable {
+                    await inboxListingViewModel.refreshInboxesWithContinuation()
+                }
             }
         }
         .task(id: taskKey) {
