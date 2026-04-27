@@ -105,14 +105,18 @@ struct SubredditListingView: View {
                         }
                     }
                     if subredditListingViewModel.hasMorePages {
-                        ProgressIndicator()
-                            .task {
-                                guard !subredditListingViewModel.isPullToRefreshing else {
-                                    return
-                                }
-                                await subredditListingViewModel.loadSubreddits()
+                        HStack {
+                            ProgressIndicator()
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(16)
+                        .task {
+                            guard !subredditListingViewModel.isPullToRefreshing else {
+                                return
                             }
-                            .listPlainItem()
+                            await subredditListingViewModel.loadSubreddits()
+                        }
+                        .listPlainItem()
                     }
                 }
                 .scrollBounceBehavior(.basedOnSize)

@@ -160,14 +160,18 @@ struct HistoryPostListingView: View {
                             }
                         }
                         if historyPostListingViewModel.hasMorePages {
-                            ProgressIndicator()
-                                .task {
-                                    guard !historyPostListingViewModel.isPullToRefreshing else {
-                                        return
-                                    }
-                                    await historyPostListingViewModel.loadPosts()
+                            HStack {
+                                ProgressIndicator()
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(16)
+                            .task {
+                                guard !historyPostListingViewModel.isPullToRefreshing else {
+                                    return
                                 }
-                                .listPlainItem()
+                                await historyPostListingViewModel.loadPosts()
+                            }
+                            .listPlainItem()
                         }
                     }
                     .scrollBounceBehavior(.basedOnSize)

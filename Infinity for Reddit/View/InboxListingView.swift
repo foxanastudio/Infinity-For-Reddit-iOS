@@ -72,14 +72,18 @@ struct InboxListingView: View {
                         }
                     }
                     if inboxListingViewModel.hasMorePages {
-                        ProgressIndicator()
-                            .task {
-                                guard !inboxListingViewModel.isPullToRefreshing else {
-                                    return
-                                }
-                                await inboxListingViewModel.loadInboxes()
+                        HStack {
+                            ProgressIndicator()
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(16)
+                        .task {
+                            guard !inboxListingViewModel.isPullToRefreshing else {
+                                return
                             }
-                            .listPlainItem()
+                            await inboxListingViewModel.loadInboxes()
+                        }
+                        .listPlainItem()
                     }
                 }
                 .scrollBounceBehavior(.basedOnSize)

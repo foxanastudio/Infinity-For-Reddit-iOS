@@ -98,14 +98,18 @@ struct UserListingView: View {
                     }
                     
                     if userListingViewModel.hasMorePages {
-                        ProgressIndicator()
-                            .task {
-                                guard !userListingViewModel.isPullToRefreshing else {
-                                    return
-                                }
-                                await userListingViewModel.loadUsers()
+                        HStack {
+                            ProgressIndicator()
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(16)
+                        .task {
+                            guard !userListingViewModel.isPullToRefreshing else {
+                                return
                             }
-                            .listPlainItem()
+                            await userListingViewModel.loadUsers()
+                        }
+                        .listPlainItem()
                     }
                 }
                 .scrollBounceBehavior(.basedOnSize)
