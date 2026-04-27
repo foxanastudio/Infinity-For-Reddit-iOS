@@ -112,7 +112,7 @@ public class HistoryPostListingViewModel: ObservableObject {
         let isInitialLoadCopy = isInitialLoad
         
         await MainActor.run {
-            if posts.isEmpty {
+            if posts.isEmpty || isRefreshWithContinuation {
                 isInitialLoading = true
             } else {
                 isLoadingMore = true

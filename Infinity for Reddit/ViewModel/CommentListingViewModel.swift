@@ -71,7 +71,7 @@ public class CommentListingViewModel: ObservableObject {
         let isInitialLoadCopy = isInitialLoad
         
         await MainActor.run {
-            if comments.isEmpty {
+            if comments.isEmpty || isRefreshWithContinuation {
                 isInitialLoading = true
             } else {
                 isLoadingMore = true

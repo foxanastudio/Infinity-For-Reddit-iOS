@@ -107,6 +107,9 @@ struct SubredditListingView: View {
                     if subredditListingViewModel.hasMorePages {
                         ProgressIndicator()
                             .task {
+                                guard !subredditListingViewModel.isPullToRefreshing else {
+                                    return
+                                }
                                 await subredditListingViewModel.loadSubreddits()
                             }
                             .listPlainItem()

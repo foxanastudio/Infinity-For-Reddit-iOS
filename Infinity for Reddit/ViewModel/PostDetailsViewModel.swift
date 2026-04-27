@@ -185,7 +185,7 @@ public class PostDetailsViewModel: ObservableObject {
         let isInitialLoadCopy = isInitialLoad
         
         await MainActor.run {
-            if allComments.isEmpty {
+            if allComments.isEmpty || isRefreshWithContinuation {
                 isInitialLoading = true
             } else {
                 isLoadingMore = true
