@@ -94,6 +94,8 @@ struct HistoryPostListingView: View {
                                 post: post,
                                 postLayout: getPostLayout(post),
                                 iconType: .fromAPI,
+                                postFeedScrollIdle: historyPostListingViewModel.isScrollIdle,
+                                postFeedGeometry: nil,
                                 onUpvote: {
                                     await historyPostListingViewModel.votePost(post: post, vote: 1)
                                 },

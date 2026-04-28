@@ -40,7 +40,7 @@ public class PostListingViewModel: ObservableObject {
     
     var appearedPosts: IdentifiedArrayOf<Post> = []
     var lazyModeScrolledPost: Post?
-    var isScrollIdle: Bool = true
+    @Published var isScrollIdle: Bool = false
     
     private var userIconStringUrlCache: [String: String] = [:]
     

@@ -357,9 +357,10 @@ extension View {
     
     func onVisiblePercentageChange(
         in space: CoordinateSpace = .global,
+        containerGeometry: GeometryProxy?,
         _ action: @escaping (CGFloat) -> Void
     ) -> some View {
-        modifier(VisiblePercentageModifier(onChange: action, space: space))
+        modifier(VisiblePercentageModifier(onChange: action, space: space, containerGeometry: containerGeometry))
     }
     
     func showErrorUsingSnackbar<P: Publisher>(

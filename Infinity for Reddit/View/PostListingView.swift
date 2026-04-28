@@ -142,170 +142,175 @@ struct PostListingView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                ScrollViewReader { proxy in
-                    List {
-                        ForEach(postListingViewModel.posts, id: \.id) { post in
-                            PostView(
-                                post: post,
-                                postLayout: getPostLayout(post),
-                                iconType: iconType,
-                                onUpvote: {
-                                    await postListingViewModel.votePost(
-                                        post: post,
-                                        vote: 1,
-                                        saveReadPosts: saveReadPosts,
-                                        limitHistorySize: limitHistorySize,
-                                        historyLimit: historyLimit,
-                                        markPostsAsReadAfterVoting: markPostsAsReadAfterVoting
-                                    )
-                                },
-                                onDownvote: {
-                                    await postListingViewModel.votePost(
-                                        post: post,
-                                        vote: -1,
-                                        saveReadPosts: saveReadPosts,
-                                        limitHistorySize: limitHistorySize,
-                                        historyLimit: historyLimit,
-                                        markPostsAsReadAfterVoting: markPostsAsReadAfterVoting
-                                    )
-                                },
-                                onToggleSave: {
-                                    await postListingViewModel.savePost(post: post, save: !post.saved)
-                                },
-                                onPostTypeTap: {
-                                    onPostTypeClicked(post: post)
-                                },
-                                onSensitiveTap: {
-                                    onSensitiveClicked(post: post)
-                                },
-                                onLongPressPost: {
-                                    postForPostOptionsSheet = post
-                                    showPostOptionsSheet = true
-                                },
-                                onShare: {
-                                    postForPostOptionsSheet = post
-                                    showPostShareSheet = true
-                                },
-                                onReadPost: {
-                                    await postListingViewModel.readPost(post: post, saveReadPosts: saveReadPosts, limitHistorySize: limitHistorySize, historyLimit: historyLimit)
-                                }
-                            )
-                            .limitedWidth()
-                            .id(ObjectIdentifier(post))
-                            .listPlainItemNoInsets()
-                            .onAppear {
-                                postListingViewModel.insertIntoAppearedPosts(post, saveLastSeenPostInFrontPage: saveLastSeenPostInFrontPage)
-                                
-                                if iconType == .user && post.userIconUrlString == nil {
-                                    postListingViewModel.loadIcon(
-                                        post: post
-                                    )
-                                }
-                            }
-                            .onDisappear {
-                                postListingViewModel.appearedPosts.remove(id: post.id)
-                                if !post.isRead && saveReadPosts && markPostsAsReadOnScroll {
-                                    Task {
-                                        await postListingViewModel.readPost(
+                GeometryReader { geometry in
+                    ScrollViewReader { proxy in
+                        List {
+                            ForEach(postListingViewModel.posts, id: \.id) { post in
+                                PostView(
+                                    post: post,
+                                    postLayout: getPostLayout(post),
+                                    iconType: iconType,
+                                    postFeedScrollIdle: postListingViewModel.isScrollIdle,
+                                    postFeedGeometry: geometry,
+                                    onUpvote: {
+                                        await postListingViewModel.votePost(
                                             post: post,
+                                            vote: 1,
                                             saveReadPosts: saveReadPosts,
                                             limitHistorySize: limitHistorySize,
-                                            historyLimit: historyLimit
+                                            historyLimit: historyLimit,
+                                            markPostsAsReadAfterVoting: markPostsAsReadAfterVoting
+                                        )
+                                    },
+                                    onDownvote: {
+                                        await postListingViewModel.votePost(
+                                            post: post,
+                                            vote: -1,
+                                            saveReadPosts: saveReadPosts,
+                                            limitHistorySize: limitHistorySize,
+                                            historyLimit: historyLimit,
+                                            markPostsAsReadAfterVoting: markPostsAsReadAfterVoting
+                                        )
+                                    },
+                                    onToggleSave: {
+                                        await postListingViewModel.savePost(post: post, save: !post.saved)
+                                    },
+                                    onPostTypeTap: {
+                                        onPostTypeClicked(post: post)
+                                    },
+                                    onSensitiveTap: {
+                                        onSensitiveClicked(post: post)
+                                    },
+                                    onLongPressPost: {
+                                        postForPostOptionsSheet = post
+                                        showPostOptionsSheet = true
+                                    },
+                                    onShare: {
+                                        postForPostOptionsSheet = post
+                                        showPostShareSheet = true
+                                    },
+                                    onReadPost: {
+                                        await postListingViewModel.readPost(post: post, saveReadPosts: saveReadPosts, limitHistorySize: limitHistorySize, historyLimit: historyLimit)
+                                    }
+                                )
+                                .limitedWidth()
+                                .id(ObjectIdentifier(post))
+                                .listPlainItemNoInsets()
+                                .onAppear {
+                                    postListingViewModel.insertIntoAppearedPosts(post, saveLastSeenPostInFrontPage: saveLastSeenPostInFrontPage)
+                                    
+                                    if iconType == .user && post.userIconUrlString == nil {
+                                        postListingViewModel.loadIcon(
+                                            post: post
                                         )
                                     }
                                 }
-                            }
-                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                if let action = SwipeAction(rawValue: postLeftSwipeAction), action != .none {
-                                    Button {
-                                        onSwipe(action, post: post)
-                                    } label: {
-                                        SwiftUI.Image(systemName: action.icon)
-                                            .foregroundStyle(.white)
+                                .onDisappear {
+                                    postListingViewModel.appearedPosts.remove(id: post.id)
+                                    if !post.isRead && saveReadPosts && markPostsAsReadOnScroll {
+                                        Task {
+                                            await postListingViewModel.readPost(
+                                                post: post,
+                                                saveReadPosts: saveReadPosts,
+                                                limitHistorySize: limitHistorySize,
+                                                historyLimit: historyLimit
+                                            )
+                                        }
                                     }
-                                    .tint(action.getTint(customThemeViewModel: customThemeViewModel))
                                 }
-                            }
-                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                                if let action = SwipeAction(rawValue: postRightSwipeAction), action != .none {
-                                    Button {
-                                        onSwipe(action, post: post)
-                                    } label: {
-                                        SwiftUI.Image(systemName: action.icon)
-                                            .foregroundStyle(.white)
+                                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                    if let action = SwipeAction(rawValue: postLeftSwipeAction), action != .none {
+                                        Button {
+                                            onSwipe(action, post: post)
+                                        } label: {
+                                            SwiftUI.Image(systemName: action.icon)
+                                                .foregroundStyle(.white)
+                                        }
+                                        .tint(action.getTint(customThemeViewModel: customThemeViewModel))
                                     }
-                                    .tint(action.getTint(customThemeViewModel: customThemeViewModel))
                                 }
-                            }
-                        }
-                        
-                        if postListingViewModel.hasMorePages {
-                            if postListingViewModel.postLoadingError != nil {
-                                HStack(spacing: 16) {
-                                    SwiftUI.Image(systemName: "exclamationmark.circle")
-                                        .primaryIcon()
-                                    
-                                    Text("Error loading more posts. Tap to retry.")
-                                        .primaryText()
-                                }
-                                .frame(maxWidth: .infinity)
-                                .padding(16)
-                                .contentShape(Rectangle())
-                                .listPlainItemNoInsets()
-                                .onTapGesture {
-                                    postListingViewModel.postLoadingError = nil
-                                }
-                            } else {
-                                HStack {
-                                    ProgressIndicator()
-                                }
-                                .frame(maxWidth: .infinity)
-                                .padding(16)
-                                .listPlainItemNoInsets()
-                                .task {
-                                    guard !postListingViewModel.isPullToRefreshing else {
-                                        return
+                                .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                    if let action = SwipeAction(rawValue: postRightSwipeAction), action != .none {
+                                        Button {
+                                            onSwipe(action, post: post)
+                                        } label: {
+                                            SwiftUI.Image(systemName: action.icon)
+                                                .foregroundStyle(.white)
+                                        }
+                                        .tint(action.getTint(customThemeViewModel: customThemeViewModel))
                                     }
-                                    await postListingViewModel.loadPosts()
+                                }
+                            }
+                            
+                            if postListingViewModel.hasMorePages {
+                                if postListingViewModel.postLoadingError != nil {
+                                    HStack(spacing: 16) {
+                                        SwiftUI.Image(systemName: "exclamationmark.circle")
+                                            .primaryIcon()
+                                        
+                                        Text("Error loading more posts. Tap to retry.")
+                                            .primaryText()
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .padding(16)
+                                    .contentShape(Rectangle())
+                                    .listPlainItemNoInsets()
+                                    .onTapGesture {
+                                        postListingViewModel.postLoadingError = nil
+                                    }
+                                } else {
+                                    HStack {
+                                        ProgressIndicator()
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .padding(16)
+                                    .listPlainItemNoInsets()
+                                    .task {
+                                        guard !postListingViewModel.isPullToRefreshing else {
+                                            return
+                                        }
+                                        await postListingViewModel.loadPosts()
+                                    }
+                                }
+                            }
+                        }
+                        .scrollBounceBehavior(.basedOnSize)
+                        .themedList()
+                        .scrollIndicators(.hidden)
+                        .refreshable {
+                            await postListingViewModel.refreshPostsWithContinuation()
+                        }
+                        .onAppear {
+                            scrollProxy = proxy
+                        }
+                        .onScrollPhaseChange { _, phase in
+                            switch phase {
+                            case .idle:
+                                if lazyModeState == .paused {
+                                    resumeLazyMode()
+                                }
+                                postListingViewModel.isScrollIdle = true
+                                postListingViewModel.applyPendingUserIconUrlString()
+                            case .interacting:
+                                if lazyModeState == .started {
+                                    pauseLazyMode(resetScrolledPost: true)
+                                }
+                                postListingViewModel.isScrollIdle = false
+                            default:
+                                break
+                            }
+                        }
+                        .applyIf(onScroll != nil) {
+                            $0.onScrollPhaseChange { oldPhase, newPhase, context in
+                                if newPhase == .interacting {
+                                    onScroll?()
                                 }
                             }
                         }
                     }
-                    .scrollBounceBehavior(.basedOnSize)
-                    .themedList()
-                    .scrollIndicators(.hidden)
-                    .refreshable {
-                        await postListingViewModel.refreshPostsWithContinuation()
-                    }
-                    .onAppear {
-                        scrollProxy = proxy
-                    }
-                    .onScrollPhaseChange { _, phase in
-                        switch phase {
-                        case .idle:
-                            if lazyModeState == .paused {
-                                resumeLazyMode()
-                            }
-                            postListingViewModel.isScrollIdle = true
-                            postListingViewModel.applyPendingUserIconUrlString()
-                        case .interacting:
-                            if lazyModeState == .started {
-                                pauseLazyMode(resetScrolledPost: true)
-                            }
-                            postListingViewModel.isScrollIdle = false
-                        default:
-                            break
-                        }
-                    }
-                    .applyIf(onScroll != nil) {
-                        $0.onScrollPhaseChange { oldPhase, newPhase, context in
-                            if newPhase == .interacting {
-                                onScroll?()
-                            }
-                        }
-                    }
+                    .showErrorUsingSnackbar(postListingViewModel.$error)
+                    .coordinateSpace(name: "postfeed")
                 }
-                .showErrorUsingSnackbar(postListingViewModel.$error)
             }
         }
         .applyIf(handleToolbarMenu) {

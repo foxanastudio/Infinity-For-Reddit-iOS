@@ -32,6 +32,8 @@ struct PostViewCard: View {
     @AppStorage(InterfaceUserDefaultsUtils.voteButtonsOnTheRightKey, store: .interface) private var voteButtonsOnTheRight: Bool = false
 
     let iconType: IconType
+    let postFeedScrollIdle: Bool
+    let postFeedGeometry: GeometryProxy?
     let onPostTap: (Double) -> Void
     let onIconTap: () -> Void
     let onSubredditTap: () -> Void
@@ -53,6 +55,8 @@ struct PostViewCard: View {
         //postViewModel: PostViewModel,
         post: Post,
         iconType: IconType,
+        postFeedScrollIdle: Bool,
+        postFeedGeometry: GeometryProxy?,
         onPostTap: @escaping (Double) -> Void,
         onIconTap: @escaping () -> Void,
         onSubredditTap: @escaping () -> Void,
@@ -71,6 +75,8 @@ struct PostViewCard: View {
         //self.postViewModel = postViewModel
         self.post = post
         self.iconType = iconType
+        self.postFeedScrollIdle = postFeedScrollIdle
+        self.postFeedGeometry = postFeedGeometry
         self.onPostTap = onPostTap
         self.onIconTap = onIconTap
         self.onSubredditTap = onSubredditTap
@@ -85,7 +91,7 @@ struct PostViewCard: View {
         self.onShare = onShare
         self.onReadPost = onReadPost
         self.onLongPressPost = onLongPressPost
-        self._videoPlayerViewModel = StateObject(wrappedValue: VideoPlayerViewModel())
+        self._videoPlayerViewModel = StateObject(wrappedValue: VideoPlayerViewModel(canPlay: postFeedScrollIdle))
     }
 
     var body: some View {
@@ -263,7 +269,14 @@ struct PostViewCard: View {
                     Spacer()
                         .frame(height: 10)
                     
-                    PostVideoView(post: post, videoUrlString: videoUrlString, inPostListing: true, videoPlayerViewModel: videoPlayerViewModel) {
+                    PostVideoView(
+                        post: post,
+                        videoUrlString: videoUrlString,
+                        inPostListing: true,
+                        postFeedScrollIdle: postFeedScrollIdle,
+                        postFeedGeometry: postFeedGeometry,
+                        videoPlayerViewModel: videoPlayerViewModel
+                    ) {
                         Task {
                             await onReadPost()
                         }
@@ -272,7 +285,14 @@ struct PostViewCard: View {
                     Spacer()
                         .frame(height: 10)
                     
-                    PostVideoView(post: post, videoUrlString: videoUrlString, inPostListing: true, videoPlayerViewModel: videoPlayerViewModel) {
+                    PostVideoView(
+                        post: post,
+                        videoUrlString: videoUrlString,
+                        inPostListing: true,
+                        postFeedScrollIdle: postFeedScrollIdle,
+                        postFeedGeometry: postFeedGeometry,
+                        videoPlayerViewModel: videoPlayerViewModel
+                    ) {
                         Task {
                             await onReadPost()
                         }

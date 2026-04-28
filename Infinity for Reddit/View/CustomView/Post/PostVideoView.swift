@@ -29,6 +29,8 @@ struct PostVideoView: View {
     let videoUrlString: String
     let inPostListing: Bool
     let playbackTimeToSeekToInitially: Double
+    let postFeedScrollIdle: Bool
+    let postFeedGeometry: GeometryProxy?
     let onReadPost: (() -> Void)?
     
     init(
@@ -36,6 +38,8 @@ struct PostVideoView: View {
         videoUrlString: String,
         inPostListing: Bool = false,
         playbackTimeToSeekToInitially: Double = 0,
+        postFeedScrollIdle: Bool,
+        postFeedGeometry: GeometryProxy?,
         videoPlayerViewModel: VideoPlayerViewModel,
         onReadPost: (() -> Void)? = nil
     ) {
@@ -44,6 +48,8 @@ struct PostVideoView: View {
         self.inPostListing = inPostListing
         self.playbackTimeToSeekToInitially = playbackTimeToSeekToInitially
         self.onReadPost = onReadPost
+        self.postFeedScrollIdle = postFeedScrollIdle
+        self.postFeedGeometry = postFeedGeometry
         self.videoPlayerViewModel = videoPlayerViewModel
     }
     
@@ -68,7 +74,7 @@ struct PostVideoView: View {
                         videoURL: URL(string: videoUrlString)!,
                         aspectRatio: preview.images[0].source?.aspectRatio,
                         muteVideo: muteAutoplayingVideo,
-                        canPlay: canPlay,
+                        canPlay: canPlay && postFeedScrollIdle,
                         isSensitive: post.over18,
                         playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
                         videoPlayerViewModel: videoPlayerViewModel
@@ -83,7 +89,7 @@ struct PostVideoView: View {
                         videoURL: URL(string: videoUrlString)!,
                         aspectRatio: nil,
                         muteVideo: muteAutoplayingVideo,
-                        canPlay: canPlay,
+                        canPlay: canPlay && postFeedScrollIdle,
                         isSensitive: post.over18,
                         playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
                         videoPlayerViewModel: videoPlayerViewModel
@@ -142,8 +148,11 @@ struct PostVideoView: View {
                 }
             }
         }
-        .onVisiblePercentageChange { percent in
+        .onVisiblePercentageChange(in: .named("postfeed"), containerGeometry: postFeedGeometry) { percent in
             canPlay = percent > 0.5
+        }
+        .onDisappear {
+            videoPlayerViewModel.resetState()
         }
     }
     
@@ -205,6 +214,9 @@ struct PostVideoViewSelfContainedViewModel: View {
             videoUrlString: videoUrlString,
             inPostListing: inPostListing,
             playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
+            // We don't care about postFeedScrollIdle here for now
+            postFeedScrollIdle: true,
+            postFeedGeometry: nil,
             videoPlayerViewModel: videoPlayerViewModel,
             onReadPost: onReadPost
         )
