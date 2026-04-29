@@ -108,11 +108,13 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
         NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime,
                                                object: player.currentItem,
                                                queue: .main) { _ in
-            if VideoUserDefaultsUtils.loopVideo {
-                self.player.seek(to: .zero)
-                self.play()
-            } else {
-                self.pause()
+            DispatchQueue.main.async {
+                if VideoUserDefaultsUtils.loopVideo {
+                    self.player.seek(to: .zero)
+                    self.play()
+                } else {
+                    self.pause()
+                }
             }
         }
     }
@@ -131,43 +133,49 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
     
     private func observeCurrentItem() {
         currentItemObserver = player.observe(\.currentItem, options: [.new, .initial]) { [weak self] player, _ in
-            guard let self = self, let item = player.currentItem else { return }
-            
-            // When we get a new item, observe its status
-            self.statusObserver = item.observe(\.status, options: [.new]) { [weak self] item, _ in
-                guard let self = self else { return }
+            DispatchQueue.main.async {
+                guard let self = self, let item = player.currentItem else { return }
                 
-                if item.status == .readyToPlay {
-                    let durationSec = item.duration.seconds
-                    if durationSec.isFinite {
-                        DispatchQueue.main.async {
-                            self.duration = durationSec
+                // When we get a new item, observe its status
+                self.statusObserver = item.observe(\.status, options: [.new]) { [weak self] item, _ in
+                    guard let self = self else { return }
+                    
+                    if item.status == .readyToPlay {
+                        let durationSec = item.duration.seconds
+                        if durationSec.isFinite {
+                            DispatchQueue.main.async {
+                                self.duration = durationSec
+                            }
                         }
                     }
                 }
-            }
-            
-            self.audioTrackObserver = item.observe(\.tracks, options: [.new]) { [weak self] item, _ in
-                guard let self = self else { return }
-                var hasAudio = false
-                for playerItem in item.tracks {
-                    hasAudio = playerItem.assetTrack?.mediaType == .audio
-                    if hasAudio {
-                        break
+                
+                self.audioTrackObserver = item.observe(\.tracks, options: [.new]) { [weak self] item, _ in
+                    DispatchQueue.main.async {
+                        guard let self = self else { return }
+                        var hasAudio = false
+                        for playerItem in item.tracks {
+                            hasAudio = playerItem.assetTrack?.mediaType == .audio
+                            if hasAudio {
+                                break
+                            }
+                        }
+                        self.hasAudio = hasAudio
                     }
                 }
-                self.hasAudio = hasAudio
             }
         }
     }
     
     private func observeTime() {
         timeObserverToken = player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 0.5, preferredTimescale: 600), queue: .main) { [weak self] time in
-            guard let self = self else {
-                return
-            }
-            if !self.isSeekingProgress {
-                self.currentTime = time.seconds
+            DispatchQueue.main.async {
+                guard let self = self else {
+                    return
+                }
+                if !self.isSeekingProgress {
+                    self.currentTime = time.seconds
+                }
             }
         }
     }
