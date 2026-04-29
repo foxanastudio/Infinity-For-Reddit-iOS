@@ -37,10 +37,10 @@ public class PostListingViewModel: ObservableObject {
     @Published var sortType: SortType
     @Published var loadPostsTaskId = UUID()
     @Published var postLayout: PostLayout
+    @Published var isScrollIdle: Bool = false
     
     var appearedPosts: IdentifiedArrayOf<Post> = []
     var lazyModeScrolledPost: Post?
-    @Published var isScrollIdle: Bool = false
     
     private var userIconStringUrlCache: [String: String] = [:]
     

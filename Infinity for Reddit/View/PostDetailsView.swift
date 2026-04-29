@@ -106,6 +106,8 @@ struct PostDetailsView: View {
                                         postDetailsViewModel: postDetailsViewModel,
                                         post: post,
                                         //isFromSubredditPostListing: isFromSubredditPostListing,
+                                        listScrollIdle: true,
+                                        listGeometry: geometryProxy,
                                         playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
                                         onSendComment: sendComment,
                                         onShare: {
@@ -137,6 +139,8 @@ struct PostDetailsView: View {
                                             postDetailsViewModel: postDetailsViewModel,
                                             post: post,
                                             //isFromSubredditPostListing: isFromSubredditPostListing,
+                                            listScrollIdle: postDetailsViewModel.isScrollIdle,
+                                            listGeometry: geometryProxy,
                                             playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
                                             onSendComment: sendComment,
                                             onShare: {
@@ -401,6 +405,7 @@ struct PostDetailsView: View {
                             }
                             .frame(maxWidth: .infinity)
                         }
+                        .coordinateSpace(name: "postfeed")
                         if #available(iOS 26, *) {
                             GlassEffectContainer(spacing: 0) {
                                 if showSearchBar {
@@ -1243,6 +1248,8 @@ private struct PostDetailsItemView: View {
     
     let post: Post
     //let isFromSubredditPostListing: Bool
+    let listScrollIdle: Bool
+    let listGeometry: GeometryProxy
     let playbackTimeToSeekToInitially: Double
     let onSendComment: () -> Void
     let onShare: () -> Void
@@ -1253,6 +1260,8 @@ private struct PostDetailsItemView: View {
         PostDetailsViewCard(
             post: post,
             //isFromSubredditPostListing: isFromSubredditPostListing,
+            listScrollIdle: listScrollIdle,
+            listGeometry: listGeometry,
             playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
             onUpvote: {
                 voteTask?.cancel()

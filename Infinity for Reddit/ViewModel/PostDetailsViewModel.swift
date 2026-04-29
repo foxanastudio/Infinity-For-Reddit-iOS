@@ -32,6 +32,7 @@ public class PostDetailsViewModel: ObservableObject {
     @Published var searchQuery: String = ""
     @Published var searchedComment: CommentItem?
     @Published var scrollToCommentAfterRestoringCacheToggle: Bool = false
+    @Published var isScrollIdle: Bool = true
     
     @Published var showMediaDownloadFinishedMessageTrigger: Bool = false
     @Published var showAllGalleryMediaDownloadFinishedMessageTrigger: Bool = false
@@ -46,7 +47,6 @@ public class PostDetailsViewModel: ObservableObject {
         refreshPostAndCommentsContinuation != nil
     }
     
-    var isScrollIdle: Bool = true
     var commentItemToScrollTo: CommentItem?
     var isPostVisibleInSingleColumnList: Bool = false
 

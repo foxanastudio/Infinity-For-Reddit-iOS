@@ -32,6 +32,8 @@ struct PostDetailsViewCard: View {
     @AppStorage(InterfacePostDetailsUserDefaultsUtils.markdownEmbeddedMediaTypeKey, store: .interfacePostDetails) private var markdownEmbeddedMediaType: Int = 15
     @AppStorage(InterfaceUserDefaultsUtils.voteButtonsOnTheRightKey, store: .interface) private var voteButtonsOnTheRight: Bool = false
 
+    let listScrollIdle: Bool
+    let listGeometry: GeometryProxy
     let playbackTimeToSeekToInitially: Double
     let onUpvote: () -> Void
     let onDownvote: () -> Void
@@ -45,6 +47,8 @@ struct PostDetailsViewCard: View {
     
     init(
         post: Post,
+        listScrollIdle: Bool,
+        listGeometry: GeometryProxy,
         playbackTimeToSeekToInitially: Double,
         onUpvote: @escaping () -> Void,
         onDownvote: @escaping () -> Void,
@@ -56,6 +60,8 @@ struct PostDetailsViewCard: View {
     ) {
         self.post = post
         self.playbackTimeToSeekToInitially = playbackTimeToSeekToInitially
+        self.listScrollIdle = listScrollIdle
+        self.listGeometry = listGeometry
         self.onUpvote = onUpvote
         self.onDownvote = onDownvote
         self.onToggleSave = onToggleSave
@@ -253,12 +259,24 @@ struct PostDetailsViewCard: View {
                 Spacer()
                     .frame(height: 10)
                 
-                PostVideoViewSelfContainedViewModel(post: post, videoUrlString: videoUrlString, playbackTimeToSeekToInitially: playbackTimeToSeekToInitially)
+                PostVideoViewSelfContainedViewModel(
+                    post: post,
+                    videoUrlString: videoUrlString,
+                    listScrollIdle: listScrollIdle,
+                    listGeometry: listGeometry,
+                    playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
+                )
             } else if case .video(let videoUrlString, _) = post.postType {
                 Spacer()
                     .frame(height: 10)
                 
-                PostVideoViewSelfContainedViewModel(post: post, videoUrlString: videoUrlString, playbackTimeToSeekToInitially: playbackTimeToSeekToInitially)
+                PostVideoViewSelfContainedViewModel(
+                    post: post,
+                    videoUrlString: videoUrlString,
+                    listScrollIdle: listScrollIdle,
+                    listGeometry: listGeometry,
+                    playbackTimeToSeekToInitially: playbackTimeToSeekToInitially
+                )
             } else if post.postType.isMedia {
                 Spacer()
                     .frame(height: 10)

@@ -30,7 +30,7 @@ struct PostVideoView: View {
     let inPostListing: Bool
     let playbackTimeToSeekToInitially: Double
     let postFeedScrollIdle: Bool
-    let postFeedGeometry: GeometryProxy?
+    let postFeedGeometry: GeometryProxy
     let onReadPost: (() -> Void)?
     
     init(
@@ -39,7 +39,7 @@ struct PostVideoView: View {
         inPostListing: Bool = false,
         playbackTimeToSeekToInitially: Double = 0,
         postFeedScrollIdle: Bool,
-        postFeedGeometry: GeometryProxy?,
+        postFeedGeometry: GeometryProxy,
         videoPlayerViewModel: VideoPlayerViewModel,
         onReadPost: (() -> Void)? = nil
     ) {
@@ -149,7 +149,7 @@ struct PostVideoView: View {
             }
         }
         .onVisiblePercentageChange(in: .named("postfeed"), containerGeometry: postFeedGeometry) { percent in
-            canPlay = percent > 0.5
+            canPlay = percent > 0.5 || (postFeedGeometry.size.height < 500 && percent > 0.15)
         }
         .onDisappear {
             videoPlayerViewModel.resetState()
@@ -190,6 +190,8 @@ struct PostVideoViewSelfContainedViewModel: View {
     let post: Post
     let videoUrlString: String
     let inPostListing: Bool
+    let listScrollIdle: Bool
+    let listGeometry: GeometryProxy
     let playbackTimeToSeekToInitially: Double
     let onReadPost: (() -> Void)?
     
@@ -197,15 +199,19 @@ struct PostVideoViewSelfContainedViewModel: View {
         post: Post,
         videoUrlString: String,
         inPostListing: Bool = false,
+        listScrollIdle: Bool,
+        listGeometry: GeometryProxy,
         playbackTimeToSeekToInitially: Double = 0,
         onReadPost: (() -> Void)? = nil
     ) {
         self.post = post
         self.videoUrlString = videoUrlString
         self.inPostListing = inPostListing
+        self.listScrollIdle = listScrollIdle
+        self.listGeometry = listGeometry
         self.playbackTimeToSeekToInitially = playbackTimeToSeekToInitially
         self.onReadPost = onReadPost
-        self._videoPlayerViewModel = StateObject(wrappedValue: VideoPlayerViewModel())
+        self._videoPlayerViewModel = StateObject(wrappedValue: VideoPlayerViewModel(canPlay: listScrollIdle))
     }
     
     var body: some View {
@@ -214,9 +220,8 @@ struct PostVideoViewSelfContainedViewModel: View {
             videoUrlString: videoUrlString,
             inPostListing: inPostListing,
             playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
-            // We don't care about postFeedScrollIdle here for now
-            postFeedScrollIdle: true,
-            postFeedGeometry: nil,
+            postFeedScrollIdle: listScrollIdle,
+            postFeedGeometry: listGeometry,
             videoPlayerViewModel: videoPlayerViewModel,
             onReadPost: onReadPost
         )

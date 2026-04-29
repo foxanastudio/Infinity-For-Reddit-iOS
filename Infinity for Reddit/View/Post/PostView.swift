@@ -16,7 +16,7 @@ struct PostView: View {
     let postLayout: PostLayout
     let iconType: IconType
     let postFeedScrollIdle: Bool
-    let postFeedGeometry: GeometryProxy?
+    let postFeedGeometry: GeometryProxy
     let onUpvote: () async -> Void
     let onDownvote: () async -> Void
     let onToggleSave: () async -> Void
@@ -31,7 +31,7 @@ struct PostView: View {
         postLayout: PostLayout,
         iconType: IconType,
         postFeedScrollIdle: Bool,
-        postFeedGeometry: GeometryProxy?,
+        postFeedGeometry: GeometryProxy,
         onUpvote: @escaping () async -> Void,
         onDownvote: @escaping () async -> Void,
         onToggleSave: @escaping () async -> Void,

@@ -23,10 +23,10 @@ public class HistoryPostListingViewModel: ObservableObject {
     @Published var postLayout: PostLayout
     @Published var showMediaDownloadFinishedMessageTrigger: Bool = false
     @Published var showAllGalleryMediaDownloadFinishedMessageTrigger: Bool = false
+    @Published var isScrollIdle: Bool = true
     
     var appearedPosts: IdentifiedArrayOf<Post> = []
     var lazyModeScrolledPost: Post?
-    var isScrollIdle: Bool = true
     
     private var historyPostListingMetadata: HistoryPostListingMetadata
     private var externalPostFilter: PostFilter?

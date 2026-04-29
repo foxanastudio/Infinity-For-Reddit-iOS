@@ -87,123 +87,126 @@ struct HistoryPostListingView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                ScrollViewReader { proxy in
-                    List {
-                        ForEach(historyPostListingViewModel.posts, id: \.id) { post in
-                            PostView(
-                                post: post,
-                                postLayout: getPostLayout(post),
-                                iconType: .fromAPI,
-                                postFeedScrollIdle: historyPostListingViewModel.isScrollIdle,
-                                postFeedGeometry: nil,
-                                onUpvote: {
-                                    await historyPostListingViewModel.votePost(post: post, vote: 1)
-                                },
-                                onDownvote: {
-                                    await historyPostListingViewModel.votePost(post: post, vote: -1)
-                                },
-                                onToggleSave: {
-                                    await historyPostListingViewModel.savePost(post: post, save: !post.saved)
-                                },
-                                onPostTypeTap: {
-                                    onPostTypeClicked(post: post)
-                                },
-                                onSensitiveTap: {
-                                    onSensitiveClicked(post: post)
-                                },
-                                onLongPressPost: {
-                                    postForPostOptionsSheet = post
-                                    showPostOptionsSheet = true
-                                },
-                                onShare: {
-                                    postForPostOptionsSheet = post
-                                    showPostShareSheet = true
-                                },
-                                onReadPost: {
-                                    await historyPostListingViewModel.readPost(post: post, markPostsAsRead: saveReadPosts, limitHistorySize: limitHistorySize, historyLimit: historyLimit)
+                GeometryReader { geometry in
+                    ScrollViewReader { proxy in
+                        List {
+                            ForEach(historyPostListingViewModel.posts, id: \.id) { post in
+                                PostView(
+                                    post: post,
+                                    postLayout: getPostLayout(post),
+                                    iconType: .fromAPI,
+                                    postFeedScrollIdle: historyPostListingViewModel.isScrollIdle,
+                                    postFeedGeometry: geometry,
+                                    onUpvote: {
+                                        await historyPostListingViewModel.votePost(post: post, vote: 1)
+                                    },
+                                    onDownvote: {
+                                        await historyPostListingViewModel.votePost(post: post, vote: -1)
+                                    },
+                                    onToggleSave: {
+                                        await historyPostListingViewModel.savePost(post: post, save: !post.saved)
+                                    },
+                                    onPostTypeTap: {
+                                        onPostTypeClicked(post: post)
+                                    },
+                                    onSensitiveTap: {
+                                        onSensitiveClicked(post: post)
+                                    },
+                                    onLongPressPost: {
+                                        postForPostOptionsSheet = post
+                                        showPostOptionsSheet = true
+                                    },
+                                    onShare: {
+                                        postForPostOptionsSheet = post
+                                        showPostShareSheet = true
+                                    },
+                                    onReadPost: {
+                                        await historyPostListingViewModel.readPost(post: post, markPostsAsRead: saveReadPosts, limitHistorySize: limitHistorySize, historyLimit: historyLimit)
+                                    }
+                                )
+                                .limitedWidth()
+                                .id(ObjectIdentifier(post))
+                                .listPlainItemNoInsets()
+                                .onAppear {
+                                    historyPostListingViewModel.insertIntoAppearedPosts(post)
+                                    
+                                    if post.resolvedSubredditIconUrlString == nil {
+                                        Task {
+                                            await historyPostListingViewModel.loadIcon(post: post)
+                                        }
+                                    }
                                 }
-                            )
-                            .limitedWidth()
-                            .id(ObjectIdentifier(post))
-                            .listPlainItemNoInsets()
-                            .onAppear {
-                                historyPostListingViewModel.insertIntoAppearedPosts(post)
-                                
-                                if post.resolvedSubredditIconUrlString == nil {
-                                    Task {
-                                        await historyPostListingViewModel.loadIcon(post: post)
+                                .onDisappear {
+                                    historyPostListingViewModel.appearedPosts.remove(id: post.id)
+                                }
+                                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                    if let action = SwipeAction(rawValue: postLeftSwipeAction), action != .none {
+                                        Button {
+                                            onSwipe(action, post: post)
+                                        } label: {
+                                            SwiftUI.Image(systemName: action.icon)
+                                                .foregroundStyle(.white)
+                                        }
+                                        .tint(action.getTint(customThemeViewModel: customThemeViewModel))
+                                    }
+                                }
+                                .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                    if let action = SwipeAction(rawValue: postRightSwipeAction), action != .none {
+                                        Button {
+                                            onSwipe(action, post: post)
+                                        } label: {
+                                            SwiftUI.Image(systemName: action.icon)
+                                                .foregroundStyle(.white)
+                                        }
+                                        .tint(action.getTint(customThemeViewModel: customThemeViewModel))
                                     }
                                 }
                             }
-                            .onDisappear {
-                                historyPostListingViewModel.appearedPosts.remove(id: post.id)
-                            }
-                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                if let action = SwipeAction(rawValue: postLeftSwipeAction), action != .none {
-                                    Button {
-                                        onSwipe(action, post: post)
-                                    } label: {
-                                        SwiftUI.Image(systemName: action.icon)
-                                            .foregroundStyle(.white)
+                            if historyPostListingViewModel.hasMorePages {
+                                HStack {
+                                    ProgressIndicator()
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(16)
+                                .task {
+                                    guard !historyPostListingViewModel.isPullToRefreshing else {
+                                        return
                                     }
-                                    .tint(action.getTint(customThemeViewModel: customThemeViewModel))
+                                    await historyPostListingViewModel.loadPosts()
                                 }
-                            }
-                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                                if let action = SwipeAction(rawValue: postRightSwipeAction), action != .none {
-                                    Button {
-                                        onSwipe(action, post: post)
-                                    } label: {
-                                        SwiftUI.Image(systemName: action.icon)
-                                            .foregroundStyle(.white)
-                                    }
-                                    .tint(action.getTint(customThemeViewModel: customThemeViewModel))
-                                }
+                                .listPlainItem()
                             }
                         }
-                        if historyPostListingViewModel.hasMorePages {
-                            HStack {
-                                ProgressIndicator()
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(16)
-                            .task {
-                                guard !historyPostListingViewModel.isPullToRefreshing else {
-                                    return
+                        .scrollBounceBehavior(.basedOnSize)
+                        .themedList()
+                        .scrollIndicators(.hidden)
+                        .refreshable {
+                            await historyPostListingViewModel.refreshPostsWithContinuation()
+                        }
+                        .onAppear {
+                            scrollProxy = proxy
+                        }
+                        .onScrollPhaseChange { _, phase in
+                            switch phase {
+                            case .idle:
+                                if lazyModeState == .paused {
+                                    resumeLazyMode()
                                 }
-                                await historyPostListingViewModel.loadPosts()
+                                historyPostListingViewModel.isScrollIdle = true
+                                historyPostListingViewModel.applyPendingResolvedIconUrlString()
+                            case .interacting:
+                                if lazyModeState == .started {
+                                    pauseLazyMode(resetScrolledPost: true)
+                                }
+                                historyPostListingViewModel.isScrollIdle = false
+                            default:
+                                break
                             }
-                            .listPlainItem()
                         }
                     }
-                    .scrollBounceBehavior(.basedOnSize)
-                    .themedList()
-                    .scrollIndicators(.hidden)
-                    .refreshable {
-                        await historyPostListingViewModel.refreshPostsWithContinuation()
-                    }
-                    .onAppear {
-                        scrollProxy = proxy
-                    }
-                    .onScrollPhaseChange { _, phase in
-                        switch phase {
-                        case .idle:
-                            if lazyModeState == .paused {
-                                resumeLazyMode()
-                            }
-                            historyPostListingViewModel.isScrollIdle = true
-                            historyPostListingViewModel.applyPendingResolvedIconUrlString()
-                        case .interacting:
-                            if lazyModeState == .started {
-                                pauseLazyMode(resetScrolledPost: true)
-                            }
-                            historyPostListingViewModel.isScrollIdle = false
-                        default:
-                            break
-                        }
-                    }
+                    .showErrorUsingSnackbar(historyPostListingViewModel.$error)
+                    .coordinateSpace(name: "postfeed")
                 }
-                .showErrorUsingSnackbar(historyPostListingViewModel.$error)
             }
         }
         .applyIf(handleToolbarMenu) {
