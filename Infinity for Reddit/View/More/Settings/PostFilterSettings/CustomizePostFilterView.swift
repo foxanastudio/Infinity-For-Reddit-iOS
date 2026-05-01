@@ -575,8 +575,11 @@ struct CustomizePostFilterView: View {
             $0.interactiveDismissDisabled(true)
         }
         .onChange(of: customizePostFilterViewModel.savedPostFilterFlag) {
-            onApplyPostFilter?(customizePostFilterViewModel.getPostFilter())
-            dismiss()
+            if let onApplyPostFilter {
+                onApplyPostFilter(customizePostFilterViewModel.getPostFilter())
+            } else {
+                dismiss()
+            }
         }
         .showErrorUsingSnackbar(customizePostFilterViewModel.$error)
         .sheet(item: $subredditSelectionPurpose) { item in
