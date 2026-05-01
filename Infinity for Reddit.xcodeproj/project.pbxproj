@@ -67,6 +67,11 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		559628832FA41567008F71C8 /* Resources */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		559BD2352CF7D58500621685 /* Infinity for Reddit */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "Infinity for Reddit";
@@ -127,6 +132,7 @@
 		559BD22A2CF7D58500621685 = {
 			isa = PBXGroup;
 			children = (
+				559628832FA41567008F71C8 /* Resources */,
 				55BA78B92F3AE62D0087037D /* Launch Screen.storyboard */,
 				559BD2352CF7D58500621685 /* Infinity for Reddit */,
 				559BD2482CF7D58600621685 /* Infinity for RedditTests */,
@@ -163,6 +169,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				559628832FA41567008F71C8 /* Resources */,
 				559BD2352CF7D58500621685 /* Infinity for Reddit */,
 			);
 			name = "Infinity for Reddit";

@@ -90,6 +90,8 @@ struct Infinity: App {
                                     userInfo[AppDeepLink.fullnameKey] = fullname
                                 }
                                 NotificationCenter.default.post(name: .contextDeepLink, object: nil, userInfo: userInfo)
+                            case .appStoreEvent(let eventName):
+                                NotificationCenter.default.post(name: .appStoreEventDeepLink, object: nil)
                             }
                         }
                         .onAppear {

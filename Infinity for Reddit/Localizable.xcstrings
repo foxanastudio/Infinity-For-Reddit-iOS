@@ -14,9 +14,6 @@
         }
       }
     },
-    "%lld" : {
-
-    },
     "%lld days" : {
 
     },
@@ -215,6 +212,9 @@
     },
     "Link posts that have the following urls will be filtered out." : {
 
+    },
+    "Major Update" : {
+        
     },
     "Manage Subscription" : {
 

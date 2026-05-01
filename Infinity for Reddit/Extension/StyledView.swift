@@ -141,6 +141,10 @@ extension View {
         self.modifier(FabIconImageViewModifier())
     }
     
+    func buttonIcon() -> some View {
+        self.modifier(ButtonIconImageViewModifier())
+    }
+    
     func themedPicker() -> some View {
         self.modifier(PickerCustomThemeViewModifier())
     }

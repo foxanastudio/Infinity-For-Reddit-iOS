@@ -35,4 +35,5 @@ enum AppNavigation: Hashable {
     case copyCustomFeed(path: String)
     case report(subredditName: String, thingFullname: String)
     case wiki(subredditName: String, wikiPath: String = "index")
+    case appStoreEvent
 }

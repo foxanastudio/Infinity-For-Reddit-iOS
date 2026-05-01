@@ -159,6 +159,9 @@ struct CustomNavigationStack<Content: View>: View {
                     case .wiki(let subredditName, let wikiPath):
                         WikiView(subredditName: subredditName, wikiPath: wikiPath)
                             .environmentObject(navigationManager)
+                    case .appStoreEvent:
+                        AppStoreEventView()
+                            .environmentObject(navigationManager)
                     }
                 }
                 .navigationDestination(for: MoreViewNavigation.self) { destination in

@@ -317,6 +317,9 @@ struct HomeView: View {
                 }
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .appStoreEventDeepLink)) { _ in
+            currentNavigationManager.append(AppNavigation.appStoreEvent)
+        }
         .onReceive(NotificationCenter.default.publisher(for: .notificationToggleChanged)) { _ in
             if NotificationUserDefaultsUtils.enableNotification {
                 printInDebugOnly("Foreground refresh enabled")
