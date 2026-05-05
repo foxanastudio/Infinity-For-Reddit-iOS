@@ -151,9 +151,6 @@ struct PostVideoView: View {
         .onVisiblePercentageChange(in: .named("postfeed"), containerGeometry: postFeedGeometry) { percent in
             canPlay = percent > 0.5 || (postFeedGeometry.size.height < 500 && percent > 0.15)
         }
-        .onDisappear {
-            videoPlayerViewModel.resetState()
-        }
     }
     
     private func getPreviewUrl(_ preview: Preview) -> String? {

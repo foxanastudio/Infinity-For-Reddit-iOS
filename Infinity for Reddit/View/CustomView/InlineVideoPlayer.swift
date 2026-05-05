@@ -155,14 +155,14 @@ private struct InlineVideoPlayerWithControls: View {
         self.muteVideo = muteVideo
         self.canPlay = canPlay
         self.playbackTimeToSeekToInitially = playbackTimeToSeekToInitially
-        videoPlayerViewModel.initailizeCanPlay(canPlay)
+        videoPlayerViewModel.setCanPlay(canPlay)
         self.videoPlayerViewModel = videoPlayerViewModel
         self.onFullScreen = onFullScreen
     }
 
     var body: some View {
         ZStack {
-            InlineVideoAVPlayer(player: videoPlayerViewModel.player)
+            InlineVideoAVPlayer(player: VideoPlayerPool.shared.playerDict[videoPlayerViewModel.id])
                 .contentShape(Rectangle())
                 .onTapGesture {
                     videoPlayerViewModel.toggleControls()
@@ -264,30 +264,28 @@ private struct InlineVideoPlayerWithControls: View {
             }
         }
         .onDisappear {
-            videoPlayerViewModel.pause()
+            videoPlayerViewModel.resetState()
         }
-        .task {
-            await videoPlayerViewModel.loadAndPlay(
-                url: url,
-                muteVideo: (postListingVideoManager?.syncMuteAcrossFeed ?? false) ? (postListingVideoManager?.isMuted ?? false) : muteVideo,
-                playbackTimeToSeekToInitially: playbackTimeToSeekToInitially
-            )
+        .task(id: canPlay) {
+            videoPlayerViewModel.setCanPlay(canPlay)
+            if canPlay {
+                await videoPlayerViewModel.loadAndPlay(
+                    url: url,
+                    muteVideo: (postListingVideoManager?.syncMuteAcrossFeed ?? false) ? (postListingVideoManager?.isMuted ?? false) : muteVideo,
+                    playbackTimeToSeekToInitially: playbackTimeToSeekToInitially
+                )
+            }
         }
         .appForegroundBackgroundListener(onAppEntersBackground: {
             videoPlayerViewModel.pause()
         })
-        .onChange(of: canPlay) { _, newValue in
-            videoPlayerViewModel.setCanPlay(newValue)
-        }
         .onReceive(videoPlayerViewModel.$currentTime
             .removeDuplicates()
             .throttle(for: .milliseconds(500), scheduler: RunLoop.main, latest: true)
         ) { newValue in
             if videoPlayerViewModel.isSeekingProgress {
+                videoPlayerViewModel.seek(to: newValue)
                 videoPlayerViewModel.resetControllerTimer()
-                videoPlayerViewModel.player.seek(
-                    to: CMTime(seconds: newValue, preferredTimescale: 600)
-                )
             }
         }
     }
@@ -301,15 +299,20 @@ private struct InlineVideoPlayerWithControls: View {
 }
 
 private struct InlineVideoAVPlayer: UIViewControllerRepresentable {
-    let player: AVPlayer
+    let player: AVPlayer?
 
     func makeUIViewController(context: Context) -> AVPlayerViewController {
         let controller = AVPlayerViewController()
-        controller.player = player
         controller.showsPlaybackControls = false
         controller.videoGravity = .resizeAspect
         return controller
     }
 
-    func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {}
+    func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {
+        if let player, uiViewController.player == nil {
+            uiViewController.player = player
+        } else if uiViewController.player != nil, player == nil {
+            uiViewController.player = nil
+        }
+    }
 }

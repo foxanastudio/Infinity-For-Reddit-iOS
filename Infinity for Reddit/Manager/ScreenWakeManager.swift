@@ -25,6 +25,11 @@ actor ScreenWakeManager {
         await updateScreenWake(!activeVideoPlayers.isEmpty)
     }
     
+    func videoDidPause(_ objectIdentifier: ObjectIdentifier) async {
+        activeVideoPlayers.remove(objectIdentifier)
+        await updateScreenWake(!activeVideoPlayers.isEmpty)
+    }
+    
     @MainActor
     private func updateScreenWake(_ disableWake: Bool) {
         UIApplication.shared.isIdleTimerDisabled = disableWake
