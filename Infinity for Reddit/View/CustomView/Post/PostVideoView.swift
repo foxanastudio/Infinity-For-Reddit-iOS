@@ -27,6 +27,7 @@ struct PostVideoView: View {
     
     let post: Post
     let videoUrlString: String
+    let isParentVisible: Bool
     let inPostListing: Bool
     let playbackTimeToSeekToInitially: Double
     let postFeedScrollIdle: Bool
@@ -36,6 +37,7 @@ struct PostVideoView: View {
     init(
         post: Post,
         videoUrlString: String,
+        isParentVisible: Bool,
         inPostListing: Bool = false,
         playbackTimeToSeekToInitially: Double = 0,
         postFeedScrollIdle: Bool,
@@ -45,6 +47,7 @@ struct PostVideoView: View {
     ) {
         self.post = post
         self.videoUrlString = videoUrlString
+        self.isParentVisible = isParentVisible
         self.inPostListing = inPostListing
         self.playbackTimeToSeekToInitially = playbackTimeToSeekToInitially
         self.onReadPost = onReadPost
@@ -70,36 +73,50 @@ struct PostVideoView: View {
                 )
                 && ((post.over18 && autoplaySensitiveVideo) || !post.over18) {
                 if let preview = post.preview, preview.images.count > 0, !(limitMediaHeight && inPostListing) {
-                    InlineVideoPlayer(
-                        videoURL: URL(string: videoUrlString)!,
-                        aspectRatio: preview.images[0].source?.aspectRatio,
-                        muteVideo: muteAutoplayingVideo,
-                        canPlay: canPlay && postFeedScrollIdle,
-                        isSensitive: post.over18,
-                        playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
-                        videoPlayerViewModel: videoPlayerViewModel
-                    ) {
-                        showFullScreenVideo()
-                        if inPostListing {
-                            onReadPost?()
+                    if isParentVisible {
+                        InlineVideoPlayer(
+                            videoURL: URL(string: videoUrlString)!,
+                            aspectRatio: preview.images[0].source?.aspectRatio,
+                            muteVideo: muteAutoplayingVideo,
+                            canPlay: canPlay && postFeedScrollIdle,
+                            isSensitive: post.over18,
+                            playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
+                            videoPlayerViewModel: videoPlayerViewModel
+                        ) {
+                            showFullScreenVideo()
+                            if inPostListing {
+                                onReadPost?()
+                            }
                         }
+                    } else {
+                        Color.black
+                            .modify {
+                                if let aspectRatio = preview.images[0].source?.aspectRatio {
+                                    $0.aspectRatio(aspectRatio, contentMode: .fit)
+                                }
+                            }
                     }
                 } else {
-                    InlineVideoPlayer(
-                        videoURL: URL(string: videoUrlString)!,
-                        aspectRatio: nil,
-                        muteVideo: muteAutoplayingVideo,
-                        canPlay: canPlay && postFeedScrollIdle,
-                        isSensitive: post.over18,
-                        playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
-                        videoPlayerViewModel: videoPlayerViewModel
-                    ) {
-                        showFullScreenVideo()
-                        if inPostListing {
-                            onReadPost?()
+                    if isParentVisible {
+                        InlineVideoPlayer(
+                            videoURL: URL(string: videoUrlString)!,
+                            aspectRatio: nil,
+                            muteVideo: muteAutoplayingVideo,
+                            canPlay: canPlay && postFeedScrollIdle,
+                            isSensitive: post.over18,
+                            playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
+                            videoPlayerViewModel: videoPlayerViewModel
+                        ) {
+                            showFullScreenVideo()
+                            if inPostListing {
+                                onReadPost?()
+                            }
                         }
+                        .frame(height: 200)
+                    } else {
+                        Color.black
+                            .frame(height: 200)
                     }
-                    .frame(height: 200)
                 }
             } else {
                 if !shouldHideVideoPreview, let preview = post.preview, preview.images.count > 0, let imageUrlString = getPreviewUrl(preview) {
@@ -186,6 +203,7 @@ struct PostVideoViewSelfContainedViewModel: View {
     
     let post: Post
     let videoUrlString: String
+    let isParentVisible: Bool
     let inPostListing: Bool
     let listScrollIdle: Bool
     let listGeometry: GeometryProxy
@@ -195,6 +213,7 @@ struct PostVideoViewSelfContainedViewModel: View {
     init(
         post: Post,
         videoUrlString: String,
+        isParentVisible: Bool,
         inPostListing: Bool = false,
         listScrollIdle: Bool,
         listGeometry: GeometryProxy,
@@ -203,6 +222,7 @@ struct PostVideoViewSelfContainedViewModel: View {
     ) {
         self.post = post
         self.videoUrlString = videoUrlString
+        self.isParentVisible = isParentVisible
         self.inPostListing = inPostListing
         self.listScrollIdle = listScrollIdle
         self.listGeometry = listGeometry
@@ -215,6 +235,7 @@ struct PostVideoViewSelfContainedViewModel: View {
         PostVideoView(
             post: post,
             videoUrlString: videoUrlString,
+            isParentVisible: isParentVisible,
             inPostListing: inPostListing,
             playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
             postFeedScrollIdle: listScrollIdle,

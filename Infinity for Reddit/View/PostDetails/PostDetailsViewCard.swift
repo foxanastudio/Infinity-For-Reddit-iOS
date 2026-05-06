@@ -32,6 +32,7 @@ struct PostDetailsViewCard: View {
     @AppStorage(InterfacePostDetailsUserDefaultsUtils.markdownEmbeddedMediaTypeKey, store: .interfacePostDetails) private var markdownEmbeddedMediaType: Int = 15
     @AppStorage(InterfaceUserDefaultsUtils.voteButtonsOnTheRightKey, store: .interface) private var voteButtonsOnTheRight: Bool = false
 
+    let isParentVisible: Bool
     let listScrollIdle: Bool
     let listGeometry: GeometryProxy
     let playbackTimeToSeekToInitially: Double
@@ -47,6 +48,7 @@ struct PostDetailsViewCard: View {
     
     init(
         post: Post,
+        isParentVisible: Bool,
         listScrollIdle: Bool,
         listGeometry: GeometryProxy,
         playbackTimeToSeekToInitially: Double,
@@ -60,6 +62,7 @@ struct PostDetailsViewCard: View {
     ) {
         self.post = post
         self.playbackTimeToSeekToInitially = playbackTimeToSeekToInitially
+        self.isParentVisible = isParentVisible
         self.listScrollIdle = listScrollIdle
         self.listGeometry = listGeometry
         self.onUpvote = onUpvote
@@ -262,6 +265,7 @@ struct PostDetailsViewCard: View {
                 PostVideoViewSelfContainedViewModel(
                     post: post,
                     videoUrlString: videoUrlString,
+                    isParentVisible: isParentVisible,
                     listScrollIdle: listScrollIdle,
                     listGeometry: listGeometry,
                     playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
@@ -273,6 +277,7 @@ struct PostDetailsViewCard: View {
                 PostVideoViewSelfContainedViewModel(
                     post: post,
                     videoUrlString: videoUrlString,
+                    isParentVisible: isParentVisible,
                     listScrollIdle: listScrollIdle,
                     listGeometry: listGeometry,
                     playbackTimeToSeekToInitially: playbackTimeToSeekToInitially

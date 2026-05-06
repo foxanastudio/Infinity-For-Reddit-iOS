@@ -19,6 +19,7 @@ struct PostListingView: View {
     @StateObject var postListingViewModel: PostListingViewModel
     @StateObject var postListingVideoManager: PostListingVideoManager = .init()
     
+    @State private var isListAppeared: Bool = false
     @State private var scrollProxy: ScrollViewProxy? = nil
     @State private var showSortTypeKindSheet: Bool = false
     @State private var showSortTypeTimeSheet: Bool = false
@@ -150,6 +151,7 @@ struct PostListingView: View {
                                     post: post,
                                     postLayout: getPostLayout(post),
                                     iconType: iconType,
+                                    isParentVisible: isListAppeared,
                                     postFeedScrollIdle: postListingViewModel.isScrollIdle,
                                     postFeedGeometry: geometry,
                                     onUpvote: {
@@ -281,7 +283,11 @@ struct PostListingView: View {
                             await postListingViewModel.refreshPostsWithContinuation()
                         }
                         .onAppear {
+                            isListAppeared = true
                             scrollProxy = proxy
+                        }
+                        .onDisappear {
+                            isListAppeared = false
                         }
                         .onScrollPhaseChange { _, phase in
                             switch phase {

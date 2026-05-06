@@ -20,7 +20,6 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
     
     let id: String = UUID().uuidString
     
-    private var isLoading: Bool = false
     private var playbackSpeed: Double = 1
     private var canPlay: Bool
     private var muteVideo: Bool = true
@@ -40,42 +39,32 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
         
         self.muteVideo = muteVideo
         self.playbackTimeToSeekToInitially = playbackTimeToSeekToInitially
-        
-        guard !isLoading else {
-            return
-        }
-        
-        isLoading = true
 
         do {
             let proxiedURL = ProxyManager.shared.proxyURL(url)
-            let item = try await loadPlayerItem(from: proxiedURL)
+            let item = loadPlayerItem(from: proxiedURL)
             
             try Task.checkCancellation()
-            
-            if canPlay {
-                let player = VideoPlayerPool.shared.setupPlayerAfterLoading(
-                    id: id,
-                    playerItem: item,
-                    muteVideo: muteVideo,
-                    playbackTimeToSeekToInitially: playbackTimeToSeekToInitially
-                ) {
-                    self.play()
-                }
-                
-                self.playbackTimeToSeekToInitially = nil
-                
-                VideoPlayerPool.shared.setPlayerObservers(
-                    id: id,
-                    playerObservers: setUpPlayerObservers(player: player)
-                )
-                
-                self.isMuted = muteVideo
-                self.playbackSpeed = VideoUserDefaultsUtils.defaultPlaybackSpeed
+            let player = VideoPlayerPool.shared.setupPlayerAfterLoading(
+                id: id,
+                playerItem: item,
+                muteVideo: false,
+                playbackTimeToSeekToInitially: playbackTimeToSeekToInitially
+            ) {
+                self.play()
             }
-            isLoading = false
+            
+            self.playbackTimeToSeekToInitially = nil
+            
+            VideoPlayerPool.shared.setPlayerObservers(
+                id: id,
+                playerObservers: setUpPlayerObservers(player: player)
+            )
+            
+            self.isMuted = muteVideo
+            self.playbackSpeed = VideoUserDefaultsUtils.defaultPlaybackSpeed
         } catch {
-            isLoading = false
+            print("loadPlayerItem \(error.localizedDescription)")
         }
     }
     
@@ -84,7 +73,7 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
         let timeObserverToken = observeTime(player)
         let timeControlStatusObserver = observeTimeControlStatus(player)
         
-        NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime,
+        let endObserver = NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime,
                                                object: player.currentItem,
                                                queue: .main) { _ in
             DispatchQueue.main.async {
@@ -99,20 +88,14 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
         
         return PlayerObservers(
             currentItemObserver: currentItemObserver,
+            endObserver: endObserver,
             timeObserverToken: timeObserverToken,
             timeControlStatusObserver: timeControlStatusObserver
         )
     }
     
-    private func loadPlayerItem(from url: URL) async throws -> AVPlayerItem {
+    private func loadPlayerItem(from url: URL) -> AVPlayerItem {
         let asset = AVURLAsset(url: url)
-        
-        try Task.checkCancellation()
-        
-        let playable = try await asset.load(.isPlayable)
-        guard playable else {
-            throw NSError(domain: "VideoLoadingError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Asset is not playable."])
-        }
         return AVPlayerItem(asset: asset)
     }
     
@@ -203,7 +186,6 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
         guard let player = VideoPlayerPool.shared.getPlayer(id: id) else {
             return
         }
-        
         if canPlay {
             usePlaybackCategoryAndPlay(player)
             player.rate = Float(playbackSpeed)
@@ -276,12 +258,9 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
     func resetState() {
         pause()
         
-        NotificationCenter.default.removeObserver(self)
-        
         timer?.invalidate()
         timer = nil
         
-        isLoading = false
         showControls = false
         isPlaying = false
         isSeekingProgress = false

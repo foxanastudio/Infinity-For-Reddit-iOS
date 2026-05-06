@@ -18,6 +18,7 @@ struct HistoryPostListingView: View {
     @StateObject var historyPostListingViewModel: HistoryPostListingViewModel
     @StateObject var postListingVideoManager: PostListingVideoManager = .init()
     
+    @State private var isListAppeared: Bool = false
     @State private var scrollProxy: ScrollViewProxy? = nil
     @State private var navigationBarMenuKey: UUID?
     @State private var showLayoutTypeSheet: Bool = false
@@ -95,6 +96,7 @@ struct HistoryPostListingView: View {
                                     post: post,
                                     postLayout: getPostLayout(post),
                                     iconType: .fromAPI,
+                                    isParentVisible: isListAppeared,
                                     postFeedScrollIdle: historyPostListingViewModel.isScrollIdle,
                                     postFeedGeometry: geometry,
                                     onUpvote: {
@@ -184,7 +186,11 @@ struct HistoryPostListingView: View {
                             await historyPostListingViewModel.refreshPostsWithContinuation()
                         }
                         .onAppear {
+                            isListAppeared = true
                             scrollProxy = proxy
+                        }
+                        .onDisappear {
+                            isListAppeared = false
                         }
                         .onScrollPhaseChange { _, phase in
                             switch phase {

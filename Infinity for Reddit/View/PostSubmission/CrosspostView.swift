@@ -20,6 +20,7 @@ struct CrosspostView: View {
 
     @State private var titleSelectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var showNoSubredditAlert: Bool = false
+    @State private var isAppeared: Bool = false
     
     init(postToBeCrossposted: Post) {
         _postSubmissionContextViewModel = StateObject(
@@ -84,6 +85,7 @@ struct CrosspostView: View {
                                 PostVideoViewSelfContainedViewModel(
                                     post: crosspostViewModel.postToBeCrossposted,
                                     videoUrlString: videoUrlString,
+                                    isParentVisible: isAppeared,
                                     listScrollIdle: true,
                                     listGeometry: geometry
                                 )
@@ -91,6 +93,7 @@ struct CrosspostView: View {
                                 PostVideoViewSelfContainedViewModel(
                                     post: crosspostViewModel.postToBeCrossposted,
                                     videoUrlString: videoUrlString,
+                                    isParentVisible: isAppeared,
                                     listScrollIdle: true,
                                     listGeometry: geometry
                                 )
@@ -146,6 +149,12 @@ struct CrosspostView: View {
                     SwiftUI.Image(systemName: "paperplane.fill")
                 }
             }
+        }
+        .onAppear {
+            isAppeared = true
+        }
+        .onDisappear {
+            isAppeared = false
         }
         .onChange(of: crosspostViewModel.submitPostTask) { _, newValue in
             if newValue != nil {

@@ -14,7 +14,7 @@ final class VideoPlayerPool: ObservableObject {
     
     @Published private(set) var playerDict: [String: AVPlayer] = [:]
 
-    private let maxConcurrentPlayback = 3
+    private let maxConcurrentPlayback = 1
 
     private var pool: [AVPlayer] = []
     private var available: [AVPlayer] = []
@@ -37,6 +37,7 @@ final class VideoPlayerPool: ObservableObject {
         onPlay: () -> Void
     ) -> AVPlayer {
         if let existingPlayer = playerDict[id] {
+            print("existing player")
             updateUsage(id)
             return existingPlayer
         }
@@ -78,7 +79,36 @@ final class VideoPlayerPool: ObservableObject {
     }
     
     func resetState(id: String) {
-        guard let player = playerDict[id], let playerObservers = observers[player] else {
+        guard let player = playerDict[id] else {
+            return
+        }
+        
+        resetPlayer(player, id)
+        
+        usageOrder.removeAll { $0 == id }
+
+        available.append(player)
+        
+        let objectIdentifier = ObjectIdentifier(player)
+        
+        Task {
+            await ScreenWakeManager.shared.videoDidPause(objectIdentifier)
+        }
+    }
+    
+    private func resetPlayer(_ player: AVPlayer, _ evictID: String? = nil) {
+        removeObservers(player)
+        
+        player.pause()
+        player.replaceCurrentItem(with: nil)
+
+        if let evictID {
+            playerDict.removeValue(forKey: evictID)
+        }
+    }
+    
+    private func removeObservers(_ player: AVPlayer) {
+        guard let playerObservers = observers[player] else {
             return
         }
         
@@ -90,22 +120,11 @@ final class VideoPlayerPool: ObservableObject {
         
         playerObservers.timeControlStatusObserver.invalidate()
         
+        NotificationCenter.default.removeObserver(playerObservers.endObserver)
+        
         player.removeTimeObserver(playerObservers.timeObserverToken)
         
-        player.pause()
-        player.replaceCurrentItem(with: nil)
-        
-        let objectIdentifier = ObjectIdentifier(player)
-        
-        playerDict.removeValue(forKey: id)
-        usageOrder.removeAll { $0 == id }
         observers.removeValue(forKey: player)
-
-        available.append(player)
-        
-        Task {
-            await ScreenWakeManager.shared.videoDidPause(objectIdentifier)
-        }
     }
 
     private func acquirePlayer() -> AVPlayer {
@@ -115,21 +134,30 @@ final class VideoPlayerPool: ObservableObject {
         }
 
         if let evictID = usageOrder.first {
-            usageOrder.removeFirst()
+            usageOrder.removeAll { $0 == evictID }
 
-            guard let player = playerDict[evictID] else {
-                return AVPlayer()
+            let player = playerDict[evictID] ?? pool.first
+            
+            guard let player else {
+                let newPlayer = AVPlayer()
+                pool.append(newPlayer)
+                return newPlayer
             }
-
-            player.pause()
-            player.replaceCurrentItem(with: nil)
-
-            playerDict.removeValue(forKey: evictID)
-            observers.removeValue(forKey: player)
+            
+            resetPlayer(player, evictID)
+            
+            return player
         }
 
         // Really shouldn't happen
-        return AVPlayer()
+        if let player = pool.first {
+            resetPlayer(player)
+            return player
+        }
+        
+        let newPlayer = AVPlayer()
+        pool.append(newPlayer)
+        return newPlayer
     }
 
     private func updateUsage(_ id: String) {
@@ -142,15 +170,18 @@ class PlayerObservers {
     var currentItemObserver: NSKeyValueObservation
     var statusObserver: NSKeyValueObservation?
     var audioTrackObserver: NSKeyValueObservation?
+    var endObserver: Any
     var timeObserverToken: Any
     var timeControlStatusObserver: NSKeyValueObservation
     
     init(
         currentItemObserver: NSKeyValueObservation,
+        endObserver: Any,
         timeObserverToken: Any,
         timeControlStatusObserver: NSKeyValueObservation
     ) {
         self.currentItemObserver = currentItemObserver
+        self.endObserver = endObserver
         self.timeObserverToken = timeObserverToken
         self.timeControlStatusObserver = timeControlStatusObserver
     }
