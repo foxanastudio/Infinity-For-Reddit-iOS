@@ -20,6 +20,7 @@ struct PostDetailsView: View {
     @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
     @EnvironmentObject private var snackbarManager: SnackbarManager
     @EnvironmentObject private var accountViewModel: AccountViewModel
+    @EnvironmentObject private var fullScreenMediaViewModel: FullScreenMediaViewModel
     
     @StateObject var postDetailsViewModel: PostDetailsViewModel
     
@@ -107,7 +108,7 @@ struct PostDetailsView: View {
                                         postDetailsViewModel: postDetailsViewModel,
                                         post: post,
                                         //isFromSubredditPostListing: isFromSubredditPostListing,
-                                        isParentVisible: isAppeared,
+                                        isParentVisible: isAppeared && fullScreenMediaViewModel.media == nil,
                                         listScrollIdle: true,
                                         listGeometry: geometryProxy,
                                         playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
@@ -141,7 +142,7 @@ struct PostDetailsView: View {
                                             postDetailsViewModel: postDetailsViewModel,
                                             post: post,
                                             //isFromSubredditPostListing: isFromSubredditPostListing,
-                                            isParentVisible: isAppeared,
+                                            isParentVisible: isAppeared && fullScreenMediaViewModel.media == nil,
                                             listScrollIdle: postDetailsViewModel.isScrollIdle,
                                             listGeometry: geometryProxy,
                                             playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,

@@ -14,6 +14,7 @@ struct HistoryPostListingView: View {
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     @EnvironmentObject private var snackbarManager: SnackbarManager
     @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
+    @EnvironmentObject private var fullScreenMediaViewModel: FullScreenMediaViewModel
     
     @StateObject var historyPostListingViewModel: HistoryPostListingViewModel
     @StateObject var postListingVideoManager: PostListingVideoManager = .init()
@@ -96,7 +97,7 @@ struct HistoryPostListingView: View {
                                     post: post,
                                     postLayout: getPostLayout(post),
                                     iconType: .fromAPI,
-                                    isParentVisible: isListAppeared,
+                                    isParentVisible: isListAppeared && fullScreenMediaViewModel.media == nil,
                                     postFeedScrollIdle: historyPostListingViewModel.isScrollIdle,
                                     postFeedGeometry: geometry,
                                     onUpvote: {

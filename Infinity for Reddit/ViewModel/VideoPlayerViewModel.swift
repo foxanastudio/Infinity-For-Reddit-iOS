@@ -52,7 +52,6 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
                 playbackTimeToSeekToInitially: playbackTimeToSeekToInitially
             ) {
                 self.play()
-                self.isMuted = muteVideo
                 self.playbackSpeed = VideoUserDefaultsUtils.defaultPlaybackSpeed
                 self.playbackTimeToSeekToInitially = nil
             }

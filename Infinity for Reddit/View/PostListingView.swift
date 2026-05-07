@@ -15,6 +15,7 @@ struct PostListingView: View {
     @EnvironmentObject private var navigationBarMenuManager: NavigationBarMenuManager
     @EnvironmentObject private var snackbarManager: SnackbarManager
     @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
+    @EnvironmentObject private var fullScreenMediaViewModel: FullScreenMediaViewModel
     
     @StateObject var postListingViewModel: PostListingViewModel
     @StateObject var postListingVideoManager: PostListingVideoManager = .init()
@@ -151,7 +152,7 @@ struct PostListingView: View {
                                     post: post,
                                     postLayout: getPostLayout(post),
                                     iconType: iconType,
-                                    isParentVisible: isListAppeared,
+                                    isParentVisible: isListAppeared && fullScreenMediaViewModel.media == nil,
                                     postFeedScrollIdle: postListingViewModel.isScrollIdle,
                                     postFeedGeometry: geometry,
                                     onUpvote: {
