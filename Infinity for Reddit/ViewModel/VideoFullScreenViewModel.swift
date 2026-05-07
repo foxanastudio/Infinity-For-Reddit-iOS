@@ -65,7 +65,9 @@ class VideoFullScreenViewModel: ObservableObject {
         }
         
         self.isLoading = true
-        self.playbackTimeToSeekToInitially = playbackTimeToSeekToInitially
+        if self.playbackTimeToSeekToInitially != nil {
+            self.playbackTimeToSeekToInitially = playbackTimeToSeekToInitially
+        }
         
         do {
             var finalURL: URL? = url

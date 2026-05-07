@@ -23,7 +23,7 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
     private var playbackSpeed: Double = 1
     private var canPlay: Bool
     private var muteVideo: Bool = true
-    private var playbackTimeToSeekToInitially: Double?
+    private var playbackTimeToSeekToInitially: Double? = 0
     
     private var timer: Timer?
     
@@ -38,7 +38,9 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
         }
         
         self.muteVideo = muteVideo
-        self.playbackTimeToSeekToInitially = playbackTimeToSeekToInitially
+        if self.playbackTimeToSeekToInitially != nil {
+            self.playbackTimeToSeekToInitially = playbackTimeToSeekToInitially
+        }
 
         do {
             let proxiedURL = ProxyManager.shared.proxyURL(url)
@@ -49,7 +51,7 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
                 id: id,
                 playerItem: item,
                 muteVideo: false,
-                playbackTimeToSeekToInitially: playbackTimeToSeekToInitially
+                playbackTimeToSeekToInitially: self.playbackTimeToSeekToInitially ?? currentTime
             ) {
                 self.play()
                 self.playbackSpeed = VideoUserDefaultsUtils.defaultPlaybackSpeed
