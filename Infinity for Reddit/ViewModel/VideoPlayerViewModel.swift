@@ -52,17 +52,15 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
                 playbackTimeToSeekToInitially: playbackTimeToSeekToInitially
             ) {
                 self.play()
+                self.isMuted = muteVideo
+                self.playbackSpeed = VideoUserDefaultsUtils.defaultPlaybackSpeed
+                self.playbackTimeToSeekToInitially = nil
             }
-            
-            self.playbackTimeToSeekToInitially = nil
             
             VideoPlayerPool.shared.setPlayerObservers(
                 id: id,
                 playerObservers: setUpPlayerObservers(player: player)
             )
-            
-            self.isMuted = muteVideo
-            self.playbackSpeed = VideoUserDefaultsUtils.defaultPlaybackSpeed
         } catch {
             print("loadPlayerItem \(error.localizedDescription)")
         }

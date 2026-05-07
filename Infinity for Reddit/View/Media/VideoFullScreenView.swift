@@ -10,6 +10,8 @@ import AVKit
 import SeekBar
 
 struct VideoFullScreenView<Content: View>: View {
+    @EnvironmentObject private var videoPlayerPool: VideoPlayerPool
+    
     @ObservedObject private var videoFullScreenViewModel: VideoFullScreenViewModel
 
     @State private var dismissStarted: Bool = false
@@ -60,14 +62,16 @@ struct VideoFullScreenView<Content: View>: View {
     
     var body: some View {
         ZStack {
-            PlayerView(player: videoFullScreenViewModel.player)
-                .onTapGesture {
-                    if !dismissStarted {
-                        withAnimation {
-                            videoFullScreenViewModel.toggleController()
+            if let player = videoPlayerPool.playerDict[videoFullScreenViewModel.id] {
+                PlayerView(player: player)
+                    .onTapGesture {
+                        if !dismissStarted {
+                            withAnimation {
+                                videoFullScreenViewModel.toggleController()
+                            }
                         }
                     }
-                }
+            }
             
             if let error = videoFullScreenViewModel.error {
                 HStack(spacing: 16) {
@@ -108,14 +112,14 @@ struct VideoFullScreenView<Content: View>: View {
                     },
                     onFastForward: {
                         let newTime = videoFullScreenViewModel.currentTime + 5
-                        videoFullScreenViewModel.player.seek(
-                            to: CMTime(seconds: min(videoFullScreenViewModel.duration, newTime), preferredTimescale: 600)
+                        videoFullScreenViewModel.seek(
+                            to: min(videoFullScreenViewModel.duration, newTime)
                         )
                     },
                     onRewind: {
                         let newTime = videoFullScreenViewModel.currentTime - 5
-                        videoFullScreenViewModel.player.seek(
-                            to: CMTime(seconds: min(videoFullScreenViewModel.duration, newTime), preferredTimescale: 600)
+                        videoFullScreenViewModel.seek(
+                            to: min(videoFullScreenViewModel.duration, newTime)
                         )
                     },
                     onDownload: {
@@ -163,7 +167,6 @@ struct VideoFullScreenView<Content: View>: View {
                 },
                 onDismiss: {
                     videoFullScreenViewModel.resetState()
-                    videoFullScreenViewModel.removeControllerTimer()
                     onDismiss()
                 }
             )
@@ -182,9 +185,7 @@ struct VideoFullScreenView<Content: View>: View {
         ) { newValue in
             if videoFullScreenViewModel.isSeekingProgress {
                 videoFullScreenViewModel.resetControllerTimer()
-                videoFullScreenViewModel.player.seek(
-                    to: CMTime(seconds: newValue, preferredTimescale: 600)
-                )
+                videoFullScreenViewModel.seek(to: newValue)
             }
         }
         .onChange(of: videoFullScreenViewModel.isSeekingProgress) { _, newValue in
@@ -197,10 +198,10 @@ struct VideoFullScreenView<Content: View>: View {
             }
         }
         .onChange(of: videoFullScreenViewModel.isMuted) { _, newValue in
-            videoFullScreenViewModel.player.isMuted = newValue
+            videoFullScreenViewModel.setMute()
         }
         .onChange(of: videoFullScreenViewModel.playbackSpeed) { _, newValue in
-            videoFullScreenViewModel.player.rate = Float(newValue)
+            videoFullScreenViewModel.setPlaybackSpeed()
         }
         .task {
             await videoFullScreenViewModel.loadAndPlay(urlString: urlString, videoType: videoType, muteVideo: muteVideo, playbackTimeToSeekToInitially: playbackTimeToSeekToInitially)
