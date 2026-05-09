@@ -21,7 +21,6 @@ struct InlineVideoPlayer: View {
     @AppStorage(DataSavingModeUserDefaultsUtils.dataSavingModeKey, store: .dataSavingMode) private var dataSavingMode: Int = 0
     
     let videoURL: URL
-    let player: AVPlayer
     private let aspectRatio: CGSize?
     private let muteVideo: Bool
     private let canPlay: Bool
@@ -40,7 +39,6 @@ struct InlineVideoPlayer: View {
         onFullScreen: (() -> Void)? = nil
     ) {
         self.videoURL = videoURL
-        self.player = AVPlayer(url: ProxyManager.shared.proxyURL(videoURL))
         self.aspectRatio = aspectRatio
         self.muteVideo = muteVideo
         self.canPlay = canPlay
