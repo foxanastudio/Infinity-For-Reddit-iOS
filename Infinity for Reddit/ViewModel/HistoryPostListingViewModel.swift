@@ -18,21 +18,28 @@ public class HistoryPostListingViewModel: ObservableObject {
     @Published var isInitialLoad: Bool = true
     @Published var isInitialLoading: Bool = false
     @Published var isLoadingMore: Bool = false
-    @Published var hasMorePages: Bool = true
     @Published var error: Error?
     @Published var loadPostsTaskId = UUID()
     @Published var postLayout: PostLayout
     @Published var showMediaDownloadFinishedMessageTrigger: Bool = false
     @Published var showAllGalleryMediaDownloadFinishedMessageTrigger: Bool = false
+    @Published var isScrollIdle: Bool = true
     
     var appearedPosts: IdentifiedArrayOf<Post> = []
     var lazyModeScrolledPost: Post?
-    var isScrollIdle: Bool = true
     
     private var historyPostListingMetadata: HistoryPostListingMetadata
     private var externalPostFilter: PostFilter?
     private var postFilter: PostFilter?
     private var before: Int64? = nil
+    
+    var hasMorePages: Bool {
+        isInitialLoad || before != nil
+    }
+    
+    var isPullToRefreshing: Bool {
+        refreshPostsContinuation != nil
+    }
     
     // UserDefaults
     private var spoilerContent: Bool
@@ -105,7 +112,7 @@ public class HistoryPostListingViewModel: ObservableObject {
         let isInitialLoadCopy = isInitialLoad
         
         await MainActor.run {
-            if posts.isEmpty {
+            if posts.isEmpty || isRefreshWithContinuation {
                 isInitialLoading = true
             } else {
                 isLoadingMore = true
@@ -122,12 +129,11 @@ public class HistoryPostListingViewModel: ObservableObject {
             let result = try await historyPostListingRepository.fetchPosts(
                 historyPostListingType: historyPostListingMetadata.historyPostListingType,
                 username: AccountViewModel.shared.account.username,
-                before: before
+                before: isRefreshWithContinuation ? nil : before
             )
             
             guard let result else {
                 await MainActor.run {
-                    hasMorePages = false
                     self.before = nil
                     
                     if isRefreshWithContinuation {
@@ -145,7 +151,6 @@ public class HistoryPostListingViewModel: ObservableObject {
             if postListing.posts.isEmpty {
                 // No more posts
                 await MainActor.run {
-                    hasMorePages = false
                     self.before = nil
                 }
             } else {
@@ -164,9 +169,10 @@ public class HistoryPostListingViewModel: ObservableObject {
                 await MainActor.run {
                     if isRefreshWithContinuation {
                         self.posts.removeAll()
+                        self.appearedPosts.removeAll()
+                        self.lazyModeScrolledPost = nil
                     }
                     self.posts.append(contentsOf: processedPosts)
-                    hasMorePages = true
                 }
             }
             
@@ -182,7 +188,11 @@ public class HistoryPostListingViewModel: ObservableObject {
             await MainActor.run {
                 self.error = error
                 
-                isInitialLoad = isInitialLoadCopy
+                if isRefreshWithContinuation {
+                    finishPullToRefresh()
+                } else {
+                    isInitialLoad = isInitialLoadCopy
+                }
                 isInitialLoading = false
                 isLoadingMore = false
             }
@@ -193,9 +203,9 @@ public class HistoryPostListingViewModel: ObservableObject {
     
     @MainActor
     func refreshPostsWithContinuation() async {
-        resetPostLoadingState()
         await withCheckedContinuation { continuation in
             refreshPostsContinuation = continuation
+            resetPostLoadingState()
             loadPostsTaskId = UUID()
         }
     }
@@ -210,10 +220,11 @@ public class HistoryPostListingViewModel: ObservableObject {
         isInitialLoading = false
         isLoadingMore = false
         
-        before = nil
-        hasMorePages = true
         if refreshPostsContinuation == nil {
+            before = nil
             posts.removeAll()
+            appearedPosts.removeAll()
+            lazyModeScrolledPost = nil
         }
     }
     

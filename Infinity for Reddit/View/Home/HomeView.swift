@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  HomeView.swift
 //  Infinity for Reddit
 //
 //  Created by Docile Alligator on 2024-11-27.
@@ -26,21 +26,21 @@ struct HomeView: View {
     @StateObject private var tab4NavigationManager: NavigationManager
     @StateObject private var tab5NavigationManager: NavigationManager
     
-    @StateObject private var tab1NavigationBarMenuManager: NavigationBarMenuManager = NavigationBarMenuManager()
-    @StateObject private var tab2NavigationBarMenuManager: NavigationBarMenuManager = NavigationBarMenuManager()
-    @StateObject private var tab3NavigationBarMenuManager: NavigationBarMenuManager = NavigationBarMenuManager()
-    @StateObject private var tab4NavigationBarMenuManager: NavigationBarMenuManager = NavigationBarMenuManager()
-    @StateObject private var tab5NavigationBarMenuManager: NavigationBarMenuManager = NavigationBarMenuManager()
+    @StateObject private var tab1NavigationBarMenuManager: NavigationBarMenuManager
+    @StateObject private var tab2NavigationBarMenuManager: NavigationBarMenuManager
+    @StateObject private var tab3NavigationBarMenuManager: NavigationBarMenuManager
+    @StateObject private var tab4NavigationBarMenuManager: NavigationBarMenuManager
+    @StateObject private var tab5NavigationBarMenuManager: NavigationBarMenuManager
     
-    @StateObject private var tab1SnackbarManager: SnackbarManager = SnackbarManager()
-    @StateObject private var tab2SnackbarManager: SnackbarManager = SnackbarManager()
-    @StateObject private var tab3SnackbarManager: SnackbarManager = SnackbarManager()
-    @StateObject private var tab4SnackbarManager: SnackbarManager = SnackbarManager()
-    @StateObject private var tab5SnackbarManager: SnackbarManager = SnackbarManager()
+    @StateObject private var tab1SnackbarManager: SnackbarManager
+    @StateObject private var tab2SnackbarManager: SnackbarManager
+    @StateObject private var tab3SnackbarManager: SnackbarManager
+    @StateObject private var tab4SnackbarManager: SnackbarManager
+    @StateObject private var tab5SnackbarManager: SnackbarManager
     
-    @StateObject private var homeViewModel = HomeViewModel(homeRepository: HomeRepository())
+    @StateObject private var homeViewModel: HomeViewModel
     
-    @StateObject private var videoFullScreenViewModel = VideoFullScreenViewModel()
+    @StateObject private var videoFullScreenViewModel: VideoFullScreenViewModel
     
     @State private var selectedTab: Tab = .home
     @State private var showProfile: Bool = false
@@ -57,6 +57,21 @@ struct HomeView: View {
                                                                              firstViewShouldHideNavigationBarOnScrollDown: false))
         _tab5NavigationManager = StateObject(wrappedValue: NavigationManager(fullScreenMediaViewModel: fullScreenMediaViewModel,
                                                                              firstViewShouldHideNavigationBarOnScrollDown: false))
+        
+        _tab1NavigationBarMenuManager = StateObject(wrappedValue: NavigationBarMenuManager())
+        _tab2NavigationBarMenuManager = StateObject(wrappedValue: NavigationBarMenuManager())
+        _tab3NavigationBarMenuManager = StateObject(wrappedValue: NavigationBarMenuManager())
+        _tab4NavigationBarMenuManager = StateObject(wrappedValue: NavigationBarMenuManager())
+        _tab5NavigationBarMenuManager = StateObject(wrappedValue: NavigationBarMenuManager())
+        
+        _tab1SnackbarManager = StateObject(wrappedValue: SnackbarManager())
+        _tab2SnackbarManager = StateObject(wrappedValue: SnackbarManager())
+        _tab3SnackbarManager = StateObject(wrappedValue: SnackbarManager())
+        _tab4SnackbarManager = StateObject(wrappedValue: SnackbarManager())
+        _tab5SnackbarManager = StateObject(wrappedValue: SnackbarManager())
+        
+        _homeViewModel = StateObject(wrappedValue: HomeViewModel(homeRepository: HomeRepository()))
+        _videoFullScreenViewModel = StateObject(wrappedValue: VideoFullScreenViewModel())
     }
     
     var body: some View {
@@ -316,6 +331,9 @@ struct HomeView: View {
                     }
                 }
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .appStoreEventDeepLink)) { _ in
+            currentNavigationManager.append(AppNavigation.appStoreEvent)
         }
         .onReceive(NotificationCenter.default.publisher(for: .notificationToggleChanged)) { _ in
             if NotificationUserDefaultsUtils.enableNotification {

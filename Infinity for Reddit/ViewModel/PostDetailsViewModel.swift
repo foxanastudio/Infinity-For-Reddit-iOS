@@ -21,7 +21,6 @@ public class PostDetailsViewModel: ObservableObject {
     @Published var isInitialLoad: Bool = true
     @Published var isInitialLoading: Bool = false
     @Published var isLoadingMore: Bool = false
-    @Published var hasMoreComments: Bool = true
     @Published var commentMore: CommentMore?
     @Published var error: Error?
     @Published var contentLoadingError: Error?
@@ -33,13 +32,21 @@ public class PostDetailsViewModel: ObservableObject {
     @Published var searchQuery: String = ""
     @Published var searchedComment: CommentItem?
     @Published var scrollToCommentAfterRestoringCacheToggle: Bool = false
+    @Published var isScrollIdle: Bool = true
     
     @Published var showMediaDownloadFinishedMessageTrigger: Bool = false
     @Published var showAllGalleryMediaDownloadFinishedMessageTrigger: Bool = false
     
     @Published var showSensitiveContentWarningTrigger: Bool = false
     
-    var isScrollIdle: Bool = true
+    var hasMoreComments: Bool {
+        isInitialLoad || commentMore?.children.isEmpty == false
+    }
+    
+    var isPullToRefreshing: Bool {
+        refreshPostAndCommentsContinuation != nil
+    }
+    
     var commentItemToScrollTo: CommentItem?
     var isPostVisibleInSingleColumnList: Bool = false
 
@@ -58,7 +65,7 @@ public class PostDetailsViewModel: ObservableObject {
     private let commentRepository: CommentRepositoryProtocol
     private var userIconStringUrlCache: [String: String] = [:]
     
-    private var refreshPostsContinuation: CheckedContinuation<Void, Never>?
+    private var refreshPostAndCommentsContinuation: CheckedContinuation<Void, Never>?
     
     private var cancellables = Set<AnyCancellable>()
     private var toggleSensitiveTask: Task<Void, Never>?
@@ -139,17 +146,17 @@ public class PostDetailsViewModel: ObservableObject {
                     await MainActor.run {
                         self.post = post
                     }
-                    await fetchPostAndComments(isRefreshWithContinuation: refreshPostsContinuation != nil)
+                    await fetchPostAndComments(isRefreshWithContinuation: refreshPostAndCommentsContinuation != nil)
                 }
             case .postAndCommentId(let postId, _):
                 if let cache = PostDetailsCommentsCacheManager.shared.getCache(postId: postId) {
                     await restoreFromCache(cache)
                 } else {
-                    await fetchPostAndComments(isRefreshWithContinuation: refreshPostsContinuation != nil, shouldLoadPost: true)
+                    await fetchPostAndComments(isRefreshWithContinuation: refreshPostAndCommentsContinuation != nil, shouldLoadPost: true)
                 }
             }
         } else {
-            await fetchPostAndComments(isRefreshWithContinuation: refreshPostsContinuation != nil)
+            await fetchPostAndComments(isRefreshWithContinuation: refreshPostAndCommentsContinuation != nil)
         }
     }
     
@@ -158,12 +165,12 @@ public class PostDetailsViewModel: ObservableObject {
         self.post = cache.post
         self.visibleComments = cache.visibleComments
         self.allComments = cache.allComments
+        self.commentMore = cache.commentMore
         self.commentFilter = cache.commentFilter
         self.commentItemToScrollTo = cache.scrolledCommentItem
         self.scrollToCommentAfterRestoringCacheToggle.toggle()
         self.lastLoadedSortTypeKind = cache.lastLoadedSortTypeKind
         self.sortTypeKind = cache.lastLoadedSortTypeKind
-        self.hasMoreComments = cache.hasMoreComments
         
         PostDetailsCommentsCacheManager.shared.removeCache(postId: cache.post.id)
         
@@ -172,13 +179,13 @@ public class PostDetailsViewModel: ObservableObject {
     
     public func fetchPostAndComments(isRefreshWithContinuation: Bool = false, shouldLoadPost: Bool = false, forceLoad: Bool = false) async {
         if !forceLoad {
-            guard !isInitialLoading, !isLoadingMore else { return }
+            guard !isInitialLoading, !isLoadingMore, hasMoreComments else { return }
         }
         
         let isInitialLoadCopy = isInitialLoad
         
         await MainActor.run {
-            if allComments.isEmpty {
+            if allComments.isEmpty || isRefreshWithContinuation {
                 isInitialLoading = true
             } else {
                 isLoadingMore = true
@@ -280,8 +287,7 @@ public class PostDetailsViewModel: ObservableObject {
                 }
                 self.visibleComments.append(contentsOf: commentsToBeAppendedToVisibleComments)
                 self.allComments.append(contentsOf: processedComments)
-                
-                hasMoreComments = postDetails.commentListing.commentMore?.children.isEmpty == false
+
                 commentMore = postDetails.commentListing.commentMore
                 
                 self.isInitialLoading = false
@@ -296,7 +302,11 @@ public class PostDetailsViewModel: ObservableObject {
             await MainActor.run {
                 self.contentLoadingError = error
                 
-                self.isInitialLoad = isInitialLoadCopy
+                if isRefreshWithContinuation {
+                    finishPullToRefresh()
+                } else {
+                    self.isInitialLoad = isInitialLoadCopy
+                }
                 self.isInitialLoading = false
                 self.isLoadingMore = false
             }
@@ -353,14 +363,13 @@ public class PostDetailsViewModel: ObservableObject {
         if await fetchMoreCommentsInCommentMore(commentMore: commentMore) {
             await MainActor.run {
                 commentMore = nil
-                hasMoreComments = false
             }
         }
     }
     
     // Pagination or "Load more comments"
     public func fetchMoreCommentsInCommentMore(commentMore: CommentMore?) async -> Bool {
-        guard refreshPostsContinuation == nil else { return false }
+        guard refreshPostAndCommentsContinuation == nil else { return false }
         guard let post else { return false }
         guard let commentMore else { return false }
         
@@ -457,7 +466,7 @@ public class PostDetailsViewModel: ObservableObject {
     @MainActor
     func refreshPostAndCommentsWithContinuation() async {
         await withCheckedContinuation { continuation in
-            refreshPostsContinuation = continuation
+            refreshPostAndCommentsContinuation = continuation
             lastLoadedSortTypeKind = nil
             loadPostAndCommentsTaskId = UUID()
         }
@@ -474,18 +483,18 @@ public class PostDetailsViewModel: ObservableObject {
             isInitialLoading = false
             isLoadingMore = false
             
-            hasMoreComments = true
-            if refreshPostsContinuation == nil {
+            if refreshPostAndCommentsContinuation == nil {
                 visibleComments.removeAll()
                 allComments.removeAll()
                 appearedComments.removeAll()
+                commentMore = nil
             }
         }
     }
     
     func finishPullToRefresh() {
-        refreshPostsContinuation?.resume()
-        refreshPostsContinuation = nil
+        refreshPostAndCommentsContinuation?.resume()
+        refreshPostAndCommentsContinuation = nil
     }
     
     func postProcessComments(_ comments: [CommentItem]) -> [CommentItem] {
@@ -1512,6 +1521,7 @@ public class PostDetailsViewModel: ObservableObject {
             post: post,
             visibleComments: visibleComments,
             allComments: allComments,
+            commentMore: commentMore,
             commentFilter: commentFilter,
             scrolledCommentItem: getCurrentScrolledCommentItem(),
             lastLoadedSortTypeKind: lastLoadedSortTypeKind,

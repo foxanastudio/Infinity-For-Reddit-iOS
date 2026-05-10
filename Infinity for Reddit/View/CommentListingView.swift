@@ -139,6 +139,9 @@ struct CommentListingView: View {
                             .frame(maxWidth: .infinity)
                             .padding(16)
                             .task {
+                                guard !commentListingViewModel.isPullToRefreshing else {
+                                    return
+                                }
                                 await commentListingViewModel.loadComments()
                             }
                             .listPlainItemNoInsets()

@@ -16,11 +16,20 @@ public class CommentListingViewModel: ObservableObject {
     @Published var isInitialLoad: Bool = true
     @Published var isInitialLoading: Bool = false
     @Published var isLoadingMore: Bool = false
-    @Published var hasMorePages: Bool = true
     @Published var error: Error? = nil
     @Published var commentLoadingError: Error?
     @Published var sortType: SortType
     @Published var loadCommentsTaskId = UUID()
+    
+    var hasMorePages: Bool {
+        isInitialLoad || !(after == nil || after?.isEmpty == true)
+    }
+    
+    private var refreshCommentsContinuation: CheckedContinuation<Void, Never>?
+    
+    var isPullToRefreshing: Bool {
+        refreshCommentsContinuation != nil
+    }
     
     private var after: String? = nil
     public let commentListingRepository: CommentListingRepositoryProtocol
@@ -28,8 +37,6 @@ public class CommentListingViewModel: ObservableObject {
     private let commentRepository: CommentRepositoryProtocol
     private let commentListingMetadata: CommentListingMetadata
     private var lastLoadedSortType: SortType? = nil
-    
-    private var refreshCommentsContinuation: CheckedContinuation<Void, Never>?
     
     // MARK: - Initializer
     init(commentListingMetadata: CommentListingMetadata,
@@ -64,7 +71,7 @@ public class CommentListingViewModel: ObservableObject {
         let isInitialLoadCopy = isInitialLoad
         
         await MainActor.run {
-            if comments.isEmpty {
+            if comments.isEmpty || isRefreshWithContinuation {
                 isInitialLoading = true
             } else {
                 isLoadingMore = true
@@ -85,9 +92,9 @@ public class CommentListingViewModel: ObservableObject {
             case .user:
                 var queries: [String: String]
                 if let time = sortType.time?.rawValue {
-                    queries = ["sort": sortType.type.rawValue, "t": time, "limit": "100", "after": after ?? ""]
+                    queries = ["sort": sortType.type.rawValue, "t": time, "limit": "100", "after": isRefreshWithContinuation ? "" : (after ?? "")]
                 } else {
-                    queries = ["sort": sortType.type.rawValue, "limit": "100", "after": after ?? ""]
+                    queries = ["sort": sortType.type.rawValue, "limit": "100", "after": isRefreshWithContinuation ? "" : (after ?? "")]
                 }
                 commentListing = try await commentListingRepository.fetchComments(
                     commentListingType: commentListingMetadata.commentListingType,
@@ -98,7 +105,7 @@ public class CommentListingViewModel: ObservableObject {
                 commentListing = try await commentListingRepository.fetchComments(
                     commentListingType: commentListingMetadata.commentListingType,
                     pathComponents: commentListingMetadata.pathComponents,
-                    queries: ["limit": "100", "after": after ?? ""].merging(commentListingMetadata.queries ?? [:], uniquingKeysWith: { _, new in new })
+                    queries: ["limit": "100", "after": isRefreshWithContinuation ? "" : (after ?? "")].merging(commentListingMetadata.queries ?? [:], uniquingKeysWith: { _, new in new })
                 )
             }
             
@@ -111,15 +118,13 @@ public class CommentListingViewModel: ObservableObject {
             await MainActor.run {
                 if (processedComments.isEmpty) {
                     // No more comments
-                    hasMorePages = false
                     self.after = nil
                 } else {
-                    self.after = commentListing.after
                     if isRefreshWithContinuation {
                         self.comments.removeAll()
                     }
                     self.comments.append(contentsOf: processedComments)
-                    self.hasMorePages = !(processedComments.isEmpty || after == nil || after?.isEmpty == true)
+                    self.after = commentListing.after
                 }
                 
                 if isRefreshWithContinuation {
@@ -135,7 +140,12 @@ public class CommentListingViewModel: ObservableObject {
             await MainActor.run {
                 self.commentLoadingError = error
                 
-                isInitialLoad = isInitialLoadCopy
+                if isRefreshWithContinuation {
+                    finishPullToRefresh()
+                } else {
+                    self.isInitialLoad = isInitialLoadCopy
+                }
+                
                 isInitialLoading = false
                 isLoadingMore = false
             }
@@ -163,10 +173,9 @@ public class CommentListingViewModel: ObservableObject {
             isInitialLoad = true
             isInitialLoading = false
             isLoadingMore = false
-            
-            after = nil
-            hasMorePages = true
+
             if refreshCommentsContinuation == nil {
+                after = nil
                 comments = []
             }
         }

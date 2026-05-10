@@ -8,6 +8,7 @@ import Foundation
 
 struct AppDeepLink {
     static let scheme = "infinity"
+    static let appStoreEventScheme = "infinityevent"
     static let inboxHost = "inbox"
     static let linkHost = "linkToView"
     static let accountNameKey = "accountName"
@@ -46,6 +47,9 @@ struct AppDeepLink {
     
     static func getAppDeepLinkType(_ url: URL) -> AppDeepLinkType? {
         guard url.scheme == scheme else {
+            if url.scheme == appStoreEventScheme, let eventName = url.host() {
+                return AppDeepLinkType.appStoreEvent(eventName: eventName)
+            }
             return nil
         }
         guard let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
@@ -86,4 +90,5 @@ struct AppDeepLink {
 enum AppDeepLinkType {
     case inbox(account: String, viewMessage: Bool, fullname: String?)
     case context(account: String, context: String, fullname: String?)
+    case appStoreEvent(eventName: String)
 }

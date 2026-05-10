@@ -15,6 +15,9 @@ struct PostView: View {
     let post: Post
     let postLayout: PostLayout
     let iconType: IconType
+    let isParentVisible: Bool
+    let postFeedScrollIdle: Bool
+    let postFeedGeometry: GeometryProxy
     let onUpvote: () async -> Void
     let onDownvote: () async -> Void
     let onToggleSave: () async -> Void
@@ -28,6 +31,9 @@ struct PostView: View {
         post: Post,
         postLayout: PostLayout,
         iconType: IconType,
+        isParentVisible: Bool,
+        postFeedScrollIdle: Bool,
+        postFeedGeometry: GeometryProxy,
         onUpvote: @escaping () async -> Void,
         onDownvote: @escaping () async -> Void,
         onToggleSave: @escaping () async -> Void,
@@ -40,6 +46,9 @@ struct PostView: View {
         self.post = post
         self.postLayout = postLayout
         self.iconType = iconType
+        self.isParentVisible = isParentVisible
+        self.postFeedScrollIdle = postFeedScrollIdle
+        self.postFeedGeometry = postFeedGeometry
         self.onUpvote = onUpvote
         self.onDownvote = onDownvote
         self.onToggleSave = onToggleSave
@@ -64,6 +73,9 @@ struct PostView: View {
                     //postViewModel: postViewModel,
                     post: post,
                     iconType: iconType,
+                    isParentVisible: isParentVisible,
+                    postFeedScrollIdle: postFeedScrollIdle,
+                    postFeedGeometry: postFeedGeometry,
                     onPostTap: { videoPlaybackTime in
                         onPostTap(videoPlaybackTime)
                     },

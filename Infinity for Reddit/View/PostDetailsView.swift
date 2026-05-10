@@ -20,6 +20,7 @@ struct PostDetailsView: View {
     @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
     @EnvironmentObject private var snackbarManager: SnackbarManager
     @EnvironmentObject private var accountViewModel: AccountViewModel
+    @EnvironmentObject private var fullScreenMediaViewModel: FullScreenMediaViewModel
     
     @StateObject var postDetailsViewModel: PostDetailsViewModel
     
@@ -42,6 +43,7 @@ struct PostDetailsView: View {
     @State private var activeAlert: ActiveAlert? = nil
     @State private var showActionBar: Bool = true
     @State private var showSearchBar: Bool = false
+    @State private var isAppeared: Bool = false
     @State private var geometryProxy: GeometryProxy?
     @State private var listProxy: ScrollViewProxy?
     @State private var commentToBeModerated: Comment?
@@ -106,6 +108,9 @@ struct PostDetailsView: View {
                                         postDetailsViewModel: postDetailsViewModel,
                                         post: post,
                                         //isFromSubredditPostListing: isFromSubredditPostListing,
+                                        isParentVisible: isAppeared && fullScreenMediaViewModel.media == nil,
+                                        listScrollIdle: true,
+                                        listGeometry: geometryProxy,
                                         playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
                                         onSendComment: sendComment,
                                         onShare: {
@@ -137,6 +142,9 @@ struct PostDetailsView: View {
                                             postDetailsViewModel: postDetailsViewModel,
                                             post: post,
                                             //isFromSubredditPostListing: isFromSubredditPostListing,
+                                            isParentVisible: isAppeared && fullScreenMediaViewModel.media == nil,
+                                            listScrollIdle: postDetailsViewModel.isScrollIdle,
+                                            listGeometry: geometryProxy,
                                             playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
                                             onSendComment: sendComment,
                                             onShare: {
@@ -401,6 +409,7 @@ struct PostDetailsView: View {
                             }
                             .frame(maxWidth: .infinity)
                         }
+                        .coordinateSpace(name: "postfeed")
                         if #available(iOS 26, *) {
                             GlassEffectContainer(spacing: 0) {
                                 if showSearchBar {
@@ -713,8 +722,10 @@ struct PostDetailsView: View {
         .onAppear {
             setUpMenu()
             showActionBar = true
+            isAppeared = true
         }
         .onDisappear {
+            isAppeared = false
             postDetailsViewModel.saveCache()
             
             guard let navigationBarMenuKey else { return }
@@ -1243,6 +1254,9 @@ private struct PostDetailsItemView: View {
     
     let post: Post
     //let isFromSubredditPostListing: Bool
+    let isParentVisible: Bool
+    let listScrollIdle: Bool
+    let listGeometry: GeometryProxy
     let playbackTimeToSeekToInitially: Double
     let onSendComment: () -> Void
     let onShare: () -> Void
@@ -1253,6 +1267,9 @@ private struct PostDetailsItemView: View {
         PostDetailsViewCard(
             post: post,
             //isFromSubredditPostListing: isFromSubredditPostListing,
+            isParentVisible: isParentVisible,
+            listScrollIdle: listScrollIdle,
+            listGeometry: listGeometry,
             playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
             onUpvote: {
                 voteTask?.cancel()
@@ -1343,6 +1360,9 @@ struct PaginationView: View {
             } else {
                 ProgressIndicator()
                     .task {
+                        guard !postDetailsViewModel.isPullToRefreshing else {
+                            return
+                        }
                         await postDetailsViewModel.fetchCommentsPagination()
                     }
             }

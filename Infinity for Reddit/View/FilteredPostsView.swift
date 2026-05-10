@@ -59,6 +59,7 @@ struct FilteredPostsView: View {
             ) { postFilter in
                 printInDebugOnly(postFilter)
                 filteredPostsViewModel.postFilter = postFilter
+                showCustomizePostFilterSheet = false
             }
         }
     }

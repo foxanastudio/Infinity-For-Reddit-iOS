@@ -8,20 +8,8 @@
 import Foundation
 import AVFoundation
 
+@MainActor
 class VideoPlayerViewModel: NSObject, ObservableObject {
-    lazy var player: AVPlayer = {
-        return AVPlayer()
-    }()
-    @Published private var isLoading: Bool = false
-    @Published private var isLoaded: Bool = false
-    private var timer: Timer?
-    
-    private var currentItemObserver: NSKeyValueObservation?
-    private var statusObserver: NSKeyValueObservation?
-    private var audioTrackObserver: NSKeyValueObservation?
-    private var timeObserverToken: Any?
-    private var timeControlStatusObserver: NSKeyValueObservation?
-    
     @Published var showControls = false
     @Published var isPlaying = false
     @Published var currentTime: Double = 0
@@ -29,117 +17,144 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
     @Published var isSeekingProgress = false
     @Published var hasAudio: Bool = false
     @Published var isMuted: Bool = false
-    @Published var playbackSpeed: Double = 1
-    var canPlay: Bool
+    
+    let id: String = UUID().uuidString
+    
+    private var playbackSpeed: Double = 1
+    private var canPlay: Bool
+    private var muteVideo: Bool = true
+    private var playbackTimeToSeekToInitially: Double? = 0
+    
+    private var timer: Timer?
     
     init(canPlay: Bool = true) {
         self.canPlay = canPlay
     }
     
     func loadAndPlay(url: URL, muteVideo: Bool, playbackTimeToSeekToInitially: Double) async {
-        guard !isLoaded, !isLoading else {
+        if let existingPlayer = VideoPlayerPool.shared.getPlayer(id: id) {
+            existingPlayer.play()
             return
         }
         
-        await MainActor.run {
-            isLoading = true
+        self.muteVideo = muteVideo
+        if self.playbackTimeToSeekToInitially != nil {
+            self.playbackTimeToSeekToInitially = playbackTimeToSeekToInitially
         }
 
         do {
             let proxiedURL = ProxyManager.shared.proxyURL(url)
-            let item = try await loadPlayerItem(from: proxiedURL)
-            player.replaceCurrentItem(with: item)
+            let item = loadPlayerItem(from: proxiedURL)
             
-            await MainActor.run {
-                isLoaded = true
-                isLoading = false
-                
-                self.player.isMuted = muteVideo
-                self.isMuted = muteVideo
-                self.playbackSpeed = VideoUserDefaultsUtils.defaultPlaybackSpeed
+            try Task.checkCancellation()
+            let player = VideoPlayerPool.shared.setupPlayerAfterLoading(
+                id: id,
+                playerItem: item,
+                muteVideo: false,
+                playbackTimeToSeekToInitially: self.playbackTimeToSeekToInitially ?? currentTime
+            ) {
                 self.play()
-                self.player.seek(
-                    to: CMTime(seconds: playbackTimeToSeekToInitially, preferredTimescale: 600)
-                )
-                
-                observeCurrentItem()
-                observeTime()
-                observeTimeControlStatus()
-                
-                NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime,
-                                                       object: player.currentItem,
-                                                       queue: .main) { _ in
-                    if VideoUserDefaultsUtils.loopVideo {
-                        self.player.seek(to: .zero)
-                        self.play()
-                    } else {
-                        self.pause()
-                    }
-                }
+                self.playbackSpeed = VideoUserDefaultsUtils.defaultPlaybackSpeed
+                self.playbackTimeToSeekToInitially = nil
             }
+            
+            VideoPlayerPool.shared.setPlayerObservers(
+                id: id,
+                playerObservers: setUpPlayerObservers(player: player)
+            )
         } catch {
-            // Error handling
-            await MainActor.run {
-                isLoaded = true
-                isLoading = false
-            }
+            print("loadPlayerItem \(error.localizedDescription)")
         }
     }
     
-    private func loadPlayerItem(from url: URL) async throws -> AVPlayerItem {
-        let asset = AVURLAsset(url: url)
-        let playable = try await asset.load(.isPlayable)
-        guard playable else {
-            throw NSError(domain: "VideoLoadingError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Asset is not playable."])
+    private func setUpPlayerObservers(player: AVPlayer) -> PlayerObservers {
+        let currentItemObserver = observeCurrentItem(player)
+        let timeObserverToken = observeTime(player)
+        let timeControlStatusObserver = observeTimeControlStatus(player)
+        
+        let endObserver = NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime,
+                                               object: player.currentItem,
+                                               queue: .main) { _ in
+            DispatchQueue.main.async {
+                if VideoUserDefaultsUtils.loopVideo {
+                    player.seek(to: .zero)
+                    self.play()
+                } else {
+                    self.pause()
+                }
+            }
         }
+        
+        return PlayerObservers(
+            currentItemObserver: currentItemObserver,
+            endObserver: endObserver,
+            timeObserverToken: timeObserverToken,
+            timeControlStatusObserver: timeControlStatusObserver
+        )
+    }
+    
+    private func loadPlayerItem(from url: URL) -> AVPlayerItem {
+        let asset = AVURLAsset(url: url)
         return AVPlayerItem(asset: asset)
     }
     
-    private func observeCurrentItem() {
-        currentItemObserver = player.observe(\.currentItem, options: [.new, .initial]) { [weak self] player, _ in
-            guard let self = self, let item = player.currentItem else { return }
-            
-            // When we get a new item, observe its status
-            self.statusObserver = item.observe(\.status, options: [.new]) { [weak self] item, _ in
-                guard let self = self else { return }
+    private func observeCurrentItem(_ player: AVPlayer) -> NSKeyValueObservation {
+        return player.observe(\.currentItem, options: [.new, .initial]) { [weak self] player, _ in
+            DispatchQueue.main.async {
+                guard let self = self, let item = player.currentItem else { return }
                 
-                if item.status == .readyToPlay {
-                    let durationSec = item.duration.seconds
-                    if durationSec.isFinite {
-                        DispatchQueue.main.async {
-                            self.duration = durationSec
+                // When we get a new item, observe its status
+                let statusObserver = item.observe(\.status, options: [.new]) { [weak self] item, _ in
+                    guard let self = self else { return }
+                    
+                    if item.status == .readyToPlay {
+                        let durationSec = item.duration.seconds
+                        if durationSec.isFinite {
+                            DispatchQueue.main.async {
+                                self.duration = durationSec
+                            }
                         }
                     }
                 }
-            }
-            
-            self.audioTrackObserver = item.observe(\.tracks, options: [.new]) { [weak self] item, _ in
-                guard let self = self else { return }
-                var hasAudio = false
-                for playerItem in item.tracks {
-                    hasAudio = playerItem.assetTrack?.mediaType == .audio
-                    if hasAudio {
-                        break
+                
+                let audioTrackObserver = item.observe(\.tracks, options: [.new]) { [weak self] item, _ in
+                    DispatchQueue.main.async {
+                        guard let self = self else { return }
+                        var hasAudio = false
+                        for playerItem in item.tracks {
+                            hasAudio = playerItem.assetTrack?.mediaType == .audio
+                            if hasAudio {
+                                break
+                            }
+                        }
+                        self.hasAudio = hasAudio
                     }
                 }
-                self.hasAudio = hasAudio
+                
+                VideoPlayerPool.shared.setStatusAndAudioTrackObserver(
+                    id: self.id,
+                    statusObserver: statusObserver,
+                    audioTrackObserver: audioTrackObserver
+                )
             }
         }
     }
     
-    private func observeTime() {
-        timeObserverToken = player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 0.5, preferredTimescale: 600), queue: .main) { [weak self] time in
-            guard let self = self else {
-                return
-            }
-            if !self.isSeekingProgress {
-                self.currentTime = time.seconds
+    private func observeTime(_ player: AVPlayer) -> Any {
+        return player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 0.5, preferredTimescale: 600), queue: .main) { [weak self] time in
+            DispatchQueue.main.async {
+                guard let self = self else {
+                    return
+                }
+                if !self.isSeekingProgress {
+                    self.currentTime = time.seconds
+                }
             }
         }
     }
     
-    private func observeTimeControlStatus() {
-        timeControlStatusObserver = player.observe(\.timeControlStatus, options: [.new, .initial]) { [weak self] player, _ in
+    private func observeTimeControlStatus(_ player: AVPlayer) -> NSKeyValueObservation {
+        return player.observe(\.timeControlStatus, options: [.new, .initial]) { [weak self] player, _ in
             DispatchQueue.main.async {
                 self?.isPlaying = (player.timeControlStatus == .playing)
             }
@@ -147,6 +162,10 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
     }
     
     func togglePlayPause() {
+        guard let player = VideoPlayerPool.shared.getPlayer(id: id) else {
+            return
+        }
+        
         if player.timeControlStatus == .playing {
             player.pause()
             
@@ -154,7 +173,7 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
                 await ScreenWakeManager.shared.videoDidPause(player)
             }
         } else {
-            usePlaybackCategoryAndPlay()
+            usePlaybackCategoryAndPlay(player)
             
             Task {
                 await ScreenWakeManager.shared.videoDidPlay(player)
@@ -163,8 +182,11 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
     }
     
     func play() {
+        guard let player = VideoPlayerPool.shared.getPlayer(id: id) else {
+            return
+        }
         if canPlay {
-            usePlaybackCategoryAndPlay()
+            usePlaybackCategoryAndPlay(player)
             player.rate = Float(playbackSpeed)
             
             Task {
@@ -174,6 +196,10 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
     }
     
     func pause() {
+        guard let player = VideoPlayerPool.shared.getPlayer(id: id) else {
+            return
+        }
+        
         player.pause()
         
         Task {
@@ -183,27 +209,18 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
     
     func setCanPlay(_ value: Bool) {
         self.canPlay = value
-        if value {
-            usePlaybackCategoryAndPlay()
-            
-            Task {
-                await ScreenWakeManager.shared.videoDidPlay(player)
-            }
-        } else {
-            player.pause()
-            
-            Task {
-                await ScreenWakeManager.shared.videoDidPause(player)
-            }
-        }
     }
     
-    private func usePlaybackCategoryAndPlay() {
+    private func usePlaybackCategoryAndPlay(_ player: AVPlayer) {
         try? AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback)
         player.play()
     }
     
     func toggleMute() -> Bool {
+        guard let player = VideoPlayerPool.shared.getPlayer(id: id) else {
+            return isMuted
+        }
+        
         if isMuted {
             player.isMuted = false
         } else {
@@ -214,8 +231,11 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
     }
     
     func seek(to time: Double) {
-        let cmTime = CMTime(seconds: time, preferredTimescale: 600)
-        player.seek(to: cmTime)
+        guard let player = VideoPlayerPool.shared.getPlayer(id: id) else {
+            return
+        }
+        
+        player.seek(to: CMTime(seconds: time, preferredTimescale: 600))
     }
     
     func toggleControls() {
@@ -234,15 +254,17 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
         }
     }
     
-    deinit {
+    func resetState() {
+        pause()
+        
         timer?.invalidate()
-        NotificationCenter.default.removeObserver(self)
-        currentItemObserver?.invalidate()
-        statusObserver?.invalidate()
-        audioTrackObserver?.invalidate()
-        timeControlStatusObserver?.invalidate()
-        if let token = timeObserverToken {
-            player.removeTimeObserver(token)
-        }
+        timer = nil
+        
+        showControls = false
+        isPlaying = false
+        isSeekingProgress = false
+        canPlay = false
+        
+        VideoPlayerPool.shared.resetState(id: id)
     }
 }

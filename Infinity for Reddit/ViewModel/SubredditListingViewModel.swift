@@ -17,7 +17,6 @@ public class SubredditListingViewModel: ObservableObject {
     @Published var isInitialLoad: Bool = true
     @Published var isInitialLoading: Bool = false
     @Published var isLoadingMore: Bool = false
-    @Published var hasMorePages: Bool = true
     @Published var error: Error?
     @Published var sortType: SortType.Kind
     @Published var loadSubredditsTaskId = UUID()
@@ -26,6 +25,14 @@ public class SubredditListingViewModel: ObservableObject {
     @Published var selectedSubscribedSubreddits: IdentifiedArrayOf<SubscribedSubredditData> = []
     @Published var selectedSubredditData: IdentifiedArrayOf<SubredditData> = []
     @Published var selectedSubredditsInCustomFeed: IdentifiedArrayOf<SubredditInCustomFeed> = []
+    
+    var hasMorePages: Bool {
+        isInitialLoad || !(after == nil || after?.isEmpty == true)
+    }
+    
+    var isPullToRefreshing: Bool {
+        refreshSubredditsContinuation != nil
+    }
     
     private var after: String? = nil
     private var lastLoadedSortType: SortType.Kind? = nil
@@ -102,7 +109,7 @@ public class SubredditListingViewModel: ObservableObject {
         
         let isInitialLoadCopy = isInitialLoad
         
-        if subreddits.isEmpty {
+        if subreddits.isEmpty || isRefreshWithContinuation {
             isInitialLoading = true
         } else {
             isLoadingMore = true
@@ -120,7 +127,7 @@ public class SubredditListingViewModel: ObservableObject {
                     "q": query,
                     "sort": sortType.rawValue,
                     "limit": "100",
-                    "after": after ?? "",
+                    "after": isRefreshWithContinuation ? "" : (after ?? ""),
                     "include_over_18": AccountViewModel.shared.account.allowSensitive ? "1" : "0"
                 ]
             )
@@ -133,7 +140,6 @@ public class SubredditListingViewModel: ObservableObject {
             
             if (allowedSubreddits.isEmpty) {
                 // No more subreddits
-                self.hasMorePages = false
                 self.after = nil
             } else {
                 self.after = subredditListing.after
@@ -141,7 +147,6 @@ public class SubredditListingViewModel: ObservableObject {
                     self.subreddits.removeAll()
                 }
                 self.subreddits.append(contentsOf: allowedSubreddits)
-                self.hasMorePages = !(after == nil || after?.isEmpty == true)
             }
             
             if isRefreshWithContinuation {
@@ -155,7 +160,12 @@ public class SubredditListingViewModel: ObservableObject {
         } catch {
             self.error = error
             
-            isInitialLoad = isInitialLoadCopy
+            if isRefreshWithContinuation {
+                finishPullToRefresh()
+            } else {
+                isInitialLoad = isInitialLoadCopy
+            }
+            
             isInitialLoading = false
             isLoadingMore = false
             
@@ -181,9 +191,8 @@ public class SubredditListingViewModel: ObservableObject {
         isInitialLoading = false
         isLoadingMore = false
         
-        after = nil
-        hasMorePages = true
         if refreshSubredditsContinuation == nil {
+            after = nil
             subreddits = []
         }
     }

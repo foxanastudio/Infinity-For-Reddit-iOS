@@ -32,21 +32,24 @@ public class PostListingViewModel: ObservableObject {
     @Published var isInitialLoad: Bool = true
     @Published var isInitialLoading: Bool = false
     @Published var isLoadingMore: Bool = false
-    @Published var hasMorePages: Bool = true
     @Published var error: Error?
     @Published var postLoadingError: Error?
     @Published var sortType: SortType
     @Published var loadPostsTaskId = UUID()
     @Published var postLayout: PostLayout
+    @Published var isScrollIdle: Bool = false
     
     var appearedPosts: IdentifiedArrayOf<Post> = []
     var lazyModeScrolledPost: Post?
-    var isScrollIdle: Bool = true
     
     private var userIconStringUrlCache: [String: String] = [:]
     
     @Published var showMediaDownloadFinishedMessageTrigger: Bool = false
     @Published var showAllGalleryMediaDownloadFinishedMessageTrigger: Bool = false
+    
+    var hasMorePages: Bool {
+        isInitialLoad || !(self.after == nil || self.after?.isEmpty == true)
+    }
     
     var itemsWithLoadingIndicator: [PostListItem] {
         if hasMorePages {
@@ -54,6 +57,10 @@ public class PostListingViewModel: ObservableObject {
         } else {
             return posts.map { .post($0) }
         }
+    }
+    
+    var isPullToRefreshing: Bool {
+        refreshPostsContinuation != nil
     }
     
     private var postListingMetadata: PostListingMetadata
@@ -144,7 +151,7 @@ public class PostListingViewModel: ObservableObject {
         let isInitialLoadCopy = isInitialLoad
         
         await MainActor.run {
-            if posts.isEmpty {
+            if posts.isEmpty || isRefreshWithContinuation {
                 isInitialLoading = true
             } else {
                 isLoadingMore = true
@@ -177,7 +184,6 @@ public class PostListingViewModel: ObservableObject {
                     guard !subscriptions.isEmpty else {
                         // No subreddits, abort
                         await MainActor.run {
-                            hasMorePages = false
                             self.after = nil
                             
                             if isRefreshWithContinuation {
@@ -199,7 +205,6 @@ public class PostListingViewModel: ObservableObject {
                     guard !fetchedSubscriptions.isEmpty else {
                         // No subreddits, abort
                         await MainActor.run {
-                            hasMorePages = false
                             self.after = nil
                             
                             if isRefreshWithContinuation {
@@ -223,9 +228,9 @@ public class PostListingViewModel: ObservableObject {
             case .inPath:
                 var queries: [String: String]
                 if let time = sortType.time?.rawValue {
-                    queries = ["t": time, "limit": "100", "after": self.after ?? ""]
+                    queries = ["t": time, "limit": "100", "after": isRefreshWithContinuation ? "" : (self.after ?? "")]
                 } else {
-                    queries = ["limit": "100", "after": self.after ?? ""]
+                    queries = ["limit": "100", "after": isRefreshWithContinuation ? "" : (self.after ?? "")]
                 }
                 if postListingMetadata.postListingType.canQuerySensitiveInAPICall {
                     queries["include_over_18"] = AccountViewModel.shared.account.allowSensitive ? "1" : "0"
@@ -239,9 +244,9 @@ public class PostListingViewModel: ObservableObject {
             case .inQuery(let key):
                 var queries: [String: String]
                 if let time = sortType.time?.rawValue {
-                    queries = [key: sortType.type.rawValue, "t": time, "limit": "100", "after": self.after ?? ""]
+                    queries = [key: sortType.type.rawValue, "t": time, "limit": "100", "after": isRefreshWithContinuation ? "" : (self.after ?? "")]
                 } else {
-                    queries = [key: sortType.type.rawValue, "limit": "100", "after": self.after ?? ""]
+                    queries = [key: sortType.type.rawValue, "limit": "100", "after": isRefreshWithContinuation ? "" : (self.after ?? "")]
                 }
                 if postListingMetadata.postListingType.canQuerySensitiveInAPICall {
                     queries["include_over_18"] = AccountViewModel.shared.account.allowSensitive ? "1" : "0"
@@ -253,7 +258,7 @@ public class PostListingViewModel: ObservableObject {
                     params: postListingMetadata.params
                 )
             case .none:
-                var queries = ["limit": "100", "after": self.after ?? ""]
+                var queries = ["limit": "100", "after": isRefreshWithContinuation ? "" : (self.after ?? "")]
                 if postListingMetadata.postListingType.canQuerySensitiveInAPICall {
                     queries["include_over_18"] = AccountViewModel.shared.account.allowSensitive ? "1" : "0"
                 }
@@ -278,10 +283,13 @@ public class PostListingViewModel: ObservableObject {
             if (processedPosts.isEmpty) {
                 // No more posts
                 await MainActor.run {
-                    hasMorePages = false
                     self.after = nil
                 }
             } else {
+                if isRefreshWithContinuation {
+                    allPostIds.removeAll()
+                }
+                
                 let realNewPosts = processedPosts.filter {
                     !self.allPostIds.contains($0.id)
                 }
@@ -302,7 +310,6 @@ public class PostListingViewModel: ObservableObject {
                         self.lazyModeScrolledPost = nil
                     }
                     self.posts.append(contentsOf: realNewPosts)
-                    hasMorePages = !(self.after == nil || self.after?.isEmpty == true)
                 }
             }
             
@@ -320,7 +327,11 @@ public class PostListingViewModel: ObservableObject {
             await MainActor.run {
                 self.postLoadingError = error
                 
-                isInitialLoad = isInitialLoadCopy
+                if isRefreshWithContinuation {
+                    finishPullToRefresh()
+                } else {
+                    isInitialLoad = isInitialLoadCopy
+                }
                 isInitialLoading = false
                 isLoadingMore = false
             }
@@ -347,15 +358,13 @@ public class PostListingViewModel: ObservableObject {
             isInitialLoading = false
             isLoadingMore = false
             
-            after = nil
-            hasMorePages = true
             if refreshPostsContinuation == nil {
+                after = nil
                 posts.removeAll()
                 appearedPosts.removeAll()
                 lazyModeScrolledPost = nil
+                allPostIds.removeAll()
             }
-            
-            allPostIds = Set<String>()
         }
     }
     

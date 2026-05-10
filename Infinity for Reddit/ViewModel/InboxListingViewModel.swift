@@ -16,10 +16,19 @@ public class InboxListingViewModel: ObservableObject {
     @Published var isInitialLoad: Bool = true
     @Published var isInitialLoading: Bool = false
     @Published var isLoadingMore: Bool = false
-    @Published var hasMorePages: Bool = true
     @Published var error: Error?
     
     private var after: String? = nil
+    
+    var hasMorePages: Bool {
+        isInitialLoad || !(after == nil || after?.isEmpty == true)
+    }
+    
+    private var refreshInboxesContinuation: CheckedContinuation<Void, Never>?
+    
+    var isPullToRefreshing: Bool {
+        refreshInboxesContinuation != nil
+    }
     
     public let inboxListingRepository: InboxListingRepositoryProtocol
     
@@ -33,15 +42,15 @@ public class InboxListingViewModel: ObservableObject {
             return
         }
         
-        await loadInboxes()
+        await loadInboxes(isRefreshWithContinuation: refreshInboxesContinuation != nil)
     }
     
-    public func loadInboxes() async {
+    public func loadInboxes(isRefreshWithContinuation: Bool = false) async {
         guard !isInitialLoading, !isLoadingMore, hasMorePages else { return }
         
         let isInitialLoadCopy = isInitialLoad
         
-        if inboxes.isEmpty {
+        if inboxes.isEmpty || isRefreshWithContinuation {
             isInitialLoading = true
         } else {
             isLoadingMore = true
@@ -51,25 +60,32 @@ public class InboxListingViewModel: ObservableObject {
             isInitialLoad = false
         }
         
+        self.error = nil
+        
         do {
             try Task.checkCancellation()
             
             let inboxListing = try await inboxListingRepository.fetchInboxListing(
                 messageWhere: messageWhere,
                 pathComponents: ["where": messageWhere.rawValue],
-                queries: ["after": after ?? ""],
+                queries: ["after": isRefreshWithContinuation ? "" : (after ?? "")],
                 interceptor: nil
             )
             
             try Task.checkCancellation()
             
             if (inboxListing.inboxes.isEmpty) {
-                self.hasMorePages = false
                 self.after = nil
             } else {
+                if isRefreshWithContinuation {
+                    self.inboxes.removeAll()
+                }
                 self.inboxes.append(contentsOf: inboxListing.inboxes)
                 self.after = inboxListing.after
-                self.hasMorePages = !(after == nil || after?.isEmpty == true)
+            }
+            
+            if isRefreshWithContinuation {
+                finishPullToRefresh()
             }
             
             self.isInitialLoading = false
@@ -80,9 +96,21 @@ public class InboxListingViewModel: ObservableObject {
                 printInDebugOnly("Error fetching inboxes: \(error)")
             }
             
-            self.isInitialLoad = isInitialLoadCopy
+            if isRefreshWithContinuation {
+                finishPullToRefresh()
+            } else {
+                self.isInitialLoad = isInitialLoadCopy
+            }
+            
             self.isInitialLoading = false
             self.isLoadingMore = false
+        }
+    }
+    
+    func refreshInboxesWithContinuation() async {
+        await withCheckedContinuation { continuation in
+            refreshInboxesContinuation = continuation
+            refreshInboxes()
         }
     }
     
@@ -90,12 +118,18 @@ public class InboxListingViewModel: ObservableObject {
         isInitialLoad = true
         isInitialLoading = false
         isLoadingMore = false
-        
-        after = nil
-        hasMorePages = true
-        inboxes.removeAll()
+
+        if refreshInboxesContinuation == nil {
+            after = nil
+            inboxes.removeAll()
+        }
         
         loadInboxFlag.toggle()
+    }
+    
+    func finishPullToRefresh() {
+        refreshInboxesContinuation?.resume()
+        refreshInboxesContinuation = nil
     }
     
     func markAsRead(inbox: Inbox) {

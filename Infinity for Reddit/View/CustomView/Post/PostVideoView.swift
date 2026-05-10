@@ -27,23 +27,32 @@ struct PostVideoView: View {
     
     let post: Post
     let videoUrlString: String
+    let isParentVisible: Bool
     let inPostListing: Bool
     let playbackTimeToSeekToInitially: Double
+    let postFeedScrollIdle: Bool
+    let postFeedGeometry: GeometryProxy
     let onReadPost: (() -> Void)?
     
     init(
         post: Post,
         videoUrlString: String,
+        isParentVisible: Bool,
         inPostListing: Bool = false,
         playbackTimeToSeekToInitially: Double = 0,
+        postFeedScrollIdle: Bool,
+        postFeedGeometry: GeometryProxy,
         videoPlayerViewModel: VideoPlayerViewModel,
         onReadPost: (() -> Void)? = nil
     ) {
         self.post = post
         self.videoUrlString = videoUrlString
+        self.isParentVisible = isParentVisible
         self.inPostListing = inPostListing
         self.playbackTimeToSeekToInitially = playbackTimeToSeekToInitially
         self.onReadPost = onReadPost
+        self.postFeedScrollIdle = postFeedScrollIdle
+        self.postFeedGeometry = postFeedGeometry
         self.videoPlayerViewModel = videoPlayerViewModel
     }
     
@@ -64,36 +73,50 @@ struct PostVideoView: View {
                 )
                 && ((post.over18 && autoplaySensitiveVideo) || !post.over18) {
                 if let preview = post.preview, preview.images.count > 0, !(limitMediaHeight && inPostListing) {
-                    InlineVideoPlayer(
-                        videoURL: URL(string: videoUrlString)!,
-                        aspectRatio: preview.images[0].source?.aspectRatio,
-                        muteVideo: muteAutoplayingVideo,
-                        canPlay: canPlay,
-                        isSensitive: post.over18,
-                        playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
-                        videoPlayerViewModel: videoPlayerViewModel
-                    ) {
-                        showFullScreenVideo()
-                        if inPostListing {
-                            onReadPost?()
+                    if isParentVisible {
+                        InlineVideoPlayer(
+                            videoURL: URL(string: videoUrlString)!,
+                            aspectRatio: preview.images[0].source?.aspectRatio,
+                            muteVideo: muteAutoplayingVideo,
+                            canPlay: canPlay && postFeedScrollIdle,
+                            isSensitive: post.over18,
+                            playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
+                            videoPlayerViewModel: videoPlayerViewModel
+                        ) {
+                            showFullScreenVideo()
+                            if inPostListing {
+                                onReadPost?()
+                            }
                         }
+                    } else {
+                        Color.black
+                            .modify {
+                                if let aspectRatio = preview.images[0].source?.aspectRatio {
+                                    $0.aspectRatio(aspectRatio, contentMode: .fit)
+                                }
+                            }
                     }
                 } else {
-                    InlineVideoPlayer(
-                        videoURL: URL(string: videoUrlString)!,
-                        aspectRatio: nil,
-                        muteVideo: muteAutoplayingVideo,
-                        canPlay: canPlay,
-                        isSensitive: post.over18,
-                        playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
-                        videoPlayerViewModel: videoPlayerViewModel
-                    ) {
-                        showFullScreenVideo()
-                        if inPostListing {
-                            onReadPost?()
+                    if isParentVisible {
+                        InlineVideoPlayer(
+                            videoURL: URL(string: videoUrlString)!,
+                            aspectRatio: nil,
+                            muteVideo: muteAutoplayingVideo,
+                            canPlay: canPlay && postFeedScrollIdle,
+                            isSensitive: post.over18,
+                            playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
+                            videoPlayerViewModel: videoPlayerViewModel
+                        ) {
+                            showFullScreenVideo()
+                            if inPostListing {
+                                onReadPost?()
+                            }
                         }
+                        .frame(height: 200)
+                    } else {
+                        Color.black
+                            .frame(height: 200)
                     }
-                    .frame(height: 200)
                 }
             } else {
                 if !shouldHideVideoPreview, let preview = post.preview, preview.images.count > 0, let imageUrlString = getPreviewUrl(preview) {
@@ -142,8 +165,8 @@ struct PostVideoView: View {
                 }
             }
         }
-        .onVisiblePercentageChange { percent in
-            canPlay = percent > 0.5
+        .onVisiblePercentageChange(in: .named("postfeed"), containerGeometry: postFeedGeometry) { percent in
+            canPlay = percent > 0.5 || (postFeedGeometry.size.height < 500 && percent > 0.15)
         }
     }
     
@@ -180,31 +203,43 @@ struct PostVideoViewSelfContainedViewModel: View {
     
     let post: Post
     let videoUrlString: String
+    let isParentVisible: Bool
     let inPostListing: Bool
+    let listScrollIdle: Bool
+    let listGeometry: GeometryProxy
     let playbackTimeToSeekToInitially: Double
     let onReadPost: (() -> Void)?
     
     init(
         post: Post,
         videoUrlString: String,
+        isParentVisible: Bool,
         inPostListing: Bool = false,
+        listScrollIdle: Bool,
+        listGeometry: GeometryProxy,
         playbackTimeToSeekToInitially: Double = 0,
         onReadPost: (() -> Void)? = nil
     ) {
         self.post = post
         self.videoUrlString = videoUrlString
+        self.isParentVisible = isParentVisible
         self.inPostListing = inPostListing
+        self.listScrollIdle = listScrollIdle
+        self.listGeometry = listGeometry
         self.playbackTimeToSeekToInitially = playbackTimeToSeekToInitially
         self.onReadPost = onReadPost
-        self._videoPlayerViewModel = StateObject(wrappedValue: VideoPlayerViewModel())
+        self._videoPlayerViewModel = StateObject(wrappedValue: VideoPlayerViewModel(canPlay: listScrollIdle))
     }
     
     var body: some View {
         PostVideoView(
             post: post,
             videoUrlString: videoUrlString,
+            isParentVisible: isParentVisible,
             inPostListing: inPostListing,
             playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
+            postFeedScrollIdle: listScrollIdle,
+            postFeedGeometry: listGeometry,
             videoPlayerViewModel: videoPlayerViewModel,
             onReadPost: onReadPost
         )

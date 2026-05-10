@@ -72,16 +72,26 @@ struct InboxListingView: View {
                         }
                     }
                     if inboxListingViewModel.hasMorePages {
-                        ProgressIndicator()
-                            .task {
-                                await inboxListingViewModel.loadInboxes()
+                        HStack {
+                            ProgressIndicator()
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(16)
+                        .task {
+                            guard !inboxListingViewModel.isPullToRefreshing else {
+                                return
                             }
-                            .listPlainItem()
+                            await inboxListingViewModel.loadInboxes()
+                        }
+                        .listPlainItem()
                     }
                 }
                 .scrollBounceBehavior(.basedOnSize)
                 .themedList()
                 .showErrorUsingSnackbar(inboxListingViewModel.$error)
+                .refreshable {
+                    await inboxListingViewModel.refreshInboxesWithContinuation()
+                }
             }
         }
         .task(id: taskKey) {

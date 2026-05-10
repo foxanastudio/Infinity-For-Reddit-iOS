@@ -261,6 +261,7 @@ struct AuthorFlairTextViewModifier: ViewModifier {
 struct VisiblePercentageModifier: ViewModifier {
     let onChange: (CGFloat) -> Void
     let space: CoordinateSpace
+    let containerGeometry: GeometryProxy?
 
     func body(content: Content) -> some View {
         content
@@ -277,14 +278,17 @@ struct VisiblePercentageModifier: ViewModifier {
 
     private func calculate(proxy: GeometryProxy) -> CGFloat {
         let frame = proxy.frame(in: space)
-        let containerHeight = UIScreen.main.bounds.height
+        
+        let visibleTop = max(frame.minY, containerGeometry?.safeAreaInsets.top ?? 0)
+        let visibleBottom: CGFloat
+        if let containerGeometry {
+            visibleBottom = min(frame.maxY, containerGeometry.size.height + containerGeometry.safeAreaInsets.top)
+        } else {
+            visibleBottom = min(frame.maxY, UIScreen.main.bounds.height)
+        }
 
-        let visibleTop = max(frame.minY, 0)
-        let visibleBottom = min(frame.maxY, containerHeight)
-
-        let visibleHeight = max(0, visibleBottom - visibleTop)
-        let percent = visibleHeight / frame.height
-
+        let percent = max(0, visibleBottom - visibleTop) / frame.height
+        
         return min(max(percent, 0), 1)
     }
 }

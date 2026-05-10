@@ -17,7 +17,6 @@ public class UserListingViewModel: ObservableObject {
     @Published var isInitialLoad: Bool = true
     @Published var isInitialLoading: Bool = false
     @Published var isLoadingMore: Bool = false
-    @Published var hasMorePages: Bool = true
     @Published var error: Error?
     @Published var sortType: SortType.Kind
     @Published var loadUsersTaskId = UUID()
@@ -26,6 +25,14 @@ public class UserListingViewModel: ObservableObject {
     @Published var selectedSubscribedUsers: IdentifiedArrayOf<SubscribedUserData> = []
     @Published var selectedUserData: IdentifiedArrayOf<UserData> = []
     @Published var selectedUserSubredditsInCustomFeed: IdentifiedArrayOf<SubredditInCustomFeed> = []
+    
+    var hasMorePages: Bool {
+        isInitialLoad || !(after == nil || after?.isEmpty == true)
+    }
+    
+    var isPullToRefreshing: Bool {
+        refreshUsersContinuation != nil
+    }
     
     private var after: String? = nil
     private var lastLoadedSortType: SortType.Kind? = nil
@@ -121,7 +128,7 @@ public class UserListingViewModel: ObservableObject {
                     "type": "user",
                     "sort": sortType.rawValue,
                     "limit": "100",
-                    "after": after ?? "",
+                    "after": isRefreshWithContinuation ? "" : (after ?? ""),
                     "include_over_18": AccountViewModel.shared.account.allowSensitive ? "1" : "0"
                 ]
             )
@@ -130,7 +137,6 @@ public class UserListingViewModel: ObservableObject {
             
             if (userListing.users.isEmpty) {
                 // No more users
-                self.hasMorePages = false
                 self.after = nil
             } else {
                 self.after = userListing.after
@@ -138,7 +144,6 @@ public class UserListingViewModel: ObservableObject {
                     self.users.removeAll()
                 }
                 self.users.append(contentsOf: userListing.users)
-                self.hasMorePages = !(after == nil || after?.isEmpty == true)
             }
             
             if isRefreshWithContinuation {
@@ -152,7 +157,12 @@ public class UserListingViewModel: ObservableObject {
         } catch {
             self.error = error
             
-            isInitialLoad = isInitialLoadCopy
+            if isRefreshWithContinuation {
+                finishPullToRefresh()
+            } else {
+                isInitialLoad = isInitialLoadCopy
+            }
+            
             isInitialLoading = false
             isLoadingMore = false
             
@@ -178,9 +188,8 @@ public class UserListingViewModel: ObservableObject {
         isInitialLoading = false
         isLoadingMore = false
         
-        after = nil
-        hasMorePages = true
         if refreshUsersContinuation == nil {
+            after = nil
             users = []
         }
     }

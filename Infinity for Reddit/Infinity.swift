@@ -20,6 +20,7 @@ struct Infinity: App {
     @StateObject private var customThemeViewModel: CustomThemeViewModel
     @StateObject private var fullScreenMediaViewModel: FullScreenMediaViewModel
     @StateObject private var networkManager: NetworkManager = NetworkManager()
+    @StateObject private var videoPlayerPool: VideoPlayerPool
     
     @State private var showAppLockScreen: Bool = false
     @State private var authenticationSuccess: Bool = false
@@ -34,6 +35,7 @@ struct Infinity: App {
         _accountViewModel = StateObject(wrappedValue: AccountViewModel.shared)
         _customThemeViewModel = StateObject(wrappedValue: CustomThemeViewModel())
         _fullScreenMediaViewModel = StateObject(wrappedValue: FullScreenMediaViewModel())
+        _videoPlayerPool = StateObject(wrappedValue: VideoPlayerPool.shared)
         
         Task {
             let center = UNUserNotificationCenter.current()
@@ -66,6 +68,7 @@ struct Infinity: App {
                         .environmentObject(accountViewModel)
                         .environmentObject(fullScreenMediaViewModel)
                         .environmentObject(networkManager)
+                        .environmentObject(videoPlayerPool)
                         .environment(\.defaultMinListRowHeight, 0)
                         .onOpenURL { url in
                             guard let appDeepLinkType = AppDeepLink.getAppDeepLinkType(url) else {
@@ -90,6 +93,8 @@ struct Infinity: App {
                                     userInfo[AppDeepLink.fullnameKey] = fullname
                                 }
                                 NotificationCenter.default.post(name: .contextDeepLink, object: nil, userInfo: userInfo)
+                            case .appStoreEvent(let eventName):
+                                NotificationCenter.default.post(name: .appStoreEventDeepLink, object: nil)
                             }
                         }
                         .onAppear {
