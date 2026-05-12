@@ -106,6 +106,13 @@ public class ModMailListingViewModel: ObservableObject {
         loadModMailFlag.toggle()
     }
     
+    func markAsRead(conversation: ModMailConversation) {
+        guard conversation.isUnread else {
+            return
+        }
+        conversation.lastUnread = nil
+    }
+    
     func latestMessagePreview(for conversation: ModMailConversation) -> String {
         for objectId in conversation.objIds.reversed() {
             guard objectId.key == "messages", let message = messages[objectId.id] else {
