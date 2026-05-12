@@ -11,6 +11,7 @@ import GRDB
 
 struct GestureButtonsSettingsView: View {
     @AppStorage(GesturesButtonsUserDefaultsUtils.hideNavigationBarOnScrollDownKey, store: .gesturesButtons) private var hideNavigationBarOnScrollDown: Bool = false
+    @AppStorage(GesturesButtonsUserDefaultsUtils.minimizeTabBarOnScrollDownKey, store: .gesturesButtons) private var minimizeTabBarOnScrollDown: Bool = false
     @AppStorage(GesturesButtonsUserDefaultsUtils.postLeftSwipeActionKey, store: .gesturesButtons) private var postLeftSwipeAction: Int = SwipeAction.upvote.rawValue
     @AppStorage(GesturesButtonsUserDefaultsUtils.postRightSwipeActionKey, store: .gesturesButtons) private var postRightSwipeAction: Int = SwipeAction.downvote.rawValue
     @AppStorage(GesturesButtonsUserDefaultsUtils.postDetailsLeftSwipeActionKey, store: .gesturesButtons) private var postDetailsLeftSwipeAction: Int = SwipeAction.upvote.rawValue
@@ -29,6 +30,14 @@ struct GestureButtonsSettingsView: View {
                     subtitle: "Only applies to some pages"
                 )
                 .listPlainItemNoInsets()
+                
+                if #available(iOS 26.0, *) {
+                    TogglePreference(
+                        isEnabled: $minimizeTabBarOnScrollDown,
+                        title: "Minimize Tab Bar on Scroll Down"
+                    )
+                    .listPlainItemNoInsets()
+                }
                 
                 CustomListSection("Swipe Actions") {
                     BarebonePickerPreference(

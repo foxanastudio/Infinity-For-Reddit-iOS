@@ -39,11 +39,13 @@ struct HomeView: View {
     @StateObject private var tab5SnackbarManager: SnackbarManager
     
     @StateObject private var homeViewModel: HomeViewModel
-    
     @StateObject private var videoFullScreenViewModel: VideoFullScreenViewModel
     
     @State private var selectedTab: Tab = .home
     @State private var showProfile: Bool = false
+    
+    @AppStorage(GesturesButtonsUserDefaultsUtils.minimizeTabBarOnScrollDownKey, store: .gesturesButtons)
+    private var minimizeTabBarOnScrollDown: Bool = false
     
     init(fullScreenMediaViewModel: FullScreenMediaViewModel) {
         self.fullScreenMediaViewModel = fullScreenMediaViewModel
@@ -226,6 +228,13 @@ struct HomeView: View {
             }
         }
         .themedTabView()
+        .modify {
+            if #available(iOS 26.0, *) {
+                $0.tabBarMinimizeBehavior(minimizeTabBarOnScrollDown ? .onScrollDown : .never)
+            } else {
+                $0
+            }
+        }
         .onAppear {
             let dirPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
             let docsDir = dirPaths[0]
