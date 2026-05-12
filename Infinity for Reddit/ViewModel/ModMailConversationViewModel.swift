@@ -9,18 +9,29 @@ import Foundation
 
 @MainActor
 class ModMailConversationViewModel: ObservableObject {
+    @Published var conversation: ModMailConversation
     @Published var modMailConversationDetail: ModMailConversationDetail?
     @Published var isLoading: Bool = false
     @Published var isInitialLoad: Bool = true
     @Published var error: Error?
     @Published var listScrollTarget: String?
 
-    private let conversationId: String
     private let modMailConversationRepository: ModMailConversationRepositoryProtocol
     
-    init(conversationId: String, modMailConversationRepository: ModMailConversationRepositoryProtocol) {
-        self.conversationId = conversationId
+    init(
+        conversation: ModMailConversation,
+        modMailConversationRepository: ModMailConversationRepositoryProtocol
+    ) {
+        self.conversation = conversation
         self.modMailConversationRepository = modMailConversationRepository
+    }
+
+    var participantUsername: String {
+        conversation.participant.name
+    }
+
+    private var conversationId: String {
+        conversation.id
     }
 
     func initialLoadModMailConversation() async {

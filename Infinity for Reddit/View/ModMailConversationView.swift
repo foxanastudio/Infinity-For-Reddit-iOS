@@ -22,16 +22,10 @@ struct ModMailConversationView: View {
     @State private var navigationBarMenuKey: UUID?
     @FocusState private var focusedField: FieldType?
     
-    let participantUsername: String
-    
-    init(
-        conversationId: String,
-        participantUsername: String
-    ) {
-        self.participantUsername = participantUsername
+    init(conversation: ModMailConversation) {
         _modMailConversationViewModel = StateObject(
             wrappedValue: ModMailConversationViewModel(
-                conversationId: conversationId,
+                conversation: conversation,
                 modMailConversationRepository: ModMailConversationRepository()
             )
         )
@@ -109,7 +103,7 @@ struct ModMailConversationView: View {
             await modMailConversationViewModel.initialLoadModMailConversation()
         }
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar(participantUsername)
+        .addTitleToInlineNavigationBar(modMailConversationViewModel.participantUsername)
         .showErrorUsingSnackbar(modMailConversationViewModel.$error)
         .toolbar {
             NavigationBarMenu()
@@ -120,7 +114,7 @@ struct ModMailConversationView: View {
             }
             navigationBarMenuKey = navigationBarMenuManager.push([
                 NavigationBarMenuItem(title: "View Profile") {
-                    navigationManager.append(AppNavigation.userDetails(username: participantUsername))
+                    navigationManager.append(AppNavigation.userDetails(username: modMailConversationViewModel.participantUsername))
                 }
             ])
         }

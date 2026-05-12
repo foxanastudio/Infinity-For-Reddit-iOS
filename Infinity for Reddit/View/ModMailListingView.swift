@@ -48,10 +48,7 @@ struct ModMailListingView: View {
                             latestMessagePreview: modMailListingViewModel.latestMessagePreview(for: conversation),
                             onTap: {
                                 navigationManager.append(
-                                    AppNavigation.modMailConversation(
-                                        conversationId: conversation.id,
-                                        participantUsername: conversation.participant.name
-                                    )
+                                    AppNavigation.modMailConversation(conversation: conversation)
                                 )
                             }
                         )
