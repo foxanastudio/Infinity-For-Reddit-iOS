@@ -20,6 +20,7 @@ struct ModMailConversationView: View {
     @State private var messageText: String = ""
     @State private var sendMessageTask: Task<Void, Never>?
     @State private var navigationBarMenuKey: UUID?
+    @State private var selectedReplyAsOption: ModMailReplyAsOption
     @FocusState private var focusedField: FieldType?
     
     init(conversation: ModMailConversation) {
@@ -29,6 +30,7 @@ struct ModMailConversationView: View {
                 modMailConversationRepository: ModMailConversationRepository()
             )
         )
+        _selectedReplyAsOption = State(initialValue: conversation.isInternal == true ? .modsOnly : .subreddit)
     }
     
     var body: some View {
@@ -40,11 +42,12 @@ struct ModMailConversationView: View {
                         
                         ForEach(Array(messages.enumerated()), id: \.element.id) { index, message in
                             let isLastFromSender = index == 0 || messages[index - 1].author.name != message.author.name
+                            let isSentMessage = isSentModMailMessage(message)
                             
-                            ChatBubble(isSentMessage: message.author.name == accountViewModel.account.username, shouldShowTail: isLastFromSender) {
+                            ChatBubble(isSentMessage: isSentMessage, shouldShowTail: isLastFromSender) {
                                 Markdown(message.displayBody)
                                     .themedChatMessageMarkdown(
-                                        isSentMessage: message.author.name == accountViewModel.account.username
+                                        isSentMessage: isSentMessage
                                     )
                                     .markdownLinkHandler { url in
                                         navigationManager.openLink(url)
@@ -69,32 +72,40 @@ struct ModMailConversationView: View {
                 }
                 
                 if modMailConversationViewModel.modMailConversationDetail?.conversation.isRepliable == true {
-                    HStack(spacing: 12) {
-                        CustomTextField(
-                            "Type a message...",
-                            text: $messageText,
-                            showBackground: false,
-                            fieldType: .message,
-                            focusedField: $focusedField
+                    VStack(spacing: 12) {
+                        ModMailReplyAsPicker(
+                            selectedReplyAsOption: $selectedReplyAsOption,
+                            subredditName: modMailConversationViewModel.conversation.owner.displayName,
+                            currentAccount: accountViewModel.account
                         )
-                        .submitLabel(.send)
-                        .lineLimit(3)
-                        .onSubmit {
-                            sendMessage()
-                        }
                         
-                        Button(action: {
-                            sendMessage()
-                        }) {
-                            SwiftUI.Image(systemName: "paperplane.fill")
-                                .foregroundColor(Color(hex: messageText.isEmpty ? customThemeViewModel.currentCustomTheme.secondaryTextColor : customThemeViewModel.currentCustomTheme.colorPrimaryLightTheme))
+                        HStack(spacing: 12) {
+                            CustomTextField(
+                                "Type a message...",
+                                text: $messageText,
+                                showBackground: false,
+                                fieldType: .message,
+                                focusedField: $focusedField
+                            )
+                            .submitLabel(.send)
+                            .lineLimit(3)
+                            .onSubmit {
+                                sendMessage()
+                            }
+
+                            Button(action: {
+                                sendMessage()
+                            }) {
+                                SwiftUI.Image(systemName: "paperplane.fill")
+                                    .foregroundColor(Color(hex: messageText.isEmpty ? customThemeViewModel.currentCustomTheme.secondaryTextColor : customThemeViewModel.currentCustomTheme.colorPrimaryLightTheme))
+                            }
+                            .disabled(messageText.isEmpty || sendMessageTask != nil)
                         }
-                        .disabled(messageText.isEmpty || sendMessageTask != nil)
+                        .padding(12)
+                        .background(Color(hex: customThemeViewModel.currentCustomTheme.filledCardViewBackgroundColor))
+                        .clipShape(RoundedRectangle(cornerRadius: 24))
+                        .clipped()
                     }
-                    .padding(12)
-                    .background(Color(hex: customThemeViewModel.currentCustomTheme.filledCardViewBackgroundColor))
-                    .clipShape(RoundedRectangle(cornerRadius: 24))
-                    .clipped()
                     .padding(8)
                 }
             }
@@ -131,16 +142,29 @@ struct ModMailConversationView: View {
         }
         
         let messageToSend = messageText
+        let subredditName = modMailConversationViewModel.conversation.owner.displayName ?? ""
+        let authorName = selectedReplyAsOption.authorName(
+            currentUsername: accountViewModel.account.username,
+            subredditName: subredditName
+        )
         sendMessageTask = Task {
             await modMailConversationViewModel.sendMessage(
                 message: messageToSend,
-                authorName: accountViewModel.account.username,
-                isAuthorHidden: true,
-                isInternal: false
+                authorName: authorName,
+                isAuthorHidden: selectedReplyAsOption.isAuthorHidden,
+                isInternal: selectedReplyAsOption.isInternal
             )
             self.messageText = ""
             self.sendMessageTask = nil
         }
+    }
+
+    private func isSentModMailMessage(_ message: ModMailMessage) -> Bool {
+        let authorName = message.author.name.lowercased()
+        let currentUsername = accountViewModel.account.username.lowercased()
+        let subredditName = (modMailConversationViewModel.conversation.owner.displayName ?? "").lowercased()
+
+        return authorName == currentUsername || authorName == subredditName
     }
     
     private enum FieldType: Hashable {
