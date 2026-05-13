@@ -84,6 +84,7 @@ struct Infinity: App {
                                     userInfo[AppDeepLink.fullnameKey] = fullname
                                 }
                                 NotificationCenter.default.post(name: .inboxDeepLink, object: nil, userInfo: userInfo)
+                                break
                             case .context(let account, let context, let fullname):
                                 var userInfo: [String: Any] = [
                                     AppDeepLink.accountNameKey: account,
@@ -93,8 +94,16 @@ struct Infinity: App {
                                     userInfo[AppDeepLink.fullnameKey] = fullname
                                 }
                                 NotificationCenter.default.post(name: .contextDeepLink, object: nil, userInfo: userInfo)
+                                break
                             case .appStoreEvent(let eventName):
                                 NotificationCenter.default.post(name: .appStoreEventDeepLink, object: nil)
+                                break
+                            case .redirect(let urlString):
+                                var userInfo: [String: Any] = [
+                                    AppDeepLink.urlStringKey: urlString
+                                ]
+                                NotificationCenter.default.post(name: .redirectDeepLink, object: nil, userInfo: userInfo)
+                                break
                             }
                         }
                         .onAppear {

@@ -288,10 +288,10 @@ struct HomeView: View {
         }, onAppEntersBackground: {
             homeViewModel.stopInboxCountPolling()
         })
-        .onReceive(NotificationCenter.default.publisher(for: .inboxDeepLink)) { note in
-            let accountName = (note.userInfo?[AppDeepLink.accountNameKey] as? String) ?? ""
-            let viewMessage = (note.userInfo?[AppDeepLink.viewMessageKey] as? Bool) ?? false
-            let inboxFullname = note.userInfo?[AppDeepLink.fullnameKey] as? String
+        .onReceive(NotificationCenter.default.publisher(for: .inboxDeepLink)) { notification in
+            let accountName = (notification.userInfo?[AppDeepLink.accountNameKey] as? String) ?? ""
+            let viewMessage = (notification.userInfo?[AppDeepLink.viewMessageKey] as? Bool) ?? false
+            let inboxFullname = notification.userInfo?[AppDeepLink.fullnameKey] as? String
             
             Task {
                 if !accountName.isEmpty {
@@ -315,14 +315,14 @@ struct HomeView: View {
                 }
             }
         }
-        .onReceive(NotificationCenter.default.publisher(for: .contextDeepLink)) { note in
-            let accountName = (note.userInfo?[AppDeepLink.accountNameKey] as? String) ?? ""
-            let inboxFullname = note.userInfo?[AppDeepLink.fullnameKey] as? String
+        .onReceive(NotificationCenter.default.publisher(for: .contextDeepLink)) { notification in
+            let accountName = (notification.userInfo?[AppDeepLink.accountNameKey] as? String) ?? ""
+            let inboxFullname = notification.userInfo?[AppDeepLink.fullnameKey] as? String
             
             Task {
                 if !accountName.isEmpty {
                     if !(await accountViewModel.switchToAccountIfNeeded(accountName)) {
-                        if let context = (note.userInfo?[AppDeepLink.contextKey] as? String) {
+                        if let context = (notification.userInfo?[AppDeepLink.contextKey] as? String) {
                             await MainActor.run {
                                 currentNavigationManager.openLink(context)
                             }
@@ -331,7 +331,7 @@ struct HomeView: View {
                             }
                         }
                     } else {
-                        if let context = (note.userInfo?[AppDeepLink.contextKey] as? String) {
+                        if let context = (notification.userInfo?[AppDeepLink.contextKey] as? String) {
                             await MainActor.run {
                                 accountViewModel.pendingContextAfterNotificationClicked = context
                                 accountViewModel.pendingInboxFullname = inboxFullname
@@ -343,6 +343,11 @@ struct HomeView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .appStoreEventDeepLink)) { _ in
             currentNavigationManager.append(AppNavigation.appStoreEvent)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .redirectDeepLink)) { notification in
+            if let link = (notification.userInfo?[AppDeepLink.urlStringKey] as? String) {
+                currentNavigationManager.openLink(link)
+            }
         }
         .onReceive(NotificationCenter.default.publisher(for: .notificationToggleChanged)) { _ in
             if NotificationUserDefaultsUtils.enableNotification {

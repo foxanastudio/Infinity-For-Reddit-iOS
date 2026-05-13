@@ -10,6 +10,7 @@ extension Notification.Name {
     static let inboxDeepLink = Notification.Name("inboxDeepLink")
     static let contextDeepLink = Notification.Name("contextDeepLink")
     static let appStoreEventDeepLink = Notification.Name("appStoreEventDeepLink")
+    static let redirectDeepLink = Notification.Name("redirectDeepLink")
     static let notificationIntervalChanged = Notification.Name("notificationIntervalChanged")
     static let notificationToggleChanged = Notification.Name("notificationToggleChanged")
     static let accountAllowSensitiveChanged = Notification.Name("accountAllowSensitiveChanged")

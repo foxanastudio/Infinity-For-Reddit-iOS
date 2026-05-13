@@ -9,6 +9,7 @@ import Foundation
 struct AppDeepLink {
     static let scheme = "infinity"
     static let appStoreEventScheme = "infinityevent"
+    static let redirectScheme = "infinityredirect"
     static let inboxHost = "inbox"
     static let linkHost = "linkToView"
     static let accountNameKey = "accountName"
@@ -16,6 +17,7 @@ struct AppDeepLink {
     static let contextKey = "context"
     static let kindKey = "kind"
     static let viewMessageKey = "viewMessage"
+    static let urlStringKey = "urlString"
     
     static func getInboxURL(account: String, viewMessage: Bool, fullname: String?) -> URL? {
         var components = URLComponents()
@@ -46,18 +48,21 @@ struct AppDeepLink {
     }
     
     static func getAppDeepLinkType(_ url: URL) -> AppDeepLinkType? {
-        guard url.scheme == scheme else {
-            if url.scheme == appStoreEventScheme, let eventName = url.host() {
-                return AppDeepLinkType.appStoreEvent(eventName: eventName)
-            }
-            return nil
-        }
         guard let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
             return nil
         }
         
         func query(_ name: String) -> String? {
             urlComponents.queryItems?.first(where: { $0.name == name })?.value
+        }
+        
+        guard url.scheme == scheme else {
+            if url.scheme == appStoreEventScheme, let eventName = url.host() {
+                return .appStoreEvent(eventName: eventName)
+            } else if url.scheme == redirectScheme, let link = query("url") {
+                return .redirect(urlString: link)
+            }
+            return nil
         }
         
         switch url.host {
@@ -91,4 +96,5 @@ enum AppDeepLinkType {
     case inbox(account: String, viewMessage: Bool, fullname: String?)
     case context(account: String, context: String, fullname: String?)
     case appStoreEvent(eventName: String)
+    case redirect(urlString: String)
 }
