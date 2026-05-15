@@ -23,7 +23,8 @@
         "js": [ "content.js" ],
         "matches": [
             "*://*.reddit.com/*",
-            "*://*.redd.it/*"
+            "*://*.redd.it/*",
+            "*://*.reddit.app/*"
         ]
     }],
 
