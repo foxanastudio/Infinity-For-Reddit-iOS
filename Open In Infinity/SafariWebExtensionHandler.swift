@@ -9,34 +9,32 @@ import SafariServices
 import os.log
 
 class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
-
+    private let safariAppExtensionOpenInInfinityEnabledKey = "safari_app_extension_open_in_infinity_enabled"
+    
     func beginRequest(with context: NSExtensionContext) {
-        let request = context.inputItems.first as? NSExtensionItem
-
-        let profile: UUID?
-        if #available(iOS 17.0, macOS 14.0, *) {
-            profile = request?.userInfo?[SFExtensionProfileKey] as? UUID
-        } else {
-            profile = request?.userInfo?["profile"] as? UUID
+        guard let item = context.inputItems.first as? NSExtensionItem,
+              let userInfo = item.userInfo as? [String: Any],
+              let message = userInfo[SFExtensionMessageKey] as? [String: String],
+              let type = message["type"] else {
+            context.completeRequest(returningItems: nil, completionHandler: nil)
+            return
         }
-
-        let message: Any?
-        if #available(iOS 15.0, macOS 11.0, *) {
-            message = request?.userInfo?[SFExtensionMessageKey]
-        } else {
-            message = request?.userInfo?["message"]
-        }
-
-        os_log(.default, "Received message from browser.runtime.sendNativeMessage: %@ (profile: %@)", String(describing: message), profile?.uuidString ?? "none")
-
+        
         let response = NSExtensionItem()
-        if #available(iOS 15.0, macOS 11.0, *) {
-            response.userInfo = [ SFExtensionMessageKey: [ "echo": message ] ]
-        } else {
-            response.userInfo = [ "message": [ "echo": message ] ]
+        let enabled = UserDefaults.standard.bool(forKey: safariAppExtensionOpenInInfinityEnabledKey, false)
+        if type == "getEnabled" {
+            response.userInfo = [ SFExtensionMessageKey: [ "enabled":  enabled ] ]
+        } else if type == "toggleEnabled" {
+            UserDefaults.standard.set(!enabled, forKey: safariAppExtensionOpenInInfinityEnabledKey)
+            response.userInfo = [ SFExtensionMessageKey: [ "enabled":  !enabled ] ]
         }
-
-        context.completeRequest(returningItems: [ response ], completionHandler: nil)
+        
+        context.completeRequest(returningItems: [response], completionHandler: nil)
     }
+}
 
+extension UserDefaults {
+    func bool(forKey key: String, _ defaultValue: Bool) -> Bool {
+        object(forKey: key) == nil ? defaultValue : bool(forKey: key)
+    }
 }

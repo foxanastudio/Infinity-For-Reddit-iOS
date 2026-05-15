@@ -1,11 +1,37 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="popup.css">
-    <script type="module" src="popup.js"></script>
-</head>
-<body>
-    <strong>Hello World!</strong>
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="popup.css">
+        <script type="module" src="popup.js"></script>
+    </head>
+    
+    <body>
+        <main class="page">
+            <section class="hero">
+                <img src="images/icon-512.png" class="icon" />
+                <h1>Infinity</h1>
+                <p>Open Reddit links in Infinity</p>
+            </section>
+            
+            <section class="settings-group">
+                <label class="setting-row">
+                    <div class="setting-text">
+                        <div class="setting-title">
+                            Enable Open in Infinity
+                        </div>
+                        
+                        <div class="setting-description">
+                            Show the redirect dialog while browsing Reddit.
+                        </div>
+                    </div>
+                    
+                    <label class="switch">
+                        <input id="switchInput" type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </label>
+            </section>
+        </main>
+    </body>
 </html>

@@ -1,15 +1,142 @@
 :root {
     color-scheme: light dark;
+    --bg: #ffffff;
+    --card: #e6f4ff;
+    --text: #111111;
+    --secondary: #6e6e73;
+    --accent: #0336ff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
 }
 
 body {
-    width: 100px;
-    padding: 10px;
+    min-height: 100vh;
+}
 
-    font-family: system-ui;
+.page {
+    padding: max(28px, env(safe-area-inset-top)) 20px max(32px, env(safe-area-inset-bottom)) 20px;
+}
+
+.hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
+    margin-top: 12px;
+    margin-bottom: 36px;
+}
+
+.icon {
+    width: 84px;
+    height: 84px;
+    border-radius: 22px;
+    object-fit: cover;
+    box-shadow: 0 10px 30px rgba(3, 54, 255, 0.22);
+}
+
+.hero h1 {
+    margin: 18px 0 6px 0;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.hero p {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.4;
+    color: var(--secondary);
+}
+
+.settings-group {
+    background: var(--card);
+    border-radius: 22px;
+    overflow: hidden;
+}
+
+.setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px;
+    min-height: 88px;
+}
+
+.setting-text {
+    flex: 1;
+}
+
+.setting-title {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.setting-description {
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--secondary);
+}
+
+.switch {
+    position: relative;
+    width: 52px;
+    height: 32px;
+    flex-shrink: 0;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    inset: 0;
+    background: #d1d1d6;
+    border-radius: 999px;
+    transition: 0.25s ease;
+}
+
+.slider::before {
+    content: "";
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    top: 2px;
+    left: 2px;
+    border-radius: 50%;
+    background: white;
+    transition: 0.25s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.switch input:checked + .slider {
+    background: var(--accent);
+}
+
+.switch input:checked + .slider::before {
+    transform: translateX(20px);
 }
 
 @media (prefers-color-scheme: dark) {
-    /* Dark Mode styles go here. */
+    :root {
+        --bg: #000000;
+        --card: rgba(28,28,30,0.9);
+        --text: #ffffff;
+        --secondary: #98989f;
+    }
 }
