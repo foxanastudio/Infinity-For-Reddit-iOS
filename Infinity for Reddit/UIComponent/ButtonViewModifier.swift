@@ -18,7 +18,7 @@ struct FilledButtonViewModifier: ViewModifier {
             .customFont()
             .modify {
                 if elevate {
-                    $0.buttonStyle(FilledButtonStyle(color: Color(hex: themeViewModel.currentCustomTheme.colorPrimaryLightTheme)))
+                    $0.buttonStyle(FilledButtonStyle(color: Color(hex: themeViewModel.currentCustomTheme.colorPrimaryLightTheme), shadowOpacity: themeViewModel.isCurrentThemeLight ? 0.75 : 0.5))
                 } else {
                     $0.tint(Color(hex: themeViewModel.currentCustomTheme.colorPrimaryLightTheme))
                         .buttonStyle(.borderedProminent)
@@ -30,6 +30,7 @@ struct FilledButtonViewModifier: ViewModifier {
 
 struct FilledButtonStyle: ButtonStyle {
     let color: Color
+    let shadowOpacity: Double
     
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -41,7 +42,7 @@ struct FilledButtonStyle: ButtonStyle {
                     .fill(configuration.isPressed ? color.opacity(0.5) : color)
             )
             .clipped()
-            .shadow(color: .gray.opacity(0.75), radius: 10, x: 0, y: 5)
+            .shadow(color: .gray.opacity(shadowOpacity), radius: 10, x: 0, y: 5)
             .scaleEffect(configuration.isPressed ? 1.05 : 1.0)
             .animation(.easeInOut, value: configuration.isPressed)
     }

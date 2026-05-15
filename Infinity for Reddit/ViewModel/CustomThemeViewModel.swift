@@ -50,6 +50,19 @@ public class CustomThemeViewModel: ObservableObject {
         return CustomTheme.getIndigo()
     }
     
+    var isCurrentThemeLight: Bool {
+        if themeType == CustomThemeUserDefaultsUtils.themeDeviceDefault {
+            return appColorScheme == .light
+        } else if themeType == CustomThemeUserDefaultsUtils.themeLight {
+            return true
+        } else if themeType == CustomThemeUserDefaultsUtils.themeDark {
+            return false
+        }
+        
+        // Really shouldn't happen
+        return true
+    }
+    
     init() {
         guard let resolvedDatabasePool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
             fatalError("Could not resolve DatabasePool")

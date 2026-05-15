@@ -42,7 +42,7 @@ struct HomeView: View {
     @StateObject private var videoFullScreenViewModel: VideoFullScreenViewModel
     
     @State private var selectedTab: Tab = .home
-    @State private var showProfile: Bool = false
+    @State private var showNewFeatureSheet: Bool = false
     
     @AppStorage(GesturesButtonsUserDefaultsUtils.minimizeTabBarOnScrollDownKey, store: .gesturesButtons)
     private var minimizeTabBarOnScrollDown: Bool = false
@@ -255,6 +255,11 @@ struct HomeView: View {
                 homeViewModel.readInbox(inboxFullname: inboxFullname)
                 accountViewModel.pendingInboxFullname = nil
             }
+            
+            if InternalStateUserDefaultsUtils.currentBuildNumber < Bundle.main.buildNumber {
+                InternalStateUserDefaultsUtils.setCurrentBuildNumber()
+                showNewFeatureSheet = true
+            }
         }
         .task {
             await homeViewModel.fetchInboxCount()
@@ -372,6 +377,10 @@ struct HomeView: View {
             } else {
                 currentSnackbarManager.dismiss()
             }
+        }
+        .sheet(isPresented: $showNewFeatureSheet) {
+            NewFeatureSheet()
+                .presentationDetents([.large])
         }
     }
     
