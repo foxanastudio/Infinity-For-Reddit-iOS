@@ -379,8 +379,9 @@ struct HomeView: View {
             }
         }
         .sheet(isPresented: $showNewFeatureSheet) {
-            NewFeatureSheet()
-                .presentationDetents([.large])
+            SheetRootView {
+                NewFeatureSheet()
+            }
         }
     }
     

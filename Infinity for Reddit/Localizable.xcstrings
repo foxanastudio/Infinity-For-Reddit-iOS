@@ -222,9 +222,6 @@
     "Link posts that have the following urls will be filtered out." : {
 
     },
-    "Major Update" : {
-
-    },
     "Manage Subscription" : {
 
     },
@@ -238,6 +235,9 @@
 
     },
     "Navigation Drawer" : {
+
+    },
+    "Need a break? Tap the extension or the settings icon in Safari, select Open in Infinity, and use the toggle inside the popup to quickly pause or resume redirects." : {
 
     },
     "New Post" : {
@@ -1981,9 +1981,6 @@
           }
         }
       }
-    },
-    "Tip: Need a break? Tap the extension or \"aA\" icon in Safari, select Open in Infinity, and use the toggle inside the popup to quickly pause or resume redirects." : {
-
     },
     "To only see sensitive or spoiler posts, please turn on the corresponding switch." : {
 
