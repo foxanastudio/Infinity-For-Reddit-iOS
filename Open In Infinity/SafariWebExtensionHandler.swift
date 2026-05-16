@@ -21,7 +21,7 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
         }
         
         let response = NSExtensionItem()
-        let enabled = UserDefaults.standard.bool(forKey: safariAppExtensionOpenInInfinityEnabledKey, false)
+        let enabled = UserDefaults.standard.bool(forKey: safariAppExtensionOpenInInfinityEnabledKey, true)
         if type == "getEnabled" {
             response.userInfo = [ SFExtensionMessageKey: [ "enabled":  enabled ] ]
         } else if type == "toggleEnabled" {
