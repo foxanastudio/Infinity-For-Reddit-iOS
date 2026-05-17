@@ -33,6 +33,19 @@ class ModMailConversationViewModel: ObservableObject {
     private var conversationId: String {
         conversation.id
     }
+    
+    func messages(currentUsername: String) -> [ModMailConversationDisplayMessage] {
+        let modMailMessages = modMailConversationDetail?.orderedMessages.reversed() ?? []
+        
+        return Array(modMailMessages.enumerated()).map { modMailMessageIndex, modMailMessage in
+            displayMessage(
+                modMailMessage: modMailMessage,
+                modMailMessageIndex: modMailMessageIndex,
+                modMailMessages: modMailMessages,
+                currentUsername: currentUsername
+            )
+        }
+    }
 
     func initialLoadModMailConversation() async {
         guard isInitialLoad else {
@@ -91,9 +104,13 @@ class ModMailConversationViewModel: ObservableObject {
             let latestMessage = modMailConversationDetail.orderedMessages.last
             let latestBody = latestMessage?.displayBody.trimmingCharacters(in: .whitespacesAndNewlines)
             let shouldAppendMessage = modMailConversationDetail.orderedMessages.count <= previousMessageCount || latestBody != sentMessage
-            let messageToScrollTo = shouldAppendMessage
-                ? modMailConversationDetail.appendMessage(body: message, isInternal: isInternal, authorName: authorName)
-                : latestMessage
+            let messageToScrollTo = shouldAppendMessage ? modMailConversationDetail.appendMessage(
+                body: message,
+                authorName: authorName,
+                isInternal: isInternal,
+                isAuthorHidden: isAuthorHidden
+            )
+            : latestMessage
 
             self.modMailConversationDetail = modMailConversationDetail
             
@@ -105,6 +122,117 @@ class ModMailConversationViewModel: ObservableObject {
             self.error = error
             
             printInDebugOnly("Error sending message: \(error)")
+        }
+    }
+    
+    private func displayMessage(
+        modMailMessage: ModMailMessage,
+        modMailMessageIndex: Int,
+        modMailMessages: [ModMailMessage],
+        currentUsername: String
+    ) -> ModMailConversationDisplayMessage {
+        let isSentMessage = isSentModMailMessage(modMailMessage, currentUsername: currentUsername)
+        let modMailSenderLabelContent = modMailSenderLabelContent(
+            modMailMessage: modMailMessage,
+            isSentMessage: isSentMessage,
+            currentUsername: currentUsername
+        )
+        let modMailSenderLabel = shouldShowModMailSenderLabel(
+            modMailMessage: modMailMessage,
+            modMailMessageIndex: modMailMessageIndex,
+            modMailMessages: modMailMessages,
+            currentIsSentMessage: isSentMessage,
+            currentLabel: modMailSenderLabelContent,
+            currentUsername: currentUsername
+        ) ? modMailSenderLabelContent : nil
+        
+        return ModMailConversationDisplayMessage(
+            message: modMailMessage,
+            isSentMessage: isSentMessage,
+            modMailSenderLabel: modMailSenderLabel
+        )
+    }
+    
+    private func isSentModMailMessage(_ message: ModMailMessage, currentUsername: String) -> Bool {
+        let authorName = message.author.name
+        let subredditName = conversation.owner.displayName ?? ""
+        return authorName == currentUsername || authorName == subredditName
+    }
+    
+    private func modMailSenderLabelContent(
+        modMailMessage: ModMailMessage,
+        isSentMessage: Bool,
+        currentUsername: String
+    ) -> String? {
+        let subredditName = conversation.owner.displayName ?? ""
+
+        guard isSentMessage else {
+            let authorName = modMailMessage.author.name ?? ""
+            if !authorName.isEmpty {
+                return "u/\(authorName)"
+            }
+
+            if !participantUsername.isEmpty {
+                return "u/\(participantUsername)"
+            }
+
+            return nil
+        }
+
+        if modMailMessage.isInternal {
+            return "Mods only"
+        }
+
+        if modMailMessage.author.isHidden == true {
+            guard !subredditName.isEmpty else {
+                return nil
+            }
+            return "r/\(subredditName)"
+        }
+
+        return "u/\(currentUsername)"
+    }
+    
+    private func shouldShowModMailSenderLabel(
+        modMailMessage: ModMailMessage,
+        modMailMessageIndex: Int,
+        modMailMessages: [ModMailMessage],
+        currentIsSentMessage: Bool,
+        currentLabel: String?,
+        currentUsername: String
+    ) -> Bool {
+        guard let currentLabel else {
+            return false
+        }
+        
+        let visuallyPreviousModMailMessageIndex = modMailMessageIndex + 1
+        guard modMailMessages.indices.contains(visuallyPreviousModMailMessageIndex) else {
+            return true
+        }
+        
+        let previousModMailMessage = modMailMessages[visuallyPreviousModMailMessageIndex]
+        let previousIsSentMessage = isSentModMailMessage(previousModMailMessage, currentUsername: currentUsername)
+        
+        if previousIsSentMessage != currentIsSentMessage {
+            return true
+        }
+        
+        let previousLabel = modMailSenderLabelContent(
+            modMailMessage: previousModMailMessage,
+            isSentMessage: previousIsSentMessage,
+            currentUsername: currentUsername
+        )
+        
+        return currentLabel != previousLabel
+    }
+    
+    struct ModMailConversationDisplayMessage: Identifiable {
+        let message: ModMailMessage
+        let isSentMessage: Bool
+        let modMailSenderLabel: String?
+        
+        var id: String {
+            message.id
         }
     }
 }

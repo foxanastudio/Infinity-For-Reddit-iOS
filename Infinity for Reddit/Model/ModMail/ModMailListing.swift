@@ -164,12 +164,12 @@ public class ModMailAuthor: NSObject {
         isOp = json["isOp"].boolValue
     }
 
-    init(localName: String) {
+    init(localName: String, isHidden: Bool) {
         id = 0
         name = localName
         isAdmin = false
         isDeleted = false
-        isHidden = false
+        self.isHidden = isHidden
         isApproved = false
         isParticipant = false
         isMod = true
@@ -184,7 +184,6 @@ public class ModMailMessage: NSObject {
     var date: String!
     var dateUtc: Int64
     var isInternal: Bool!
-    var participatingAs: String!
     var author: ModMailAuthor!
     
     init(fromJson json: JSON!) throws {
@@ -198,19 +197,17 @@ public class ModMailMessage: NSObject {
         date = json["date"].stringValue
         dateUtc = ModMailDateParser.parseSeconds(from: date)
         isInternal = json["isInternal"].boolValue
-        participatingAs = json["participatingAs"].stringValue
         author = try ModMailAuthor(fromJson: json["author"])
     }
 
-    init(localId: String, body: String, isInternal: Bool, authorName: String) {
+    init(localId: String, body: String, authorName: String, isInternal: Bool, isAuthorHidden: Bool) {
         id = localId
         self.body = body
         bodyMarkdown = body
         date = ISO8601DateFormatter().string(from: Date())
         dateUtc = Int64(Date().timeIntervalSince1970)
         self.isInternal = isInternal
-        participatingAs = "moderator"
-        author = ModMailAuthor(localName: authorName)
+        author = ModMailAuthor(localName: authorName, isHidden: isAuthorHidden)
     }
 
     var displayBody: String {

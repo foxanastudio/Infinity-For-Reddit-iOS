@@ -43,13 +43,14 @@ public class ModMailConversationDetail: NSObject {
         }
     }
 
-    func appendMessage(body: String, isInternal: Bool, authorName: String) -> ModMailMessage {
+    func appendMessage(body: String, authorName: String, isInternal: Bool, isAuthorHidden: Bool) -> ModMailMessage {
         let messageId = "local-\(UUID().uuidString)"
         let message = ModMailMessage(
             localId: messageId,
             body: body,
+            authorName: authorName,
             isInternal: isInternal,
-            authorName: authorName
+            isAuthorHidden: isAuthorHidden
         )
 
         messages[messageId] = message

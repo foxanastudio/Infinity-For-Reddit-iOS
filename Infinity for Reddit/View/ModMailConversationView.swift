@@ -38,16 +38,19 @@ struct ModMailConversationView: View {
             VStack(spacing: 0) {
                 ScrollViewReader { proxy in
                     List {
-                        let messages = modMailConversationViewModel.modMailConversationDetail?.orderedMessages.reversed() ?? []
+                        let modMailMessages = modMailConversationViewModel.messages(
+                            currentUsername: accountViewModel.account.username
+                        )
                         
-                        ForEach(Array(messages.enumerated()), id: \.element.id) { index, message in
-                            let isLastFromSender = index == 0 || messages[index - 1].author.name != message.author.name
-                            let isSentMessage = isSentModMailMessage(message)
-                            
-                            ChatBubble(isSentMessage: isSentMessage, shouldShowTail: isLastFromSender) {
-                                Markdown(message.displayBody)
+                        ForEach(Array(modMailMessages.enumerated()), id: \.element.id) { index, modMailMessage in
+                            ModMailMessageBubble(
+                                isSentMessage: modMailMessage.isSentMessage,
+                                shouldShowTail: index == 0 || modMailMessages[index - 1].message.author.name != modMailMessage.message.author.name,
+                                modMailSenderLabel: modMailMessage.modMailSenderLabel
+                            ) {
+                                Markdown(modMailMessage.message.displayBody)
                                     .themedChatMessageMarkdown(
-                                        isSentMessage: isSentMessage
+                                        isSentMessage: modMailMessage.isSentMessage
                                     )
                                     .markdownLinkHandler { url in
                                         navigationManager.openLink(url)
@@ -55,7 +58,7 @@ struct ModMailConversationView: View {
                             }
                             .listPlainItemNoInsets()
                             .rotationEffect(.degrees(180))
-                            .id(message.id)
+                            .id(modMailMessage.id)
                         }
                     }
                     .rotationEffect(.degrees(180))
@@ -157,14 +160,6 @@ struct ModMailConversationView: View {
             self.messageText = ""
             self.sendMessageTask = nil
         }
-    }
-
-    private func isSentModMailMessage(_ message: ModMailMessage) -> Bool {
-        let authorName = message.author.name.lowercased()
-        let currentUsername = accountViewModel.account.username.lowercased()
-        let subredditName = (modMailConversationViewModel.conversation.owner.displayName ?? "").lowercased()
-
-        return authorName == currentUsername || authorName == subredditName
     }
     
     private enum FieldType: Hashable {
