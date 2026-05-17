@@ -134,7 +134,7 @@ class LinkHandler {
             return LinkDestination.fullScreenMedia(FullScreenMediaType.imgurGallery(imgurId: segments[1].components(separatedBy: "-").last ?? segments[1]))
         } else if path.matches("/(album|a)/\\w+/?") {
             printInDebugOnly("Open Imgur album: \(segments[1])")
-            return LinkDestination.fullScreenMedia(FullScreenMediaType.imgurGallery(imgurId: segments[1].components(separatedBy: "-").last ?? segments[1]))
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.imgurAlbum(imgurId: segments[1].components(separatedBy: "-").last ?? segments[1]))
         } else if path.matches("/\\w+/?") {
             printInDebugOnly("Open Imgur image: \(path.dropFirst())")
             let potentialId = path.dropFirst()
