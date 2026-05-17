@@ -38,6 +38,7 @@ struct ImgurFullScreenView: View {
                         if item.mediaType != .video {
                             ImgurImageView(
                                 childViewHasZoomed: $childViewHasZoomed,
+                                index: index,
                                 imgurMediaItem: item,
                                 imgurMedia: imgurMedia,
                                 post: post,
@@ -150,6 +151,7 @@ struct ImgurImageView: View {
     
     @Binding var childViewHasZoomed: Bool
     
+    let index: Int
     let imgurMediaItem: ImgurMediaItem
     let imgurMedia: ImgurMedia
     let post: Post?
@@ -177,6 +179,7 @@ struct ImgurImageView: View {
             ImgurImageToolbar(
                 downloadMediaType: imgurMediaItem.toDownloadMediaType(post: post),
                 isVisible: $isToolbarVisible,
+                index: index,
                 imgurMediaItem: imgurMediaItem,
                 imgurMedia: imgurMedia,
                 post: post,
@@ -193,6 +196,7 @@ struct ImgurImageToolbar: View {
     
     @Binding var isVisible: Bool
     
+    let index: Int
     let imgurMediaItem: ImgurMediaItem
     let imgurMedia: ImgurMedia
     let post: Post?
@@ -204,6 +208,7 @@ struct ImgurImageToolbar: View {
     
     init(downloadMediaType: DownloadMediaType,
          isVisible: Binding<Bool>,
+         index: Int,
          imgurMediaItem: ImgurMediaItem,
          imgurMedia: ImgurMedia,
          post: Post?,
@@ -215,6 +220,7 @@ struct ImgurImageToolbar: View {
             wrappedValue: FullScreenMediaToolbarViewModel(downloadMediaType: downloadMediaType)
         )
         self._isVisible = isVisible
+        self.index = index
         self.imgurMediaItem = imgurMediaItem
         self.imgurMedia = imgurMedia
         self.post = post
@@ -243,6 +249,15 @@ struct ImgurImageToolbar: View {
                     }
                     
                     Spacer()
+                    
+                    Text("\(index + 1)/\(imgurMedia.imagesCount ?? 1)")
+                        .padding(10)
+                        .foregroundColor(Color.white)
+                        .customFont()
+                        .background(
+                            Capsule()
+                                .fill(Color(hex: "#2E2E2E"))
+                        )
                 }
                 .padding(16)
                 .transition(.move(edge: .top).combined(with: .opacity))
