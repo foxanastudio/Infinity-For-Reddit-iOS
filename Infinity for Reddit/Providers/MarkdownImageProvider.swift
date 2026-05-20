@@ -132,6 +132,32 @@ struct MarkdownImageProvider: ImageProvider {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .linkText(.f15)
                     }
+                } else if media.e == MediaMetadata.parsedVideoType {
+                    if markdownEmbeddedMediaType.allowVideo {
+                        VStack {
+                            if let url = URL(string: media.hlsUrl) {
+                                InlineVideoPlayerWithSelfContainedViewModel(
+                                    videoURL: url,
+                                    aspectRatio: nil,
+                                    muteVideo: VideoUserDefaultsUtils.muteAutoplayingVideo,
+                                    isSensitive: isSensitive,
+                                    onFullScreen: onFullScreenVideo == nil ? nil : {
+                                        onFullScreenVideo?(media.hlsUrl)
+                                    }
+                                )
+                                .id(url)
+                            }
+                            
+                            if media.caption != nil {
+                                Text(media.caption!)
+                                    .secondaryText(.f15)
+                            }
+                        }
+                    } else if let urlString = media.videoLinkMarkdown {
+                        Text(getLinkAttributedString(urlString: urlString, caption: media.caption))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .linkText(.f15)
+                    }
                 } else {
                     if media.status == "invalid" {
                         Text(unescapedUrl)

@@ -13,6 +13,7 @@ class MediaMetadata : NSObject, ObservableObject, Identifiable {
     static let imageType = "Image"
     static let gifType = "AnimatedImage"
     static let redditVideoType = "RedditVideo"
+    static let parsedVideoType = "ParsedVideo"
     
     // Type (image: Image, gif: AnimatedImage)
     var e : String!
@@ -79,6 +80,18 @@ class MediaMetadata : NSObject, ObservableObject, Identifiable {
         y = 0
         dashUrl = ""
         hlsUrl = ""
+    }
+    
+    init(e: String, id: String, m: String, hlsUrl: String) {
+        self.e = e
+        self.id = id
+        self.m = m
+        self.hlsUrl = hlsUrl
+        
+        x = 0
+        y = 0
+        dashUrl = ""
+        isGif = false
     }
 }
 

@@ -258,8 +258,12 @@ private struct InlineVideoPlayerWithControls: View {
                 videoPlayerViewModel.toggleControls()
             }
         }
-        .applyIf(aspectRatio != nil) {
-            $0.aspectRatio(aspectRatio!, contentMode: .fit)
+        .modify {
+            if let aspectRatio {
+                $0.aspectRatio(aspectRatio, contentMode: .fit)
+            } else {
+                $0.frame(height: 400)
+            }
         }
         .onReceive(fullScreenMediaViewModel.$media) { newValue in
             if newValue != nil {
