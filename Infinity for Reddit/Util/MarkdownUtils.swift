@@ -23,7 +23,7 @@ class MarkdownUtils {
     }()
     
     static func parseRedditImagesBlock(_ comment: Comment) {
-        guard var markdownString = comment.body else {
+        guard var markdownString = comment.body, !markdownString.isEmpty else {
             return
         }
         
@@ -125,6 +125,65 @@ class MarkdownUtils {
         }
         
         guard let mediaMetadataMap = post.mediaMetadata else {
+            guard let postId = post.id else {
+                return
+            }
+            
+            var startIndex = 0
+            
+            while true {
+                // Apply regex starting from the current index
+                let rangeToSearch = NSRange(location: startIndex, length: markdownString.count - startIndex)
+                if let videoMatch = REGEX_PATTERNS[4].firstMatch(in: markdownString, options: [], range: rangeToSearch) {
+                    if let matchRange = Range(videoMatch.range, in: markdownString) {
+                        let videoID = (markdownString as NSString).substring(with: videoMatch.range(at: 4))
+                        
+                        if post.mediaMetadata == nil {
+                            post.mediaMetadata = [String: MediaMetadata]()
+                        }
+                        
+                        guard let _ = post.mediaMetadata else {
+                            startIndex = matchRange.upperBound.utf16Offset(in: markdownString)
+                            continue
+                        }
+                        post.mediaMetadata?[videoID] = MediaMetadata(
+                            e: MediaMetadata.parsedVideoType,
+                            id: videoID,
+                            m: "video/mp4",
+                            hlsUrl: "https://v.redd.it/link/\(postId)/asset/\(videoID)/HLSPlaylist.m3u8"
+                        )
+                        
+                        guard let mediaMetadata = post.mediaMetadata?[videoID] else {
+                            startIndex = matchRange.upperBound.utf16Offset(in: markdownString)
+                            continue
+                        }
+                        
+                        let linkID = (markdownString as NSString).substring(with: videoMatch.range(at: 3))
+                        mediaMetadata.caption = videoMatch.range(at: 1).location != NSNotFound ? (markdownString as NSString).substring(with: videoMatch.range(at: 1)) : nil
+                        var videoLinkMarkdown = (markdownString as NSString).substring(with: videoMatch.range)
+                        if videoLinkMarkdown.hasPrefix("[") {
+                            if let range = videoLinkMarkdown.range(of: "https://", options: .backwards) {
+                                videoLinkMarkdown = String(videoLinkMarkdown[range.lowerBound..<videoLinkMarkdown.index(videoLinkMarkdown.endIndex, offsetBy: -1)])
+                            }
+                        }
+                        mediaMetadata.videoLinkMarkdown = videoLinkMarkdown
+                        printInDebugOnly(mediaMetadata.videoLinkMarkdown)
+                        
+                        let replacingText = "![](\(videoID))"
+                        markdownString.replaceSubrange(matchRange, with: replacingText)
+                        printInDebugOnly(replacingText)
+                        startIndex = matchRange.lowerBound.utf16Offset(in: markdownString) + replacingText.count
+                        
+                        printInDebugOnly("Link ID: \(linkID)")
+                        printInDebugOnly("Video ID: \(videoID)")
+                    }
+                } else {
+                    break
+                }
+                
+                post.selftext = markdownString
+            }
+            
             return
         }
         
