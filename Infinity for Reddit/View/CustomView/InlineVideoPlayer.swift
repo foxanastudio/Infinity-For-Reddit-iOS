@@ -11,6 +11,7 @@ import SeekBar
 
 struct InlineVideoPlayer: View {
     @EnvironmentObject private var networkManager: NetworkManager
+    @EnvironmentObject private var videoPlayerPool: VideoPlayerPool
     
     @ObservedObject private var videoPlayerViewModel: VideoPlayerViewModel
     
@@ -21,6 +22,7 @@ struct InlineVideoPlayer: View {
     @AppStorage(DataSavingModeUserDefaultsUtils.dataSavingModeKey, store: .dataSavingMode) private var dataSavingMode: Int = 0
     
     let videoURL: URL
+    private let ignoreAutoplay: Bool
     private let aspectRatio: CGSize?
     private let muteVideo: Bool
     private let canPlay: Bool
@@ -30,6 +32,7 @@ struct InlineVideoPlayer: View {
     
     init(
         videoURL: URL,
+        ignoreAutoplay: Bool = false,
         aspectRatio: CGSize?,
         muteVideo: Bool = false,
         canPlay: Bool = true,
@@ -39,6 +42,7 @@ struct InlineVideoPlayer: View {
         onFullScreen: (() -> Void)? = nil
     ) {
         self.videoURL = videoURL
+        self.ignoreAutoplay = ignoreAutoplay
         self.aspectRatio = aspectRatio
         self.muteVideo = muteVideo
         self.canPlay = canPlay
@@ -78,11 +82,22 @@ struct InlineVideoPlayer: View {
                 }
             }
         }
-        .applyIf(aspectRatio != nil) {
-            $0.aspectRatio(aspectRatio!, contentMode: .fit)
+        .modify {
+            if let aspectRatio {
+                $0.aspectRatio(aspectRatio, contentMode: .fit)
+            } else {
+                $0.frame(height: 400)
+            }
+        }
+        .applyIf(ignoreAutoplay) {
+            $0.onChange(of: isVideoPlayerGrabbed) { _, newValue in
+                if !newValue {
+                    showPlayer = false
+                }
+            }
         }
         .onAppear {
-            if showPlayer == nil {
+            if !ignoreAutoplay && showPlayer == nil {
                 showPlayer = !isDataSavingModeActive && VideoUserDefaultsUtils.canAutoplayVideo(videoAutoplay: videoAutoplay, isWifiConnected: networkManager.isWifiConnected) && ((isSensitive && autoplaySensitiveVideo) || !isSensitive)
             }
         }
@@ -90,6 +105,10 @@ struct InlineVideoPlayer: View {
     
     private var isDataSavingModeActive: Bool {
         return DataSavingModeUserDefaultsUtils.isDataSavingModeActive(dataSavingMode: dataSavingMode, isWifiConnected: networkManager.isWifiConnected)
+    }
+    
+    private var isVideoPlayerGrabbed: Bool {
+        videoPlayerPool.playerDict[videoPlayerViewModel.id] != nil
     }
 }
 
@@ -116,6 +135,7 @@ struct InlineVideoPlayerWithSelfContainedViewModel: View {
     var body: some View {
         InlineVideoPlayer(
             videoURL: videoURL,
+            ignoreAutoplay: true,
             aspectRatio: aspectRatio,
             muteVideo: VideoUserDefaultsUtils.muteAutoplayingVideo,
             isSensitive: isSensitive,
