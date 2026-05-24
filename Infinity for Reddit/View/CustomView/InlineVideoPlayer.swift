@@ -28,7 +28,7 @@ struct InlineVideoPlayer: View {
     private let canPlay: Bool
     private let isSensitive: Bool
     private let playbackTimeToSeekToInitially: Double
-    private let onFullScreen: (() -> Void)?
+    private let onFullScreen: ((Double) -> Void)?
     
     init(
         videoURL: URL,
@@ -39,7 +39,7 @@ struct InlineVideoPlayer: View {
         isSensitive: Bool,
         playbackTimeToSeekToInitially: Double = 0,
         videoPlayerViewModel: VideoPlayerViewModel,
-        onFullScreen: (() -> Void)? = nil
+        onFullScreen: ((Double) -> Void)? = nil
     ) {
         self.videoURL = videoURL
         self.ignoreAutoplay = ignoreAutoplay
@@ -120,9 +120,9 @@ struct InlineVideoPlayerWithSelfContainedViewModel: View {
     private let muteVideo: Bool
     private let canPlay: Bool
     private let isSensitive: Bool
-    private let onFullScreen: (() -> Void)?
+    private let onFullScreen: ((Double) -> Void)?
     
-    init(videoURL: URL, aspectRatio: CGSize?, muteVideo: Bool = false, canPlay: Bool = true, isSensitive: Bool, onFullScreen: (() -> Void)? = nil) {
+    init(videoURL: URL, aspectRatio: CGSize?, muteVideo: Bool = false, canPlay: Bool = true, isSensitive: Bool, onFullScreen: ((Double) -> Void)? = nil) {
         self.videoURL = videoURL
         self.aspectRatio = aspectRatio
         self.muteVideo = muteVideo
@@ -158,7 +158,7 @@ private struct InlineVideoPlayerWithControls: View {
     private let aspectRatio: CGSize?
     private let muteVideo: Bool
     private let playbackTimeToSeekToInitially: Double
-    private let onFullScreen: (() -> Void)?
+    private let onFullScreen: ((Double) -> Void)?
 
     init(
         url: URL,
@@ -167,7 +167,7 @@ private struct InlineVideoPlayerWithControls: View {
         canPlay: Bool,
         playbackTimeToSeekToInitially: Double,
         videoPlayerViewModel: VideoPlayerViewModel,
-        onFullScreen: (() -> Void)?
+        onFullScreen: ((Double) -> Void)?
     ) {
         self.url = url
         self.aspectRatio = aspectRatio
@@ -256,7 +256,7 @@ private struct InlineVideoPlayerWithControls: View {
                     
                     if let onFullScreen {
                         Button(action: {
-                            onFullScreen()
+                            onFullScreen(videoPlayerViewModel.currentTime)
                         }) {
                             SwiftUI.Image(systemName: "arrow.down.left.and.arrow.up.right.rectangle")
                                 .resizable()

@@ -17,7 +17,7 @@ struct MarkdownImageProvider: ImageProvider {
     let linkColor: Color
     let fullScreenMediaViewModel: FullScreenMediaViewModel
     let onLinkTap: ((URL) -> Void)?
-    let onFullScreenVideo: ((String) -> Void)?
+    let onFullScreenVideo: ((String, Double) -> Void)?
     
     init(
         mediaMetadata: [String: MediaMetadata]?,
@@ -28,7 +28,7 @@ struct MarkdownImageProvider: ImageProvider {
         linkColor: Color = .black,
         fullScreenMediaViewModel: FullScreenMediaViewModel,
         onLinkTap: ((URL) -> Void)? = nil,
-        onFullScreenVideo: ((String) -> Void)? = nil
+        onFullScreenVideo: ((String, Double) -> Void)? = nil
     ) {
         self.mediaMetadata = mediaMetadata
         self.markdownEmbeddedMediaType = MarkdownEmbeddedMediaType(rawValue: markdownEmbeddedMediaType) ?? .all
@@ -115,8 +115,8 @@ struct MarkdownImageProvider: ImageProvider {
                                     aspectRatio: CGSize(width: media.x, height: media.y),
                                     muteVideo: VideoUserDefaultsUtils.muteAutoplayingVideo,
                                     isSensitive: isSensitive,
-                                    onFullScreen: onFullScreenVideo == nil ? nil : {
-                                        onFullScreenVideo?(media.hlsUrl)
+                                    onFullScreen: onFullScreenVideo == nil ? nil : { playbackTime in
+                                        onFullScreenVideo?(media.hlsUrl, playbackTime)
                                     }
                                 )
                                 .id(url)
@@ -141,8 +141,8 @@ struct MarkdownImageProvider: ImageProvider {
                                     aspectRatio: nil,
                                     muteVideo: VideoUserDefaultsUtils.muteAutoplayingVideo,
                                     isSensitive: isSensitive,
-                                    onFullScreen: onFullScreenVideo == nil ? nil : {
-                                        onFullScreenVideo?(media.hlsUrl)
+                                    onFullScreen: onFullScreenVideo == nil ? nil : { playbackTime in
+                                        onFullScreenVideo?(media.hlsUrl, playbackTime)
                                     }
                                 )
                                 .id(url)

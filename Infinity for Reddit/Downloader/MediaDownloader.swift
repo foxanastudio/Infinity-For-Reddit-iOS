@@ -72,6 +72,8 @@ class MediaDownloader {
                     }
                 }
             }
+        } else if case .parsedVideo = downloadMediaType {
+            return try await downloadParsedVideo(downloadURL: downloadMediaType.getDownloadUrl(), onProgressWithTitle: onProgressWithTitle)
         }
         
         let downloadedFileURL = try await downloadFile(
@@ -92,6 +94,9 @@ class MediaDownloader {
             try await saveVideoToPhotosLibrary(downloadedFileURL)
         case .vReddIt:
             try await saveVideoToPhotosLibrary(downloadedFileURL)
+        case .parsedVideo:
+            //Impossible to reach here
+            break
         case .redgifs:
             try await saveVideoToPhotosLibrary(downloadedFileURL)
         case .streamable:
@@ -127,6 +132,36 @@ class MediaDownloader {
         }
         
         return try await request.serializingDownloadedFileURL().value
+    }
+    
+    private func downloadParsedVideo(downloadURL: URL?, onProgressWithTitle: @escaping (String, Double) async -> Void) async throws {
+        guard var downloadURL else {
+            throw MediaDownloaderError.invalidURL
+        }
+        
+        downloadURL.deleteLastPathComponent()
+        downloadURL.appendPathComponent("CMAF_480.mp4")
+        
+        let videoTrackDownloadedFileURL = try await downloadFile(downloadURL: downloadURL, fileName: "video_track.mp4", onProgress: { progress in
+            await onProgressWithTitle("Downloading video track...", progress)
+        })
+        
+        downloadURL.deleteLastPathComponent()
+        let fileName = "\(downloadURL.lastPathComponent).mp4"
+        
+        downloadURL.appendPathComponent("CMAF_AUDIO_128.mp4")
+        
+        let audioTrackDownloadedFileURL = try await downloadFile(downloadURL: downloadURL, fileName: "audio_track.mp4", onProgress: { progress in
+            await onProgressWithTitle("Downloading audio track...", progress)
+        })
+        
+        do {
+            await onProgressWithTitle("Muxing video and audio...", 0)
+            let exportedMuxedVideoURL = try await muxVideoAndAudio(downloadedVideoURL: videoTrackDownloadedFileURL, downloadedAudioURL: audioTrackDownloadedFileURL, fileName: fileName)
+            try await saveVideoToPhotosLibrary(exportedMuxedVideoURL)
+        } catch {
+            try await saveRedditVideoWithOnlyVideoTrackToPhotosLibrary(videoTrackDownloadedFileURL, fileName: fileName)
+        }
     }
     
     private func downloadRedditVideo(post: Post, fileName: String, onProgressWithTitle: @escaping (String, Double) async -> Void) async throws {
@@ -276,6 +311,7 @@ enum DownloadMediaType {
     case redditVideo(post: Post)
     case video(downloadUrlString: String, fileName: String)
     case vReddIt(urlString: String, downloadUrlString: String?)
+    case parsedVideo(downloadUrlString: String)
     case redgifs(redgifsId: String, downloadUrlString: String?)
     case streamable(shortCode: String, downloadUrlString: String?)
     case imgurVideo(downloadUrlString: String, fileName: String)
@@ -291,9 +327,19 @@ enum DownloadMediaType {
             return "\(post.fileNameWithoutExtension).mp4"
         case .video(_, let fileName):
             return fileName
-        case .vReddIt(urlString: let urlString, downloadUrlString: let downloadUrlString):
+        case .vReddIt:
             // Should not get file name here
             return "vReddIt-\(Utils.randomString()).mp4"
+        case .parsedVideo(let downloadUrlString):
+            guard let url = URL(string: downloadUrlString) else {
+                return "\(Utils.randomString()).mp4"
+            }
+            
+            if url.pathComponents.count > 4 {
+                return "\(url.pathComponents[3]).mp4"
+            }
+            
+            return "\(Utils.randomString()).mp4"
         case .redgifs(let redgifsId, _):
             return "Redgifs-\(redgifsId).mp4"
         case .streamable(let shortCode, _):
@@ -324,6 +370,8 @@ enum DownloadMediaType {
                 return try? await VideoFetcher.shared.fetchVReddItVideo(url: url)
             }
             return nil
+        case .parsedVideo(let downloadUrlString):
+            return URL(string: downloadUrlString)
         case .redgifs(let redgifsId, let downloadUrlString):
             if let downloadUrlString {
                 return URL(string: downloadUrlString)

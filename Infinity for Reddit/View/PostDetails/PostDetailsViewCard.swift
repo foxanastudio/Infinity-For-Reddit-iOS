@@ -304,9 +304,9 @@ struct PostDetailsViewCard: View {
                             fullScreenMediaViewModel: fullScreenMediaViewModel
                         ) { url in
                             navigationManager.openLink(url)
-                        } onFullScreenVideo: { videoUrlString in
+                        } onFullScreenVideo: { urlString, playbackTime in
                             fullScreenMediaViewModel.show(
-                                .video(urlString: videoUrlString, videoType: .direct, canDownload: false)
+                                .video(urlString: urlString, videoType: .direct, canDownload: false, playbackTime: playbackTime)
                             )
                         }
                     )

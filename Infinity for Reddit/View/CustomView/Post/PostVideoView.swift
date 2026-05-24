@@ -82,7 +82,7 @@ struct PostVideoView: View {
                             isSensitive: post.over18,
                             playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
                             videoPlayerViewModel: videoPlayerViewModel
-                        ) {
+                        ) { _ in
                             showFullScreenVideo()
                             if inPostListing {
                                 onReadPost?()
@@ -106,7 +106,7 @@ struct PostVideoView: View {
                             isSensitive: post.over18,
                             playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
                             videoPlayerViewModel: videoPlayerViewModel
-                        ) {
+                        ) { _ in
                             showFullScreenVideo()
                             if inPostListing {
                                 onReadPost?()

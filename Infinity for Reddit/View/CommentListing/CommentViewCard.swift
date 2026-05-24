@@ -156,6 +156,9 @@ struct CommentViewCard: View {
                                         fullScreenMediaViewModel: fullScreenMediaViewModel,
                                         onLinkTap: { url in
                                             navigationManager.openLink(url)
+                                        },
+                                        onFullScreenVideo: { urlString, playbackTime in
+                                            fullScreenMediaViewModel.show(.video(urlString: urlString, videoType: .parsedVideo, playbackTime: playbackTime))
                                         }
                                     )
                                 )
@@ -177,6 +180,9 @@ struct CommentViewCard: View {
                                         fullScreenMediaViewModel: fullScreenMediaViewModel,
                                         onLinkTap: { url in
                                             navigationManager.openLink(url)
+                                        },
+                                        onFullScreenVideo: { urlString, playbackTime in
+                                            fullScreenMediaViewModel.show(.video(urlString: urlString, videoType: .parsedVideo, playbackTime: playbackTime))
                                         }
                                     )
                                 )

@@ -299,6 +299,8 @@ class VideoFullScreenViewModel: ObservableObject {
                 downloadMediaType = .video(downloadUrlString: urlString, fileName: post == nil ? "\(Utils.randomString()).mp4" : "\(post!.fileNameWithoutExtension).mp4")
             case .vReddIt:
                 downloadMediaType = .vReddIt(urlString: urlString, downloadUrlString: nil)
+            case .parsedVideo:
+                downloadMediaType = .parsedVideo(downloadUrlString: urlString)
             case .redgifs(let id):
                 downloadMediaType = .redgifs(redgifsId: id, downloadUrlString: nil)
             case .streamable(let shortCode):
