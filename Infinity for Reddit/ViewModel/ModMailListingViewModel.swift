@@ -15,14 +15,22 @@ public class ModMailListingViewModel: ObservableObject {
     @Published var isInitialLoad: Bool = true
     @Published var isInitialLoading: Bool = false
     @Published var isLoadingMore: Bool = false
-    @Published var hasMorePages: Bool = true
     @Published var error: Error?
     
     private var messages: [String: ModMailMessage] = [:]
     private var conversationIds: Set<String> = []
     private var after: String? = nil
+    private var refreshModMailListingContinuation: CheckedContinuation<Void, Never>?
     
     public let modMailListingRepository: ModMailListingRepositoryProtocol
+    
+    var hasMorePages: Bool {
+        isInitialLoad || !(after == nil || after?.isEmpty == true)
+    }
+    
+    var isPullToRefreshing: Bool {
+        refreshModMailListingContinuation != nil
+    }
     
     init(modMailListingRepository: ModMailListingRepositoryProtocol) {
         self.modMailListingRepository = modMailListingRepository
@@ -33,17 +41,17 @@ public class ModMailListingViewModel: ObservableObject {
             return
         }
         
-        await loadModMailListing()
+        await loadModMailListing(isRefreshWithContinuation: refreshModMailListingContinuation != nil)
     }
     
-    public func loadModMailListing() async {
-        guard !isInitialLoading, !isLoadingMore, hasMorePages else {
+    public func loadModMailListing(isRefreshWithContinuation: Bool = false) async {
+        guard !isInitialLoading, !isLoadingMore, isRefreshWithContinuation || hasMorePages else {
             return
         }
         
         let isInitialLoadCopy = isInitialLoad
 
-        if conversations.isEmpty {
+        if conversations.isEmpty || isRefreshWithContinuation {
             isInitialLoading = true
         } else {
             isLoadingMore = true
@@ -53,12 +61,14 @@ public class ModMailListingViewModel: ObservableObject {
             isInitialLoad = false
         }
         
+        self.error = nil
+        
         do {
             try Task.checkCancellation()
             
             let modMailListing = try await modMailListingRepository.fetchModMailListing(
                 queries: [
-                    "after": after ?? "",
+                    "after": isRefreshWithContinuation ? "" : (after ?? ""),
                     "state": "all",
                     "sort": "recent"
                 ],
@@ -67,15 +77,24 @@ public class ModMailListingViewModel: ObservableObject {
             
             try Task.checkCancellation()
             
-            let newConversations = modMailListing.orderedConversations.filter { conversationIds.insert($0.id).inserted }
+            let existingConversationIds = isRefreshWithContinuation ? Set<String>() : conversationIds
+            let newConversations = modMailListing.orderedConversations.filter { !existingConversationIds.contains($0.id) }
             if (newConversations.isEmpty) {
-                self.hasMorePages = false
                 self.after = nil
             } else {
+                if isRefreshWithContinuation {
+                    self.messages.removeAll()
+                    self.conversationIds.removeAll()
+                    self.conversations.removeAll()
+                }
                 self.messages.merge(modMailListing.messages) { _, new in new }
+                self.conversationIds.formUnion(newConversations.map(\.id))
                 self.conversations.append(contentsOf: newConversations)
                 self.after = modMailListing.after
-                self.hasMorePages = !(after == nil || after?.isEmpty == true)
+            }
+            
+            if isRefreshWithContinuation {
+                finishPullToRefresh()
             }
 
             self.isInitialLoading = false
@@ -86,9 +105,20 @@ public class ModMailListingViewModel: ObservableObject {
                 printInDebugOnly("Error fetching mod mail listing: \(error)")
             }
             
-            self.isInitialLoad = isInitialLoadCopy
+            if isRefreshWithContinuation {
+                finishPullToRefresh()
+            } else {
+                self.isInitialLoad = isInitialLoadCopy
+            }
             self.isInitialLoading = false
             self.isLoadingMore = false
+        }
+    }
+    
+    func refreshModMailListingWithContinuation() async {
+        await withCheckedContinuation { continuation in
+            refreshModMailListingContinuation = continuation
+            refreshModMailListing()
         }
     }
     
@@ -97,13 +127,19 @@ public class ModMailListingViewModel: ObservableObject {
         isInitialLoading = false
         isLoadingMore = false
 
-        after = nil
-        hasMorePages = true
-        messages.removeAll()
-        conversationIds.removeAll()
-        conversations.removeAll()
+        if refreshModMailListingContinuation == nil {
+            after = nil
+            messages.removeAll()
+            conversationIds.removeAll()
+            conversations.removeAll()
+        }
 
         loadModMailFlag.toggle()
+    }
+    
+    func finishPullToRefresh() {
+        refreshModMailListingContinuation?.resume()
+        refreshModMailListingContinuation = nil
     }
     
     func markAsRead(conversation: ModMailConversation) {

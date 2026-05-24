@@ -22,7 +22,7 @@ public class ModMailListing: NSObject {
         
         viewerId = json["viewerId"].stringValue
         conversationIds = json["conversationIds"].arrayValue.map(\.stringValue)
-        after = json["after"].string ?? conversationIds.last
+        after = json["after"].string
         
         for (conversationId, conversationJson):(String, JSON) in json["conversations"] {
             do {

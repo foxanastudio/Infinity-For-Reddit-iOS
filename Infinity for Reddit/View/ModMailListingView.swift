@@ -41,6 +41,7 @@ struct ModMailListingView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+
             } else {
                 List {
                     ForEach(modMailListingViewModel.conversations, id: \.id) { conversation in
@@ -59,14 +60,21 @@ struct ModMailListingView: View {
                     if modMailListingViewModel.hasMorePages {
                         ProgressIndicator()
                             .task {
+                                guard !modMailListingViewModel.isPullToRefreshing else {
+                                    return
+                                }
                                 await modMailListingViewModel.loadModMailListing()
                             }
                             .listPlainItem()
                     }
                 }
-                .scrollBounceBehavior(.basedOnSize)
+                .scrollBounceBehavior(.always)
                 .themedList()
                 .showErrorUsingSnackbar(modMailListingViewModel.$error)
+                .refreshable {
+                    await modMailListingViewModel.refreshModMailListingWithContinuation()
+                }
+
             }
         }
         .task(id: modMailListingViewModel.loadModMailFlag) {
