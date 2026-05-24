@@ -50,11 +50,11 @@ class LinkHandler {
         if path.hasSuffix(".mp4") {
             return LinkDestination.fullScreenMedia(FullScreenMediaType.video(urlString: finalURL.absoluteString, videoType: .direct))
         } else if path.hasSuffix(".jpg") || path.hasSuffix(".JPG") || path.hasSuffix(".jpeg") {
-            return LinkDestination.fullScreenMedia(FullScreenMediaType.image(urlString: finalURL.absoluteString, fileName: "\(segments[segments.count - 1]).jpg"))
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.image(urlString: finalURL.absoluteString, fileName: "\(segments[segments.count - 1])"))
         } else if path.hasSuffix(".png") || path.hasSuffix(".PNG") {
-            return LinkDestination.fullScreenMedia(FullScreenMediaType.image(urlString: finalURL.absoluteString, fileName: "\(segments[segments.count - 1]).png"))
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.image(urlString: finalURL.absoluteString, fileName: "\(segments[segments.count - 1])"))
         } else if path.hasSuffix(".gif") {
-            return LinkDestination.fullScreenMedia(FullScreenMediaType.gif(urlString: finalURL.absoluteString, fileName: "\(segments[segments.count - 1]).gif"))
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.gif(urlString: finalURL.absoluteString, fileName: "\(segments[segments.count - 1])"))
         }
         
         switch host {
