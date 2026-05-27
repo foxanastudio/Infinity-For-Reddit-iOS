@@ -57,6 +57,8 @@ struct MarkdownImageProvider: ImageProvider {
                                     onMediaTap(urlString: urlString, fileName: "\(Utils.randomString()).gif", isGif: true)
                                 }
                             })
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .clipped()
                             
                             if media.caption != nil {
                                 Text(media.caption!)
@@ -88,6 +90,8 @@ struct MarkdownImageProvider: ImageProvider {
                                     onMediaTap(urlString: urlString, fileName: "\(Utils.randomString()).jpg", isGif: false)
                                 }
                             })
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .clipped()
                             
                             if media.caption != nil {
                                 Text(media.caption!)
