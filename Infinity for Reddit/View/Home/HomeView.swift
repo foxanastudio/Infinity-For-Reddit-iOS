@@ -256,8 +256,7 @@ struct HomeView: View {
                 accountViewModel.pendingInboxFullname = nil
             }
             
-            if InternalStateUserDefaultsUtils.currentBuildNumber < Bundle.main.buildNumber {
-                InternalStateUserDefaultsUtils.setCurrentBuildNumber()
+            if InternalStateUserDefaultsUtils.currentBuildNumber <= Bundle.main.buildNumber {
                 showNewFeatureSheet = true
             }
         }
@@ -380,8 +379,9 @@ struct HomeView: View {
         }
         .sheet(isPresented: $showNewFeatureSheet) {
             SheetRootView {
-                NewFeatureSheet()
+                NewFeatureView()
             }
+            .interactiveDismissDisabled()
         }
     }
     

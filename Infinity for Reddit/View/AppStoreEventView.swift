@@ -221,7 +221,7 @@ struct AppStoreEventView: View {
                 }
             } else {
                 RootView {
-                    NewFeatureSheet()
+                    NewFeatureView()
                         .background {
                             if let confettiPath = Bundle.main.path(forResource: "Confetti", ofType:"png"), let confetti = UIImage(named: confettiPath) {
                                 SwiftUI.Image(uiImage: confetti)

@@ -1,5 +1,5 @@
 //
-//  NewFeatureSheet.swift
+//  NewFeatureView.swift
 //  Infinity for Reddit
 //
 //  Created by Docile Alligator on 2026-05-15.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct NewFeatureSheet: View {
+struct NewFeatureView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
     
@@ -174,6 +174,7 @@ struct NewFeatureSheet: View {
                     if let url = URL(string: "x-safari-https://www.reddit.com/r/Infinity_For_Reddit") {
                         UIApplication.shared.open(url, options: [:], completionHandler: nil)
                     }
+                    InternalStateUserDefaultsUtils.setCurrentBuildNumber()
                     dismiss()
                 } label: {
                     Text("Open Safari to Enable")
@@ -184,6 +185,7 @@ struct NewFeatureSheet: View {
                 .filledButton()
                 
                 Button {
+                    InternalStateUserDefaultsUtils.setCurrentBuildNumber()
                     dismiss()
                 } label: {
                     Text("Maybe Later")
