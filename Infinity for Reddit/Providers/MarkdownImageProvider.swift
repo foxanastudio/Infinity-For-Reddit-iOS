@@ -120,6 +120,8 @@ struct MarkdownImageProvider: ImageProvider {
                                     }
                                 )
                                 .id(url)
+                                .clipShape(RoundedRectangle(cornerRadius: 16))
+                                .clipped()
                             }
                             
                             if media.caption != nil {
@@ -146,6 +148,8 @@ struct MarkdownImageProvider: ImageProvider {
                                     }
                                 )
                                 .id(url)
+                                .clipShape(RoundedRectangle(cornerRadius: 16))
+                                .clipped()
                             }
                             
                             if media.caption != nil {

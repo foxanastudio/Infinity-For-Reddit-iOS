@@ -15,7 +15,7 @@ class MarkdownUtils {
                 NSRegularExpression(pattern: #"((?<=[\\s])|^)[rRuU]/[\\w-]+/{0,1}"#, options: []),
                 NSRegularExpression(pattern: #"\\^{2,}"#, options: []),
                 NSRegularExpression(pattern: #"((?:\[(?:(?!(?:(?<!\\)\[)).)*?]\()?https://preview\.redd\.it/\w+\.(?:jpg|png|jpeg)(?:(?:\?+[-a-zA-Z0-9()@:%_+.~#?&/=]*)|))|((?:\[(?:(?!(?:(?<!\\)\[)).)*?]\()?https://i\.redd\.it/\w+\.(?:jpg|png|jpeg|gif))"#, options: []),
-                NSRegularExpression(pattern: #"(?:\[(.*?)\]\()?(https:\/\/reddit\.com\/link\/([^\/]+)\/video\/([^\/]+)\/player)(?:\))?"#, options: []),
+                NSRegularExpression(pattern: #"(?:\[(.*?)\]\()?(https:\/\/reddit\.com\/link\/([^\/]+)\/video\/([^\/]+)\/player)"#, options: []),
             ]
         } catch {
             fatalError("Error creating regular expressions: \(error)")
@@ -62,17 +62,19 @@ class MarkdownUtils {
                         }
                         
                         let linkID = (markdownString as NSString).substring(with: videoMatch.range(at: 3))
-                        mediaMetadata.caption = videoMatch.range(at: 1).location != NSNotFound ? (markdownString as NSString).substring(with: videoMatch.range(at: 1)) : nil
-                        var videoLinkMarkdown = (markdownString as NSString).substring(with: videoMatch.range)
-                        if videoLinkMarkdown.hasPrefix("[") {
-                            if let range = videoLinkMarkdown.range(of: "https://", options: .backwards) {
-                                videoLinkMarkdown = String(videoLinkMarkdown[range.lowerBound..<videoLinkMarkdown.index(videoLinkMarkdown.endIndex, offsetBy: -1)])
-                            }
-                        }
+                        let caption = videoMatch.range(at: 1).location != NSNotFound ? (markdownString as NSString).substring(with: videoMatch.range(at: 1)) : nil
+                        mediaMetadata.caption = caption
+                        let videoLinkMarkdown = (markdownString as NSString).substring(with: videoMatch.range(at: 2))
                         mediaMetadata.videoLinkMarkdown = videoLinkMarkdown
                         printInDebugOnly(mediaMetadata.videoLinkMarkdown)
                         
-                        let replacingText = "![](\(videoID))"
+                        let replacingText: String
+                        if let caption {
+                            replacingText = "![\(caption)](\(videoID)"
+                        } else {
+                            replacingText = "![](\(videoID))"
+                        }
+
                         markdownString.replaceSubrange(matchRange, with: replacingText)
                         printInDebugOnly(replacingText)
                         startIndex = matchRange.lowerBound.utf16Offset(in: markdownString) + replacingText.count
@@ -159,17 +161,19 @@ class MarkdownUtils {
                         }
                         
                         let linkID = (markdownString as NSString).substring(with: videoMatch.range(at: 3))
-                        mediaMetadata.caption = videoMatch.range(at: 1).location != NSNotFound ? (markdownString as NSString).substring(with: videoMatch.range(at: 1)) : nil
-                        var videoLinkMarkdown = (markdownString as NSString).substring(with: videoMatch.range)
-                        if videoLinkMarkdown.hasPrefix("[") {
-                            if let range = videoLinkMarkdown.range(of: "https://", options: .backwards) {
-                                videoLinkMarkdown = String(videoLinkMarkdown[range.lowerBound..<videoLinkMarkdown.index(videoLinkMarkdown.endIndex, offsetBy: -1)])
-                            }
-                        }
+                        let caption = videoMatch.range(at: 1).location != NSNotFound ? (markdownString as NSString).substring(with: videoMatch.range(at: 1)) : nil
+                        mediaMetadata.caption = caption
+                        let videoLinkMarkdown = (markdownString as NSString).substring(with: videoMatch.range(at: 2))
                         mediaMetadata.videoLinkMarkdown = videoLinkMarkdown
                         printInDebugOnly(mediaMetadata.videoLinkMarkdown)
                         
-                        let replacingText = "![](\(videoID))"
+                        let replacingText: String
+                        if let caption {
+                            replacingText = "![\(caption)](\(videoID)"
+                        } else {
+                            replacingText = "![](\(videoID))"
+                        }
+
                         markdownString.replaceSubrange(matchRange, with: replacingText)
                         printInDebugOnly(replacingText)
                         startIndex = matchRange.lowerBound.utf16Offset(in: markdownString) + replacingText.count
@@ -219,17 +223,18 @@ class MarkdownUtils {
                     }
                     
                     let linkID = (markdownString as NSString).substring(with: videoMatch.range(at: 3))
-                    mediaMetadata.caption = videoMatch.range(at: 1).location != NSNotFound ? (markdownString as NSString).substring(with: videoMatch.range(at: 1)) : nil
-                    var videoLinkMarkdown = (markdownString as NSString).substring(with: videoMatch.range)
-                    if videoLinkMarkdown.hasPrefix("[") {
-                        if let range = videoLinkMarkdown.range(of: "https://", options: .backwards) {
-                            videoLinkMarkdown = String(videoLinkMarkdown[range.lowerBound..<videoLinkMarkdown.index(videoLinkMarkdown.endIndex, offsetBy: -1)])
-                        }
-                    }
+                    let caption = videoMatch.range(at: 1).location != NSNotFound ? (markdownString as NSString).substring(with: videoMatch.range(at: 1)) : nil
+                    mediaMetadata.caption = caption
+                    let videoLinkMarkdown = (markdownString as NSString).substring(with: videoMatch.range(at: 2))
                     mediaMetadata.videoLinkMarkdown = videoLinkMarkdown
                     printInDebugOnly(mediaMetadata.videoLinkMarkdown)
                     
-                    let replacingText = "![](\(videoID))"
+                    let replacingText: String
+                    if let caption {
+                        replacingText = "![\(caption)](\(videoID)"
+                    } else {
+                        replacingText = "![](\(videoID))"
+                    }
                     markdownString.replaceSubrange(matchRange, with: replacingText)
                     printInDebugOnly(replacingText)
                     startIndex = matchRange.lowerBound.utf16Offset(in: markdownString) + replacingText.count
