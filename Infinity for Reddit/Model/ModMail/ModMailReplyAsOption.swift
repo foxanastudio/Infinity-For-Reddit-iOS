@@ -37,9 +37,9 @@ enum ModMailReplyAsOption: String, CaseIterable, Hashable {
     func title(currentUsername: String, subredditName: String) -> String {
         switch self {
         case .subreddit:
-            return "r/\(subredditName.isEmpty ? currentUsername : subredditName)"
+            return "Reply as r/\(subredditName.isEmpty ? currentUsername : subredditName)"
         case .user:
-            return "u/\(currentUsername)"
+            return "Reply as u/\(currentUsername)"
         case .modsOnly:
             return "Mods only"
         }
