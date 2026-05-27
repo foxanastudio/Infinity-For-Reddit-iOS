@@ -112,7 +112,7 @@ struct UserListingView: View {
                         .listPlainItem()
                     }
                 }
-                .scrollBounceBehavior(.basedOnSize)
+                .scrollBounceBehavior(.always)
                 .themedList()
                 .showErrorUsingSnackbar(userListingViewModel.$error)
             }

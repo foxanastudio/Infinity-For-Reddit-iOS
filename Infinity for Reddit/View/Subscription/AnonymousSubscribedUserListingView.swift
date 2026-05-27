@@ -96,7 +96,7 @@ struct AnonymousSubscribedUserListingView: View {
                     }
                 }
             }
-            .scrollBounceBehavior(.basedOnSize)
+            .scrollBounceBehavior(.always)
             .themedList()
         }
     }

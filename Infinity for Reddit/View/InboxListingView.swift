@@ -86,7 +86,7 @@ struct InboxListingView: View {
                         .listPlainItem()
                     }
                 }
-                .scrollBounceBehavior(.basedOnSize)
+                .scrollBounceBehavior(.always)
                 .themedList()
                 .showErrorUsingSnackbar(inboxListingViewModel.$error)
                 .refreshable {

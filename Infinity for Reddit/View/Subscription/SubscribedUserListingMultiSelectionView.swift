@@ -64,7 +64,7 @@ struct SubscribedUserListingMultiSelectionView: View {
                     .listPlainItemNoInsets()
                 }
             }
-            .scrollBounceBehavior(.basedOnSize)
+            .scrollBounceBehavior(.always)
             .themedList()
         }
     }

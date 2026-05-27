@@ -134,7 +134,7 @@ struct SubscribedSubredditListingView: View {
                     }
                 }
             }
-            .scrollBounceBehavior(.basedOnSize)
+            .scrollBounceBehavior(.always)
             .themedList()
         }
     }

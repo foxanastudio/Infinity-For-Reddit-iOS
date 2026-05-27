@@ -54,7 +54,7 @@ struct AnonymousSubscribedSubredditListingMultiSelectionView: View {
                     .listPlainItemNoInsets()
                 }
             }
-            .scrollBounceBehavior(.basedOnSize)
+            .scrollBounceBehavior(.always)
             .themedList()
         }
     }

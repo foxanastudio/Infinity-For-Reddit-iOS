@@ -104,7 +104,7 @@ struct SubscribedUserListingView: View {
                     }
                 }
             }
-            .scrollBounceBehavior(.basedOnSize)
+            .scrollBounceBehavior(.always)
             .themedList()
         }
     }

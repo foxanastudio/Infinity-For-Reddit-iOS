@@ -96,7 +96,7 @@ struct AnonymousSubscribedSubredditListingView: View {
                     }
                 }
             }
-            .scrollBounceBehavior(.basedOnSize)
+            .scrollBounceBehavior(.always)
             .themedList()
         }
     }

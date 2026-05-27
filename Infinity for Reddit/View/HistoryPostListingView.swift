@@ -180,7 +180,7 @@ struct HistoryPostListingView: View {
                                 .listPlainItem()
                             }
                         }
-                        .scrollBounceBehavior(.basedOnSize)
+                        .scrollBounceBehavior(.always)
                         .themedList()
                         .scrollIndicators(.hidden)
                         .refreshable {

@@ -148,7 +148,7 @@ struct CommentListingView: View {
                         }
                     }
                 }
-                .scrollBounceBehavior(.basedOnSize)
+                .scrollBounceBehavior(.always)
                 .applyIf(onScroll != nil) {
                     $0.onScrollPhaseChange { oldPhase, newPhase, context in
                         if newPhase == .interacting {

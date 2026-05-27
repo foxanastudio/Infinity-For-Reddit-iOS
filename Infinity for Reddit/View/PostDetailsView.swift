@@ -132,7 +132,7 @@ struct PostDetailsView: View {
                                         .listPlainItemNoInsets()
                                 }
                                 .scrollIndicators(.hidden)
-                                .scrollBounceBehavior(.basedOnSize)
+                                .scrollBounceBehavior(.always)
                             }
                             
                             ScrollViewReader { proxy in
@@ -378,7 +378,7 @@ struct PostDetailsView: View {
                                 .transaction { $0.animation = nil }
                                 .themedList()
                                 .scrollIndicators(.hidden)
-                                .scrollBounceBehavior(.basedOnSize)
+                                .scrollBounceBehavior(.always)
                                 .onAppear {
                                     self.listProxy = proxy
                                 }
