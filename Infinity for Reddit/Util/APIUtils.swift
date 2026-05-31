@@ -23,7 +23,7 @@ class APIUtils {
     // Keys and Constants
     static let CLIENT_ID_KEY = "client_id"
     static let CLIENT_SECRET_KEY = "client_secret"
-    static let CLIENT_ID = "NOe2iKrPPzwscA"
+    static let CLIENT_ID = ""
     static let IMGUR_CLIENT_ID = "Client-ID cc671794e0ab397"
     static let REDGIFS_CLIENT_ID = "1828d0bcc93-15ac-bde6-0005-d2ecbe8daab3"
     static let REDGIFS_CLIENT_SECRET = "TJBlw7jRXW65NAGgFBtgZHu97WlzRXHYybK81sZ9dLM="
@@ -43,7 +43,7 @@ class APIUtils {
     static let AUTHORIZATION_KEY = "Authorization"
     static let AUTHORIZATION_BASE = "bearer "
     static let USER_AGENT_KEY = "User-Agent"
-    static let USER_AGENT = "ios:com.foxanastudio.infinity:\((Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String) ?? "1.0") (by /u/Hostilenemy)"
+    static let USER_AGENT = ""
     static let USERNAME_KEY = "username"
     
     static let GRANT_TYPE_KEY = "grant_type"
