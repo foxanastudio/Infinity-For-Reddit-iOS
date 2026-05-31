@@ -26,7 +26,7 @@ final class RedditAccessTokenInterceptor: RequestInterceptor {
             }
         } else if url.absoluteString.hasPrefix("https://www.reddit.com") {
             var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
-            components?.host = "www.reddit.com"
+            components?.host = "oauth.reddit.com"
             
             if let newURL = components?.url {
                 urlRequest.url = newURL
