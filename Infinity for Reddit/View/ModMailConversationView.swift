@@ -35,81 +35,100 @@ struct ModMailConversationView: View {
     
     var body: some View {
         RootView {
-            VStack(spacing: 0) {
-                ScrollViewReader { proxy in
-                    List {
-                        let modMailMessages = modMailConversationViewModel.messages(
-                            currentUsername: accountViewModel.account.username
-                        )
-                        
-                        ForEach(Array(modMailMessages.enumerated()), id: \.element.id) { index, modMailMessage in
-                            ModMailMessageBubble(
-                                isSentMessage: modMailMessage.isSentMessage,
-                                shouldShowTail: index == 0 || modMailMessages[index - 1].message.author.name != modMailMessage.message.author.name,
-                                modMailSenderLabel: modMailMessage.modMailSenderLabel
-                            ) {
-                                Markdown(modMailMessage.message.displayBody)
-                                    .themedChatMessageMarkdown(
-                                        isSentMessage: modMailMessage.isSentMessage
-                                    )
-                                    .markdownLinkHandler { url in
-                                        navigationManager.openLink(url)
-                                    }
+            if (modMailConversationViewModel.modMailConversationDetail == nil) {
+                ZStack {
+                    if modMailConversationViewModel.isInitialLoading {
+                        ProgressIndicator()
+                    } else if modMailConversationViewModel.isInitialLoad, let error = modMailConversationViewModel.error {
+                        Text("Unable to load mod mail. Tap to retry. Error: \(error.localizedDescription)")
+                            .primaryText()
+                            .padding(16)
+                            .onTapGesture {
+                                modMailConversationViewModel.reloadModMailConversation()
                             }
-                            .listPlainItemNoInsets()
-                            .rotationEffect(.degrees(180))
-                            .id(modMailMessage.id)
-                        }
-                    }
-                    .rotationEffect(.degrees(180))
-                    .themedList()
-                    .scrollIndicators(.hidden)
-                    .onTapGesture {
-                        focusedField = nil
-                    }
-                    .onChange(of: modMailConversationViewModel.listScrollTarget) {
-                        guard let target = modMailConversationViewModel.listScrollTarget else { return }
-                        
-                        proxy.scrollTo(target, anchor: .bottom)
+                    } else {
+                        Text("No items")
+                            .primaryText()
                     }
                 }
-                
-                if modMailConversationViewModel.modMailConversationDetail?.conversation.isRepliable == true {
-                    VStack(spacing: 12) {
-                        ModMailReplyAsPicker(
-                            selectedReplyAsOption: $selectedReplyAsOption,
-                            subredditName: modMailConversationViewModel.conversation.owner.displayName,
-                            currentAccount: accountViewModel.account
-                        )
-                        
-                        HStack(spacing: 12) {
-                            CustomTextField(
-                                "Type a message...",
-                                text: $messageText,
-                                showBackground: false,
-                                fieldType: .message,
-                                focusedField: $focusedField
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                VStack(spacing: 0) {
+                    ScrollViewReader { proxy in
+                        List {
+                            let modMailMessages = modMailConversationViewModel.messages(
+                                currentUsername: accountViewModel.account.username
                             )
-                            .submitLabel(.send)
-                            .lineLimit(3)
-                            .onSubmit {
-                                sendMessage()
+                            
+                            ForEach(Array(modMailMessages.enumerated()), id: \.element.id) { index, modMailMessage in
+                                ModMailMessageBubble(
+                                    isSentMessage: modMailMessage.isSentMessage,
+                                    shouldShowTail: index == 0 || modMailMessages[index - 1].message.author.name != modMailMessage.message.author.name,
+                                    modMailSenderLabel: modMailMessage.modMailSenderLabel
+                                ) {
+                                    Markdown(modMailMessage.message.displayBody)
+                                        .themedChatMessageMarkdown(
+                                            isSentMessage: modMailMessage.isSentMessage
+                                        )
+                                        .markdownLinkHandler { url in
+                                            navigationManager.openLink(url)
+                                        }
+                                }
+                                .listPlainItemNoInsets()
+                                .rotationEffect(.degrees(180))
+                                .id(modMailMessage.id)
                             }
-
-                            Button(action: {
-                                sendMessage()
-                            }) {
-                                SwiftUI.Image(systemName: "paperplane.fill")
-                                    .foregroundColor(Color(hex: messageText.isEmpty ? customThemeViewModel.currentCustomTheme.secondaryTextColor : customThemeViewModel.currentCustomTheme.colorPrimaryLightTheme))
-                            }
-                            .disabled(messageText.isEmpty || sendMessageTask != nil)
                         }
-                        .padding(12)
-                        .background(Color(hex: customThemeViewModel.currentCustomTheme.filledCardViewBackgroundColor))
-                        .clipShape(RoundedRectangle(cornerRadius: 24))
-                        .clipped()
+                        .rotationEffect(.degrees(180))
+                        .themedList()
+                        .scrollIndicators(.hidden)
+                        .onTapGesture {
+                            focusedField = nil
+                        }
+                        .onChange(of: modMailConversationViewModel.listScrollTarget) {
+                            guard let target = modMailConversationViewModel.listScrollTarget else { return }
+                            
+                            proxy.scrollTo(target, anchor: .bottom)
+                        }
                     }
-                    .padding(8)
+                    
+                    if modMailConversationViewModel.modMailConversationDetail?.conversation.isRepliable == true {
+                        VStack(spacing: 12) {
+                            ModMailReplyAsPicker(
+                                selectedReplyAsOption: $selectedReplyAsOption,
+                                subredditName: modMailConversationViewModel.conversation.owner.displayName,
+                                currentAccount: accountViewModel.account
+                            )
+                            
+                            HStack(spacing: 12) {
+                                CustomTextField(
+                                    "Type a message...",
+                                    text: $messageText,
+                                    showBackground: false,
+                                    fieldType: .message,
+                                    focusedField: $focusedField
+                                )
+                                .submitLabel(.send)
+                                .lineLimit(3)
+                                .onSubmit {
+                                    sendMessage()
+                                }
+                                
+                                Button(action: {
+                                    sendMessage()
+                                }) {
+                                    SwiftUI.Image(systemName: "paperplane.fill")
+                                        .foregroundColor(Color(hex: messageText.isEmpty ? customThemeViewModel.currentCustomTheme.secondaryTextColor : customThemeViewModel.currentCustomTheme.colorPrimaryLightTheme))
+                                }
+                                .disabled(messageText.isEmpty || sendMessageTask != nil)
+                            }
+                            .padding(12)
+                            .background(Color(hex: customThemeViewModel.currentCustomTheme.filledCardViewBackgroundColor))
+                            .clipShape(RoundedRectangle(cornerRadius: 24))
+                            .clipped()
+                        }
+                        .padding(8)
+                    }
                 }
             }
         }

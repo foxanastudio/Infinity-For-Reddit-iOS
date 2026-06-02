@@ -13,6 +13,7 @@ class ModMailConversationViewModel: ObservableObject {
     @Published var modMailConversationDetail: ModMailConversationDetail?
     @Published var isLoading: Bool = false
     @Published var isInitialLoad: Bool = true
+    @Published var isInitialLoading: Bool = false
     @Published var error: Error?
     @Published var listScrollTarget: String?
 
@@ -62,10 +63,16 @@ class ModMailConversationViewModel: ObservableObject {
 
         isLoading = true
         let isInitialLoadCopy = isInitialLoad
+        
+        if modMailConversationDetail == nil {
+            isInitialLoading = true
+        }
 
         if isInitialLoad {
             isInitialLoad = false
         }
+        
+        error = nil
 
         do {
             try Task.checkCancellation()
@@ -79,6 +86,7 @@ class ModMailConversationViewModel: ObservableObject {
 
             self.modMailConversationDetail = modMailConversationDetail
             self.isLoading = false
+            self.isInitialLoading = false
         } catch {
             if !(error is CancellationError) {
                 self.error = error
@@ -87,6 +95,7 @@ class ModMailConversationViewModel: ObservableObject {
             self.isInitialLoad = isInitialLoadCopy
 
             self.isLoading = false
+            self.isInitialLoading = false
         }
     }
     
@@ -224,6 +233,18 @@ class ModMailConversationViewModel: ObservableObject {
         )
         
         return currentLabel != previousLabel
+    }
+    
+    
+    func reloadModMailConversation() {
+        error = nil
+        isInitialLoad = true
+        isInitialLoading = false
+        modMailConversationDetail = nil
+
+        Task {
+            await loadModMailConversation()
+        }
     }
     
     struct ModMailConversationDisplayMessage: Identifiable {
