@@ -148,6 +148,29 @@ public class ModMailListingViewModel: ObservableObject {
         }
         conversation.lastUnread = nil
     }
+
+    func markAllAsRead() async throws {
+        conversations.forEach { conversation in
+            conversation.lastUnread = nil
+        }
+        
+        objectWillChange.send()
+
+        var subredditNames: [String] = []
+        for conversation in conversations {
+            guard let subredditName = conversation.owner.displayName?.trimmingCharacters(in: .whitespacesAndNewlines),
+                  !subredditName.isEmpty,
+                  !subredditNames.contains(subredditName) else {
+                continue
+            }
+            subredditNames.append(subredditName)
+        }
+
+        try await modMailListingRepository.markAllModMailAsRead(
+            subredditNames: subredditNames,
+            state: "all"
+        )
+    }
     
     func latestMessagePreview(for conversation: ModMailConversation) -> String {
         for objectId in conversation.objIds.reversed() {

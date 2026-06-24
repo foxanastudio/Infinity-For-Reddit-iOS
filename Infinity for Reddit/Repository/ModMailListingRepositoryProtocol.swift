@@ -9,4 +9,5 @@ import Alamofire
 
 public protocol ModMailListingRepositoryProtocol {
     func fetchModMailListing(queries: [String : String], interceptor: RequestInterceptor?) async throws -> ModMailListing
+    func markAllModMailAsRead(subredditNames: [String], state: String) async throws
 }

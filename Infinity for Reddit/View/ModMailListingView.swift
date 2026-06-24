@@ -100,6 +100,17 @@ struct ModMailListingView: View {
         }
 
         navigationBarMenuKey = navigationBarMenuManager.push([
+            NavigationBarMenuItem(title: "Mark All as Read") {
+                Task {
+                    do {
+                        try await modMailListingViewModel.markAllAsRead()
+                    } catch {
+                        await MainActor.run {
+                            modMailListingViewModel.error = error
+                        }
+                    }
+                }
+            },
             NavigationBarMenuItem(title: "Refresh") {
                 modMailListingViewModel.refreshModMailListing()
             }

@@ -54,11 +54,13 @@ public class ModMailListingRepository: ModMailListingRepositoryProtocol {
         .response
         
         if let statusCode = response.response?.statusCode {
-            printInDebugOnly("Status code: \(statusCode) Session: \(self.sessionName)")
+            printInDebugOnly("Status code: \(statusCode) Session: \(self.sessionName ?? "nil")")
         }
         
         let data = response.data
-        printInDebugOnly(data)
+        if let data {
+            printInDebugOnly(data)
+        }
         try Task.checkCancellation()
         
         let json = JSON(data)
@@ -67,5 +69,36 @@ public class ModMailListingRepository: ModMailListingRepositoryProtocol {
         }
         
         return try ModMailListing(fromJson: json)
+    }
+
+    public func markAllModMailAsRead(subredditNames: [String],
+                                     state: String
+    ) async throws {
+        if self.sessionName == "plain" {
+            throw ModMailListingRepositoryError.AuthRequiredError
+        }
+
+        guard !subredditNames.isEmpty else {
+            return
+        }
+
+        let response = await self.session.request(
+            RedditOAuthAPI.bulkReadModMail(
+                params: [
+                    "state": state,
+                    "entity": subredditNames.joined(separator: ",")
+                ]
+            )
+        )
+        .serializingData(automaticallyCancelling: true)
+        .response
+
+        if let statusCode = response.response?.statusCode, !(200...299).contains(statusCode) {
+            throw ModMailListingRepositoryError.NetworkError("Mod mail bulk read failed with status code \(statusCode)")
+        }
+
+        if let error = response.error {
+            throw error
+        }
     }
 }
