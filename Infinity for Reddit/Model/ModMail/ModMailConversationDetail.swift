@@ -43,6 +43,15 @@ public class ModMailConversationDetail: NSObject {
         }
     }
 
+    func refreshConversationMetadata() {
+        conversation.numMessages = max(conversation.numMessages, orderedMessages.count)
+
+        if let latestMessage = orderedMessages.last {
+            conversation.lastUpdatedUtc = latestMessage.dateUtc
+            conversation.lastUpdated = latestMessage.date
+        }
+    }
+
     func appendMessage(body: String, authorName: String, isInternal: Bool, isAuthorHidden: Bool) -> ModMailMessage {
         let messageId = "local-\(UUID().uuidString)"
         let message = ModMailMessage(
@@ -58,6 +67,7 @@ public class ModMailConversationDetail: NSObject {
         conversation.numMessages += 1
         conversation.lastUpdatedUtc = message.dateUtc
         conversation.lastUpdated = message.date
+        refreshConversationMetadata()
 
         return message
     }

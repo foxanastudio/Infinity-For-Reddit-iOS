@@ -188,4 +188,25 @@ public class ModMailListingViewModel: ObservableObject {
 
         return ""
     }
+    
+    func applyConversationUpdate (_ detail: ModMailConversationDetail) {
+        detail.refreshConversationMetadata()
+
+        let updatedConversation = detail.conversation
+        let conversationId = updatedConversation.id ?? ""
+        
+        guard !conversationId.isEmpty else {
+            return
+        }
+        
+        messages.merge(detail.messages) { _, new in new }
+        
+        if let existingIndex = conversations.firstIndex(where: { $0.id == conversationId}) {
+            conversations.remove(at: existingIndex)
+        }
+        
+        updatedConversation.lastUnread = nil
+        conversationIds.insert(conversationId)
+        conversations.insert(updatedConversation, at: 0)
+    }
 }

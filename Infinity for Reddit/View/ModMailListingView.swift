@@ -10,6 +10,7 @@ import SwiftUI
 struct ModMailListingView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
     @EnvironmentObject private var navigationBarMenuManager: NavigationBarMenuManager
+    @EnvironmentObject private var modMailShareableViewModel: ModMailShareableViewModel
 
     @StateObject var modMailListingViewModel: ModMailListingViewModel
     @State private var navigationBarMenuKey: UUID?
@@ -85,6 +86,7 @@ struct ModMailListingView: View {
         }
         .onAppear {
             setUpMenu()
+            applySharedConversationUpdateIfNeeded()
         }
         .onDisappear {
             guard let navigationBarMenuKey else {
@@ -116,12 +118,20 @@ struct ModMailListingView: View {
             }
         ])
     }
+
+    private func applySharedConversationUpdateIfNeeded() {
+        guard let detail = modMailShareableViewModel.consumeUpdatedConversationDetail() else {
+            return
+        }
+
+        modMailListingViewModel.applyConversationUpdate(detail)
+    }
 }
 
 struct ModMailConversationItemView: View {
     @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
     
-    @State var conversation: ModMailConversation
+    let conversation: ModMailConversation
     let latestMessagePreview: String
     let onTap: () -> Void
     

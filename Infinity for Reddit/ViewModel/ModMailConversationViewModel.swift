@@ -87,6 +87,7 @@ class ModMailConversationViewModel: ObservableObject {
             self.modMailConversationDetail = modMailConversationDetail
             self.isLoading = false
             self.isInitialLoading = false
+            self.conversation = modMailConversationDetail.conversation
         } catch {
             if !(error is CancellationError) {
                 self.error = error
@@ -99,7 +100,7 @@ class ModMailConversationViewModel: ObservableObject {
         }
     }
     
-    func sendMessage(message: String, authorName: String, isAuthorHidden: Bool, isInternal: Bool) async {
+    func sendMessage(message: String, authorName: String, isAuthorHidden: Bool, isInternal: Bool) async -> ModMailConversationDetail? {
         do {
             let previousMessageCount = modMailConversationDetail?.orderedMessages.count ?? 0
             let modMailConversationDetail = try await modMailConversationRepository.sendMessage(
@@ -121,16 +122,23 @@ class ModMailConversationViewModel: ObservableObject {
             )
             : latestMessage
 
+            modMailConversationDetail.refreshConversationMetadata()
+
             self.modMailConversationDetail = modMailConversationDetail
+            self.conversation = modMailConversationDetail.conversation
             
             Task { @MainActor in
                 await Task.yield()
                 self.listScrollTarget = messageToScrollTo?.id
             }
+            
+            return modMailConversationDetail
         } catch {
             self.error = error
             
             printInDebugOnly("Error sending message: \(error)")
+            
+            return nil
         }
     }
     

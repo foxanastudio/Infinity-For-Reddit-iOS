@@ -14,6 +14,7 @@ struct ModMailConversationView: View {
     @EnvironmentObject private var accountViewModel: AccountViewModel
     @EnvironmentObject private var snackbarManager: SnackbarManager
     @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
+    @EnvironmentObject private var modMailShareableViewModel: ModMailShareableViewModel
     
     @StateObject var modMailConversationViewModel: ModMailConversationViewModel
     
@@ -170,13 +171,17 @@ struct ModMailConversationView: View {
             subredditName: subredditName
         )
         sendMessageTask = Task {
-            await modMailConversationViewModel.sendMessage(
+            let detail = await modMailConversationViewModel.sendMessage(
                 message: messageToSend,
                 authorName: authorName,
                 isAuthorHidden: selectedReplyAsOption.isAuthorHidden,
                 isInternal: selectedReplyAsOption.isInternal
             )
-            self.messageText = ""
+            
+            if let detail {
+                modMailShareableViewModel.updatedConversationDetail = detail
+                self.messageText = ""
+            }
             self.sendMessageTask = nil
         }
     }
