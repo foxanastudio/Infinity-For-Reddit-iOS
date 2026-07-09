@@ -46,7 +46,7 @@ struct PostVideoView: View {
         onReadPost: (() -> Void)? = nil
     ) {
         self.post = post
-        self.videoUrlString = videoUrlString
+        self.videoUrlString = videoUrlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? videoUrlString
         self.isParentVisible = isParentVisible
         self.inPostListing = inPostListing
         self.playbackTimeToSeekToInitially = playbackTimeToSeekToInitially

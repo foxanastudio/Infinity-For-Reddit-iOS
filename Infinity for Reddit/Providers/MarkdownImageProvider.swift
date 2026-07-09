@@ -204,7 +204,7 @@ struct MarkdownImageProvider: ImageProvider {
     
     private func getLinkAttributedString(urlString: String, caption: String? = nil) -> AttributedString {
         var attributedString = AttributedString(caption ?? urlString)
-        attributedString.link = URL(string: urlString)!
+        attributedString.link = URL(string: urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? urlString)!
         attributedString.foregroundColor = linkColor
         return attributedString
     }

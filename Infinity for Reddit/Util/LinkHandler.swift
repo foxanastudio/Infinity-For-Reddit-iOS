@@ -14,7 +14,7 @@ class LinkHandler {
     private func constructRedditURL(from path: String) -> URL {
         let trimmed = path.trimmingCharacters(in: .whitespacesAndNewlines)
         let full = trimmed.hasPrefix("/") ? "https://www.reddit.com\(trimmed)" : "https://www.reddit.com/\(trimmed)"
-        return URL(string: full)!
+        return URL(string: full.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? full)!
     }
     
     func handle(link: String, allowRedditShareLink: Bool = true) -> LinkDestination {
