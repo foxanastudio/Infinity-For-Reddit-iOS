@@ -64,7 +64,7 @@ struct NavigationBarTitleGlassEffectViewModifier: ViewModifier {
             content
                 .padding(.horizontal, 20)
                 .padding(.vertical, 12)
-                .glassEffect(.regular, in: Capsule())
+                .glassEffect(.regular)
         } else {
             content
         }
