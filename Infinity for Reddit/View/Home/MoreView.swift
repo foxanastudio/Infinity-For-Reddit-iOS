@@ -113,6 +113,12 @@ struct MoreView: View {
                 }
                 
                 CustomListSection("Preferences") {
+                    SimpleTouchItemRow(text: "Reminders", icon: "bell") {
+                        navigationManager.append(MoreViewNavigation.reminders)
+                    }
+                    .listPlainItemNoInsets()
+                    .limitedWidth()
+                    
                     SimpleTouchItemRow(text: "Settings", icon: "gearshape") {
                         navigationManager.append(MoreViewNavigation.settings)
                     }

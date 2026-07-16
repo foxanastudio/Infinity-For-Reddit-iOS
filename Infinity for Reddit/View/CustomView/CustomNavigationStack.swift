@@ -197,6 +197,9 @@ struct CustomNavigationStack<Content: View>: View {
                     case .test:
                         TestView()
                             .environmentObject(navigationManager)
+                    case .reminders:
+                        ReminderListingView()
+                            .environmentObject(navigationManager)
                     }
                 }
                 .navigationDestination(for: SettingsViewNavigation.self) { destination in

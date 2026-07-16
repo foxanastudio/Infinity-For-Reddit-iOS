@@ -94,13 +94,4 @@ struct SetReminderView: View {
             dismiss()
         }
     }
-    
-    var formattedReminderTime: String {
-        let dateFormatter = DateFormatter()
-        
-        dateFormatter.dateStyle = .medium
-        dateFormatter.timeStyle = .medium
-        
-        return dateFormatter.string(from: reminderTime)
-    }
 }

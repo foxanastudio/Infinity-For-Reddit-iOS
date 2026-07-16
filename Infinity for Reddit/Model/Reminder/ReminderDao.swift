@@ -20,4 +20,14 @@ struct ReminderDao {
             try reminder.insert(db, onConflict: .replace)
         }
     }
+    
+    func getAllReminders() async throws -> [Reminder] {
+        try await dbPool.read { db in
+            try Reminder.fetchAll(db, sql: """
+                SELECT * 
+                FROM reminders
+                ORDER BY reminder_time
+                """)
+        }
+    }
 }

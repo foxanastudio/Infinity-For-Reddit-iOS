@@ -76,7 +76,7 @@ struct PostOptionsSheet: View {
                         }
                     }
                     
-                    IconTextButton(startIconUrl: "arrow.2.squarepath", text: "Set Reminder") {
+                    IconTextButton(startIconUrl: "bell", text: "Set Reminder") {
                         dismiss()
                         onSetReminder()
                     }
