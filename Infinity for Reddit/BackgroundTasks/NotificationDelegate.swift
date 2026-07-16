@@ -59,6 +59,17 @@ class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
         
         let userInfo = response.notification.request.content.userInfo
         
+        if let postId = userInfo[AppDeepLink.postId] as? String,
+           let commentId = userInfo[AppDeepLink.commentId] as? String {
+            if let url = AppDeepLink.getReminderURL(postId: postId, commentId: commentId) {
+                Task { @MainActor in
+                    UIApplication.shared.open(url)
+                }
+            }
+            completion()
+            return
+        }
+        
         guard let accountName = userInfo[AppDeepLink.accountNameKey] as? String,
               let kind = userInfo[AppDeepLink.kindKey] as? String else {
             completion()

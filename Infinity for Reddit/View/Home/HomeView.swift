@@ -354,6 +354,18 @@ struct HomeView: View {
                 currentNavigationManager.openLink(link)
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .reminderDeepLink)) { notification in
+            if let postId = (notification.userInfo?[AppDeepLink.postId] as? String),
+               let commentId = (notification.userInfo?[AppDeepLink.commentId] as? String) {
+                currentNavigationManager.append(
+                    AppNavigation.postDetails(
+                        postDetailsInput: .postAndCommentId(
+                            postId: postId, commentId: commentId.isEmpty ? nil : commentId),
+                        videoPlaybackTime: 0
+                    )
+                )
+            }
+        }
         .onReceive(NotificationCenter.default.publisher(for: .notificationToggleChanged)) { _ in
             if NotificationUserDefaultsUtils.enableNotification {
                 printInDebugOnly("Foreground refresh enabled")

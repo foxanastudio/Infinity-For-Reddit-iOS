@@ -27,9 +27,10 @@ class ReminderManager {
     
     private func scheculeReminder(reminder: Reminder) {
         let content = UNMutableNotificationContent()
-        content.title = "Reminder"
+        content.title = "\(reminder.commentId.isEmpty ? "Post" : "Comment") Reminder"
         content.body = reminder.content
         content.sound = .default
+        content.userInfo = [AppDeepLink.postId: reminder.postId, AppDeepLink.commentId: reminder.commentId]
 
         let triggerDate = Date(timeIntervalSince1970: TimeInterval(reminder.reminderTime))
 
@@ -60,6 +61,6 @@ class ReminderManager {
     }
     
     private func getIdentifier(reminder: Reminder) -> String {
-        return "\(reminder.postId)-\(reminder.commentId)-\(reminder.reminderTime)"
+        return "\(reminder.postId)-\(reminder.commentId)-\(reminder.createdAt)-\(reminder.reminderTime)"
     }
 }

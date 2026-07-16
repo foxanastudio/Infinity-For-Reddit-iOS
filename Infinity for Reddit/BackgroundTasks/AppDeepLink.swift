@@ -10,14 +10,18 @@ struct AppDeepLink {
     static let scheme = "infinity"
     static let appStoreEventScheme = "infinityevent"
     static let redirectScheme = "infinityredirect"
+    static let reminderScheme = "infinityreminder"
     static let inboxHost = "inbox"
     static let linkHost = "linkToView"
+    static let reminderHost = "postOrCommentToRemind"
     static let accountNameKey = "accountName"
     static let fullnameKey = "fullname"
     static let contextKey = "context"
     static let kindKey = "kind"
     static let viewMessageKey = "viewMessage"
     static let urlStringKey = "urlString"
+    static let postId = "postId"
+    static let commentId = "commentId"
     
     static func getInboxURL(account: String, viewMessage: Bool, fullname: String?) -> URL? {
         var components = URLComponents()
@@ -47,6 +51,18 @@ struct AppDeepLink {
         return components.url
     }
     
+    static func getReminderURL(postId: String, commentId: String) -> URL? {
+        var components = URLComponents()
+        components.scheme = reminderScheme
+        components.host = reminderHost
+        let items: [URLQueryItem] = [
+            URLQueryItem(name: self.postId, value: postId),
+            URLQueryItem(name: self.commentId, value: commentId)
+        ]
+        components.queryItems = items
+        return components.url
+    }
+    
     static func getAppDeepLinkType(_ url: URL) -> AppDeepLinkType? {
         guard let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
             return nil
@@ -61,6 +77,10 @@ struct AppDeepLink {
                 return .appStoreEvent(eventName: eventName)
             } else if url.scheme == redirectScheme, let link = query("url") {
                 return .redirect(urlString: link)
+            } else if url.scheme == reminderScheme,
+                      let postId = query(self.postId),
+                      let commentId = query(self.commentId) {
+                return .reminder(postId: postId, commentId: commentId)
             }
             return nil
         }
@@ -97,4 +117,5 @@ enum AppDeepLinkType {
     case context(account: String, context: String, fullname: String?)
     case appStoreEvent(eventName: String)
     case redirect(urlString: String)
+    case reminder(postId: String, commentId: String)
 }

@@ -38,6 +38,16 @@
 				<string>infinityredirect</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.foxanastudio.infinity</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>infinityreminder</string>
+			</array>
+		</dict>
 	</array>
 	<key>UIAppFonts</key>
 	<array>

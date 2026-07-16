@@ -99,10 +99,17 @@ struct Infinity: App {
                                 NotificationCenter.default.post(name: .appStoreEventDeepLink, object: nil)
                                 break
                             case .redirect(let urlString):
-                                var userInfo: [String: Any] = [
+                                let userInfo: [String: Any] = [
                                     AppDeepLink.urlStringKey: urlString
                                 ]
                                 NotificationCenter.default.post(name: .redirectDeepLink, object: nil, userInfo: userInfo)
+                                break
+                            case .reminder(postId: let postId, commentId: let commentId):
+                                let userInfo: [String: Any] = [
+                                    AppDeepLink.postId: postId,
+                                    AppDeepLink.commentId: commentId
+                                ]
+                                NotificationCenter.default.post(name: .reminderDeepLink, object: nil, userInfo: userInfo)
                                 break
                             }
                         }
