@@ -43,10 +43,10 @@ struct ReminderDao {
         .eraseToAnyPublisher()
     }
     
-    func deleteReminder(_ reminder: Reminder) async throws {
+    func deleteReminder(postId: String, commentId: String, reminderTime: Int) async throws {
         try await dbPool.write { db in
             try db.execute(sql: "DELETE FROM reminders WHERE post_id = ? AND comment_id = ? AND reminder_time = ?",
-                           arguments: [reminder.postId, reminder.commentId, reminder.reminderTime])
+                           arguments: [postId, commentId, reminderTime])
         }
     }
 }

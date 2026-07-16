@@ -60,8 +60,11 @@ class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
         let userInfo = response.notification.request.content.userInfo
         
         if let postId = userInfo[AppDeepLink.postId] as? String,
-           let commentId = userInfo[AppDeepLink.commentId] as? String {
+           let commentId = userInfo[AppDeepLink.commentId] as? String,
+           let reminderTime = userInfo[AppDeepLink.reminderTime] as? Int {
             if let url = AppDeepLink.getReminderURL(postId: postId, commentId: commentId) {
+                ReminderManager.shared.deleteReminder(postId: postId, commentId: commentId, reminderTime: reminderTime)
+                
                 Task { @MainActor in
                     UIApplication.shared.open(url)
                 }

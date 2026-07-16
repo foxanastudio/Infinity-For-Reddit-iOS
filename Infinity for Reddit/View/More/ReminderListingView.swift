@@ -51,6 +51,7 @@ struct ReminderListingView: View {
                     }
                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                         Button(role: .destructive) {
+                            ReminderManager.shared.cancelReminder(reminder: reminder)
                             Task {
                                 await reminderListingViewModel.deleteReminder(reminder)
                             }

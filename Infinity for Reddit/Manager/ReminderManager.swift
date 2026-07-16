@@ -30,7 +30,11 @@ class ReminderManager {
         content.title = "\(reminder.commentId.isEmpty ? "Post" : "Comment") Reminder"
         content.body = reminder.content
         content.sound = .default
-        content.userInfo = [AppDeepLink.postId: reminder.postId, AppDeepLink.commentId: reminder.commentId]
+        content.userInfo = [
+            AppDeepLink.postId: reminder.postId,
+            AppDeepLink.commentId: reminder.commentId,
+            AppDeepLink.reminderTime: reminder.reminderTime
+        ]
 
         let triggerDate = Date(timeIntervalSince1970: TimeInterval(reminder.reminderTime))
 
@@ -58,6 +62,12 @@ class ReminderManager {
             .removePendingNotificationRequests(
                 withIdentifiers: [getIdentifier(reminder: reminder)]
             )
+    }
+    
+    func deleteReminder(postId: String, commentId: String, reminderTime: Int) {
+        Task {
+            try? await reminderDao.deleteReminder(postId: postId, commentId: commentId, reminderTime: reminderTime)
+        }
     }
     
     private func getIdentifier(reminder: Reminder) -> String {

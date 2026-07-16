@@ -23,6 +23,6 @@ class ReminderListingRepository: ReminderListingRepositoryProtocol {
     }
     
     func deleteReminder(_ reminder: Reminder) async throws {
-        try await reminderDao.deleteReminder(reminder)
+        try await reminderDao.deleteReminder(postId: reminder.postId, commentId: reminder.commentId, reminderTime: reminder.reminderTime)
     }
 }

@@ -22,6 +22,7 @@ struct AppDeepLink {
     static let urlStringKey = "urlString"
     static let postId = "postId"
     static let commentId = "commentId"
+    static let reminderTime = "reminderTime"
     
     static func getInboxURL(account: String, viewMessage: Bool, fullname: String?) -> URL? {
         var components = URLComponents()
