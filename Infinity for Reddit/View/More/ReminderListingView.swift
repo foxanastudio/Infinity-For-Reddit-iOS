@@ -49,15 +49,24 @@ struct ReminderListingView: View {
                             )
                         )
                     }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            Task {
+                                await reminderListingViewModel.deleteReminder(reminder)
+                            }
+                        } label: {
+                            Text("Delete")
+                                .primaryText()
+                                .foregroundStyle(.white)
+                        }
+                        .tint(.red)
+                    }
                 }
             }
             .themedList()
         }
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Reminders")
-        .task {
-            await reminderListingViewModel.fetchReminders()
-        }
         .showErrorUsingSnackbar(reminderListingViewModel.$error)
     }
     

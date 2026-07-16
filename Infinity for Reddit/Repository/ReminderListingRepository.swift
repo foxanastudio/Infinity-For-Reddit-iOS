@@ -6,6 +6,7 @@
 //
 
 import GRDB
+import Combine
 
 class ReminderListingRepository: ReminderListingRepositoryProtocol {
     private let reminderDao: ReminderDao
@@ -17,7 +18,11 @@ class ReminderListingRepository: ReminderListingRepositoryProtocol {
         self.reminderDao = ReminderDao(dbPool: resolvedDBPool)
     }
     
-    func getReminders() async throws -> [Reminder] {
-        return try await reminderDao.getAllReminders()
+    func getRemindersPublisher() -> AnyPublisher<[Reminder], Error> {
+        return reminderDao.getAllRemindersPublisher()
+    }
+    
+    func deleteReminder(_ reminder: Reminder) async throws {
+        try await reminderDao.deleteReminder(reminder)
     }
 }
