@@ -463,6 +463,9 @@ struct PostListingView: View {
                     onDownloadAllGalleryMedia: {
                         postListingViewModel.downloadAllGalleryMedia(post: postForPostOptionsSheet)
                     },
+                    onSetReminder: {
+                        navigationManager.append(AppNavigation.setReminder(post: postForPostOptionsSheet))
+                    },
                     onReport: {
                         if AccountViewModel.shared.account.isAnonymous() {
                             navigationManager.openLink("https://www.reddit.com/report")

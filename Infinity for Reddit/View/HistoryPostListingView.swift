@@ -298,6 +298,9 @@ struct HistoryPostListingView: View {
                     onDownloadAllGalleryMedia: {
                         historyPostListingViewModel.downloadAllGalleryMedia(post: postForPostOptionsSheet)
                     },
+                    onSetReminder: {
+                        
+                    },
                     onReport: {
                         if AccountViewModel.shared.account.isAnonymous() {
                             navigationManager.openLink("https://www.reddit.com/report")

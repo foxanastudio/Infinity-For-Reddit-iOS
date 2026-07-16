@@ -797,6 +797,9 @@ struct PostDetailsView: View {
                     onDownloadAllGalleryMedia: {
                         postDetailsViewModel.downloadAllGalleryMedia()
                     },
+                    onSetReminder: {
+                        
+                    },
                     onReport: {
                         if AccountViewModel.shared.account.isAnonymous() {
                             navigationManager.openLink("https://www.reddit.com/report")

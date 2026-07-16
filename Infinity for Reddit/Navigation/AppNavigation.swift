@@ -36,4 +36,5 @@ enum AppNavigation: Hashable {
     case report(subredditName: String, thingFullname: String)
     case wiki(subredditName: String, wikiPath: String = "index")
     case appStoreEvent
+    case setReminder(post: Post, comment: Comment? = nil)
 }

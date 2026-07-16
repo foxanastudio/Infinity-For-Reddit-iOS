@@ -162,6 +162,9 @@ struct CustomNavigationStack<Content: View>: View {
                     case .appStoreEvent:
                         AppStoreEventView()
                             .environmentObject(navigationManager)
+                    case .setReminder(let post, let comment):
+                        SetReminderView(post: post, comment: comment)
+                            .environmentObject(navigationManager)
                     }
                 }
                 .navigationDestination(for: MoreViewNavigation.self) { destination in
