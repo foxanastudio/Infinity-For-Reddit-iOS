@@ -325,7 +325,11 @@ public class PostListingViewModel: ObservableObject {
             }
         } catch {
             await MainActor.run {
-                self.postLoadingError = error
+                if error.asAFError?.responseCode == 403 && AccountViewModel.shared.account.isAnonymous() {
+                    self.postLoadingError = APIError.anonymous403Error
+                } else {
+                    self.postLoadingError = error
+                }
                 
                 if isRefreshWithContinuation {
                     finishPullToRefresh()

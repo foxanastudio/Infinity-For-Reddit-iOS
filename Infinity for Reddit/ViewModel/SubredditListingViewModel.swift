@@ -158,7 +158,11 @@ public class SubredditListingViewModel: ObservableObject {
             
             self.lastLoadedSortType = self.sortType
         } catch {
-            self.error = error
+            if error.asAFError?.responseCode == 403 && AccountViewModel.shared.account.isAnonymous() {
+                self.error = APIError.anonymous403Error
+            } else {
+                self.error = error
+            }
             
             if isRefreshWithContinuation {
                 finishPullToRefresh()

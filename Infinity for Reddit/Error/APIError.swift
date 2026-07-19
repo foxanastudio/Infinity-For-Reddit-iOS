@@ -11,6 +11,7 @@ enum APIError: LocalizedError {
     case networkError(String)
     case jsonDecodingError(String)
     case invalidResponse(String)
+    case anonymous403Error
     
     var errorDescription: String? {
         switch self {
@@ -20,6 +21,8 @@ enum APIError: LocalizedError {
             return "Failed to decode the response: \(message)"
         case .invalidResponse(let message):
             return message
+        case .anonymous403Error:
+            return "Due to platform limitations, content cannot be loaded right now.\n\nYou can try again shortly or subscribe for a more consistent experience."
         }
     }
 }
