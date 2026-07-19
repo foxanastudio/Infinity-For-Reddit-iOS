@@ -29,6 +29,7 @@ public class AccountViewModel: ObservableObject {
     @Published var inboxNavigationTarget: InboxNavigationTarget?
     @Published var pendingInboxTabAfterNotificationClicked: Bool = false
     @Published var pendingContextAfterNotificationClicked: String?
+    @Published var pendingOpenModMailAfterNotificationClicked: Bool = false
     @Published var pendingInboxFullname: String?
     
     @Published var loginFetchAccountDataTask: Task<Void, Never>?

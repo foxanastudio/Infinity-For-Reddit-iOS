@@ -17,6 +17,7 @@ class PullNotificationBackgroundTaskManager {
     
     private let accountDao: AccountDao
     private let inboxListingRepository: InboxListingRepositoryProtocol
+    private let modMailListingRepository: ModMailListingRepositoryProtocol
     
     private init() {
         guard let resolvedDatabasePool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
@@ -24,6 +25,7 @@ class PullNotificationBackgroundTaskManager {
         }
         self.accountDao = AccountDao(dbPool: resolvedDatabasePool)
         self.inboxListingRepository = InboxListingRepository(sessionName: "plain")
+        self.modMailListingRepository = ModMailListingRepository(sessionName: "plain")
     }
     
     func registerAndScheduleBackgroundTaskIfNecessary() {
@@ -93,7 +95,7 @@ class PullNotificationBackgroundTaskManager {
         var successful = true
         
         let lastTime = UserDefaults.notification.integer(forKey: UserDefaultsUtils.PULL_NOTIFICATION_TIME_KEY)
-        var newTime = lastTime
+        let lastModMailTime = UserDefaults.notification.integer(forKey: UserDefaultsUtils.PULL_MODMAIL_NOTIFICATION_TIME_KEY)
         
         for account in accounts {
             let perAccountAccessTokenInterceptor = await RedditAccessTokenProvider.shared.getRedditPerAccountInterceptor(account: account)
@@ -113,8 +115,6 @@ class PullNotificationBackgroundTaskManager {
                 guard inbox.createdUtc > lastTime else {
                     continue
                 }
-                
-                newTime = max(newTime, Int(inbox.createdUtc))
                 
                 let (title, subtitle) = getTitleAndSubtitle(inbox)
                 
@@ -141,10 +141,46 @@ class PullNotificationBackgroundTaskManager {
                     userInfo: info
                 )
             }
+
+            if account.isMod {
+                guard let modMailListing = try? await fetchModMailListing(interceptor: perAccountAccessTokenInterceptor) else {
+                    successful = false
+                    continue
+                }
+
+                let conversations = modMailListing.orderedConversations
+                    .sorted { $0.lastUpdatedUtc > $1.lastUpdatedUtc }
+                    .prefix(20)
+
+                for conversation in conversations {
+                    guard conversation.lastUnread != nil,
+                          conversation.lastUpdatedUtc > lastModMailTime else {
+                        continue
+                    }
+
+                    let (title, subtitle) = getTitleAndSubtitle(conversation)
+                    let body = modMailListing.latestMessagePreview(for: conversation)
+                    let notificationId = "com.foxanastudio.infinity-modmail-\(account.username)-\(conversation.id ?? Utils.randomString())"
+                    let threadId = "modmail.\(account.username.lowercased())"
+
+                    try? await NotificationDelegate.shared.postNotification(
+                        notificationId: notificationId,
+                        threadId: threadId,
+                        title: title,
+                        subtitle: subtitle,
+                        body: body.isEmpty ? "You've got a new mod mail message" : body,
+                        userInfo: [
+                            AppDeepLink.accountNameKey: account.username,
+                            AppDeepLink.kindKey: AppDeepLink.modMailHost
+                        ]
+                    )
+                }
+            }
         }
         
         if successful {
             UserDefaults.notification.set(Date().timeIntervalSince1970, forKey: UserDefaultsUtils.PULL_NOTIFICATION_TIME_KEY)
+            UserDefaults.notification.set(Date().timeIntervalSince1970, forKey: UserDefaultsUtils.PULL_MODMAIL_NOTIFICATION_TIME_KEY)
         }
         return successful
     }
@@ -154,6 +190,17 @@ class PullNotificationBackgroundTaskManager {
             messageWhere: .unread,
             pathComponents: [:],
             queries: ["limit": "20"],
+            interceptor: interceptor
+        )
+    }
+
+    private func fetchModMailListing(interceptor: RequestInterceptor? = nil) async throws -> ModMailListing {
+        return try await modMailListingRepository.fetchModMailListing(
+            queries: [
+                "limit": "20",
+                "sort": "recent",
+                "state": "all"
+            ],
             interceptor: interceptor
         )
     }
@@ -176,5 +223,12 @@ class PullNotificationBackgroundTaskManager {
         case .unknown:
             return (!inbox.linkTitle.isEmpty ? inbox.linkTitle : fallback, "New notification")
         }
+    }
+
+    private func getTitleAndSubtitle(_ conversation: ModMailConversation) -> (title: String, subtitle: String) {
+        let subject = conversation.subject?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let title = subject.isEmpty ? "r/\(conversation.owner.displayName ?? "-")" : subject
+        let subtitle = "New mod mail r/\(conversation.owner.displayName ?? "-")"
+        return (title, subtitle)
     }
 }

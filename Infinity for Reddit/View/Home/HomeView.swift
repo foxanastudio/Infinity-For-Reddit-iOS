@@ -237,6 +237,9 @@ struct HomeView: View {
             if accountViewModel.pendingInboxTabAfterNotificationClicked {
                 selectedTab = .inbox
                 accountViewModel.pendingInboxTabAfterNotificationClicked = false
+            } else if accountViewModel.pendingOpenModMailAfterNotificationClicked {
+                openModMailListing()
+                accountViewModel.pendingOpenModMailAfterNotificationClicked = false
             } else if let context = accountViewModel.pendingContextAfterNotificationClicked {
                 currentNavigationManager.openLink(context)
                 accountViewModel.pendingContextAfterNotificationClicked = nil
@@ -332,6 +335,23 @@ struct HomeView: View {
                 }
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .modMailDeepLink)) { note in
+            let accountName = (note.userInfo?[AppDeepLink.accountNameKey] as? String) ?? ""
+
+            Task {
+                if !accountName.isEmpty {
+                    if !(await accountViewModel.switchToAccountIfNeeded(accountName)) {
+                        await MainActor.run {
+                            openModMailListing()
+                        }
+                    } else {
+                        await MainActor.run {
+                            accountViewModel.pendingOpenModMailAfterNotificationClicked = true
+                        }
+                    }
+                }
+            }
+        }
         .onReceive(NotificationCenter.default.publisher(for: .appStoreEventDeepLink)) { _ in
             currentNavigationManager.append(AppNavigation.appStoreEvent)
         }
@@ -397,6 +417,13 @@ struct HomeView: View {
         case .more:
             return tab5NavigationManager
         }
+    }
+    
+    private func openModMailListing() {
+        selectedTab = .more
+        tab5NavigationManager.path = NavigationPath()
+        tab5NavigationManager.viewShouldHideNavigationBarOnScroll.removeAll()
+        tab5NavigationManager.append(MoreViewNavigation.modmail)
     }
     
     private var currentSnackbarManager: SnackbarManager {

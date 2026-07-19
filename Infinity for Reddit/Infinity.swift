@@ -93,6 +93,12 @@ struct Infinity: App {
                                     userInfo[AppDeepLink.fullnameKey] = fullname
                                 }
                                 NotificationCenter.default.post(name: .contextDeepLink, object: nil, userInfo: userInfo)
+                            case .modMail(let account):
+                                NotificationCenter.default.post(
+                                    name: .modMailDeepLink,
+                                    object: nil,
+                                    userInfo: [AppDeepLink.accountNameKey: account]
+                                )
                             case .appStoreEvent(let eventName):
                                 NotificationCenter.default.post(name: .appStoreEventDeepLink, object: nil)
                             }

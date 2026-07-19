@@ -10,6 +10,7 @@ struct AppDeepLink {
     static let scheme = "infinity"
     static let appStoreEventScheme = "infinityevent"
     static let inboxHost = "inbox"
+    static let modMailHost = "modmail"
     static let linkHost = "linkToView"
     static let accountNameKey = "accountName"
     static let fullnameKey = "fullname"
@@ -42,6 +43,16 @@ struct AppDeepLink {
             items.append(URLQueryItem(name: fullnameKey, value: fullname))
         }
         components.queryItems = items
+        return components.url
+    }
+
+    static func getModMailURL(account: String) -> URL? {
+        var components = URLComponents()
+        components.scheme = scheme
+        components.host = modMailHost
+        components.queryItems = [
+            URLQueryItem(name: accountNameKey, value: account)
+        ]
         return components.url
     }
     
@@ -80,6 +91,11 @@ struct AppDeepLink {
                 context: context,
                 fullname: query(fullnameKey)
             )
+        case modMailHost:
+            guard let account = query(accountNameKey) else {
+                break
+            }
+            return .modMail(account: account)
         default:
             break
         }
@@ -90,5 +106,6 @@ struct AppDeepLink {
 enum AppDeepLinkType {
     case inbox(account: String, viewMessage: Bool, fullname: String?)
     case context(account: String, context: String, fullname: String?)
+    case modMail(account: String)
     case appStoreEvent(eventName: String)
 }

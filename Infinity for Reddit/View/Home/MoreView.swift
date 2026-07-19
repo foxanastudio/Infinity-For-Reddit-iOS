@@ -129,6 +129,17 @@ struct MoreView: View {
                     .listPlainItemNoInsets()
                     .limitedWidth()
                     
+                    if !accountViewModel.account.isAnonymous() {
+                        SimpleTouchItemRow(text: "Pull Notifications Now", icon: "bell.badge") {
+                            Task {
+                                let success = await PullNotificationBackgroundTaskManager.shared.pullNotificationsForAllAccounts()
+                                printInDebugOnly("Manual pull notifications success=\(success)")
+                            }
+                        }
+                        .listPlainItemNoInsets()
+                        .limitedWidth()
+                    }
+                    
                     SimpleTouchItemRow(text: "Test", icon: "testtube.2") {
                         navigationManager.append(MoreViewNavigation.test)
                     }
