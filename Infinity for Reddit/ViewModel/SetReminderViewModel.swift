@@ -25,10 +25,13 @@ class SetReminderViewModel: ObservableObject {
     }
     
     enum SetReminderError: LocalizedError {
+        case invalidTime
         case saveToDatabaseFailed
         
         var errorDescription: String? {
             switch self {
+            case .invalidTime:
+                return "Make sure the reminder time is in the future."
             case .saveToDatabaseFailed:
                 return "Cannot save this reminder to database. Please try again."
             }
@@ -43,6 +46,11 @@ class SetReminderViewModel: ObservableObject {
     
     func setReminder(reminderTime: Date) {
         guard !self.isSettingReminder else {
+            return
+        }
+        
+        guard reminderTime.timeIntervalSince1970 > TimeInterval(Utils.getCurrentTimeEpochInSecond()) else {
+            self.error = SetReminderError.invalidTime
             return
         }
         

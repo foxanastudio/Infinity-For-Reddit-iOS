@@ -36,6 +36,7 @@ struct SetReminderView: View {
                 VStack(spacing: 16) {
                     RowText(setReminderViewModel.contentText)
                         .primaryText()
+                        .fontWeight(.bold)
                         .padding(.horizontal, 16)
                     
                     CustomDivider()
