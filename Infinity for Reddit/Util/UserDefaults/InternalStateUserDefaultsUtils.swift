@@ -20,4 +20,12 @@ class InternalStateUserDefaultsUtils {
     static func setCurrentBuildNumber() {
         UserDefaults.internalState?.set(Bundle.main.buildNumber, forKey: currentBuildNumberKey)
     }
+    
+    static let reminderCheckTimeInSecondsKey = "reminder_sync_time"
+    static var reminderCheckTimeInSeconds: Int {
+        return UserDefaults.internalState?.integer(forKey: reminderCheckTimeInSecondsKey, 0) ?? 0
+    }
+    static func setReminderCheckTimeInSecondsNow() {
+        UserDefaults.internalState?.set(Utils.getCurrentTimeEpochInSecond(), forKey: reminderCheckTimeInSecondsKey)
+    }
 }

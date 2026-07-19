@@ -31,6 +31,17 @@ struct ReminderDao {
         }
     }
     
+    func getAllRemindersForChecking() async throws -> [Reminder] {
+        try await dbPool.read { db in
+            try Reminder.fetchAll(db, sql: """
+                SELECT * 
+                FROM reminders
+                ORDER BY reminder_time
+                LIMIT 50
+                """)
+        }
+    }
+    
     func getAllRemindersPublisher() -> AnyPublisher<[Reminder], Error> {
         ValueObservation.tracking { db in
             try Reminder.fetchAll(db, sql: """

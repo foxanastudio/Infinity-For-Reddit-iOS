@@ -22,10 +22,10 @@ class ReminderManager {
     
     func setReminder(reminder: Reminder) async throws {
         try await reminderDao.insert(reminder: reminder)
-        scheculeReminder(reminder: reminder)
+        scheduleReminder(reminder: reminder)
     }
     
-    private func scheculeReminder(reminder: Reminder) {
+    private func scheduleReminder(reminder: Reminder) {
         let content = UNMutableNotificationContent()
         content.title = "\(reminder.commentId.isEmpty ? "Post" : "Comment") Reminder"
         content.body = reminder.content
@@ -55,6 +55,32 @@ class ReminderManager {
         )
 
         UNUserNotificationCenter.current().add(request)
+    }
+    
+    func checkRemindersIfNecessary() {
+        // 1 hour
+        guard InternalStateUserDefaultsUtils.reminderCheckTimeInSeconds < Utils.getCurrentTimeEpochInSecond() - 3600 else {
+            return
+        }
+        
+        InternalStateUserDefaultsUtils.setReminderCheckTimeInSecondsNow()
+        
+        Task {
+            var requestIds = Set(await UNUserNotificationCenter.current().pendingNotificationRequests().map(\.identifier))
+            
+            let remindersInDatabase = try await reminderDao.getAllRemindersForChecking()
+            for reminder in remindersInDatabase {
+                guard requestIds.count < 50 else {
+                    break
+                }
+                
+                let reminderId = getIdentifier(reminder: reminder)
+                if !requestIds.contains(reminderId) {
+                    self.scheduleReminder(reminder: reminder)
+                    requestIds.insert(reminderId)
+                }
+            }
+        }
     }
     
     func cancelReminder(reminder: Reminder) {

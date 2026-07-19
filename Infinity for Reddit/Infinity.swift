@@ -150,6 +150,8 @@ struct Infinity: App {
                         }
                     }
                 }
+                
+                ReminderManager.shared.checkRemindersIfNecessary()
             }
         }
         
