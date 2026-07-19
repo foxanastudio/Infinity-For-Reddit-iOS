@@ -31,14 +31,15 @@ struct ReminderDao {
         }
     }
     
-    func getAllRemindersForChecking() async throws -> [Reminder] {
+    func getAllRemindersAvailableForScheduling(currentTimeInSeconds: Int) async throws -> [Reminder] {
         try await dbPool.read { db in
             try Reminder.fetchAll(db, sql: """
                 SELECT * 
                 FROM reminders
+                WHERE reminder_time > ?
                 ORDER BY reminder_time
-                LIMIT 50
-                """)
+                LIMIT 64
+                """, arguments: [currentTimeInSeconds])
         }
     }
     

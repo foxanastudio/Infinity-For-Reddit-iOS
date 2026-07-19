@@ -22,7 +22,13 @@ class ReminderManager {
     
     func setReminder(reminder: Reminder) async throws {
         try await reminderDao.insert(reminder: reminder)
-        scheduleReminder(reminder: reminder)
+        
+        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+        
+        let remindersInDatabase = try await reminderDao.getAllRemindersAvailableForScheduling(currentTimeInSeconds: Utils.getCurrentTimeEpochInSecond())
+        for reminder in remindersInDatabase {
+            scheduleReminder(reminder: reminder)
+        }
     }
     
     private func scheduleReminder(reminder: Reminder) {
@@ -68,9 +74,9 @@ class ReminderManager {
         Task {
             var requestIds = Set(await UNUserNotificationCenter.current().pendingNotificationRequests().map(\.identifier))
             
-            let remindersInDatabase = try await reminderDao.getAllRemindersForChecking()
+            let remindersInDatabase = try await reminderDao.getAllRemindersAvailableForScheduling(currentTimeInSeconds: Utils.getCurrentTimeEpochInSecond())
             for reminder in remindersInDatabase {
-                guard requestIds.count < 50 else {
+                guard requestIds.count < 64 else {
                     break
                 }
                 
