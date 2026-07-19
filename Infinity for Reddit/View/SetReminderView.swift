@@ -17,7 +17,7 @@ struct SetReminderView: View {
     
     @State private var reminderTime = Date(timeInterval: TimeInterval(24 * 60 * 60), since: Date())
     
-    init(post: Post, comment: Comment?) {
+    init(post: Post?, comment: Comment?) {
         _setReminderViewModel = StateObject(wrappedValue: SetReminderViewModel(post: post, comment: comment))
     }
     

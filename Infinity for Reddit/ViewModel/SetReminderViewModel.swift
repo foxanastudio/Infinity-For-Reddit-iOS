@@ -14,14 +14,14 @@ class SetReminderViewModel: ObservableObject {
     @Published var isSettingReminder: Bool = false
     @Published var reminderSet: Bool = false
     
-    let post: Post
+    let post: Post?
     let comment: Comment?
     var contentText: String {
         if let commentBody = comment?.body {
             return commentBody.substring(to: 200)
         }
         
-        return post.title
+        return post?.title ?? "Can't get content text."
     }
     
     enum SetReminderError: LocalizedError {
@@ -35,7 +35,7 @@ class SetReminderViewModel: ObservableObject {
         }
     }
     
-    init(post: Post, comment: Comment?) {
+    init(post: Post?, comment: Comment?) {
         self.reminderTime = Utils.getCurrentTimeEpochInSecond()
         self.post = post
         self.comment = comment
@@ -50,7 +50,7 @@ class SetReminderViewModel: ObservableObject {
         
         let reminder = Reminder(
             accountName: AccountViewModel.shared.account.username,
-            postId: post.id,
+            postId: post?.id ?? comment?.linkId ?? "",
             commentId: comment?.id ?? "",
             content: contentText,
             createdAt: Utils.getCurrentTimeEpochInSecond(),

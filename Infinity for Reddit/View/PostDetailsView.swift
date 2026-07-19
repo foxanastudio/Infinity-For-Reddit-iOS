@@ -248,6 +248,9 @@ struct PostDetailsView: View {
                                                     onAddToCommentFilter: {
                                                         navigationManager.append(SettingsViewNavigation.commentFilter(commentToBeAdded: comment))
                                                     },
+                                                    onSetReminder: {
+                                                        navigationManager.append(AppNavigation.setReminder(post: post, comment: comment))
+                                                    },
                                                     onModerate: {
                                                         commentToBeModerated = comment
                                                         showCommentModerationSheet = true
