@@ -58,7 +58,7 @@ class SetReminderViewModel: ObservableObject {
         
         let reminder = Reminder(
             accountName: AccountViewModel.shared.account.username,
-            postId: post?.id ?? comment?.linkId ?? "",
+            postId: post?.id ?? comment?.linkId?.substring(from: 3) ?? "",
             commentId: comment?.id ?? "",
             content: contentText,
             createdAt: Utils.getCurrentTimeEpochInSecond(),
