@@ -9,7 +9,6 @@ import Foundation
 
 @MainActor
 public class ModMailListingViewModel: ObservableObject {
-    // MARK: - Properties
     @Published var conversations: [ModMailConversation] = []
     @Published var loadModMailFlag: Bool = false
     @Published var isInitialLoad: Bool = true
@@ -171,20 +170,7 @@ public class ModMailListingViewModel: ObservableObject {
     }
     
     func latestMessagePreview(for conversation: ModMailConversation) -> String {
-        for objectId in conversation.objIds.reversed() {
-            guard objectId.key == "messages", let message = messages[objectId.id] else {
-                continue
-            }
-            
-            let bodyMarkdown = message.bodyMarkdown.trimmingCharacters(in: .whitespacesAndNewlines)
-            if !bodyMarkdown.isEmpty {
-                return bodyMarkdown
-            }
-            
-            return message.body.trimmingCharacters(in: .whitespacesAndNewlines)
-        }
-        
-        return ""
+        ModMailMessagePreview.latest(for: conversation, messages: messages)
     }
     
     func applyConversationUpdate (_ detail: ModMailConversationDetail) {

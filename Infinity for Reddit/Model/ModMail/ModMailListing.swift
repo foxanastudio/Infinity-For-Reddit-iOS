@@ -46,6 +46,12 @@ public class ModMailListing: NSObject {
     }
     
     func latestMessagePreview(for conversation: ModMailConversation) -> String {
+        ModMailMessagePreview.latest(for: conversation, messages: messages)
+    }
+}
+
+enum ModMailMessagePreview {
+    static func latest(for conversation: ModMailConversation, messages: [String: ModMailMessage]) -> String {
         for objectId in conversation.objIds.reversed() {
             guard objectId.key == "messages", let message = messages[objectId.id] else {
                 continue
@@ -156,7 +162,7 @@ public class ModMailOwner: NSObject {
         type = json["type"].stringValue
         displayName = json["displayName"].stringValue
     }
-
+    
     init(localId: String, type: String, displayName: String) {
         id = localId
         self.type = type
@@ -190,7 +196,7 @@ public class ModMailAuthor: NSObject {
         isMod = json["isMod"].boolValue
         isOp = json["isOp"].boolValue
     }
-
+    
     init(localName: String, isHidden: Bool) {
         id = 0
         name = localName
@@ -226,7 +232,7 @@ public class ModMailMessage: NSObject {
         isInternal = json["isInternal"].boolValue
         author = try ModMailAuthor(fromJson: json["author"])
     }
-
+    
     init(localId: String, body: String, authorName: String, isInternal: Bool, isAuthorHidden: Bool) {
         id = localId
         self.body = body
@@ -236,13 +242,13 @@ public class ModMailMessage: NSObject {
         self.isInternal = isInternal
         author = ModMailAuthor(localName: authorName, isHidden: isAuthorHidden)
     }
-
+    
     var displayBody: String {
         let bodyMarkdown = bodyMarkdown.trimmingCharacters(in: .whitespacesAndNewlines)
         if !bodyMarkdown.isEmpty {
             return bodyMarkdown
         }
-
+        
         return body.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
@@ -259,7 +265,7 @@ public class ModMailObjectId: NSObject {
         id = json["id"].stringValue
         key = json["key"].stringValue
     }
-
+    
     init(localMessageId: String) {
         id = localMessageId
         key = "messages"

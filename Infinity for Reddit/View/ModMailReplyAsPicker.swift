@@ -9,43 +9,23 @@ import SwiftUI
 
 struct ModMailReplyAsPicker: View {
     @Binding var selectedReplyAsOption: ModMailReplyAsOption
-
+    
     let subredditName: String
     let currentAccount: Account
-
+    
     var body: some View {
         Menu {
-            Button {
-                selectedReplyAsOption = .subreddit
-            } label: {
-                replyAsMenuRow(
-                    title: ModMailReplyAsOption.subreddit.title(
-                        currentUsername: currentAccount.username,
-                        subredditName: subredditName
+            ForEach(ModMailReplyAsOption.allCases, id: \.self) { option in
+                Button {
+                    selectedReplyAsOption = option
+                } label: {
+                    replyAsMenuRow(
+                        title: option.title(
+                            currentUsername: currentAccount.username,
+                            subredditName: subredditName
+                        )
                     )
-                )
-            }
-
-            Button {
-                selectedReplyAsOption = .user
-            } label: {
-                replyAsMenuRow(
-                    title: ModMailReplyAsOption.user.title(
-                        currentUsername: currentAccount.username,
-                        subredditName: subredditName
-                    )
-                )
-            }
-
-            Button {
-                selectedReplyAsOption = .modsOnly
-            } label: {
-                replyAsMenuRow(
-                    title: ModMailReplyAsOption.modsOnly.title(
-                        currentUsername: currentAccount.username,
-                        subredditName: subredditName
-                    )
-                )
+                }
             }
         } label: {
             HStack(spacing: 12) {
@@ -56,7 +36,7 @@ struct ModMailReplyAsPicker: View {
                 .primaryText()
                 .lineLimit(1)
                 .padding(.trailing, 2)
-
+                
                 SwiftUI.Image(systemName: "chevron.up.chevron.down")
                     .primaryIcon()
                     .font(.system(size: 14))
@@ -66,14 +46,14 @@ struct ModMailReplyAsPicker: View {
             .padding(.vertical, 6)
         }
     }
-
+    
     private func replyAsMenuRow(title: String) -> some View {
         HStack(spacing: 12) {
             Text(title)
                 .primaryText()
                 .fontWeight(.medium)
                 .lineLimit(1)
-
+            
             Spacer(minLength: 12)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
