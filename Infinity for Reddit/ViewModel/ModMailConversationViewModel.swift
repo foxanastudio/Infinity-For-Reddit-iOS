@@ -166,7 +166,8 @@ class ModMailConversationViewModel: ObservableObject {
         return ModMailConversationDisplayMessage(
             message: modMailMessage,
             isSentMessage: isSentMessage,
-            modMailSenderLabel: modMailSenderLabel
+            modMailSenderLabel: modMailSenderLabel,
+            isInternal: modMailMessage.isInternal
         )
     }
     
@@ -194,10 +195,6 @@ class ModMailConversationViewModel: ObservableObject {
             }
 
             return nil
-        }
-
-        if modMailMessage.isInternal {
-            return "Mods only"
         }
 
         if modMailMessage.author.isHidden == true {
@@ -259,7 +256,8 @@ class ModMailConversationViewModel: ObservableObject {
         let message: ModMailMessage
         let isSentMessage: Bool
         let modMailSenderLabel: String?
-        
+        let isInternal: Bool
+
         var id: String {
             message.id
         }

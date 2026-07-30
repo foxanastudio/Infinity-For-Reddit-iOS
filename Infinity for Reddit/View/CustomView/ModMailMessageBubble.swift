@@ -13,8 +13,17 @@ struct ModMailMessageBubble<Content: View>: View {
     let isSentMessage: Bool
     let shouldShowTail: Bool
     let modMailSenderLabel: String?
+    let isInternal: Bool
     let content: () -> Content
-    
+
+    private var bubbleBackgroundColor: Color {
+        if isSentMessage {
+            Color(hex: customThemeViewModel.currentCustomTheme.sentMessageBackgroundColor)
+        } else {
+            Color(hex: customThemeViewModel.currentCustomTheme.receivedMessageBackgroundColor)
+        }
+    }
+
     var body: some View {
         HStack {
             if isSentMessage {
@@ -29,6 +38,14 @@ struct ModMailMessageBubble<Content: View>: View {
                         .secondaryText()
                 }
                 
+                if isInternal {
+                    Text("Mods only")
+                        .padding(.leading, isSentMessage ? 6 : 16)
+                        .padding(.trailing, isSentMessage ? 16 : 6)
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(Color(hex: customThemeViewModel.currentCustomTheme.moderator))
+                }
+                
                 content()
                     .padding(.vertical, 12)
                     .padding(.leading, isSentMessage ? 12 : 20)
@@ -36,13 +53,13 @@ struct ModMailMessageBubble<Content: View>: View {
                     .applyIf(shouldShowTail) {
                         $0.background(
                             ChatBubbleWithTailShape(isSentMessage: isSentMessage, tailWidth: 8)
-                                .fill(isSentMessage ? Color(hex: customThemeViewModel.currentCustomTheme.sentMessageBackgroundColor) : Color(hex: customThemeViewModel.currentCustomTheme.receivedMessageBackgroundColor))
+                                .fill(bubbleBackgroundColor)
                         )
                     }
                     .applyIf(!shouldShowTail) {
                         $0.background(
                             ChatBubbleShape(isSentMessage: isSentMessage)
-                                .fill(isSentMessage ? Color(hex: customThemeViewModel.currentCustomTheme.sentMessageBackgroundColor) : Color(hex: customThemeViewModel.currentCustomTheme.receivedMessageBackgroundColor))
+                                .fill(bubbleBackgroundColor)
                         )
                     }
                     .customFont()

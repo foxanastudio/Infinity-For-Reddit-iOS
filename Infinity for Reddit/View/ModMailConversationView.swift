@@ -65,7 +65,8 @@ struct ModMailConversationView: View {
                                 ModMailMessageBubble(
                                     isSentMessage: modMailMessage.isSentMessage,
                                     shouldShowTail: index == 0 || modMailMessages[index - 1].message.author.name != modMailMessage.message.author.name,
-                                    modMailSenderLabel: modMailMessage.modMailSenderLabel
+                                    modMailSenderLabel: modMailMessage.modMailSenderLabel,
+                                    isInternal: modMailMessage.isInternal
                                 ) {
                                     Markdown(modMailMessage.message.displayBody)
                                         .themedChatMessageMarkdown(
