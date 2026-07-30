@@ -52,7 +52,22 @@ public class Inbox: NSObject {
     var inboxKind: InboxKind {
         return Inbox.InboxKind(rawValue: kind) ?? .unknown
     }
-
+    
+    var authorDisplayName: String {
+        Inbox.resolveDisplayName(author, subreddit: subreddit)
+    }
+    
+    var destDisplayName: String {
+        Inbox.resolveDisplayName(dest, subreddit: subreddit)
+    }
+    
+    private static func resolveDisplayName(_ rawValue: String, subreddit: String) -> String {
+        guard rawValue.isEmpty || rawValue.hasPrefix("#") else {
+            return rawValue
+        }
+        return subreddit.isEmpty ? rawValue : "r/\(subreddit)"
+    }
+    
     init(fromJson json: JSON!, kind: String!, messageWhere: MessageWhere?) throws {
         if json.isEmpty {
             throw JSONError.invalidData

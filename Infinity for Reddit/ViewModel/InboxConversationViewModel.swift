@@ -35,11 +35,11 @@ class InboxConversationViewModel: ObservableObject {
                         fullNameTemp = inboxes[i].name
                         fullNameToReplyTo = fullNameTemp
                         recipientTemp = inboxes[i].author
-                        recipient = recipientTemp
+                        recipient = inboxes[i].authorDisplayName
                         break
                     } else if inboxes[i].dest != AccountViewModel.shared.account.username {
                         recipientTemp = inboxes[i].dest
-                        recipient = recipientTemp
+                        recipient = inboxes[i].destDisplayName
                     }
                 }
             }
@@ -47,11 +47,11 @@ class InboxConversationViewModel: ObservableObject {
                 fullNameToReplyTo = inbox.name
             }
             if recipientTemp == nil {
-                recipient = inbox.dest
+                recipient = inbox.destDisplayName
             }
         } else {
             fullNameToReplyTo = inbox.name
-            recipient = inbox.author
+            recipient = inbox.authorDisplayName
         }
         self.inboxConversationRepository = inboxConversationRepository
     }

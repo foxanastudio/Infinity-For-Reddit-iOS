@@ -171,7 +171,7 @@ struct InboxMessageItemView: View {
             }) {
                 VStack(spacing: 4) {
                     HStack(alignment: .top, spacing: 8) {
-                        RowText(account.username == inbox.author ? inbox.dest : inbox.author)
+                        RowText(account.username == inbox.author ? inbox.destDisplayName : inbox.authorDisplayName)
                             .username()
                         
                         Spacer()
