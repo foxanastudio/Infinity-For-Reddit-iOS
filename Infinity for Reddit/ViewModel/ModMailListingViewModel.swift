@@ -16,6 +16,7 @@ public class ModMailListingViewModel: ObservableObject {
     @Published var isInitialLoading: Bool = false
     @Published var isLoadingMore: Bool = false
     @Published var error: Error?
+    @Published var hasMarkedAllAsRead: Bool = false
     
     private var messages: [String: ModMailMessage] = [:]
     private var conversationIds: Set<String> = []
@@ -50,7 +51,7 @@ public class ModMailListingViewModel: ObservableObject {
         }
         
         let isInitialLoadCopy = isInitialLoad
-
+        
         if conversations.isEmpty || isRefreshWithContinuation {
             isInitialLoading = true
         } else {
@@ -96,7 +97,7 @@ public class ModMailListingViewModel: ObservableObject {
             if isRefreshWithContinuation {
                 finishPullToRefresh()
             }
-
+            
             self.isInitialLoading = false
             self.isLoadingMore = false
         } catch {
@@ -126,14 +127,15 @@ public class ModMailListingViewModel: ObservableObject {
         isInitialLoad = true
         isInitialLoading = false
         isLoadingMore = false
-
+        hasMarkedAllAsRead = false
+        
         if refreshModMailListingContinuation == nil {
             after = nil
             messages.removeAll()
             conversationIds.removeAll()
             conversations.removeAll()
         }
-
+        
         loadModMailFlag.toggle()
     }
     
@@ -148,14 +150,8 @@ public class ModMailListingViewModel: ObservableObject {
         }
         conversation.lastUnread = nil
     }
-
+    
     func markAllAsRead() async throws {
-        conversations.forEach { conversation in
-            conversation.lastUnread = nil
-        }
-        
-        objectWillChange.send()
-
         var subredditNames: [String] = []
         for conversation in conversations {
             guard let subredditName = conversation.owner.displayName?.trimmingCharacters(in: .whitespacesAndNewlines),
@@ -165,11 +161,13 @@ public class ModMailListingViewModel: ObservableObject {
             }
             subredditNames.append(subredditName)
         }
-
+        
         try await modMailListingRepository.markAllModMailAsRead(
             subredditNames: subredditNames,
             state: "all"
         )
+        
+        hasMarkedAllAsRead = true
     }
     
     func latestMessagePreview(for conversation: ModMailConversation) -> String {
@@ -177,21 +175,21 @@ public class ModMailListingViewModel: ObservableObject {
             guard objectId.key == "messages", let message = messages[objectId.id] else {
                 continue
             }
-
+            
             let bodyMarkdown = message.bodyMarkdown.trimmingCharacters(in: .whitespacesAndNewlines)
             if !bodyMarkdown.isEmpty {
                 return bodyMarkdown
             }
-
+            
             return message.body.trimmingCharacters(in: .whitespacesAndNewlines)
         }
-
+        
         return ""
     }
     
     func applyConversationUpdate (_ detail: ModMailConversationDetail) {
         detail.refreshConversationMetadata()
-
+        
         let updatedConversation = detail.conversation
         let conversationId = updatedConversation.id ?? ""
         

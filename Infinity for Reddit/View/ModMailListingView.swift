@@ -49,6 +49,7 @@ struct ModMailListingView: View {
                         ModMailConversationItemView(
                             conversation: conversation,
                             latestMessagePreview: modMailListingViewModel.latestMessagePreview(for: conversation),
+                            hasMarkedAllAsRead: modMailListingViewModel.hasMarkedAllAsRead,
                             onTap: {
                                 modMailListingViewModel.markAsRead(conversation: conversation)
                                 navigationManager.append(
@@ -133,6 +134,7 @@ struct ModMailConversationItemView: View {
     
     let conversation: ModMailConversation
     let latestMessagePreview: String
+    let hasMarkedAllAsRead: Bool
     let onTap: () -> Void
     
     var body: some View {
@@ -161,7 +163,7 @@ struct ModMailConversationItemView: View {
                 }
                 .contentShape(Rectangle())
                 .padding(16)
-                .background(conversation.isUnread ? Color(hex: customThemeViewModel.currentCustomTheme.unreadMessageBackgroundColor) : .clear)
+                .background(conversation.isUnread && !hasMarkedAllAsRead ? Color(hex: customThemeViewModel.currentCustomTheme.unreadMessageBackgroundColor) : .clear)
             }
             
             CustomDivider()
