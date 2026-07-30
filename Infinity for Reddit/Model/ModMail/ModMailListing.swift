@@ -112,6 +112,27 @@ public class ModMailConversation: NSObject {
         isInternal = json["isInternal"].boolValue
     }
     
+    init(localId: String) {
+        id = localId
+        subject = ""
+        owner = ModMailOwner(localId: "", type: "", displayName: "")
+        lastModUpdate = nil
+        participantSubreddit = nil
+        isHighlighted = false
+        conversationType = ""
+        numMessages = 0
+        lastUpdated = ""
+        lastUpdatedUtc = 0
+        isAuto = false
+        legacyFirstMessageId = ""
+        isRepliable = false
+        participant = ModMailAuthor(localName: "", isHidden: false)
+        lastUserUpdate = ""
+        state = 0
+        lastUnread = nil
+        isInternal = false
+    }
+    
     var replyCount: Int {
         max(0, numMessages - 1)
     }
@@ -134,6 +155,12 @@ public class ModMailOwner: NSObject {
         id = json["id"].stringValue
         type = json["type"].stringValue
         displayName = json["displayName"].stringValue
+    }
+
+    init(localId: String, type: String, displayName: String) {
+        id = localId
+        self.type = type
+        self.displayName = displayName
     }
 }
 

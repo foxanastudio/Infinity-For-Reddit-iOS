@@ -238,8 +238,9 @@ struct HomeView: View {
                 selectedTab = .inbox
                 accountViewModel.pendingInboxTabAfterNotificationClicked = false
             } else if accountViewModel.pendingOpenModMailAfterNotificationClicked {
-                openModMailListing()
+                openModMailListing(conversationId: accountViewModel.pendingModMailConversationId)
                 accountViewModel.pendingOpenModMailAfterNotificationClicked = false
+                accountViewModel.pendingModMailConversationId = nil
             } else if let context = accountViewModel.pendingContextAfterNotificationClicked {
                 currentNavigationManager.openLink(context)
                 accountViewModel.pendingContextAfterNotificationClicked = nil
@@ -337,16 +338,18 @@ struct HomeView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .modMailDeepLink)) { note in
             let accountName = (note.userInfo?[AppDeepLink.accountNameKey] as? String) ?? ""
+            let conversationId = note.userInfo?[AppDeepLink.conversationIdKey] as? String
 
             Task {
                 if !accountName.isEmpty {
                     if !(await accountViewModel.switchToAccountIfNeeded(accountName)) {
                         await MainActor.run {
-                            openModMailListing()
+                            openModMailListing(conversationId: conversationId)
                         }
                     } else {
                         await MainActor.run {
                             accountViewModel.pendingOpenModMailAfterNotificationClicked = true
+                            accountViewModel.pendingModMailConversationId = conversationId
                         }
                     }
                 }
@@ -419,11 +422,14 @@ struct HomeView: View {
         }
     }
     
-    private func openModMailListing() {
+    private func openModMailListing(conversationId: String?) {
         selectedTab = .more
         tab5NavigationManager.path = NavigationPath()
         tab5NavigationManager.viewShouldHideNavigationBarOnScroll.removeAll()
         tab5NavigationManager.append(MoreViewNavigation.modmail)
+        if let conversationId, !conversationId.isEmpty {
+            tab5NavigationManager.append(AppNavigation.modMailConversation(conversation: ModMailConversation(localId: conversationId)))
+        }
     }
     
     private var currentSnackbarManager: SnackbarManager {

@@ -160,7 +160,8 @@ class PullNotificationBackgroundTaskManager {
 
                     let (title, subtitle) = getTitleAndSubtitle(conversation)
                     let body = modMailListing.latestMessagePreview(for: conversation)
-                    let notificationId = "com.foxanastudio.infinity-modmail-\(account.username)-\(conversation.id ?? Utils.randomString())"
+                    let conversationId = conversation.id ?? Utils.randomString()
+                    let notificationId = "com.foxanastudio.infinity-modmail-\(account.username)-\(conversationId)"
                     let threadId = "modmail.\(account.username.lowercased())"
 
                     try? await NotificationDelegate.shared.postNotification(
@@ -171,7 +172,8 @@ class PullNotificationBackgroundTaskManager {
                         body: body.isEmpty ? "You've got a new mod mail message" : body,
                         userInfo: [
                             AppDeepLink.accountNameKey: account.username,
-                            AppDeepLink.kindKey: AppDeepLink.modMailHost
+                            AppDeepLink.kindKey: AppDeepLink.modMailHost,
+                            AppDeepLink.conversationIdKey: conversationId
                         ]
                     )
                 }

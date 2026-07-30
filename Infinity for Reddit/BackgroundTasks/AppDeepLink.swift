@@ -17,6 +17,7 @@ struct AppDeepLink {
     static let contextKey = "context"
     static let kindKey = "kind"
     static let viewMessageKey = "viewMessage"
+    static let conversationIdKey = "conversationId"
     
     static func getInboxURL(account: String, viewMessage: Bool, fullname: String?) -> URL? {
         var components = URLComponents()
@@ -45,14 +46,16 @@ struct AppDeepLink {
         components.queryItems = items
         return components.url
     }
-
-    static func getModMailURL(account: String) -> URL? {
+    
+    static func getModMailURL(account: String, conversationId: String?) -> URL? {
         var components = URLComponents()
         components.scheme = scheme
         components.host = modMailHost
-        components.queryItems = [
-            URLQueryItem(name: accountNameKey, value: account)
-        ]
+        var items = [URLQueryItem(name: accountNameKey, value: account)]
+        if let conversationId {
+            items.append(URLQueryItem(name: conversationIdKey, value: conversationId))
+        }
+        components.queryItems = items
         return components.url
     }
     
@@ -95,7 +98,7 @@ struct AppDeepLink {
             guard let account = query(accountNameKey) else {
                 break
             }
-            return .modMail(account: account)
+            return .modMail(account: account, conversationId: query(conversationIdKey))
         default:
             break
         }
@@ -106,6 +109,6 @@ struct AppDeepLink {
 enum AppDeepLinkType {
     case inbox(account: String, viewMessage: Bool, fullname: String?)
     case context(account: String, context: String, fullname: String?)
-    case modMail(account: String)
+    case modMail(account: String, conversationId: String?)
     case appStoreEvent(eventName: String)
 }

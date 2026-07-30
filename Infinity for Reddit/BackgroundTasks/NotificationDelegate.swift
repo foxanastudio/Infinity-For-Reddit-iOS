@@ -71,7 +71,8 @@ class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
         var deepLinkUrl: URL?
 
         if kind == AppDeepLink.modMailHost {
-            deepLinkUrl = AppDeepLink.getModMailURL(account: accountName)
+            let conversationId = userInfo[AppDeepLink.conversationIdKey] as? String
+            deepLinkUrl = AppDeepLink.getModMailURL(account: accountName, conversationId: conversationId)
         } else {
             let fullname = userInfo[AppDeepLink.fullnameKey] as? String
             let inboxKind = Inbox.InboxKind(rawValue: kind) ?? .unknown
