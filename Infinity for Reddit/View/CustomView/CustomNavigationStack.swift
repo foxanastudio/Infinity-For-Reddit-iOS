@@ -200,6 +200,9 @@ struct CustomNavigationStack<Content: View>: View {
                     case .reminders:
                         ReminderListingView()
                             .environmentObject(navigationManager)
+                    case .discover:
+                        SubredditDiscoveryView()
+                            .environmentObject(navigationManager)
                     }
                 }
                 .navigationDestination(for: SettingsViewNavigation.self) { destination in

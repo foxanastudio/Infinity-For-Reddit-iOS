@@ -53,6 +53,10 @@ struct MoreView: View {
                     .listPlainItemNoInsets()
                     .limitedWidth()
                     
+                    SimpleTouchItemRow(text: "Discover Subreddits", icon:"sparkle.magnifyingglass") {
+                        navigationManager.append(MoreViewNavigation.discover)
+                    }
+                    
                     SimpleTouchItemRow(text: "Go to Subreddit", icon: "bubble.left.and.text.bubble.right") {
                         withAnimation(.linear(duration: 0.2)) {
                             subredditName = ""
