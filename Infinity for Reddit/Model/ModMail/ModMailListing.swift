@@ -11,9 +11,9 @@ import SwiftyJSON
 public class ModMailListing: NSObject {
     var viewerId: String!
     var after: String!
-    var conversationIds: [String]! = []
-    var conversations: [String: ModMailConversation]! = [:]
-    var messages: [String: ModMailMessage]! = [:]
+    var conversationIds: [String] = []
+    var conversations: [String: ModMailConversation] = [:]
+    var messages: [String: ModMailMessage] = [:]
     
     init(fromJson json: JSON!) throws {
         if json.isEmpty {
@@ -45,13 +45,11 @@ public class ModMailListing: NSObject {
         conversationIds.compactMap { conversations[$0] }
     }
     
-    func latestMessagePreview(for conversation: ModMailConversation) -> String {
-        ModMailMessagePreview.latest(for: conversation, messages: messages)
+    func getLatestMessagePreview(for conversation: ModMailConversation) -> String {
+        ModMailListing.getLatestMessagePreview(for: conversation, messages: messages)
     }
-}
-
-enum ModMailMessagePreview {
-    static func latest(for conversation: ModMailConversation, messages: [String: ModMailMessage]) -> String {
+    
+    static func getLatestMessagePreview(for conversation: ModMailConversation, messages: [String: ModMailMessage]) -> String {
         for objectId in conversation.objIds.reversed() {
             guard objectId.key == "messages", let message = messages[objectId.id] else {
                 continue
@@ -69,7 +67,7 @@ enum ModMailMessagePreview {
     }
 }
 
-public class ModMailConversation: NSObject {
+public class ModMailConversation: NSObject, Identifiable {
     var id: String!
     var subject: String!
     var owner: ModMailOwner!
@@ -90,6 +88,8 @@ public class ModMailConversation: NSObject {
     var state: Int!
     var lastUnread: String!
     var isInternal: Bool!
+    
+    @Published var latestMessagePreview: String = ""
     
     init(fromJson json: JSON!) throws {
         if json.isEmpty {

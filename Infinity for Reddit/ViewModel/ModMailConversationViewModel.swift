@@ -11,10 +11,11 @@ import Foundation
 class ModMailConversationViewModel: ObservableObject {
     @Published var conversation: ModMailConversation
     @Published var modMailConversationDetail: ModMailConversationDetail?
+    @Published var modMailConversationDisplayMessages: [ModMailConversationDisplayMessage]?
+    @Published var loadConversationFlag: Bool = false
     @Published var isLoading: Bool = false
-    @Published var isInitialLoad: Bool = true
-    @Published var isInitialLoading: Bool = false
     @Published var error: Error?
+    @Published var sendMessageError: Error?
     @Published var listScrollTarget: String?
 
     private let modMailConversationRepository: ModMailConversationRepositoryProtocol
@@ -31,81 +32,38 @@ class ModMailConversationViewModel: ObservableObject {
         conversation.participant.name
     }
 
-    private var conversationId: String {
-        conversation.id
-    }
-    
-    func messages(currentUsername: String) -> [ModMailConversationDisplayMessage] {
-        let modMailMessages = modMailConversationDetail?.orderedMessages.reversed() ?? []
-        
-        return Array(modMailMessages.enumerated()).map { modMailMessageIndex, modMailMessage in
-            displayMessage(
-                modMailMessage: modMailMessage,
-                modMailMessageIndex: modMailMessageIndex,
-                modMailMessages: modMailMessages,
-                currentUsername: currentUsername
-            )
-        }
-    }
-
-    func initialLoadModMailConversation() async {
-        guard isInitialLoad else {
-            return
-        }
-
-        await loadModMailConversation()
-    }
-
     func loadModMailConversation() async {
-        guard !isLoading else {
-            return
-        }
-
         isLoading = true
-        let isInitialLoadCopy = isInitialLoad
-        
-        if modMailConversationDetail == nil {
-            isInitialLoading = true
-        }
-
-        if isInitialLoad {
-            isInitialLoad = false
-        }
-        
         error = nil
 
         do {
             try Task.checkCancellation()
 
             let modMailConversationDetail = try await modMailConversationRepository.fetchModMailConversation(
-                conversationId: conversationId,
-                interceptor: nil
+                conversationId: conversation.id
             )
 
             try Task.checkCancellation()
 
             self.modMailConversationDetail = modMailConversationDetail
-            self.isLoading = false
-            self.isInitialLoading = false
+            extractMessages()
             self.conversation = modMailConversationDetail.conversation
         } catch {
             if !(error is CancellationError) {
                 self.error = error
                 printInDebugOnly("Cannot fetch mod mail conversation: \(error)")
             }
-            self.isInitialLoad = isInitialLoadCopy
-
-            self.isLoading = false
-            self.isInitialLoading = false
         }
+        self.isLoading = false
     }
     
     func sendMessage(message: String, authorName: String, isAuthorHidden: Bool, isInternal: Bool) async -> ModMailConversationDetail? {
+        sendMessageError = nil
         do {
             let previousMessageCount = modMailConversationDetail?.orderedMessages.count ?? 0
             let modMailConversationDetail = try await modMailConversationRepository.sendMessage(
                 message: message,
-                conversationId: conversationId,
+                conversationId: conversation.id,
                 isAuthorHidden: isAuthorHidden,
                 isInternal: isInternal
             )
@@ -119,13 +77,13 @@ class ModMailConversationViewModel: ObservableObject {
                 authorName: authorName,
                 isInternal: isInternal,
                 isAuthorHidden: isAuthorHidden
-            )
-            : latestMessage
+            ) : latestMessage
 
             modMailConversationDetail.refreshConversationMetadata()
 
             self.modMailConversationDetail = modMailConversationDetail
             self.conversation = modMailConversationDetail.conversation
+            extractMessages()
             
             Task { @MainActor in
                 await Task.yield()
@@ -134,7 +92,7 @@ class ModMailConversationViewModel: ObservableObject {
             
             return modMailConversationDetail
         } catch {
-            self.error = error
+            self.sendMessageError = error
             
             printInDebugOnly("Error sending message: \(error)")
             
@@ -142,25 +100,53 @@ class ModMailConversationViewModel: ObservableObject {
         }
     }
     
-    private func displayMessage(
+    private func extractMessages() {
+        guard let modMailConversationDetail else {
+            modMailConversationDisplayMessages = nil
+            return
+        }
+        
+        let modMailMessages = Array(modMailConversationDetail.orderedMessages.reversed())
+        
+        modMailConversationDisplayMessages = Array(modMailMessages.enumerated()).map { modMailMessageIndex, modMailMessage in
+            let isSentMessage = isSentModMailMessage(modMailMessage)
+            let modMailSenderLabelContent = getModMailSenderLabelContent(
+                modMailMessage: modMailMessage,
+                isSentMessage: isSentMessage
+            )
+            let modMailSenderLabel = shouldShowModMailSenderLabel(
+                modMailMessage: modMailMessage,
+                modMailMessageIndex: modMailMessageIndex,
+                modMailMessages: modMailMessages,
+                currentIsSentMessage: isSentMessage,
+                currentLabel: modMailSenderLabelContent
+            ) ? modMailSenderLabelContent : nil
+            
+            return ModMailConversationDisplayMessage(
+                message: modMailMessage,
+                isSentMessage: isSentMessage,
+                modMailSenderLabel: modMailSenderLabel,
+                isInternal: modMailMessage.isInternal
+            )
+        }
+    }
+    
+    private func getDisplayMessage(
         modMailMessage: ModMailMessage,
         modMailMessageIndex: Int,
-        modMailMessages: [ModMailMessage],
-        currentUsername: String
+        modMailMessages: [ModMailMessage]
     ) -> ModMailConversationDisplayMessage {
-        let isSentMessage = isSentModMailMessage(modMailMessage, currentUsername: currentUsername)
-        let modMailSenderLabelContent = modMailSenderLabelContent(
+        let isSentMessage = isSentModMailMessage(modMailMessage)
+        let modMailSenderLabelContent = getModMailSenderLabelContent(
             modMailMessage: modMailMessage,
-            isSentMessage: isSentMessage,
-            currentUsername: currentUsername
+            isSentMessage: isSentMessage
         )
         let modMailSenderLabel = shouldShowModMailSenderLabel(
             modMailMessage: modMailMessage,
             modMailMessageIndex: modMailMessageIndex,
             modMailMessages: modMailMessages,
             currentIsSentMessage: isSentMessage,
-            currentLabel: modMailSenderLabelContent,
-            currentUsername: currentUsername
+            currentLabel: modMailSenderLabelContent
         ) ? modMailSenderLabelContent : nil
         
         return ModMailConversationDisplayMessage(
@@ -171,22 +157,20 @@ class ModMailConversationViewModel: ObservableObject {
         )
     }
     
-    private func isSentModMailMessage(_ message: ModMailMessage, currentUsername: String) -> Bool {
+    private func isSentModMailMessage(_ message: ModMailMessage) -> Bool {
         let authorName = message.author.name
         let subredditName = conversation.owner.displayName ?? ""
-        return authorName == currentUsername || authorName == subredditName
+        return authorName == AccountViewModel.shared.account.username || authorName == subredditName
     }
     
-    private func modMailSenderLabelContent(
+    private func getModMailSenderLabelContent(
         modMailMessage: ModMailMessage,
-        isSentMessage: Bool,
-        currentUsername: String
+        isSentMessage: Bool
     ) -> String? {
         let subredditName = conversation.owner.displayName ?? ""
 
         guard isSentMessage else {
-            let authorName = modMailMessage.author.name ?? ""
-            if !authorName.isEmpty {
+            if let authorName = modMailMessage.author.name, !authorName.isEmpty {
                 return "u/\(authorName)"
             }
 
@@ -204,7 +188,7 @@ class ModMailConversationViewModel: ObservableObject {
             return "r/\(subredditName)"
         }
 
-        return "u/\(currentUsername)"
+        return "u/\(AccountViewModel.shared.account.username)"
     }
     
     private func shouldShowModMailSenderLabel(
@@ -212,8 +196,7 @@ class ModMailConversationViewModel: ObservableObject {
         modMailMessageIndex: Int,
         modMailMessages: [ModMailMessage],
         currentIsSentMessage: Bool,
-        currentLabel: String?,
-        currentUsername: String
+        currentLabel: String?
     ) -> Bool {
         guard let currentLabel else {
             return false
@@ -225,31 +208,28 @@ class ModMailConversationViewModel: ObservableObject {
         }
         
         let previousModMailMessage = modMailMessages[visuallyPreviousModMailMessageIndex]
-        let previousIsSentMessage = isSentModMailMessage(previousModMailMessage, currentUsername: currentUsername)
+        let previousIsSentMessage = isSentModMailMessage(previousModMailMessage)
         
         if previousIsSentMessage != currentIsSentMessage {
             return true
         }
         
-        let previousLabel = modMailSenderLabelContent(
+        let previousLabel = getModMailSenderLabelContent(
             modMailMessage: previousModMailMessage,
-            isSentMessage: previousIsSentMessage,
-            currentUsername: currentUsername
+            isSentMessage: previousIsSentMessage
         )
         
         return currentLabel != previousLabel
     }
     
     
-    func reloadModMailConversation() {
+    func refreshModMailConversation() {
         error = nil
-        isInitialLoad = true
-        isInitialLoading = false
+        sendMessageError = nil
+        isLoading = false
         modMailConversationDetail = nil
-
-        Task {
-            await loadModMailConversation()
-        }
+        modMailConversationDisplayMessages = nil
+        loadConversationFlag.toggle()
     }
     
     struct ModMailConversationDisplayMessage: Identifiable {

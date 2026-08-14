@@ -37,18 +37,17 @@ struct ModMailListingView: View {
                                 modMailListingViewModel.refreshModMailListing()
                             }
                     } else {
-                        Text("No items")
+                        Text("No conversation")
                             .primaryText()
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-
             } else {
                 List {
                     ForEach(modMailListingViewModel.conversations, id: \.id) { conversation in
                         ModMailConversationItemView(
                             conversation: conversation,
-                            latestMessagePreview: modMailListingViewModel.latestMessagePreview(for: conversation),
+                            latestMessagePreview: conversation.latestMessagePreview,
                             hasMarkedAllAsRead: modMailListingViewModel.hasMarkedAllAsRead,
                             onTap: {
                                 modMailListingViewModel.markAsRead(conversation: conversation)
@@ -76,7 +75,6 @@ struct ModMailListingView: View {
                 .refreshable {
                     await modMailListingViewModel.refreshModMailListingWithContinuation()
                 }
-
             }
         }
         .task(id: modMailListingViewModel.loadModMailFlag) {
@@ -87,7 +85,7 @@ struct ModMailListingView: View {
         }
         .onAppear {
             setUpMenu()
-            applySharedConversationUpdateIfNeeded()
+            updateSharedConversationIfNeeded()
         }
         .onDisappear {
             guard let navigationBarMenuKey else {
@@ -120,12 +118,12 @@ struct ModMailListingView: View {
         ])
     }
 
-    private func applySharedConversationUpdateIfNeeded() {
+    private func updateSharedConversationIfNeeded() {
         guard let detail = modMailShareableViewModel.consumeUpdatedConversationDetail() else {
             return
         }
 
-        modMailListingViewModel.applyConversationUpdate(detail)
+        modMailListingViewModel.updateConversation(detail)
     }
 }
 

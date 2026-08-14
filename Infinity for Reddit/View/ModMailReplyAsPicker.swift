@@ -11,7 +11,6 @@ struct ModMailReplyAsPicker: View {
     @Binding var selectedReplyAsOption: ModMailReplyAsOption
     
     let subredditName: String
-    let currentAccount: Account
     
     var body: some View {
         Menu {
@@ -20,8 +19,7 @@ struct ModMailReplyAsPicker: View {
                     selectedReplyAsOption = option
                 } label: {
                     replyAsMenuRow(
-                        title: option.title(
-                            currentUsername: currentAccount.username,
+                        title: option.getTitle(
                             subredditName: subredditName
                         )
                     )
@@ -29,8 +27,7 @@ struct ModMailReplyAsPicker: View {
             }
         } label: {
             HStack(spacing: 12) {
-                Text(selectedReplyAsOption.title(
-                    currentUsername: currentAccount.username,
+                Text(selectedReplyAsOption.getTitle(
                     subredditName: subredditName
                 ))
                 .primaryText()

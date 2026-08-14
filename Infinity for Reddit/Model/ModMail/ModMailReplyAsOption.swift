@@ -25,21 +25,21 @@ enum ModMailReplyAsOption: String, CaseIterable, Hashable {
         self == .modsOnly
     }
 
-    func authorName(currentUsername: String, subredditName: String) -> String {
+    func getAuthorName(subredditName: String) -> String {
         switch self {
         case .subreddit:
-            return subredditName.isEmpty ? currentUsername : subredditName
+            return subredditName.isEmpty ? AccountViewModel.shared.account.username : subredditName
         case .user, .modsOnly:
-            return currentUsername
+            return AccountViewModel.shared.account.username
         }
     }
 
-    func title(currentUsername: String, subredditName: String) -> String {
+    func getTitle(subredditName: String) -> String {
         switch self {
         case .subreddit:
-            return "Reply as r/\(subredditName.isEmpty ? currentUsername : subredditName)"
+            return "Reply as r/\(subredditName.isEmpty ? AccountViewModel.shared.account.username : subredditName)"
         case .user:
-            return "Reply as u/\(currentUsername)"
+            return "Reply as u/\(AccountViewModel.shared.account.username)"
         case .modsOnly:
             return "Mods only"
         }

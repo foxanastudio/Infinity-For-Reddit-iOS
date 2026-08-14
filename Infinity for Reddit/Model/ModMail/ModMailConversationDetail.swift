@@ -44,6 +44,7 @@ public class ModMailConversationDetail: NSObject {
     }
 
     func refreshConversationMetadata() {
+        let orderedMessages = orderedMessages
         conversation.numMessages = max(conversation.numMessages, orderedMessages.count)
 
         if let latestMessage = orderedMessages.last {

@@ -11,65 +11,50 @@ import Foundation
 
 public class ModMailConversationRepository: ModMailConversationRepositoryProtocol {
     enum ModMailConversationRepositoryError: LocalizedError {
-        case NetworkError(String)
-        case JSONDecodingError(String)
         case sendMessageError(String)
-        case AuthRequiredError
         
         var errorDescription: String? {
             switch self {
-            case .NetworkError(let message):
-                return message
-            case .JSONDecodingError(let message):
-                return message
             case .sendMessageError(let message):
                 return message
-            case .AuthRequiredError:
-                return "Authentication required"
             }
         }
     }
     
     private let session: Session
-    private let sessionName: String?
     
-    public init(sessionName: String? = nil) {
-        self.sessionName = sessionName
-        guard let resolvedSession = DependencyManager.shared.container.resolve(Session.self, name: self.sessionName) else {
-            fatalError("Failed to resolve Session")
+    public init() {
+        guard let resolvedSession = DependencyManager.shared.container.resolve(Session.self) else {
+            fatalError("Failed to resolve Session in ModMailConversationRepository")
         }
         self.session = resolvedSession
     }
     
-    public func fetchModMailConversation(conversationId: String,
-                                         interceptor: RequestInterceptor? = nil
-    ) async throws -> ModMailConversationDetail {
-        if self.sessionName == "plain", interceptor == nil {
-            throw ModMailConversationRepositoryError.AuthRequiredError
-        }
-        
+    public func fetchModMailConversation(conversationId: String) async throws -> ModMailConversationDetail {
         let response = await self.session.request(
-            RedditOAuthAPI.getModMailConversation(conversationId: conversationId),
-            interceptor: interceptor
+            RedditOAuthAPI.getModMailConversation(conversationId: conversationId)
         )
         .validate()
         .serializingData()
         .response
         
         if let statusCode = response.response?.statusCode {
-            printInDebugOnly("Status code: \(statusCode) Session: \(self.sessionName ?? "nil")")
+            printInDebugOnly("Status code: \(statusCode)")
         }
         
-        let data = response.data
-        printInDebugOnly(data)
-        try Task.checkCancellation()
-        
-        let json = JSON(data)
-        if let error = json.error {
-            throw ModMailConversationRepositoryError.JSONDecodingError(error.localizedDescription)
-        }
+        if let data = response.data {
+            printInDebugOnly(data)
+            try Task.checkCancellation()
+            
+            let json = JSON(data)
+            if let error = json.error {
+                throw APIError.jsonDecodingError(error.localizedDescription)
+            }
 
-        return try ModMailConversationDetail(fromJson: json)
+            return try ModMailConversationDetail(fromJson: json)
+        }
+        
+        throw APIError.networkError("Status code: \(response.response?.statusCode ?? 0)")
     }
 
     public func sendMessage(message: String,
@@ -77,10 +62,6 @@ public class ModMailConversationRepository: ModMailConversationRepositoryProtoco
                             isAuthorHidden: Bool,
                             isInternal: Bool
     ) async throws -> ModMailConversationDetail {
-        if self.sessionName == "plain" {
-            throw ModMailConversationRepositoryError.AuthRequiredError
-        }
-
         let params = [
             "body": message,
             "isAuthorHidden": isAuthorHidden ? "true" : "false",

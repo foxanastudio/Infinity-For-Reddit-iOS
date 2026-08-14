@@ -11,17 +11,11 @@ import Foundation
 
 public class ModMailListingRepository: ModMailListingRepositoryProtocol {
     enum ModMailListingRepositoryError: LocalizedError {
-        case NetworkError(String)
-        case JSONDecodingError(String)
-        case AuthRequiredError
+        case authRequiredError
         
         var errorDescription: String? {
             switch self {
-            case .NetworkError(let message):
-                return message
-            case .JSONDecodingError(let message):
-                return message
-            case .AuthRequiredError:
+            case .authRequiredError:
                 return "Authentication required"
             }
         }
@@ -33,7 +27,7 @@ public class ModMailListingRepository: ModMailListingRepositoryProtocol {
     public init(sessionName: String? = nil) {
         self.sessionName = sessionName
         guard let resolvedSession = DependencyManager.shared.container.resolve(Session.self, name: self.sessionName) else {
-            fatalError("Failed to resolve Session")
+            fatalError("Failed to resolve Session in ModMailListingRepository")
         }
         self.session = resolvedSession
     }
@@ -42,7 +36,7 @@ public class ModMailListingRepository: ModMailListingRepositoryProtocol {
                                     interceptor: RequestInterceptor? = nil
     ) async throws -> ModMailListing {
         if self.sessionName == "plain", interceptor == nil {
-            throw ModMailListingRepositoryError.AuthRequiredError
+            throw ModMailListingRepositoryError.authRequiredError
         }
         
         let response = await self.session.request(
@@ -57,25 +51,26 @@ public class ModMailListingRepository: ModMailListingRepositoryProtocol {
             printInDebugOnly("Status code: \(statusCode) Session: \(self.sessionName ?? "nil")")
         }
         
-        let data = response.data
-        if let data {
+        if let data = response.data {
             printInDebugOnly(data)
+            try Task.checkCancellation()
+            
+            let json = JSON(data)
+            if let error = json.error {
+                throw APIError.jsonDecodingError(error.localizedDescription)
+            }
+            
+            return try ModMailListing(fromJson: json)
         }
-        try Task.checkCancellation()
         
-        let json = JSON(data)
-        if let error = json.error {
-            throw ModMailListingRepositoryError.JSONDecodingError(error.localizedDescription)
-        }
-        
-        return try ModMailListing(fromJson: json)
+        throw APIError.networkError("Status code: \(response.response?.statusCode ?? 0)")
     }
 
     public func markAllModMailAsRead(subredditNames: [String],
                                      state: String
     ) async throws {
         if self.sessionName == "plain" {
-            throw ModMailListingRepositoryError.AuthRequiredError
+            throw ModMailListingRepositoryError.authRequiredError
         }
 
         guard !subredditNames.isEmpty else {
@@ -94,11 +89,11 @@ public class ModMailListingRepository: ModMailListingRepositoryProtocol {
         .response
 
         if let statusCode = response.response?.statusCode, !(200...299).contains(statusCode) {
-            throw ModMailListingRepositoryError.NetworkError("Mod mail bulk read failed with status code \(statusCode)")
+            throw APIError.networkError("Mod mail bulk read failed with status code \(statusCode)")
         }
 
         if let error = response.error {
-            throw error
+            throw APIError.networkError(error.localizedDescription)
         }
     }
 }

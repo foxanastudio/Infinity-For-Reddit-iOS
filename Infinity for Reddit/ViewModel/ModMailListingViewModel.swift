@@ -6,10 +6,11 @@
 //
 
 import Foundation
+import IdentifiedCollections
 
 @MainActor
 public class ModMailListingViewModel: ObservableObject {
-    @Published var conversations: [ModMailConversation] = []
+    @Published var conversations: IdentifiedArrayOf<ModMailConversation> = []
     @Published var loadModMailFlag: Bool = false
     @Published var isInitialLoad: Bool = true
     @Published var isInitialLoading: Bool = false
@@ -80,6 +81,11 @@ public class ModMailListingViewModel: ObservableObject {
             let existingConversationIds = isRefreshWithContinuation ? Set<String>() : conversationIds
             let newConversations = modMailListing.orderedConversations.filter { !existingConversationIds.contains($0.id) }
             if (newConversations.isEmpty) {
+                if isRefreshWithContinuation {
+                    self.messages.removeAll()
+                    self.conversationIds.removeAll()
+                    self.conversations.removeAll()
+                }
                 self.after = nil
             } else {
                 if isRefreshWithContinuation {
@@ -89,6 +95,7 @@ public class ModMailListingViewModel: ObservableObject {
                 }
                 self.messages.merge(modMailListing.messages) { _, new in new }
                 self.conversationIds.formUnion(newConversations.map(\.id))
+                postProcessConversations(newConversations)
                 self.conversations.append(contentsOf: newConversations)
                 self.after = modMailListing.after
             }
@@ -112,6 +119,12 @@ public class ModMailListingViewModel: ObservableObject {
             }
             self.isInitialLoading = false
             self.isLoadingMore = false
+        }
+    }
+    
+    private func postProcessConversations(_ conversations: [ModMailConversation]) {
+        conversations.forEach { conversation in
+            conversation.latestMessagePreview = ModMailListing.getLatestMessagePreview(for: conversation, messages: messages)
         }
     }
     
@@ -169,11 +182,11 @@ public class ModMailListingViewModel: ObservableObject {
         hasMarkedAllAsRead = true
     }
     
-    func latestMessagePreview(for conversation: ModMailConversation) -> String {
-        ModMailMessagePreview.latest(for: conversation, messages: messages)
+    func getLatestMessagePreview(for conversation: ModMailConversation) -> String {
+        ModMailListing.getLatestMessagePreview(for: conversation, messages: messages)
     }
     
-    func applyConversationUpdate (_ detail: ModMailConversationDetail) {
+    func updateConversation(_ detail: ModMailConversationDetail) {
         detail.refreshConversationMetadata()
         
         let updatedConversation = detail.conversation
@@ -190,6 +203,7 @@ public class ModMailListingViewModel: ObservableObject {
         }
         
         updatedConversation.lastUnread = nil
+        updatedConversation.latestMessagePreview = ModMailListing.getLatestMessagePreview(for: updatedConversation, messages: messages)
         conversationIds.insert(conversationId)
         conversations.insert(updatedConversation, at: 0)
     }

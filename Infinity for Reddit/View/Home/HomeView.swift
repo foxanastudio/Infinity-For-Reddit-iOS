@@ -340,8 +340,8 @@ struct HomeView: View {
             let accountName = (note.userInfo?[AppDeepLink.accountNameKey] as? String) ?? ""
             let conversationId = note.userInfo?[AppDeepLink.conversationIdKey] as? String
 
-            Task {
-                if !accountName.isEmpty {
+            if !accountName.isEmpty {
+                Task {
                     if !(await accountViewModel.switchToAccountIfNeeded(accountName)) {
                         await MainActor.run {
                             openModMailListing(conversationId: conversationId)

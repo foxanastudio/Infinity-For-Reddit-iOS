@@ -159,7 +159,7 @@ class PullNotificationBackgroundTaskManager {
                     }
 
                     let (title, subtitle) = getTitleAndSubtitle(conversation)
-                    let body = modMailListing.latestMessagePreview(for: conversation)
+                    let body = modMailListing.getLatestMessagePreview(for: conversation)
                     let conversationId = conversation.id ?? Utils.randomString()
                     let notificationId = "com.foxanastudio.infinity-modmail-\(account.username)-\(conversationId)"
                     let threadId = "modmail.\(account.username.lowercased())"
@@ -228,7 +228,7 @@ class PullNotificationBackgroundTaskManager {
     }
 
     private func getTitleAndSubtitle(_ conversation: ModMailConversation) -> (title: String, subtitle: String) {
-        let subject = conversation.subject?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let subject = conversation.subject?.trimmingCharacters(in: .whitespacesAndNewlines).capitalizedFirst ?? ""
         let title = subject.isEmpty ? "r/\(conversation.owner.displayName ?? "-")" : subject
         let subtitle = "New mod mail r/\(conversation.owner.displayName ?? "-")"
         return (title, subtitle)

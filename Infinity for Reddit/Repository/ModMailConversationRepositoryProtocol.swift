@@ -8,7 +8,7 @@
 import Alamofire
 
 public protocol ModMailConversationRepositoryProtocol {
-    func fetchModMailConversation(conversationId: String, interceptor: RequestInterceptor?) async throws -> ModMailConversationDetail
+    func fetchModMailConversation(conversationId: String) async throws -> ModMailConversationDetail
     
     func sendMessage(message: String, conversationId: String, isAuthorHidden: Bool, isInternal: Bool) async throws -> ModMailConversationDetail
 }
