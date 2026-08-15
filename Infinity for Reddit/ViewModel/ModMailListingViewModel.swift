@@ -198,13 +198,19 @@ public class ModMailListingViewModel: ObservableObject {
         
         messages.merge(detail.messages) { _, new in new }
         
-        if let existingIndex = conversations.firstIndex(where: { $0.id == conversationId}) {
+        let existingIndex = conversations.firstIndex(where: { $0.id == conversationId})
+        
+        if let existingIndex {
             conversations.remove(at: existingIndex)
         }
         
         updatedConversation.lastUnread = nil
         updatedConversation.latestMessagePreview = ModMailListing.getLatestMessagePreview(for: updatedConversation, messages: messages)
         conversationIds.insert(conversationId)
-        conversations.insert(updatedConversation, at: 0)
+        if let existingIndex {
+            conversations.insert(updatedConversation, at: existingIndex)
+        } else {
+            conversations.insert(updatedConversation, at: 0)
+        }
     }
 }

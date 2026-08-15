@@ -89,7 +89,7 @@ public class ModMailConversation: NSObject, Identifiable {
     var lastUnread: String!
     var isInternal: Bool!
     
-    @Published var latestMessagePreview: String = ""
+    var latestMessagePreview: String = ""
     
     init(fromJson json: JSON!) throws {
         if json.isEmpty {
