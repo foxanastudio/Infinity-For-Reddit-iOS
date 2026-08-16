@@ -11,4 +11,8 @@ extension Bundle {
     var appVersion: String {
         infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
     }
+    
+    var buildNumber: Int {
+        Int(infoDictionary?["CFBundleVersion"] as? String ?? "0") ?? 0
+    }
 }

@@ -123,6 +123,9 @@
     "Copy" : {
 
     },
+    "Date and Time" : {
+
+    },
     "Delete" : {
 
     },
@@ -204,6 +207,12 @@
     "Inbox" : {
 
     },
+    "Infinity" : {
+
+    },
+    "Jump directly from Reddit webpages into Infinity while browsing in Safari." : {
+
+    },
     "Karma: %lld" : {
 
     },
@@ -216,10 +225,10 @@
     "Link posts that have the following urls will be filtered out." : {
 
     },
-    "Major Update" : {
+    "Manage Subscription" : {
 
     },
-    "Manage Subscription" : {
+    "Maybe Later" : {
 
     },
     "Moderate" : {
@@ -234,6 +243,9 @@
     "Navigation Drawer" : {
 
     },
+    "Need a break? Tap the extension or the settings icon in Safari, select Open in Infinity, and use the toggle inside the popup to quickly pause or resume redirects." : {
+
+    },
     "New Post" : {
 
     },
@@ -246,6 +258,9 @@
     "No comments yet. Be the first to share your thoughts!" : {
 
     },
+    "No conversation" : {
+
+    },
     "No custom feeds" : {
 
     },
@@ -255,7 +270,7 @@
     "No items" : {
 
     },
-    "No messages" : {
+    "No message" : {
 
     },
     "No posts" : {
@@ -286,6 +301,12 @@
 
     },
     "Once enabled, sensitive content will always be hidden, regardless of the sensitive content setting. This option is irreversible; the only way to re-enable the sensitive content is to clear the app data.\n\nDo you still want to enable it?" : {
+
+    },
+    "Open Reddit Links in Infinity" : {
+
+    },
+    "Open Safari to Enable" : {
 
     },
     "Posts from the following subreddits will be filtered out." : {
@@ -354,6 +375,9 @@
     "Rules" : {
 
     },
+    "Safari" : {
+
+    },
     "Save" : {
 
     },
@@ -385,6 +409,9 @@
 
     },
     "Sensitive" : {
+
+    },
+    "Set Reminder" : {
 
     },
     "Share" : {

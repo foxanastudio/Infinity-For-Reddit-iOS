@@ -54,9 +54,9 @@ struct EditPostView: View {
                                             mediaMetadata: editPostViewModel.postToBeEdited.mediaMetadata,
                                             isSensitive: editPostViewModel.postToBeEdited.over18,
                                             fullScreenMediaViewModel: fullScreenMediaViewModel,
-                                            onFullScreenVideo: { videoUrlString in
+                                            onFullScreenVideo: { urlString, playbackTime in
                                                 fullScreenMediaViewModel.show(
-                                                    .video(urlString: videoUrlString, videoType: .direct, canDownload: false)
+                                                    .video(urlString: urlString, videoType: .direct, canDownload: false, playbackTime: playbackTime)
                                                 )
                                             }
                                         )
@@ -73,9 +73,9 @@ struct EditPostView: View {
                                             mediaMetadata: editPostViewModel.postToBeEdited.mediaMetadata,
                                             isSensitive: editPostViewModel.postToBeEdited.over18,
                                             fullScreenMediaViewModel: fullScreenMediaViewModel,
-                                            onFullScreenVideo: { videoUrlString in
+                                            onFullScreenVideo: { urlString, playbackTime in
                                                 fullScreenMediaViewModel.show(
-                                                    .video(urlString: videoUrlString, videoType: .direct, canDownload: false)
+                                                    .video(urlString: urlString, videoType: .direct, canDownload: false, playbackTime: playbackTime)
                                                 )
                                             }
                                         )

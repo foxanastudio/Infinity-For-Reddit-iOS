@@ -21,6 +21,15 @@ extension String {
         return String(self[start...])
     }
     
+    func substring(to index: Int) -> String {
+        guard index < count else {
+            return self
+        }
+        
+        let end = self.index(startIndex, offsetBy: index)
+        return String(self[...end])
+    }
+    
     var capitalizedFirst: String {
         guard let first = first else { return self }
         return first.uppercased() + dropFirst()

@@ -54,6 +54,7 @@ struct CommentViewCard: View {
     let onEdit: () -> Void
     let onDelete: () -> Void
     let onAddToCommentFilter: () -> Void
+    let onSetReminder: () -> Void
     let onModerate: () -> Void
     let onCopy: () -> Void
     
@@ -71,6 +72,7 @@ struct CommentViewCard: View {
         onEdit: @escaping () -> Void,
         onDelete: @escaping () -> Void,
         onAddToCommentFilter: @escaping () -> Void,
+        onSetReminder: @escaping () -> Void,
         onModerate: @escaping () -> Void,
         onCopy: @escaping () -> Void
     ) {
@@ -86,6 +88,7 @@ struct CommentViewCard: View {
         self.onEdit = onEdit
         self.onDelete = onDelete
         self.onAddToCommentFilter = onAddToCommentFilter
+        self.onSetReminder = onSetReminder
         self.onModerate = onModerate
         self.onCopy = onCopy
         self.isToolbarHidden = isInPostDetails ? UserDefaults.interfaceComment.bool(forKey: InterfaceCommentUserDefaultsUtils.hideToolbarKey) : false
@@ -156,6 +159,9 @@ struct CommentViewCard: View {
                                         fullScreenMediaViewModel: fullScreenMediaViewModel,
                                         onLinkTap: { url in
                                             navigationManager.openLink(url)
+                                        },
+                                        onFullScreenVideo: { urlString, playbackTime in
+                                            fullScreenMediaViewModel.show(.video(urlString: urlString, videoType: .parsedVideo, playbackTime: playbackTime))
                                         }
                                     )
                                 )
@@ -177,6 +183,9 @@ struct CommentViewCard: View {
                                         fullScreenMediaViewModel: fullScreenMediaViewModel,
                                         onLinkTap: { url in
                                             navigationManager.openLink(url)
+                                        },
+                                        onFullScreenVideo: { urlString, playbackTime in
+                                            fullScreenMediaViewModel.show(.video(urlString: urlString, videoType: .parsedVideo, playbackTime: playbackTime))
                                         }
                                     )
                                 )
@@ -245,6 +254,10 @@ struct CommentViewCard: View {
                                     
                                     Button("Add to Comment Filter") {
                                         onAddToCommentFilter()
+                                    }
+                                    
+                                    Button("Set Reminder") {
+                                        onSetReminder()
                                     }
                                     
                                     Button("Report") {
@@ -360,6 +373,10 @@ struct CommentViewCard: View {
                                     
                                     Button("Add to Comment Filter") {
                                         onAddToCommentFilter()
+                                    }
+                                    
+                                    Button("Set Reminder") {
+                                        onSetReminder()
                                     }
                                     
                                     Button("Report") {

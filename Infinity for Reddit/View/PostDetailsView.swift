@@ -248,6 +248,9 @@ struct PostDetailsView: View {
                                                     onAddToCommentFilter: {
                                                         navigationManager.append(SettingsViewNavigation.commentFilter(commentToBeAdded: comment))
                                                     },
+                                                    onSetReminder: {
+                                                        navigationManager.append(AppNavigation.setReminder(post: post, comment: comment))
+                                                    },
                                                     onModerate: {
                                                         commentToBeModerated = comment
                                                         showCommentModerationSheet = true
@@ -474,7 +477,15 @@ struct PostDetailsView: View {
                                     }
                                     .padding(.vertical, 16)
                                     .padding(.leading, 16)
-                                    .glassEffect(.regular, in: .rect(cornerRadius: 12))
+                                    .modify {
+                                        if #available(iOS 26.1, *) {
+                                            $0.padding(12)
+                                                .glassEffect(.regular, in: .rect(cornerRadius: 12))
+                                        } else {
+                                            $0.padding(12)
+                                                .glassEffect(.regular)
+                                        }
+                                    }
                                     .padding(16)
                                     .contentShape(RoundedRectangle(cornerRadius: 12))
                                     .zIndex(2)
@@ -788,6 +799,9 @@ struct PostDetailsView: View {
                     },
                     onDownloadAllGalleryMedia: {
                         postDetailsViewModel.downloadAllGalleryMedia()
+                    },
+                    onSetReminder: {
+                        
                     },
                     onReport: {
                         if AccountViewModel.shared.account.isAnonymous() {

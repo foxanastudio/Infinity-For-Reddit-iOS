@@ -190,14 +190,14 @@ struct PostViewCompact: View {
                     
                     switch post.postType {
                     case .noPreviewLink:
-                        if let url = URL(string: post.url), let domain = url.host {
+                        if let url = URL(string: post.url) {
                             NoPreviewLinkView {
                                 onOpenLink(url)
                                 Task {
                                     await onReadPost()
                                 }
                             }
-                        } else if let crosspost = post.crosspostParent, let url = URL(string: crosspost.url), let domain = url.host {
+                        } else if let crosspost = post.crosspostParent, let url = URL(string: crosspost.url) {
                             NoPreviewLinkView {
                                 onOpenLink(url)
                                 Task {

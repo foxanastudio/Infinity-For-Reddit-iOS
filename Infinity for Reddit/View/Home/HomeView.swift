@@ -39,11 +39,13 @@ struct HomeView: View {
     @StateObject private var tab5SnackbarManager: SnackbarManager
     
     @StateObject private var homeViewModel: HomeViewModel
-    
     @StateObject private var videoFullScreenViewModel: VideoFullScreenViewModel
     
     @State private var selectedTab: Tab = .home
-    @State private var showProfile: Bool = false
+    @State private var showNewFeatureSheet: Bool = false
+    
+    @AppStorage(GesturesButtonsUserDefaultsUtils.minimizeTabBarOnScrollDownKey, store: .gesturesButtons)
+    private var minimizeTabBarOnScrollDown: Bool = false
     
     init(fullScreenMediaViewModel: FullScreenMediaViewModel) {
         self.fullScreenMediaViewModel = fullScreenMediaViewModel
@@ -226,6 +228,13 @@ struct HomeView: View {
             }
         }
         .themedTabView()
+        .modify {
+            if #available(iOS 26.0, *) {
+                $0.tabBarMinimizeBehavior(minimizeTabBarOnScrollDown ? .onScrollDown : .never)
+            } else {
+                $0
+            }
+        }
         .onAppear {
             let dirPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
             let docsDir = dirPaths[0]
@@ -249,6 +258,11 @@ struct HomeView: View {
             if let inboxFullname = accountViewModel.pendingInboxFullname, !inboxFullname.isEmpty {
                 homeViewModel.readInbox(inboxFullname: inboxFullname)
                 accountViewModel.pendingInboxFullname = nil
+            }
+            
+            if InternalStateUserDefaultsUtils.currentBuildNumber <= Bundle.main.buildNumber {
+                //showNewFeatureSheet = true
+                InternalStateUserDefaultsUtils.setCurrentBuildNumber()
             }
         }
         .task {
@@ -283,10 +297,10 @@ struct HomeView: View {
         }, onAppEntersBackground: {
             homeViewModel.stopInboxCountPolling()
         })
-        .onReceive(NotificationCenter.default.publisher(for: .inboxDeepLink)) { note in
-            let accountName = (note.userInfo?[AppDeepLink.accountNameKey] as? String) ?? ""
-            let viewMessage = (note.userInfo?[AppDeepLink.viewMessageKey] as? Bool) ?? false
-            let inboxFullname = note.userInfo?[AppDeepLink.fullnameKey] as? String
+        .onReceive(NotificationCenter.default.publisher(for: .inboxDeepLink)) { notification in
+            let accountName = (notification.userInfo?[AppDeepLink.accountNameKey] as? String) ?? ""
+            let viewMessage = (notification.userInfo?[AppDeepLink.viewMessageKey] as? Bool) ?? false
+            let inboxFullname = notification.userInfo?[AppDeepLink.fullnameKey] as? String
             
             Task {
                 if !accountName.isEmpty {
@@ -310,14 +324,14 @@ struct HomeView: View {
                 }
             }
         }
-        .onReceive(NotificationCenter.default.publisher(for: .contextDeepLink)) { note in
-            let accountName = (note.userInfo?[AppDeepLink.accountNameKey] as? String) ?? ""
-            let inboxFullname = note.userInfo?[AppDeepLink.fullnameKey] as? String
+        .onReceive(NotificationCenter.default.publisher(for: .contextDeepLink)) { notification in
+            let accountName = (notification.userInfo?[AppDeepLink.accountNameKey] as? String) ?? ""
+            let inboxFullname = notification.userInfo?[AppDeepLink.fullnameKey] as? String
             
             Task {
                 if !accountName.isEmpty {
                     if !(await accountViewModel.switchToAccountIfNeeded(accountName)) {
-                        if let context = (note.userInfo?[AppDeepLink.contextKey] as? String) {
+                        if let context = (notification.userInfo?[AppDeepLink.contextKey] as? String) {
                             await MainActor.run {
                                 currentNavigationManager.openLink(context)
                             }
@@ -326,7 +340,7 @@ struct HomeView: View {
                             }
                         }
                     } else {
-                        if let context = (note.userInfo?[AppDeepLink.contextKey] as? String) {
+                        if let context = (notification.userInfo?[AppDeepLink.contextKey] as? String) {
                             await MainActor.run {
                                 accountViewModel.pendingContextAfterNotificationClicked = context
                                 accountViewModel.pendingInboxFullname = inboxFullname
@@ -358,6 +372,23 @@ struct HomeView: View {
         .onReceive(NotificationCenter.default.publisher(for: .appStoreEventDeepLink)) { _ in
             currentNavigationManager.append(AppNavigation.appStoreEvent)
         }
+        .onReceive(NotificationCenter.default.publisher(for: .redirectDeepLink)) { notification in
+            if let link = (notification.userInfo?[AppDeepLink.urlStringKey] as? String) {
+                currentNavigationManager.openLink(link)
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .reminderDeepLink)) { notification in
+            if let postId = (notification.userInfo?[AppDeepLink.postId] as? String),
+               let commentId = (notification.userInfo?[AppDeepLink.commentId] as? String) {
+                currentNavigationManager.append(
+                    AppNavigation.postDetails(
+                        postDetailsInput: .postAndCommentId(
+                            postId: postId, commentId: commentId.isEmpty ? nil : commentId),
+                        videoPlaybackTime: 0
+                    )
+                )
+            }
+        }
         .onReceive(NotificationCenter.default.publisher(for: .notificationToggleChanged)) { _ in
             if NotificationUserDefaultsUtils.enableNotification {
                 printInDebugOnly("Foreground refresh enabled")
@@ -381,6 +412,12 @@ struct HomeView: View {
             } else {
                 currentSnackbarManager.dismiss()
             }
+        }
+        .sheet(isPresented: $showNewFeatureSheet) {
+            SheetRootView {
+                NewFeatureView()
+            }
+            .interactiveDismissDisabled()
         }
     }
     

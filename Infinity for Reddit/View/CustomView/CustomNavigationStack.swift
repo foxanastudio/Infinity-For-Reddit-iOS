@@ -167,6 +167,9 @@ struct CustomNavigationStack<Content: View>: View {
                     case .appStoreEvent:
                         AppStoreEventView()
                             .environmentObject(navigationManager)
+                    case .setReminder(let post, let comment):
+                        SetReminderView(post: post, comment: comment)
+                            .environmentObject(navigationManager)
                     }
                 }
                 .navigationDestination(for: MoreViewNavigation.self) { destination in
@@ -203,6 +206,9 @@ struct CustomNavigationStack<Content: View>: View {
                         ModMailView()
                             .environmentObject(navigationManager)
                             .environmentObject(modMailShareableViewModel)
+                    case .reminders:
+                        ReminderListingView()
+                            .environmentObject(navigationManager)
                     }
                 }
                 .navigationDestination(for: SettingsViewNavigation.self) { destination in

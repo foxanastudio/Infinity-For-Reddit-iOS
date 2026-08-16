@@ -14,6 +14,7 @@
 		554918CB2E26D8ED00355B48 /* Flow in Frameworks */ = {isa = PBXBuildFile; productRef = 554918CA2E26D8ED00355B48 /* Flow */; };
 		555866B72F0ABFA800A609C5 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 555866B62F0ABFA800A609C5 /* Lottie */; };
 		555F0B842D07AD53003A1CA7 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 555F0B832D07AD53003A1CA7 /* SDWebImageSwiftUI */; };
+		557622442FB3CED500BEBB5C /* Open In Infinity.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5576222C2FB3CED500BEBB5C /* Open In Infinity.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		5582E51B2EFF32550031EDE7 /* SeekBar in Frameworks */ = {isa = PBXBuildFile; productRef = 5582E51A2EFF32550031EDE7 /* SeekBar */; };
 		5582E51C2EFF45980031EDE7 /* SeekBar in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 5582E51A2EFF32550031EDE7 /* SeekBar */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		5588B8552E0A30A1004CDAA2 /* IdentifiedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 5588B8542E0A30A1004CDAA2 /* IdentifiedCollections */; };
@@ -28,6 +29,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		557622422FB3CED500BEBB5C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 559BD22B2CF7D58500621685 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5576222B2FB3CED500BEBB5C;
+			remoteInfo = "Open In Infinity";
+		};
 		559BD2462CF7D58600621685 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 559BD22B2CF7D58500621685 /* Project object */;
@@ -45,6 +53,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		557622452FB3CED500BEBB5C /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				557622442FB3CED500BEBB5C /* Open In Infinity.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5582E51D2EFF45980031EDE7 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -59,6 +78,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5576222C2FB3CED500BEBB5C /* Open In Infinity.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Open In Infinity.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		559BD2332CF7D58500621685 /* Infinity for Reddit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Infinity for Reddit.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		559BD2452CF7D58600621685 /* Infinity for RedditTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Infinity for RedditTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		559BD24F2CF7D58600621685 /* Infinity for RedditUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Infinity for RedditUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -66,7 +86,29 @@
 		55BA78B92F3AE62D0087037D /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		557622482FB3CED500BEBB5C /* Exceptions for "Open In Infinity" folder in "Open In Infinity" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 5576222B2FB3CED500BEBB5C /* Open In Infinity */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		5576222D2FB3CED500BEBB5C /* Open In Infinity */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				557622482FB3CED500BEBB5C /* Exceptions for "Open In Infinity" folder in "Open In Infinity" target */,
+			);
+			explicitFolders = (
+				Resources/_locales,
+				Resources/images,
+			);
+			path = "Open In Infinity";
+			sourceTree = "<group>";
+		};
 		559628832FA41567008F71C8 /* Resources */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Resources;
@@ -90,6 +132,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		557622292FB3CED500BEBB5C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		559BD2302CF7D58500621685 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -137,6 +186,7 @@
 				559BD2352CF7D58500621685 /* Infinity for Reddit */,
 				559BD2482CF7D58600621685 /* Infinity for RedditTests */,
 				559BD2522CF7D58600621685 /* Infinity for RedditUITests */,
+				5576222D2FB3CED500BEBB5C /* Open In Infinity */,
 				559BD2342CF7D58500621685 /* Products */,
 				55BA78B42F21D4270087037D /* AppIcon.icon */,
 			);
@@ -148,6 +198,7 @@
 				559BD2332CF7D58500621685 /* Infinity for Reddit.app */,
 				559BD2452CF7D58600621685 /* Infinity for RedditTests.xctest */,
 				559BD24F2CF7D58600621685 /* Infinity for RedditUITests.xctest */,
+				5576222C2FB3CED500BEBB5C /* Open In Infinity.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -155,6 +206,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		5576222B2FB3CED500BEBB5C /* Open In Infinity */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 557622492FB3CED500BEBB5C /* Build configuration list for PBXNativeTarget "Open In Infinity" */;
+			buildPhases = (
+				557622282FB3CED500BEBB5C /* Sources */,
+				557622292FB3CED500BEBB5C /* Frameworks */,
+				5576222A2FB3CED500BEBB5C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				5576222D2FB3CED500BEBB5C /* Open In Infinity */,
+			);
+			name = "Open In Infinity";
+			packageProductDependencies = (
+			);
+			productName = "Open In Infinity";
+			productReference = 5576222C2FB3CED500BEBB5C /* Open In Infinity.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		559BD2322CF7D58500621685 /* Infinity for Reddit */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 559BD2592CF7D58600621685 /* Build configuration list for PBXNativeTarget "Infinity for Reddit" */;
@@ -163,10 +236,12 @@
 				559BD2302CF7D58500621685 /* Frameworks */,
 				559BD2312CF7D58500621685 /* Resources */,
 				5582E51D2EFF45980031EDE7 /* Embed Frameworks */,
+				557622452FB3CED500BEBB5C /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				557622432FB3CED500BEBB5C /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				559628832FA41567008F71C8 /* Resources */,
@@ -247,9 +322,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1610;
+				LastSwiftUpdateCheck = 2620;
 				LastUpgradeCheck = 1610;
 				TargetAttributes = {
+					5576222B2FB3CED500BEBB5C = {
+						CreatedOnToolsVersion = 26.2;
+					};
 					559BD2322CF7D58500621685 = {
 						CreatedOnToolsVersion = 16.1;
 					};
@@ -297,11 +375,19 @@
 				559BD2322CF7D58500621685 /* Infinity for Reddit */,
 				559BD2442CF7D58600621685 /* Infinity for RedditTests */,
 				559BD24E2CF7D58600621685 /* Infinity for RedditUITests */,
+				5576222B2FB3CED500BEBB5C /* Open In Infinity */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		5576222A2FB3CED500BEBB5C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		559BD2312CF7D58500621685 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -328,6 +414,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		557622282FB3CED500BEBB5C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		559BD22F2CF7D58500621685 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -352,6 +445,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		557622432FB3CED500BEBB5C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5576222B2FB3CED500BEBB5C /* Open In Infinity */;
+			targetProxy = 557622422FB3CED500BEBB5C /* PBXContainerItemProxy */;
+		};
 		559BD2472CF7D58600621685 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 559BD2322CF7D58500621685 /* Infinity for Reddit */;
@@ -365,6 +463,72 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		557622462FB3CED500BEBB5C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5P86PK4YC6;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Open In Infinity/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Open In Infinity";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.foxanastudio.infinity.Open-In-Infinity";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		557622472FB3CED500BEBB5C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5P86PK4YC6;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Open In Infinity/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Open In Infinity";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.foxanastudio.infinity.Open-In-Infinity";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		559BD2572CF7D58600621685 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -631,6 +795,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		557622492FB3CED500BEBB5C /* Build configuration list for PBXNativeTarget "Open In Infinity" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				557622462FB3CED500BEBB5C /* Debug */,
+				557622472FB3CED500BEBB5C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		559BD22E2CF7D58500621685 /* Build configuration list for PBXProject "Infinity for Reddit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

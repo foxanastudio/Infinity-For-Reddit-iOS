@@ -20,6 +20,7 @@ struct PostOptionsSheet: View {
     var onCrosspost: () -> Void
     var onDownloadMedia: () -> Void
     var onDownloadAllGalleryMedia: () -> Void
+    var onSetReminder: () -> Void
     var onReport: () -> Void
     var onModeration: () -> Void
     
@@ -73,6 +74,11 @@ struct PostOptionsSheet: View {
                             onDownloadAllGalleryMedia()
                             dismiss()
                         }
+                    }
+                    
+                    IconTextButton(startIconUrl: "bell", text: "Set Reminder") {
+                        dismiss()
+                        onSetReminder()
                     }
                     
                     IconTextButton(startIconUrl: "flag", text: "Report") {

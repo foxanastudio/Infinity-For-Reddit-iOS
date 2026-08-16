@@ -138,7 +138,11 @@ public class CommentListingViewModel: ObservableObject {
             }
         } catch {
             await MainActor.run {
-                self.commentLoadingError = error
+                if error.asAFError?.responseCode == 403 && AccountViewModel.shared.account.isAnonymous() {
+                    self.commentLoadingError = APIError.anonymous403Error
+                } else {
+                    self.commentLoadingError = error
+                }
                 
                 if isRefreshWithContinuation {
                     finishPullToRefresh()

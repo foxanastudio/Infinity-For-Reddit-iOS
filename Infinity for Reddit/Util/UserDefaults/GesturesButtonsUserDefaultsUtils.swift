@@ -13,6 +13,11 @@ class GesturesButtonsUserDefaultsUtils {
         return UserDefaults.gesturesButtons.bool(forKey: hideNavigationBarOnScrollDownKey, false)
     }
     
+    static let minimizeTabBarOnScrollDownKey = "minimize_tab_bar_on_scroll_down"
+    static var minimizeTabBarOnScrollDown: Bool {
+        return UserDefaults.gesturesButtons.bool(forKey: minimizeTabBarOnScrollDownKey, false)
+    }
+    
     static let postLeftSwipeActionKey = "post_left_swipe_actions"
     static var postLeftSwipeAction: Int {
         return UserDefaults.gesturesButtons.integer(forKey: postLeftSwipeActionKey, SwipeAction.upvote.rawValue)

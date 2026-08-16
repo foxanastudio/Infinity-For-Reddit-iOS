@@ -11,6 +11,7 @@ import SeekBar
 
 struct InlineVideoPlayer: View {
     @EnvironmentObject private var networkManager: NetworkManager
+    @EnvironmentObject private var videoPlayerPool: VideoPlayerPool
     
     @ObservedObject private var videoPlayerViewModel: VideoPlayerViewModel
     
@@ -21,24 +22,27 @@ struct InlineVideoPlayer: View {
     @AppStorage(DataSavingModeUserDefaultsUtils.dataSavingModeKey, store: .dataSavingMode) private var dataSavingMode: Int = 0
     
     let videoURL: URL
+    private let ignoreAutoplay: Bool
     private let aspectRatio: CGSize?
     private let muteVideo: Bool
     private let canPlay: Bool
     private let isSensitive: Bool
     private let playbackTimeToSeekToInitially: Double
-    private let onFullScreen: (() -> Void)?
+    private let onFullScreen: ((Double) -> Void)?
     
     init(
         videoURL: URL,
+        ignoreAutoplay: Bool = false,
         aspectRatio: CGSize?,
         muteVideo: Bool = false,
         canPlay: Bool = true,
         isSensitive: Bool,
         playbackTimeToSeekToInitially: Double = 0,
         videoPlayerViewModel: VideoPlayerViewModel,
-        onFullScreen: (() -> Void)? = nil
+        onFullScreen: ((Double) -> Void)? = nil
     ) {
         self.videoURL = videoURL
+        self.ignoreAutoplay = ignoreAutoplay
         self.aspectRatio = aspectRatio
         self.muteVideo = muteVideo
         self.canPlay = canPlay
@@ -78,11 +82,22 @@ struct InlineVideoPlayer: View {
                 }
             }
         }
-        .applyIf(aspectRatio != nil) {
-            $0.aspectRatio(aspectRatio!, contentMode: .fit)
+        .modify {
+            if let aspectRatio {
+                $0.aspectRatio(aspectRatio, contentMode: .fit)
+            } else {
+                $0.frame(height: 400)
+            }
+        }
+        .applyIf(ignoreAutoplay) {
+            $0.onChange(of: isVideoPlayerGrabbed) { _, newValue in
+                if !newValue {
+                    showPlayer = false
+                }
+            }
         }
         .onAppear {
-            if showPlayer == nil {
+            if !ignoreAutoplay && showPlayer == nil {
                 showPlayer = !isDataSavingModeActive && VideoUserDefaultsUtils.canAutoplayVideo(videoAutoplay: videoAutoplay, isWifiConnected: networkManager.isWifiConnected) && ((isSensitive && autoplaySensitiveVideo) || !isSensitive)
             }
         }
@@ -90,6 +105,10 @@ struct InlineVideoPlayer: View {
     
     private var isDataSavingModeActive: Bool {
         return DataSavingModeUserDefaultsUtils.isDataSavingModeActive(dataSavingMode: dataSavingMode, isWifiConnected: networkManager.isWifiConnected)
+    }
+    
+    private var isVideoPlayerGrabbed: Bool {
+        videoPlayerPool.playerDict[videoPlayerViewModel.id] != nil
     }
 }
 
@@ -101,9 +120,9 @@ struct InlineVideoPlayerWithSelfContainedViewModel: View {
     private let muteVideo: Bool
     private let canPlay: Bool
     private let isSensitive: Bool
-    private let onFullScreen: (() -> Void)?
+    private let onFullScreen: ((Double) -> Void)?
     
-    init(videoURL: URL, aspectRatio: CGSize?, muteVideo: Bool = false, canPlay: Bool = true, isSensitive: Bool, onFullScreen: (() -> Void)? = nil) {
+    init(videoURL: URL, aspectRatio: CGSize?, muteVideo: Bool = false, canPlay: Bool = true, isSensitive: Bool, onFullScreen: ((Double) -> Void)? = nil) {
         self.videoURL = videoURL
         self.aspectRatio = aspectRatio
         self.muteVideo = muteVideo
@@ -116,6 +135,7 @@ struct InlineVideoPlayerWithSelfContainedViewModel: View {
     var body: some View {
         InlineVideoPlayer(
             videoURL: videoURL,
+            ignoreAutoplay: true,
             aspectRatio: aspectRatio,
             muteVideo: VideoUserDefaultsUtils.muteAutoplayingVideo,
             isSensitive: isSensitive,
@@ -138,7 +158,7 @@ private struct InlineVideoPlayerWithControls: View {
     private let aspectRatio: CGSize?
     private let muteVideo: Bool
     private let playbackTimeToSeekToInitially: Double
-    private let onFullScreen: (() -> Void)?
+    private let onFullScreen: ((Double) -> Void)?
 
     init(
         url: URL,
@@ -147,7 +167,7 @@ private struct InlineVideoPlayerWithControls: View {
         canPlay: Bool,
         playbackTimeToSeekToInitially: Double,
         videoPlayerViewModel: VideoPlayerViewModel,
-        onFullScreen: (() -> Void)?
+        onFullScreen: ((Double) -> Void)?
     ) {
         self.url = url
         self.aspectRatio = aspectRatio
@@ -236,7 +256,7 @@ private struct InlineVideoPlayerWithControls: View {
                     
                     if let onFullScreen {
                         Button(action: {
-                            onFullScreen()
+                            onFullScreen(videoPlayerViewModel.currentTime)
                         }) {
                             SwiftUI.Image(systemName: "arrow.down.left.and.arrow.up.right.rectangle")
                                 .resizable()
@@ -258,8 +278,12 @@ private struct InlineVideoPlayerWithControls: View {
                 videoPlayerViewModel.toggleControls()
             }
         }
-        .applyIf(aspectRatio != nil) {
-            $0.aspectRatio(aspectRatio!, contentMode: .fit)
+        .modify {
+            if let aspectRatio {
+                $0.aspectRatio(aspectRatio, contentMode: .fit)
+            } else {
+                $0.frame(height: 400)
+            }
         }
         .onReceive(fullScreenMediaViewModel.$media) { newValue in
             if newValue != nil {

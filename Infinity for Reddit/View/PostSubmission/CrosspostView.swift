@@ -108,9 +108,9 @@ struct CrosspostView: View {
                                             mediaMetadata: crosspostViewModel.postToBeCrossposted.mediaMetadata,
                                             isSensitive: crosspostViewModel.postToBeCrossposted.over18,
                                             fullScreenMediaViewModel: fullScreenMediaViewModel,
-                                            onFullScreenVideo: { videoUrlString in
+                                            onFullScreenVideo: { urlString, playbackTime in
                                                 fullScreenMediaViewModel.show(
-                                                    .video(urlString: videoUrlString, videoType: .direct, canDownload: false)
+                                                    .video(urlString: urlString, videoType: .direct, canDownload: false, playbackTime: playbackTime)
                                                 )
                                             }
                                         )

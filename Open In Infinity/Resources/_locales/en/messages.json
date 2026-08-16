@@ -1,0 +1,10 @@
+{
+    "extension_name": {
+        "message": "Open In Infinity",
+        "description": "The display name for the extension."
+    },
+    "extension_description": {
+        "message": "Automatically opens Reddit links directly in the Infinity for Reddit app for a seamless experience.",
+        "description": "Description of what the extension does."
+    }
+}

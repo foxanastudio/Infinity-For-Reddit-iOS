@@ -17,7 +17,7 @@ struct MarkdownImageProvider: ImageProvider {
     let linkColor: Color
     let fullScreenMediaViewModel: FullScreenMediaViewModel
     let onLinkTap: ((URL) -> Void)?
-    let onFullScreenVideo: ((String) -> Void)?
+    let onFullScreenVideo: ((String, Double) -> Void)?
     
     init(
         mediaMetadata: [String: MediaMetadata]?,
@@ -28,7 +28,7 @@ struct MarkdownImageProvider: ImageProvider {
         linkColor: Color = .black,
         fullScreenMediaViewModel: FullScreenMediaViewModel,
         onLinkTap: ((URL) -> Void)? = nil,
-        onFullScreenVideo: ((String) -> Void)? = nil
+        onFullScreenVideo: ((String, Double) -> Void)? = nil
     ) {
         self.mediaMetadata = mediaMetadata
         self.markdownEmbeddedMediaType = MarkdownEmbeddedMediaType(rawValue: markdownEmbeddedMediaType) ?? .all
@@ -57,6 +57,8 @@ struct MarkdownImageProvider: ImageProvider {
                                     onMediaTap(urlString: urlString, fileName: "\(Utils.randomString()).gif", isGif: true)
                                 }
                             })
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .clipped()
                             
                             if media.caption != nil {
                                 Text(media.caption!)
@@ -88,6 +90,8 @@ struct MarkdownImageProvider: ImageProvider {
                                     onMediaTap(urlString: urlString, fileName: "\(Utils.randomString()).jpg", isGif: false)
                                 }
                             })
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .clipped()
                             
                             if media.caption != nil {
                                 Text(media.caption!)
@@ -115,11 +119,41 @@ struct MarkdownImageProvider: ImageProvider {
                                     aspectRatio: CGSize(width: media.x, height: media.y),
                                     muteVideo: VideoUserDefaultsUtils.muteAutoplayingVideo,
                                     isSensitive: isSensitive,
-                                    onFullScreen: onFullScreenVideo == nil ? nil : {
-                                        onFullScreenVideo?(media.hlsUrl)
+                                    onFullScreen: onFullScreenVideo == nil ? nil : { playbackTime in
+                                        onFullScreenVideo?(media.hlsUrl, playbackTime)
                                     }
                                 )
                                 .id(url)
+                                .clipShape(RoundedRectangle(cornerRadius: 16))
+                                .clipped()
+                            }
+                            
+                            if media.caption != nil {
+                                Text(media.caption!)
+                                    .secondaryText(.f15)
+                            }
+                        }
+                    } else if let urlString = media.videoLinkMarkdown {
+                        Text(getLinkAttributedString(urlString: urlString, caption: media.caption))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .linkText(.f15)
+                    }
+                } else if media.e == MediaMetadata.parsedVideoType {
+                    if markdownEmbeddedMediaType.allowVideo {
+                        VStack {
+                            if let url = URL(string: media.hlsUrl) {
+                                InlineVideoPlayerWithSelfContainedViewModel(
+                                    videoURL: url,
+                                    aspectRatio: nil,
+                                    muteVideo: VideoUserDefaultsUtils.muteAutoplayingVideo,
+                                    isSensitive: isSensitive,
+                                    onFullScreen: onFullScreenVideo == nil ? nil : { playbackTime in
+                                        onFullScreenVideo?(media.hlsUrl, playbackTime)
+                                    }
+                                )
+                                .id(url)
+                                .clipShape(RoundedRectangle(cornerRadius: 16))
+                                .clipped()
                             }
                             
                             if media.caption != nil {
@@ -170,7 +204,7 @@ struct MarkdownImageProvider: ImageProvider {
     
     private func getLinkAttributedString(urlString: String, caption: String? = nil) -> AttributedString {
         var attributedString = AttributedString(caption ?? urlString)
-        attributedString.link = URL(string: urlString)!
+        attributedString.link = URL(string: urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? urlString)!
         attributedString.foregroundColor = linkColor
         return attributedString
     }

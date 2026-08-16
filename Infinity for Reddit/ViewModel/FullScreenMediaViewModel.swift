@@ -112,6 +112,7 @@ enum VideoType {
     case reddit
     case direct
     case vReddIt
+    case parsedVideo
     case redgifs(id: String)
     case streamable(shortCode: String)
 }

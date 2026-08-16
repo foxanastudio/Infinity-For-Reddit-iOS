@@ -14,7 +14,7 @@ class LinkHandler {
     private func constructRedditURL(from path: String) -> URL {
         let trimmed = path.trimmingCharacters(in: .whitespacesAndNewlines)
         let full = trimmed.hasPrefix("/") ? "https://www.reddit.com\(trimmed)" : "https://www.reddit.com/\(trimmed)"
-        return URL(string: full)!
+        return URL(string: full.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? full)!
     }
     
     func handle(link: String, allowRedditShareLink: Bool = true) -> LinkDestination {
@@ -50,11 +50,11 @@ class LinkHandler {
         if path.hasSuffix(".mp4") {
             return LinkDestination.fullScreenMedia(FullScreenMediaType.video(urlString: finalURL.absoluteString, videoType: .direct))
         } else if path.hasSuffix(".jpg") || path.hasSuffix(".JPG") || path.hasSuffix(".jpeg") {
-            return LinkDestination.fullScreenMedia(FullScreenMediaType.image(urlString: finalURL.absoluteString, fileName: "\(segments[segments.count - 1]).jpg"))
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.image(urlString: finalURL.absoluteString, fileName: "\(segments[segments.count - 1])"))
         } else if path.hasSuffix(".png") || path.hasSuffix(".PNG") {
-            return LinkDestination.fullScreenMedia(FullScreenMediaType.image(urlString: finalURL.absoluteString, fileName: "\(segments[segments.count - 1]).png"))
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.image(urlString: finalURL.absoluteString, fileName: "\(segments[segments.count - 1])"))
         } else if path.hasSuffix(".gif") {
-            return LinkDestination.fullScreenMedia(FullScreenMediaType.gif(urlString: finalURL.absoluteString, fileName: "\(segments[segments.count - 1]).gif"))
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.gif(urlString: finalURL.absoluteString, fileName: "\(segments[segments.count - 1])"))
         }
         
         switch host {
@@ -134,7 +134,7 @@ class LinkHandler {
             return LinkDestination.fullScreenMedia(FullScreenMediaType.imgurGallery(imgurId: segments[1].components(separatedBy: "-").last ?? segments[1]))
         } else if path.matches("/(album|a)/\\w+/?") {
             printInDebugOnly("Open Imgur album: \(segments[1])")
-            return LinkDestination.fullScreenMedia(FullScreenMediaType.imgurGallery(imgurId: segments[1].components(separatedBy: "-").last ?? segments[1]))
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.imgurAlbum(imgurId: segments[1].components(separatedBy: "-").last ?? segments[1]))
         } else if path.matches("/\\w+/?") {
             printInDebugOnly("Open Imgur image: \(path.dropFirst())")
             let potentialId = path.dropFirst()

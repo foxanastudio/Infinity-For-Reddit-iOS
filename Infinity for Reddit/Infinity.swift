@@ -84,6 +84,7 @@ struct Infinity: App {
                                     userInfo[AppDeepLink.fullnameKey] = fullname
                                 }
                                 NotificationCenter.default.post(name: .inboxDeepLink, object: nil, userInfo: userInfo)
+                                break
                             case .context(let account, let context, let fullname):
                                 var userInfo: [String: Any] = [
                                     AppDeepLink.accountNameKey: account,
@@ -93,14 +94,30 @@ struct Infinity: App {
                                     userInfo[AppDeepLink.fullnameKey] = fullname
                                 }
                                 NotificationCenter.default.post(name: .contextDeepLink, object: nil, userInfo: userInfo)
+                                break
                             case .modMail(let account, let conversationId):
                                 var userInfo: [String: Any] = [AppDeepLink.accountNameKey: account]
                                 if let conversationId {
                                     userInfo[AppDeepLink.conversationIdKey] = conversationId
                                 }
                                 NotificationCenter.default.post(name: .modMailDeepLink, object: nil, userInfo: userInfo)
+                                break
                             case .appStoreEvent(let eventName):
                                 NotificationCenter.default.post(name: .appStoreEventDeepLink, object: nil)
+                                break
+                            case .redirect(let urlString):
+                                let userInfo: [String: Any] = [
+                                    AppDeepLink.urlStringKey: urlString
+                                ]
+                                NotificationCenter.default.post(name: .redirectDeepLink, object: nil, userInfo: userInfo)
+                                break
+                            case .reminder(postId: let postId, commentId: let commentId):
+                                let userInfo: [String: Any] = [
+                                    AppDeepLink.postId: postId,
+                                    AppDeepLink.commentId: commentId
+                                ]
+                                NotificationCenter.default.post(name: .reminderDeepLink, object: nil, userInfo: userInfo)
+                                break
                             }
                         }
                         .onAppear {
@@ -140,6 +157,8 @@ struct Infinity: App {
                         }
                     }
                 }
+                
+                ReminderManager.shared.checkRemindersIfNecessary()
             }
         }
         

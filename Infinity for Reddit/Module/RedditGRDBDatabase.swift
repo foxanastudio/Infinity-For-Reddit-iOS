@@ -28,7 +28,34 @@ struct RedditGRDBDatabase {
     }
     
     private static func setupMigrations(_ dbPool: DatabasePool) throws {
-        // TODO for future database scheme migration
+        var migrator = DatabaseMigrator()
+
+        migrator.registerMigration("Create reminders") { db in
+            try db.create(table: "reminders") { t in
+                    t.column("username", .text)
+                    t.column("post_id", .text)
+                        .notNull()
+                    t.column("comment_id", .text)
+                        .notNull()
+                    t.column("content", .text)
+                        .notNull()
+                    t.column("created_at", .integer)
+                        .notNull()
+                        .defaults(to: 0)
+                    t.column("reminder_time", .integer)
+                        .notNull()
+                        .defaults(to: 0)
+                    t.primaryKey(["post_id", "comment_id", "reminder_time"])
+                    t.foreignKey(
+                        ["username"],
+                        references: "accounts",
+                        columns: ["username"],
+                        onDelete: .setNull
+                    )
+                }
+        }
+
+        try migrator.migrate(dbPool)
     }
     
     private static func setupDatabaseScheme(_ dbPool: DatabasePool) throws {
