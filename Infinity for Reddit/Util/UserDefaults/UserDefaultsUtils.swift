@@ -28,5 +28,6 @@ struct UserDefaultsUtils {
     
     // BackgrounTasks
     static let PULL_NOTIFICATION_TIME_KEY = "pull_notification_time"
+    static let PULL_MODMAIL_NOTIFICATION_TIME_KEY = "pull_modmail_notification_time"
     
 }

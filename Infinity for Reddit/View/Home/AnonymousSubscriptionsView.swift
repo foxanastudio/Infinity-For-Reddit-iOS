@@ -269,7 +269,7 @@ struct AnonymousSubscriptionsView: View {
                         }
                     }
                 }
-                .scrollBounceBehavior(.basedOnSize)
+                .scrollBounceBehavior(.always)
                 .themedList()
             }
         }

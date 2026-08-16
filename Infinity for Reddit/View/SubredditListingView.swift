@@ -119,7 +119,7 @@ struct SubredditListingView: View {
                         .listPlainItem()
                     }
                 }
-                .scrollBounceBehavior(.basedOnSize)
+                .scrollBounceBehavior(.always)
                 .themedList()
                 .showErrorUsingSnackbar(subredditListingViewModel.$error)
             }

@@ -83,22 +83,30 @@ class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
         let inboxKind = Inbox.InboxKind(rawValue: kind) ?? .unknown
         
         var deepLinkUrl: URL?
-        
-        switch inboxKind {
-        case .comment, .link:
-            if let context = userInfo[AppDeepLink.contextKey] as? String {
-                deepLinkUrl = AppDeepLink.getContextURL(
-                    context: context,
+
+        if kind == AppDeepLink.modMailHost {
+            let conversationId = userInfo[AppDeepLink.conversationIdKey] as? String
+            deepLinkUrl = AppDeepLink.getModMailURL(account: accountName, conversationId: conversationId)
+        } else {
+            let fullname = userInfo[AppDeepLink.fullnameKey] as? String
+            let inboxKind = Inbox.InboxKind(rawValue: kind) ?? .unknown
+
+            switch inboxKind {
+            case .comment, .link:
+                if let context = userInfo[AppDeepLink.contextKey] as? String {
+                    deepLinkUrl = AppDeepLink.getContextURL(
+                        context: context,
+                        account: accountName,
+                        fullname: fullname
+                    )
+                }
+            case .message, .account, .subreddit, .award, .unknown:
+                deepLinkUrl = AppDeepLink.getInboxURL(
                     account: accountName,
+                    viewMessage: (inboxKind == .message),
                     fullname: fullname
                 )
             }
-        case .message, .account, .subreddit, .award, .unknown:
-            deepLinkUrl = AppDeepLink.getInboxURL(
-                account: accountName,
-                viewMessage: (inboxKind == .message),
-                fullname: fullname
-            )
         }
         
         if let url = deepLinkUrl {

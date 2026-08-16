@@ -246,6 +246,10 @@ struct HomeView: View {
             if accountViewModel.pendingInboxTabAfterNotificationClicked {
                 selectedTab = .inbox
                 accountViewModel.pendingInboxTabAfterNotificationClicked = false
+            } else if accountViewModel.pendingOpenModMailAfterNotificationClicked {
+                openModMailListing(conversationId: accountViewModel.pendingModMailConversationId)
+                accountViewModel.pendingOpenModMailAfterNotificationClicked = false
+                accountViewModel.pendingModMailConversationId = nil
             } else if let context = accountViewModel.pendingContextAfterNotificationClicked {
                 currentNavigationManager.openLink(context)
                 accountViewModel.pendingContextAfterNotificationClicked = nil
@@ -346,6 +350,25 @@ struct HomeView: View {
                 }
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .modMailDeepLink)) { note in
+            let accountName = (note.userInfo?[AppDeepLink.accountNameKey] as? String) ?? ""
+            let conversationId = note.userInfo?[AppDeepLink.conversationIdKey] as? String
+
+            if !accountName.isEmpty {
+                Task {
+                    if !(await accountViewModel.switchToAccountIfNeeded(accountName)) {
+                        await MainActor.run {
+                            openModMailListing(conversationId: conversationId)
+                        }
+                    } else {
+                        await MainActor.run {
+                            accountViewModel.pendingOpenModMailAfterNotificationClicked = true
+                            accountViewModel.pendingModMailConversationId = conversationId
+                        }
+                    }
+                }
+            }
+        }
         .onReceive(NotificationCenter.default.publisher(for: .appStoreEventDeepLink)) { _ in
             currentNavigationManager.append(AppNavigation.appStoreEvent)
         }
@@ -433,6 +456,16 @@ struct HomeView: View {
             return tab4NavigationManager
         case .more:
             return tab5NavigationManager
+        }
+    }
+    
+    private func openModMailListing(conversationId: String?) {
+        selectedTab = .more
+        tab5NavigationManager.path = NavigationPath()
+        tab5NavigationManager.viewShouldHideNavigationBarOnScroll.removeAll()
+        tab5NavigationManager.append(MoreViewNavigation.modmail)
+        if let conversationId, !conversationId.isEmpty {
+            tab5NavigationManager.append(AppNavigation.modMailConversation(conversation: ModMailConversation(localId: conversationId)))
         }
     }
     

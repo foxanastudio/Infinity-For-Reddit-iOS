@@ -1,0 +1,171 @@
+//
+//  ModMailListingView.swift
+//  Infinity for Reddit
+//
+//  Created by joeylr2042 on 2026-04-09.
+//
+
+import SwiftUI
+
+struct ModMailListingView: View {
+    @EnvironmentObject private var navigationManager: NavigationManager
+    @EnvironmentObject private var navigationBarMenuManager: NavigationBarMenuManager
+    @EnvironmentObject private var modMailShareableViewModel: ModMailShareableViewModel
+
+    @StateObject var modMailListingViewModel: ModMailListingViewModel
+    @State private var navigationBarMenuKey: UUID?
+    
+    init() {
+        _modMailListingViewModel = StateObject(
+            wrappedValue: ModMailListingViewModel(
+                modMailListingRepository: ModMailListingRepository()
+            )
+        )
+    }
+    
+    var body: some View {
+        RootView {
+            if modMailListingViewModel.conversations.isEmpty {
+                ZStack {
+                    if modMailListingViewModel.isInitialLoading {
+                        ProgressIndicator()
+                    } else if modMailListingViewModel.isInitialLoad, let error = modMailListingViewModel.error {
+                        Text("Unable to load mod mail. Tap to retry. Error: \(error.localizedDescription)")
+                            .primaryText()
+                            .padding(16)
+                            .onTapGesture {
+                                modMailListingViewModel.refreshModMailListing()
+                            }
+                    } else {
+                        Text("No conversation")
+                            .primaryText()
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                List {
+                    ForEach(modMailListingViewModel.conversations, id: \.id) { conversation in
+                        ModMailConversationItemView(
+                            conversation: conversation,
+                            latestMessagePreview: conversation.latestMessagePreview,
+                            hasMarkedAllAsRead: modMailListingViewModel.hasMarkedAllAsRead,
+                            onTap: {
+                                modMailListingViewModel.markAsRead(conversation: conversation)
+                                navigationManager.append(
+                                    AppNavigation.modMailConversation(conversation: conversation)
+                                )
+                            }
+                        )
+                        .limitedWidth()
+                    }
+                    if modMailListingViewModel.hasMorePages {
+                        ProgressIndicator()
+                            .task {
+                                guard !modMailListingViewModel.isPullToRefreshing else {
+                                    return
+                                }
+                                await modMailListingViewModel.loadModMailListing()
+                            }
+                            .listPlainItem()
+                    }
+                }
+                .scrollBounceBehavior(.always)
+                .themedList()
+                .showErrorUsingSnackbar(modMailListingViewModel.$error)
+                .refreshable {
+                    await modMailListingViewModel.refreshModMailListingWithContinuation()
+                }
+            }
+        }
+        .task(id: modMailListingViewModel.loadModMailFlag) {
+            await modMailListingViewModel.initialLoadModMailListing()
+        }
+        .toolbar {
+            NavigationBarMenu()
+        }
+        .onAppear {
+            setUpMenu()
+            updateSharedConversationIfNeeded()
+        }
+        .onDisappear {
+            guard let navigationBarMenuKey else {
+                return
+            }
+            navigationBarMenuManager.pop(key: navigationBarMenuKey)
+        }
+    }
+
+    private func setUpMenu() {
+        if let key = navigationBarMenuKey {
+            navigationBarMenuManager.pop(key: key)
+        }
+
+        navigationBarMenuKey = navigationBarMenuManager.push([
+            NavigationBarMenuItem(title: "Mark All as Read") {
+                Task {
+                    do {
+                        try await modMailListingViewModel.markAllAsRead()
+                    } catch {
+                        await MainActor.run {
+                            modMailListingViewModel.error = error
+                        }
+                    }
+                }
+            },
+            NavigationBarMenuItem(title: "Refresh") {
+                modMailListingViewModel.refreshModMailListing()
+            }
+        ])
+    }
+
+    private func updateSharedConversationIfNeeded() {
+        guard let detail = modMailShareableViewModel.consumeUpdatedConversationDetail() else {
+            return
+        }
+
+        modMailListingViewModel.updateConversation(detail)
+    }
+}
+
+struct ModMailConversationItemView: View {
+    @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
+    
+    let conversation: ModMailConversation
+    let latestMessagePreview: String
+    let hasMarkedAllAsRead: Bool
+    let onTap: () -> Void
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            TouchRipple(action: onTap) {
+                VStack(spacing: 4) {
+                    HStack(alignment: .top, spacing: 8) {
+                        RowText("u/\(conversation.participant.name ?? "-"), \(conversation.replyCount) replies")
+                            .username()
+                        
+                        Spacer()
+                        
+                        TimeText(timeUTCInSeconds: conversation.lastUpdatedUtc, forceShowElapsedTime: true)
+                            .primaryText()
+                    }
+                    
+                    RowText("r/\(conversation.owner.displayName ?? "-")")
+                        .primaryText()
+                    
+                    RowText(conversation.subject)
+                        .primaryText()
+                    
+                    RowText(latestMessagePreview.isEmpty ? "-" : latestMessagePreview)
+                        .lineLimit(1)
+                        .secondaryText()
+                }
+                .contentShape(Rectangle())
+                .padding(16)
+                .background(conversation.isUnread && !hasMarkedAllAsRead ? Color(hex: customThemeViewModel.currentCustomTheme.unreadMessageBackgroundColor) : .clear)
+            }
+            
+            CustomDivider()
+        }
+        .listPlainItemNoInsets()
+    }
+}

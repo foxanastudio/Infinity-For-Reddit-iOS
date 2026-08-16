@@ -277,7 +277,7 @@ struct PostListingView: View {
                                 }
                             }
                         }
-                        .scrollBounceBehavior(.basedOnSize)
+                        .scrollBounceBehavior(.always)
                         .themedList()
                         .scrollIndicators(.hidden)
                         .refreshable {

@@ -14,6 +14,7 @@ struct CustomNavigationStack<Content: View>: View {
     
     @StateObject var commentSubmissionShareableViewModel: CommentSubmissionShareableViewModel = CommentSubmissionShareableViewModel()
     @StateObject var postEditingShareableViewModel: PostEditingShareableViewModel = PostEditingShareableViewModel()
+    @StateObject var modMailShareableViewModel = ModMailShareableViewModel()
     
     @AppStorage(GesturesButtonsUserDefaultsUtils.hideNavigationBarOnScrollDownKey, store: .gesturesButtons) private var hideNavigationBarOnScrollDown: Bool = false
     
@@ -80,6 +81,10 @@ struct CustomNavigationStack<Content: View>: View {
                     case .inboxConversation(let inbox):
                         InboxConversationView(inbox: inbox)
                             .environmentObject(navigationManager)
+                    case .modMailConversation(let conversation):
+                        ModMailConversationView(conversation: conversation)
+                            .environmentObject(navigationManager)
+                            .environmentObject(modMailShareableViewModel)
                     case .submitComment(let commentParent):
                         SubmitCommentView(parent: commentParent)
                             .environmentObject(navigationManager)
@@ -197,6 +202,10 @@ struct CustomNavigationStack<Content: View>: View {
                     case .test:
                         TestView()
                             .environmentObject(navigationManager)
+                    case .modmail:
+                        ModMailView()
+                            .environmentObject(navigationManager)
+                            .environmentObject(modMailShareableViewModel)
                     case .reminders:
                         ReminderListingView()
                             .environmentObject(navigationManager)

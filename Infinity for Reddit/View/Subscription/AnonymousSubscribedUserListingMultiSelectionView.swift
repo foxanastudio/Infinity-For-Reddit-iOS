@@ -53,7 +53,7 @@ struct AnonymousSubscribedUserListingMultiSelectionView: View {
                     .listPlainItemNoInsets()
                 }
             }
-            .scrollBounceBehavior(.basedOnSize)
+            .scrollBounceBehavior(.always)
             .themedList()
         }
     }

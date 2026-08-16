@@ -59,7 +59,7 @@ struct MyCustomFeedListingMultiSelectionView: View {
                         }
                     }
                 }
-                .scrollBounceBehavior(.basedOnSize)
+                .scrollBounceBehavior(.always)
                 .themedList()
             }
         }

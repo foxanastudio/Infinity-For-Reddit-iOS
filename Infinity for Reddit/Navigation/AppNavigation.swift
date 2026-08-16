@@ -15,6 +15,7 @@ enum AppNavigation: Hashable {
     case searchResults(query: String, searchInSubredditOrUserName: String?, searchInMultiReddit: String?, searchInThingType: SearchInThingType, searchResultTab: Int)
     case customFeed(customFeed: CustomFeedWrapper)
     case inboxConversation(inbox: Inbox)
+    case modMailConversation(conversation: ModMailConversation)
     case submitComment(commentParent: CommentParent)
     case editComment(commentToBeEdited: Comment)
     case submitTextPost

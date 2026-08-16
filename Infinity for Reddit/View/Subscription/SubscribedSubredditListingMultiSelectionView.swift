@@ -62,7 +62,7 @@ struct SubscribedSubredditListingMultiSelectionView: View {
                     .listPlainItemNoInsets()
                 }
             }
-            .scrollBounceBehavior(.basedOnSize)
+            .scrollBounceBehavior(.always)
             .themedList()
         }
     }

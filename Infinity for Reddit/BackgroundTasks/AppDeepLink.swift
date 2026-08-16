@@ -12,6 +12,7 @@ struct AppDeepLink {
     static let redirectScheme = "infinityredirect"
     static let reminderScheme = "infinityreminder"
     static let inboxHost = "inbox"
+    static let modMailHost = "modmail"
     static let linkHost = "linkToView"
     static let reminderHost = "postOrCommentToRemind"
     static let accountNameKey = "accountName"
@@ -19,6 +20,7 @@ struct AppDeepLink {
     static let contextKey = "context"
     static let kindKey = "kind"
     static let viewMessageKey = "viewMessage"
+    static let conversationIdKey = "conversationId"
     static let urlStringKey = "urlString"
     static let postId = "postId"
     static let commentId = "commentId"
@@ -47,6 +49,18 @@ struct AppDeepLink {
         ]
         if let fullname {
             items.append(URLQueryItem(name: fullnameKey, value: fullname))
+        }
+        components.queryItems = items
+        return components.url
+    }
+    
+    static func getModMailURL(account: String, conversationId: String?) -> URL? {
+        var components = URLComponents()
+        components.scheme = scheme
+        components.host = modMailHost
+        var items = [URLQueryItem(name: accountNameKey, value: account)]
+        if let conversationId {
+            items.append(URLQueryItem(name: conversationIdKey, value: conversationId))
         }
         components.queryItems = items
         return components.url
@@ -106,6 +120,11 @@ struct AppDeepLink {
                 context: context,
                 fullname: query(fullnameKey)
             )
+        case modMailHost:
+            guard let account = query(accountNameKey) else {
+                break
+            }
+            return .modMail(account: account, conversationId: query(conversationIdKey))
         default:
             break
         }
@@ -116,6 +135,7 @@ struct AppDeepLink {
 enum AppDeepLinkType {
     case inbox(account: String, viewMessage: Bool, fullname: String?)
     case context(account: String, context: String, fullname: String?)
+    case modMail(account: String, conversationId: String?)
     case appStoreEvent(eventName: String)
     case redirect(urlString: String)
     case reminder(postId: String, commentId: String)

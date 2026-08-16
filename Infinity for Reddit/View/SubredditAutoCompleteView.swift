@@ -91,7 +91,7 @@ struct SubredditAutoCompleteView: View {
                         }
                     }
                 }
-                .scrollBounceBehavior(.basedOnSize)
+                .scrollBounceBehavior(.always)
                 .themedList()
             }
         }

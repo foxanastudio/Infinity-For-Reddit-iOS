@@ -112,6 +112,16 @@ struct MoreView: View {
                     .limitedWidth()
                 }
                 
+                if accountViewModel.account.isMod {
+                    CustomListSection("Moderating") {
+                        SimpleTouchItemRow(text: "Mod Mail", icon: "envelope.badge.shield.half.filled") {
+                            navigationManager.append(MoreViewNavigation.modmail)
+                        }
+                        .listPlainItemNoInsets()
+                        .limitedWidth()
+                    }
+                }
+                
                 CustomListSection("Preferences") {
                     SimpleTouchItemRow(text: "Reminders", icon: "bell") {
                         navigationManager.append(MoreViewNavigation.reminders)

@@ -15,5 +15,6 @@ enum MoreViewNavigation: Hashable {
     case saved
     case settings
     case test
+    case modmail
     case reminders
 }
