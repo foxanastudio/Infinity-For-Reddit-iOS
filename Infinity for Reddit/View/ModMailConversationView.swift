@@ -51,7 +51,7 @@ struct ModMailConversationView: View {
                                 ForEach(Array(modMailMessages.enumerated()), id: \.element.id) { index, modMailMessage in
                                     ModMailMessageBubble(
                                         isSentMessage: modMailMessage.isSentMessage,
-                                        shouldShowTail: index == 0 || modMailMessages[index - 1].message.author.name != modMailMessage.message.author.name,
+                                        shouldShowTail: index == 0 || modMailMessages[index - 1].message.author.name != modMailMessage.message.author.name || modMailMessages[index - 1].isInternal != modMailMessage.isInternal,
                                         modMailSenderLabel: modMailMessage.modMailSenderLabel,
                                         isInternal: modMailMessage.isInternal
                                     ) {

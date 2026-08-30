@@ -168,7 +168,11 @@ class ModMailConversationViewModel: ObservableObject {
         isSentMessage: Bool
     ) -> String? {
         let subredditName = conversation.owner.displayName ?? ""
-
+        
+        guard modMailMessage.isInternal != true else {
+            return nil
+        }
+        
         guard isSentMessage else {
             if let authorName = modMailMessage.author.name, !authorName.isEmpty {
                 return "u/\(authorName)"
@@ -209,11 +213,15 @@ class ModMailConversationViewModel: ObservableObject {
         
         let previousModMailMessage = modMailMessages[visuallyPreviousModMailMessageIndex]
         let previousIsSentMessage = isSentModMailMessage(previousModMailMessage)
-        
+
         if previousIsSentMessage != currentIsSentMessage {
             return true
         }
-        
+
+        if previousModMailMessage.isInternal != modMailMessage.isInternal {
+            return true
+        }
+
         let previousLabel = getModMailSenderLabelContent(
             modMailMessage: previousModMailMessage,
             isSentMessage: previousIsSentMessage

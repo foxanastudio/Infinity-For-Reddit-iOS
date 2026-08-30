@@ -42,8 +42,9 @@ struct ModMailMessageBubble<Content: View>: View {
                     Text("Mods only")
                         .padding(.leading, isSentMessage ? 6 : 16)
                         .padding(.trailing, isSentMessage ? 16 : 6)
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(Color(hex: customThemeViewModel.currentCustomTheme.moderator))
+                        .customFont(fontSize: .f13)
+                        .fontWeight(.semibold)
+                        .foregroundColor(bubbleBackgroundColor)
                 }
                 
                 content()
