@@ -165,6 +165,9 @@ struct PostVideoView: View {
                 }
             }
         }
+        .onChange(of: muteAutoplayingVideo) { _, newValue in
+            videoPlayerViewModel.hasSetIsMuted = false
+        }
         .onVisiblePercentageChange(in: .named("postfeed"), containerGeometry: postFeedGeometry) { percent in
             canPlay = percent > 0.5 || (postFeedGeometry.size.height < 500 && percent > 0.15)
         }

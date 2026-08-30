@@ -19,6 +19,7 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
     @Published var isMuted: Bool = false
     
     let id: String = UUID().uuidString
+    var hasSetIsMuted = false
     
     private var playbackSpeed: Double = 1
     private var canPlay: Bool
@@ -50,7 +51,7 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
             let player = VideoPlayerPool.shared.setupPlayerAfterLoading(
                 id: id,
                 playerItem: item,
-                muteVideo: false,
+                muteVideo: muteVideo,
                 playbackTimeToSeekToInitially: self.playbackTimeToSeekToInitially ?? currentTime
             ) {
                 self.play()

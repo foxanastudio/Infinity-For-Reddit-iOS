@@ -295,6 +295,10 @@ private struct InlineVideoPlayerWithControls: View {
         }
         .task(id: canPlay) {
             videoPlayerViewModel.setCanPlay(canPlay)
+            if !videoPlayerViewModel.hasSetIsMuted {
+                videoPlayerViewModel.isMuted = muteVideo
+                videoPlayerViewModel.hasSetIsMuted = true
+            }
             if canPlay {
                 await videoPlayerViewModel.loadAndPlay(
                     url: url,
