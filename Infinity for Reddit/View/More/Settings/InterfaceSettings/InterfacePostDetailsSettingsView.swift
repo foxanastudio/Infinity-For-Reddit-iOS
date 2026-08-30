@@ -17,6 +17,7 @@ struct InterfacePostDetailsSettingsView: View {
     @AppStorage(InterfacePostDetailsUserDefaultsUtils.hideSubredditAndUserPrefixKey, store: .interfacePostDetails) private var hideSubredditAndUserPrefix: Bool = false
     @AppStorage(InterfacePostDetailsUserDefaultsUtils.hideNVotesKey, store: .interfacePostDetails) private var hideNVotes: Bool = false
     @AppStorage(InterfacePostDetailsUserDefaultsUtils.hideNCommentsKey, store: .interfacePostDetails) private var hideNComments: Bool = false
+    @AppStorage(InterfacePostDetailsUserDefaultsUtils.hideFloatingControlsKey, store: .interfacePostDetails) private var hideFloatingControls: Bool = false
     @AppStorage(InterfacePostDetailsUserDefaultsUtils.markdownEmbeddedMediaTypeKey, store: .interfacePostDetails) private var markdownEmbeddedMediaType: Int = 15
     
     var body: some View {
@@ -45,6 +46,9 @@ struct InterfacePostDetailsSettingsView: View {
                     .listPlainItemNoInsets()
                 
                 TogglePreference(isEnabled: $hideNComments, title: "Hide the Number of Comments")
+                    .listPlainItemNoInsets()
+                
+                TogglePreference(isEnabled: $hideFloatingControls, title: "Hide Floating Controls")
                     .listPlainItemNoInsets()
                 
                 BarebonePickerPreference(

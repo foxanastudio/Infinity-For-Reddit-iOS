@@ -49,4 +49,9 @@ class InterfacePostDetailsUserDefaultsUtils {
     }
     static let markdownEmbeddedMediaTypes = [15, 8, 3, 0]
     static let markdownEmbeddedMediaTypesText = ["All", "Video and Image", "Image", "None"]
+    
+    static let hideFloatingControlsKey = "hide_floating_controls"
+    static var hideFloatingControls: Bool {
+        return UserDefaults.interfacePostDetails.bool(forKey: hideFloatingControlsKey)
+    }
 }
