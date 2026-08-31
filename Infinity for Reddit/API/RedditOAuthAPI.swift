@@ -360,11 +360,9 @@ enum RedditOAuthAPI: URLRequestConvertible {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         default:
             //Setup URL encoded form data
-            let formEncodedData = parameters?.map { key, value in
-                "\(key)=\(value)"
-            }.joined(separator: "&")
-            request.httpBody = formEncodedData?.data(using: .utf8)
-            request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+            if let parameters {
+                request = try encoding.encode(request, with: parameters)
+            }
         }
         
         return request
