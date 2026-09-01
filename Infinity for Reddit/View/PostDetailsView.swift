@@ -42,7 +42,7 @@ struct PostDetailsView: View {
     @State private var commentToBeEdited: Comment? = nil
     @State private var activeAlert: ActiveAlert? = nil
     @State private var showActionBar: Bool = true
-    @State private var showSearchBar: Bool = false
+    @State private var showSearchPanel: Bool = false
     @State private var isAppeared: Bool = false
     @State private var geometryProxy: GeometryProxy?
     @State private var listProxy: ScrollViewProxy?
@@ -419,80 +419,34 @@ struct PostDetailsView: View {
                         if !hideFloatingControls {
                             if #available(iOS 26, *) {
                                 GlassEffectContainer(spacing: 0) {
-                                    if showSearchBar {
-                                        HStack(spacing: 0) {
-                                            CustomTextField(
-                                                "Search",
-                                                text: $postDetailsViewModel.searchQuery,
-                                                singleLine: true,
-                                                keyboardType: .default,
-                                                autocapitalization: .never,
-                                                customTextFieldScheme: .fab,
-                                                showBorder: false,
-                                                showBackground: false,
-                                                fieldType: .search,
-                                                focusedField: $focusedField
-                                            )
-                                            .submitLabel(.search)
-                                            .onSubmit {
+                                    if showSearchPanel {
+                                        ios26SearchPanel(
+                                            postDetailsViewModel: postDetailsViewModel,
+                                            focusedField: $focusedField,
+                                            onSearch: {
                                                 if let listProxy, let commentItem = postDetailsViewModel.getNextSearchedComment() {
                                                     scrollToComment(listProxy: listProxy, commentItem: commentItem)
                                                 }
+                                            },
+                                            onNextResult: {
+                                                if let listProxy, let commentItem = postDetailsViewModel.getNextSearchedComment() {
+                                                    scrollToComment(listProxy: listProxy, commentItem: commentItem)
+                                                }
+                                            },
+                                            onPreviousResult: {
+                                                if let listProxy, let commentItem = postDetailsViewModel.getPreviousSearchedComment() {
+                                                    scrollToComment(listProxy: listProxy, commentItem: commentItem)
+                                                }
+                                            },
+                                            onClose: {
+                                                withAnimation {
+                                                    focusedField = nil
+                                                    showSearchPanel = false
+                                                    postDetailsViewModel.searchedComment = nil
+                                                    postDetailsViewModel.searchQuery = ""
+                                                }
                                             }
-                                            
-                                            SwiftUI.Image(systemName: "chevron.up")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 16)
-                                                .padding(16)
-                                                .contentShape(Rectangle())
-                                                .onTapGesture {
-                                                    if let listProxy, let commentItem = postDetailsViewModel.getPreviousSearchedComment() {
-                                                        scrollToComment(listProxy: listProxy, commentItem: commentItem)
-                                                    }
-                                                }
-                                            
-                                            SwiftUI.Image(systemName: "chevron.down")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 16)
-                                                .padding(16)
-                                                .contentShape(Rectangle())
-                                                .onTapGesture {
-                                                    if let listProxy, let commentItem = postDetailsViewModel.getNextSearchedComment() {
-                                                        scrollToComment(listProxy: listProxy, commentItem: commentItem)
-                                                    }
-                                                }
-                                            
-                                            SwiftUI.Image(systemName: "xmark")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 16)
-                                                .padding(16)
-                                                .contentShape(Rectangle())
-                                                .onTapGesture {
-                                                    withAnimation {
-                                                        focusedField = nil
-                                                        showSearchBar = false
-                                                        postDetailsViewModel.searchedComment = nil
-                                                        postDetailsViewModel.searchQuery = ""
-                                                    }
-                                                }
-                                        }
-                                        .padding(.vertical, 16)
-                                        .padding(.leading, 16)
-                                        .modify {
-                                            if #available(iOS 26.1, *) {
-                                                $0.padding(12)
-                                                    .glassEffect(.regular, in: .rect(cornerRadius: 12))
-                                            } else {
-                                                $0.padding(12)
-                                                    .glassEffect(.regular)
-                                            }
-                                        }
-                                        .padding(16)
-                                        .contentShape(RoundedRectangle(cornerRadius: 12))
-                                        .zIndex(2)
+                                        )
                                     } else if showActionBar {
                                         HStack(spacing: 0) {
                                             SwiftUI.Image(systemName: "chevron.up")
@@ -519,7 +473,7 @@ struct PostDetailsView: View {
                                                 .glassEffectUnion(id: "actionBarOptions", namespace: glassActionBarNamespace)
                                                 .onTapGesture {
                                                     withAnimation {
-                                                        showSearchBar = true
+                                                        showSearchPanel = true
                                                     }
                                                 }
                                             
@@ -542,80 +496,34 @@ struct PostDetailsView: View {
                                     }
                                 }
                             } else {
-                                if showSearchBar {
-                                    HStack(spacing: 0) {
-                                        CustomTextField(
-                                            "Search",
-                                            text: $postDetailsViewModel.searchQuery,
-                                            singleLine: true,
-                                            keyboardType: .default,
-                                            autocapitalization: .never,
-                                            customTextFieldScheme: .fab,
-                                            showBorder: false,
-                                            showBackground: false,
-                                            fieldType: .search,
-                                            focusedField: $focusedField
-                                        )
-                                        .submitLabel(.search)
-                                        .onSubmit {
+                                if showSearchPanel {
+                                    ios18SearchPanel(
+                                        postDetailsViewModel: postDetailsViewModel,
+                                        focusedField: $focusedField,
+                                        onSearch: {
                                             if let listProxy, let commentItem = postDetailsViewModel.getNextSearchedComment() {
                                                 scrollToComment(listProxy: listProxy, commentItem: commentItem)
                                             }
+                                        },
+                                        onNextResult: {
+                                            if let listProxy, let commentItem = postDetailsViewModel.getNextSearchedComment() {
+                                                scrollToComment(listProxy: listProxy, commentItem: commentItem)
+                                            }
+                                        },
+                                        onPreviousResult: {
+                                            if let listProxy, let commentItem = postDetailsViewModel.getPreviousSearchedComment() {
+                                                scrollToComment(listProxy: listProxy, commentItem: commentItem)
+                                            }
+                                        },
+                                        onClose: {
+                                            withAnimation {
+                                                focusedField = nil
+                                                showSearchPanel = false
+                                                postDetailsViewModel.searchedComment = nil
+                                                postDetailsViewModel.searchQuery = ""
+                                            }
                                         }
-                                        
-                                        SwiftUI.Image(systemName: "chevron.up")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 16)
-                                            .padding(16)
-                                            .fabIcon()
-                                            .contentShape(Rectangle())
-                                            .onTapGesture {
-                                                if let listProxy, let commentItem = postDetailsViewModel.getPreviousSearchedComment() {
-                                                    scrollToComment(listProxy: listProxy, commentItem: commentItem)
-                                                }
-                                            }
-                                        
-                                        SwiftUI.Image(systemName: "chevron.down")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 16)
-                                            .padding(16)
-                                            .fabIcon()
-                                            .contentShape(Rectangle())
-                                            .onTapGesture {
-                                                if let listProxy, let commentItem = postDetailsViewModel.getNextSearchedComment() {
-                                                    scrollToComment(listProxy: listProxy, commentItem: commentItem)
-                                                }
-                                            }
-                                        
-                                        SwiftUI.Image(systemName: "xmark")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 16)
-                                            .padding(16)
-                                            .fabIcon()
-                                            .contentShape(Rectangle())
-                                            .onTapGesture {
-                                                withAnimation {
-                                                    focusedField = nil
-                                                    showSearchBar = false
-                                                    postDetailsViewModel.searchedComment = nil
-                                                    postDetailsViewModel.searchQuery = ""
-                                                }
-                                            }
-                                    }
-                                    .padding(.vertical, 16)
-                                    .padding(.leading, 16)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .fill(Color(hex: customThemeViewModel.currentCustomTheme.colorAccent))
-                                            .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 8)
                                     )
-                                    .padding(16)
-                                    .contentShape(RoundedRectangle(cornerRadius: 12))
-                                    .transition(.opacity)
-                                    .zIndex(2)
                                 } else if showActionBar {
                                     HStack(spacing: 0) {
                                         SwiftUI.Image(systemName: "chevron.up")
@@ -640,7 +548,7 @@ struct PostDetailsView: View {
                                             .contentShape(Rectangle())
                                             .onTapGesture {
                                                 withAnimation {
-                                                    showSearchBar = true
+                                                    showSearchPanel = true
                                                 }
                                             }
                                         
@@ -668,155 +576,63 @@ struct PostDetailsView: View {
                                     .zIndex(1)
                                 }
                             }
-                        } else if showSearchBar {
+                        } else if showSearchPanel {
                             if #available(iOS 26, *) {
-                                HStack(spacing: 0) {
-                                    CustomTextField(
-                                        "Search",
-                                        text: $postDetailsViewModel.searchQuery,
-                                        singleLine: true,
-                                        keyboardType: .default,
-                                        autocapitalization: .never,
-                                        customTextFieldScheme: .fab,
-                                        showBorder: false,
-                                        showBackground: false,
-                                        fieldType: .search,
-                                        focusedField: $focusedField
-                                    )
-                                    .submitLabel(.search)
-                                    .onSubmit {
+                                ios26SearchPanel(
+                                    postDetailsViewModel: postDetailsViewModel,
+                                    focusedField: $focusedField,
+                                    onSearch: {
                                         if let listProxy, let commentItem = postDetailsViewModel.getNextSearchedComment() {
                                             scrollToComment(listProxy: listProxy, commentItem: commentItem)
                                         }
-                                    }
-                                    
-                                    SwiftUI.Image(systemName: "chevron.up")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 16)
-                                        .padding(16)
-                                        .contentShape(Rectangle())
-                                        .onTapGesture {
-                                            if let listProxy, let commentItem = postDetailsViewModel.getPreviousSearchedComment() {
-                                                scrollToComment(listProxy: listProxy, commentItem: commentItem)
-                                            }
-                                        }
-                                    
-                                    SwiftUI.Image(systemName: "chevron.down")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 16)
-                                        .padding(16)
-                                        .contentShape(Rectangle())
-                                        .onTapGesture {
-                                            if let listProxy, let commentItem = postDetailsViewModel.getNextSearchedComment() {
-                                                scrollToComment(listProxy: listProxy, commentItem: commentItem)
-                                            }
-                                        }
-                                    
-                                    SwiftUI.Image(systemName: "xmark")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 16)
-                                        .padding(16)
-                                        .contentShape(Rectangle())
-                                        .onTapGesture {
-                                            withAnimation {
-                                                focusedField = nil
-                                                showSearchBar = false
-                                                postDetailsViewModel.searchedComment = nil
-                                                postDetailsViewModel.searchQuery = ""
-                                            }
-                                        }
-                                }
-                                .padding(.vertical, 16)
-                                .padding(.leading, 16)
-                                .modify {
-                                    if #available(iOS 26.1, *) {
-                                        $0.padding(12)
-                                            .glassEffect(.regular, in: .rect(cornerRadius: 12))
-                                    } else {
-                                        $0.padding(12)
-                                            .glassEffect(.regular)
-                                    }
-                                }
-                                .padding(16)
-                                .contentShape(RoundedRectangle(cornerRadius: 12))
-                                .zIndex(2)
-                            } else {
-                                HStack(spacing: 0) {
-                                    CustomTextField(
-                                        "Search",
-                                        text: $postDetailsViewModel.searchQuery,
-                                        singleLine: true,
-                                        keyboardType: .default,
-                                        autocapitalization: .never,
-                                        customTextFieldScheme: .fab,
-                                        showBorder: false,
-                                        showBackground: false,
-                                        fieldType: .search,
-                                        focusedField: $focusedField
-                                    )
-                                    .submitLabel(.search)
-                                    .onSubmit {
+                                    },
+                                    onNextResult: {
                                         if let listProxy, let commentItem = postDetailsViewModel.getNextSearchedComment() {
                                             scrollToComment(listProxy: listProxy, commentItem: commentItem)
                                         }
+                                    },
+                                    onPreviousResult: {
+                                        if let listProxy, let commentItem = postDetailsViewModel.getPreviousSearchedComment() {
+                                            scrollToComment(listProxy: listProxy, commentItem: commentItem)
+                                        }
+                                    },
+                                    onClose: {
+                                        withAnimation {
+                                            focusedField = nil
+                                            showSearchPanel = false
+                                            postDetailsViewModel.searchedComment = nil
+                                            postDetailsViewModel.searchQuery = ""
+                                        }
                                     }
-                                    
-                                    SwiftUI.Image(systemName: "chevron.up")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 16)
-                                        .padding(16)
-                                        .fabIcon()
-                                        .contentShape(Rectangle())
-                                        .onTapGesture {
-                                            if let listProxy, let commentItem = postDetailsViewModel.getPreviousSearchedComment() {
-                                                scrollToComment(listProxy: listProxy, commentItem: commentItem)
-                                            }
-                                        }
-                                    
-                                    SwiftUI.Image(systemName: "chevron.down")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 16)
-                                        .padding(16)
-                                        .fabIcon()
-                                        .contentShape(Rectangle())
-                                        .onTapGesture {
-                                            if let listProxy, let commentItem = postDetailsViewModel.getNextSearchedComment() {
-                                                scrollToComment(listProxy: listProxy, commentItem: commentItem)
-                                            }
-                                        }
-                                    
-                                    SwiftUI.Image(systemName: "xmark")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 16)
-                                        .padding(16)
-                                        .fabIcon()
-                                        .contentShape(Rectangle())
-                                        .onTapGesture {
-                                            withAnimation {
-                                                focusedField = nil
-                                                showSearchBar = false
-                                                postDetailsViewModel.searchedComment = nil
-                                                postDetailsViewModel.searchQuery = ""
-                                            }
-                                        }
-                                }
-                                .padding(.vertical, 16)
-                                .padding(.leading, 16)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(Color(hex: customThemeViewModel.currentCustomTheme.colorAccent))
-                                        .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 8)
                                 )
-                                .padding(16)
-                                .contentShape(RoundedRectangle(cornerRadius: 12))
-                                .transition(.opacity)
-                                .zIndex(2)
+                            } else {
+                                ios18SearchPanel(
+                                    postDetailsViewModel: postDetailsViewModel,
+                                    focusedField: $focusedField,
+                                    onSearch: {
+                                        if let listProxy, let commentItem = postDetailsViewModel.getNextSearchedComment() {
+                                            scrollToComment(listProxy: listProxy, commentItem: commentItem)
+                                        }
+                                    },
+                                    onNextResult: {
+                                        if let listProxy, let commentItem = postDetailsViewModel.getNextSearchedComment() {
+                                            scrollToComment(listProxy: listProxy, commentItem: commentItem)
+                                        }
+                                    },
+                                    onPreviousResult: {
+                                        if let listProxy, let commentItem = postDetailsViewModel.getPreviousSearchedComment() {
+                                            scrollToComment(listProxy: listProxy, commentItem: commentItem)
+                                        }
+                                    },
+                                    onClose: {
+                                        withAnimation {
+                                            focusedField = nil
+                                            showSearchPanel = false
+                                            postDetailsViewModel.searchedComment = nil
+                                            postDetailsViewModel.searchQuery = ""
+                                        }
+                                    }
+                                )
                             }
                         }
                     }
@@ -1095,6 +911,162 @@ struct PostDetailsView: View {
         )
     }
     
+    @available(iOS 26.0, *)
+    private struct ios26SearchPanel: View {
+        @ObservedObject var postDetailsViewModel: PostDetailsViewModel
+        
+        @FocusState.Binding var focusedField: FieldType?
+        
+        let onSearch: () -> Void
+        let onNextResult: () -> Void
+        let onPreviousResult: () -> Void
+        let onClose: () -> Void
+        
+        var body: some View {
+            HStack(spacing: 0) {
+                CustomTextField(
+                    "Search",
+                    text: $postDetailsViewModel.searchQuery,
+                    singleLine: true,
+                    keyboardType: .default,
+                    autocapitalization: .never,
+                    customTextFieldScheme: .fab,
+                    showBorder: false,
+                    showBackground: false,
+                    fieldType: .search,
+                    focusedField: $focusedField
+                )
+                .submitLabel(.search)
+                .onSubmit {
+                    onSearch()
+                }
+                
+                SwiftUI.Image(systemName: "chevron.up")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 16)
+                    .padding(16)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        onPreviousResult()
+                    }
+                
+                SwiftUI.Image(systemName: "chevron.down")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 16)
+                    .padding(16)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        onNextResult()
+                    }
+                
+                SwiftUI.Image(systemName: "xmark")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 16)
+                    .padding(16)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        onClose()
+                    }
+            }
+            .padding(.vertical, 16)
+            .padding(.leading, 16)
+            .modify {
+                if #available(iOS 26.1, *) {
+                    $0.padding(12)
+                        .glassEffect(.regular, in: .rect(cornerRadius: 12))
+                } else {
+                    $0.padding(12)
+                        .glassEffect(.regular)
+                }
+            }
+            .padding(16)
+            .contentShape(RoundedRectangle(cornerRadius: 12))
+            .zIndex(2)
+            EmptyView()
+        }
+    }
+    
+    private struct ios18SearchPanel: View {
+        @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
+        
+        @ObservedObject var postDetailsViewModel: PostDetailsViewModel
+        
+        @FocusState.Binding var focusedField: FieldType?
+        
+        let onSearch: () -> Void
+        let onNextResult: () -> Void
+        let onPreviousResult: () -> Void
+        let onClose: () -> Void
+        
+        var body: some View {
+            HStack(spacing: 0) {
+                CustomTextField(
+                    "Search",
+                    text: $postDetailsViewModel.searchQuery,
+                    singleLine: true,
+                    keyboardType: .default,
+                    autocapitalization: .never,
+                    customTextFieldScheme: .fab,
+                    showBorder: false,
+                    showBackground: false,
+                    fieldType: .search,
+                    focusedField: $focusedField
+                )
+                .submitLabel(.search)
+                .onSubmit {
+                    onSearch()
+                }
+                
+                SwiftUI.Image(systemName: "chevron.up")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 16)
+                    .padding(16)
+                    .fabIcon()
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        onPreviousResult()
+                    }
+                
+                SwiftUI.Image(systemName: "chevron.down")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 16)
+                    .padding(16)
+                    .fabIcon()
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        onNextResult()
+                    }
+                
+                SwiftUI.Image(systemName: "xmark")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 16)
+                    .padding(16)
+                    .fabIcon()
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        onClose()
+                    }
+            }
+            .padding(.vertical, 16)
+            .padding(.leading, 16)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(hex: customThemeViewModel.currentCustomTheme.colorAccent))
+                    .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 8)
+            )
+            .padding(16)
+            .contentShape(RoundedRectangle(cornerRadius: 12))
+            .transition(.opacity)
+            .zIndex(2)
+        }
+    }
+    
     private var needToSeparatePostAndComments: Bool {
         guard let geometryProxy else {
             return false
@@ -1262,7 +1234,7 @@ struct PostDetailsView: View {
             },
             
             NavigationBarMenuItem(title: "Search") {
-                showSearchBar = true
+                showSearchPanel = true
             }
         ])
         
