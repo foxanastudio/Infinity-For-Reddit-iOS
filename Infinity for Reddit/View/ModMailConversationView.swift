@@ -140,6 +140,9 @@ struct ModMailConversationView: View {
         }
         .task(id: modMailConversationViewModel.loadConversationFlag) {
             await modMailConversationViewModel.loadModMailConversation()
+            if let detail = modMailConversationViewModel.modMailConversationDetail {
+                modMailShareableViewModel.updatedConversationDetail = detail
+            }
         }
         .themedNavigationBar()
         .addTitleToInlineNavigationBar(modMailConversationViewModel.participantUsername)

@@ -98,7 +98,7 @@ public class ModMailConversation: NSObject, Identifiable {
         
         id = json["id"].stringValue
         subject = json["subject"].stringValue
-        owner = try ModMailOwner(fromJson: json["owner"])
+        owner = (try? ModMailOwner(fromJson: json["owner"])) ?? ModMailOwner(localId: "", type: "", displayName: "")
         lastModUpdate = json["lastModUpdate"].string
         participantSubreddit = json["participantSubreddit"]
         isHighlighted = json["isHighlighted"].boolValue
@@ -111,7 +111,7 @@ public class ModMailConversation: NSObject, Identifiable {
         isAuto = json["isAuto"].boolValue
         legacyFirstMessageId = json["legacyFirstMessageId"].stringValue
         isRepliable = json["isRepliable"].boolValue
-        participant = try ModMailAuthor(fromJson: json["participant"])
+        participant = (try? ModMailAuthor(fromJson: json["participant"])) ?? ModMailAuthor(localName: "", isHidden: false)
         lastUserUpdate = json["lastUserUpdate"].stringValue
         state = json["state"].intValue
         lastUnread = json["lastUnread"].string

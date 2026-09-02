@@ -461,10 +461,12 @@ struct HomeView: View {
     
     private func openModMailListing(conversationId: String?) {
         selectedTab = .more
-        tab5NavigationManager.path = NavigationPath()
-        tab5NavigationManager.viewShouldHideNavigationBarOnScroll.removeAll()
         tab5NavigationManager.append(MoreViewNavigation.modmail)
-        if let conversationId, !conversationId.isEmpty {
+        
+        guard let conversationId, !conversationId.isEmpty else {
+            return
+        }
+        Task { @MainActor in
             tab5NavigationManager.append(AppNavigation.modMailConversation(conversation: ModMailConversation(localId: conversationId)))
         }
     }

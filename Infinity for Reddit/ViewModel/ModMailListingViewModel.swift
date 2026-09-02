@@ -156,13 +156,6 @@ public class ModMailListingViewModel: ObservableObject {
         refreshModMailListingContinuation = nil
     }
     
-    func markAsRead(conversation: ModMailConversation) {
-        guard conversation.isUnread else {
-            return
-        }
-        conversation.lastUnread = nil
-    }
-    
     func markAllAsRead() async throws {
         var subredditNames: [String] = []
         for conversation in conversations {
