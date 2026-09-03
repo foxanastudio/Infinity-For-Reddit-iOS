@@ -124,7 +124,7 @@ public class ModMailListingViewModel: ObservableObject {
     
     private func postProcessConversations(_ conversations: [ModMailConversation]) {
         conversations.forEach { conversation in
-            conversation.latestMessagePreview = ModMailListing.getLatestMessagePreview(for: conversation, messages: messages)
+            conversation.latestMessagePreview = getLatestMessagePreview(for: conversation)
         }
     }
     
@@ -198,7 +198,7 @@ public class ModMailListingViewModel: ObservableObject {
         }
         
         updatedConversation.lastUnread = nil
-        updatedConversation.latestMessagePreview = ModMailListing.getLatestMessagePreview(for: updatedConversation, messages: messages)
+        updatedConversation.latestMessagePreview = getLatestMessagePreview(for: updatedConversation)
         conversationIds.insert(conversationId)
         if let existingIndex {
             conversations.insert(updatedConversation, at: existingIndex)

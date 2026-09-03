@@ -131,32 +131,6 @@ class ModMailConversationViewModel: ObservableObject {
         }
     }
     
-    private func getDisplayMessage(
-        modMailMessage: ModMailMessage,
-        modMailMessageIndex: Int,
-        modMailMessages: [ModMailMessage]
-    ) -> ModMailConversationDisplayMessage {
-        let isSentMessage = isSentModMailMessage(modMailMessage)
-        let modMailSenderLabelContent = getModMailSenderLabelContent(
-            modMailMessage: modMailMessage,
-            isSentMessage: isSentMessage
-        )
-        let modMailSenderLabel = shouldShowModMailSenderLabel(
-            modMailMessage: modMailMessage,
-            modMailMessageIndex: modMailMessageIndex,
-            modMailMessages: modMailMessages,
-            currentIsSentMessage: isSentMessage,
-            currentLabel: modMailSenderLabelContent
-        ) ? modMailSenderLabelContent : nil
-        
-        return ModMailConversationDisplayMessage(
-            message: modMailMessage,
-            isSentMessage: isSentMessage,
-            modMailSenderLabel: modMailSenderLabel,
-            isInternal: modMailMessage.isInternal
-        )
-    }
-    
     private func isSentModMailMessage(_ message: ModMailMessage) -> Bool {
         let authorName = message.author.name
         let subredditName = conversation.owner.displayName ?? ""
