@@ -85,6 +85,10 @@ struct CustomNavigationStack<Content: View>: View {
                         ModMailConversationView(conversation: conversation)
                             .environmentObject(navigationManager)
                             .environmentObject(modMailShareableViewModel)
+                    case .createModMailConversation:
+                        CreateModMailConversationView()
+                            .environmentObject(navigationManager)
+                            .environmentObject(modMailShareableViewModel)
                     case .submitComment(let commentParent):
                         SubmitCommentView(parent: commentParent)
                             .environmentObject(navigationManager)

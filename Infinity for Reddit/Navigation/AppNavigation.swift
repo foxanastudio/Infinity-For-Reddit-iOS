@@ -16,6 +16,7 @@ enum AppNavigation: Hashable {
     case customFeed(customFeed: CustomFeedWrapper)
     case inboxConversation(inbox: Inbox)
     case modMailConversation(conversation: ModMailConversation)
+    case createModMailConversation
     case submitComment(commentParent: CommentParent)
     case editComment(commentToBeEdited: Comment)
     case submitTextPost
