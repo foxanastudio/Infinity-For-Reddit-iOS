@@ -100,9 +100,6 @@ struct ModMailListingView: View {
         }
 
         navigationBarMenuKey = navigationBarMenuManager.push([
-            NavigationBarMenuItem(title: "Create Mod Mail") {
-                navigationManager.append(AppNavigation.createModMailConversation)
-            },
             NavigationBarMenuItem(title: "Mark All as Read") {
                 Task {
                     do {
