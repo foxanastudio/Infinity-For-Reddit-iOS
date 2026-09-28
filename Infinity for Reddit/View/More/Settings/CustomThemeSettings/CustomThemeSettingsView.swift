@@ -103,7 +103,7 @@ struct CustomThemeSettingsView: View {
         }
         .wrapContentSheet(isPresented: $showCreateThemeSheet) {
             CreateThemeSheet(onCreateTheme: {
-                
+                navigationManager.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customThemeId: customThemeViewModel.currentLightCustomTheme?.id, predefindCustomThemeName: "Indigo"))
             }, onImportTheme: {
                 
             })
