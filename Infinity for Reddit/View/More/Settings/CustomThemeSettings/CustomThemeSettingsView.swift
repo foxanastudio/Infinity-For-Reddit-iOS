@@ -16,6 +16,8 @@ struct CustomThemeSettingsView: View {
     @AppStorage(CustomThemeUserDefaultsUtils.themeKey, store: .theme) private var theme: Int = CustomThemeUserDefaultsUtils.themeDeviceDefault
     @AppStorage(CustomThemeUserDefaultsUtils.amoledDarkKey, store: .theme) private var amoledDark: Bool = false
     
+    @State private var showCreateThemeSheet: Bool = false
+    
     var body: some View {
         RootView {
             List {
@@ -84,11 +86,27 @@ struct CustomThemeSettingsView: View {
         }
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Theme")
+        .toolbar {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                Button {
+                    showCreateThemeSheet = true
+                } label: {
+                    SwiftUI.Image(systemName: "plus")
+                }
+            }
+        }
         .onChange(of: theme) { oldValue, newValue in
             customThemeViewModel.setThemeType(newValue)
         }
         .onChange(of: amoledDark) { oldValue, newValue in
             customThemeViewModel.setAmoledDark(newValue)
+        }
+        .wrapContentSheet(isPresented: $showCreateThemeSheet) {
+            CreateThemeSheet(onCreateTheme: {
+                
+            }, onImportTheme: {
+                
+            })
         }
     }
 }
