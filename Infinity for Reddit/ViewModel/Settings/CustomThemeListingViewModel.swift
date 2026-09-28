@@ -8,15 +8,25 @@
 import Foundation
 import Combine
 import GRDB
+import UniformTypeIdentifiers
 
 @MainActor
 class CustomThemeListingViewModel: ObservableObject {
     @Published var customThemes: [CustomTheme] = []
     @Published var error: Error?
+    @Published var customThemeToShare: CustomTheme?
     
     private let customThemeDao: CustomThemeDao
     private let customThemeListingRepository: CustomThemeListingRepositoryProtocol
     private var cancellables: Set<AnyCancellable> = []
+    
+    var document: String? {
+        guard let customThemeToShare else {
+            return nil
+        }
+        
+        return try? customThemeToShare.exportJSON()
+    }
     
     init(customThemeListingRepository: CustomThemeListingRepositoryProtocol) {
         guard let resolvedDatabasePool = DependencyManager.shared.container.resolve(DatabasePool.self) else {

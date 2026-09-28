@@ -305,6 +305,33 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
         }
     }
     
+    func exportJSON() throws -> String {
+        let mirror = Mirror(reflecting: self)
+        var dictionary: [String: Any] = [:]
+        
+        for child in mirror.children {
+            guard let label = child.label else { continue }
+            
+            switch child.value {
+            case _ as Bool:
+                dictionary[label] = child.value
+            case let value as Int:
+                dictionary[label] = String(format: "#%06X", value)
+            default:
+                if child.label != "id" {
+                    dictionary[label] = child.value
+                }
+            }
+        }
+        
+        let data = try JSONSerialization.data(
+            withJSONObject: dictionary,
+            options: [.prettyPrinted, .sortedKeys]
+        )
+        
+        return String(decoding: data, as: UTF8.self)
+    }
+    
     static func getPredefinedTheme(name: String) -> CustomTheme {
         switch name {
         case "Indigo":

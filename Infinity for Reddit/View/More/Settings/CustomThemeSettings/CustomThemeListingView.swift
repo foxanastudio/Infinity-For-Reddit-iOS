@@ -14,6 +14,8 @@ struct CustomThemeListingView: View {
     
     @StateObject private var customThemeListingViewModel: CustomThemeListingViewModel
     
+    @State private var showShareSheet: Bool = false
+    
     init() {
         _customThemeListingViewModel = StateObject(
             wrappedValue: CustomThemeListingViewModel(
@@ -39,6 +41,16 @@ struct CustomThemeListingView: View {
                         }
                         .tint(.red)
                     }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                        Button {
+                            customThemeListingViewModel.customThemeToShare = customTheme
+                            showShareSheet = true
+                        } label: {
+                            Text("Share")
+                                .foregroundStyle(.white)
+                        }
+                        .tint(Color(hex: customTheme.colorPrimaryLightTheme))
+                    }
                 }
             }
             .themedList()
@@ -46,5 +58,26 @@ struct CustomThemeListingView: View {
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Manage Themes")
         .showErrorUsingSnackbar(customThemeListingViewModel.$error)
+        .sheet(isPresented: $showShareSheet) {
+            if let document = customThemeListingViewModel.document {
+                ShareSheet(json: document)
+            }
+        }
     }
+}
+
+struct ShareSheet: UIViewControllerRepresentable {
+    let json: String
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(
+            activityItems: [json],
+            applicationActivities: nil
+        )
+    }
+
+    func updateUIViewController(
+        _ uiViewController: UIActivityViewController,
+        context: Context
+    ) {}
 }
