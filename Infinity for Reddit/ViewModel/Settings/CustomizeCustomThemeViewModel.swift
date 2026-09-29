@@ -43,6 +43,7 @@ class CustomizeCustomThemeViewModel: ObservableObject {
     
     private let customThemeId: Int?
     private let predefindCustomThemeName: String?
+    private let importedCustomTheme: CustomTheme?
     private let customizeCustomThemeRepository: CustomizeCustomThemeRepositoryProtocol
     private let customThemeDao: CustomThemeDao
     
@@ -60,12 +61,18 @@ class CustomizeCustomThemeViewModel: ObservableObject {
         }
     }
     
-    init(customThemeId: Int?, predefindCustomThemeName: String?, customizeCustomThemeRepository: CustomizeCustomThemeRepositoryProtocol) {
+    init(
+        customThemeId: Int?,
+        predefindCustomThemeName: String?,
+        importedCustomTheme: CustomTheme?,
+        customizeCustomThemeRepository: CustomizeCustomThemeRepositoryProtocol
+    ) {
         guard let resolvedDatabasePool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
             fatalError("Could not resolve DatabasePool")
         }
         self.customThemeId = customThemeId
         self.predefindCustomThemeName = predefindCustomThemeName
+        self.importedCustomTheme = importedCustomTheme
         self.customizeCustomThemeRepository = customizeCustomThemeRepository
         self.customThemeDao = CustomThemeDao(dbPool: resolvedDatabasePool)
     }
@@ -78,7 +85,11 @@ class CustomizeCustomThemeViewModel: ObservableObject {
         loadState = .loading
         
         do {
-            if let loadedTheme = try await customizeCustomThemeRepository.getCustomTheme(customThemeId: customThemeId, predefindCustomThemeName: predefindCustomThemeName) {
+            if let loadedTheme = try await customizeCustomThemeRepository.getCustomTheme(
+                customThemeId: customThemeId,
+                predefindCustomThemeName: predefindCustomThemeName,
+                importedCustomTheme: importedCustomTheme
+            ) {
                 loadedTheme.getProperties(customThemeFields: &customThemeFields, customThemeFieldsBoolType: &customThemeFieldsBoolType)
                 initializeCustomThemeSettingsItems(customThemeSettingsItems: &customThemeSettingsItems)
                 self.customTheme = loadedTheme

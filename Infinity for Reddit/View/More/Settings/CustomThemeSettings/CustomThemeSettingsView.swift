@@ -113,6 +113,7 @@ struct CustomThemeSettingsView: View {
                     print(clipboardText)
                     do {
                         let customTheme = try CustomTheme.fromJSON(clipboardText)
+                        navigationManager.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(importedCustomTheme: customTheme))
                     } catch {
                         print(error.localizedDescription)
                     }

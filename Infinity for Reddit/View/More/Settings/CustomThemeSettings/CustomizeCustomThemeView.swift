@@ -15,11 +15,12 @@ struct CustomizeCustomThemeView: View {
     @State var showColorPicker: Bool = false
     @FocusState private var focusedField: FieldType?
     
-    init(customThemeId: Int?, predefindCustomThemeName: String?) {
+    init(customThemeId: Int?, predefindCustomThemeName: String?, importedCustomTheme: CustomTheme?) {
         _customizeCustomThemeViewModel = StateObject(
             wrappedValue: CustomizeCustomThemeViewModel(
                 customThemeId: customThemeId,
                 predefindCustomThemeName: predefindCustomThemeName,
+                importedCustomTheme: importedCustomTheme,
                 customizeCustomThemeRepository: CustomizeCustomThemeRepository()
             )
         )

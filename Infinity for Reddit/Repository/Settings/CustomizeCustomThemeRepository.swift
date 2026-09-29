@@ -18,11 +18,13 @@ class CustomizeCustomThemeRepository: CustomizeCustomThemeRepositoryProtocol {
         self.customThemeDao = CustomThemeDao(dbPool: resolvedDatabasePool)
     }
     
-    func getCustomTheme(customThemeId: Int?, predefindCustomThemeName: String?) async throws -> CustomTheme? {
+    func getCustomTheme(customThemeId: Int?, predefindCustomThemeName: String?, importedCustomTheme: CustomTheme?) async throws -> CustomTheme? {
         if let id = customThemeId {
             return try await customThemeDao.getCustomTheme(id: id)
         } else if let name = predefindCustomThemeName {
             return CustomTheme.getPredefinedTheme(name: name)
+        } else if let importedCustomTheme {
+            return importedCustomTheme
         } else {
             return CustomTheme.getIndigo()
         }

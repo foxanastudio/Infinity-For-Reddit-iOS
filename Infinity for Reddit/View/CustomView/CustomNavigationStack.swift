@@ -282,9 +282,13 @@ struct CustomNavigationStack<Content: View>: View {
                 }
                 .navigationDestination(for: CustomThemeSettingsViewNavigation.self) { destination in
                     switch destination {
-                    case .customizeCustomTheme(let customThemeId, let predefindCustomThemeName):
-                        CustomizeCustomThemeView(customThemeId: customThemeId, predefindCustomThemeName: predefindCustomThemeName)
-                            .environmentObject(navigationManager)
+                    case .customizeCustomTheme(let customThemeId, let predefindCustomThemeName, let importedCustomTheme):
+                        CustomizeCustomThemeView(
+                            customThemeId: customThemeId,
+                            predefindCustomThemeName: predefindCustomThemeName,
+                            importedCustomTheme: importedCustomTheme
+                        )
+                        .environmentObject(navigationManager)
                     case .customThemeListing:
                         CustomThemeListingView()
                             .environmentObject(navigationManager)
