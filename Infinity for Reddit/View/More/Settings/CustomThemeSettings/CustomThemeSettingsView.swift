@@ -109,7 +109,14 @@ struct CustomThemeSettingsView: View {
             }, onCreateAmoledTheme: {
                 navigationManager.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customThemeId: customThemeViewModel.currentAmoledCustomTheme?.id, predefindCustomThemeName: "Indigo Amoled"))
             }, onImportTheme: {
-                
+                if let clipboardText = UIPasteboard.general.string {
+                    print(clipboardText)
+                    do {
+                        let customTheme = try CustomTheme.fromJSON(clipboardText)
+                    } catch {
+                        print(error.localizedDescription)
+                    }
+                }
             })
         }
     }

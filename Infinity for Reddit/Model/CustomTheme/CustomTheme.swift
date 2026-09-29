@@ -332,6 +332,32 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
         return String(decoding: data, as: UTF8.self)
     }
     
+    static func fromJSON(_ json: String) throws -> CustomTheme {
+        let data = Data(json.utf8)
+
+        var object = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        
+        for (key, value) in object {
+            if value is Bool {
+                continue
+            }
+            if let id = value as? String, id == "id" {
+                continue
+            }
+            if let string = value as? String,
+               string.hasPrefix("#"),
+               let intValue = Int(string.dropFirst(), radix: 16) {
+                object[key] = intValue
+            }
+        }
+
+        let convertedData = try JSONSerialization.data(
+            withJSONObject: object
+        )
+
+        return try JSONDecoder().decode(CustomTheme.self, from: convertedData)
+    }
+    
     static func getPredefinedTheme(name: String) -> CustomTheme {
         switch name {
         case "Indigo":
