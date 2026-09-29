@@ -31,7 +31,7 @@ struct CustomThemeSettingsView: View {
                 
                 TogglePreference(
                     isEnabled: $amoledDark,
-                    title: "AMOLED Dark",
+                    title: "Amoled Dark",
                     icon: "moon.fill"
                 )
                 .listPlainItemNoInsets()
@@ -102,8 +102,12 @@ struct CustomThemeSettingsView: View {
             customThemeViewModel.setAmoledDark(newValue)
         }
         .wrapContentSheet(isPresented: $showCreateThemeSheet) {
-            CreateThemeSheet(onCreateTheme: {
+            CreateThemeSheet(onCreateLightTheme: {
                 navigationManager.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customThemeId: customThemeViewModel.currentLightCustomTheme?.id, predefindCustomThemeName: "Indigo"))
+            }, onCreateDarkTheme: {
+                navigationManager.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customThemeId: customThemeViewModel.currentDarkCustomTheme?.id, predefindCustomThemeName: "Indigo Dark"))
+            }, onCreateAmoledTheme: {
+                navigationManager.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customThemeId: customThemeViewModel.currentAmoledCustomTheme?.id, predefindCustomThemeName: "Indigo Amoled"))
             }, onImportTheme: {
                 
             })

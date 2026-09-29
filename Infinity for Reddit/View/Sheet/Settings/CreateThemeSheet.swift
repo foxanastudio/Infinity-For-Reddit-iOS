@@ -10,7 +10,9 @@ import SwiftUI
 struct CreateThemeSheet: View {
     @Environment(\.dismiss) private var dismiss
     
-    let onCreateTheme: () -> Void
+    let onCreateLightTheme: () -> Void
+    let onCreateDarkTheme: () -> Void
+    let onCreateAmoledTheme: () -> Void
     let onImportTheme: () -> Void
     
     var body: some View {
@@ -18,10 +20,28 @@ struct CreateThemeSheet: View {
             ScrollView {
                 VStack(spacing: 0) {
                     IconTextButton(
-                        startIconUrl: "pencil",
-                        text: "Create Theme"
+                        startIconUrl: "sun.max",
+                        text: "Create Light Theme"
                     ) {
-                        onCreateTheme()
+                        onCreateLightTheme()
+                        dismiss()
+                    }
+                    .listPlainItemNoInsets()
+                    
+                    IconTextButton(
+                        startIconUrl: "moon",
+                        text: "Create Dark Theme"
+                    ) {
+                        onCreateDarkTheme()
+                        dismiss()
+                    }
+                    .listPlainItemNoInsets()
+                    
+                    IconTextButton(
+                        startIconUrl: "moon",
+                        text: "Create Amoled Theme"
+                    ) {
+                        onCreateAmoledTheme()
                         dismiss()
                     }
                     .listPlainItemNoInsets()
