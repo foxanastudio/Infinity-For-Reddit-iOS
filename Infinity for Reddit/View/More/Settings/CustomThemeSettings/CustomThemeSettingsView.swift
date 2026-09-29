@@ -12,6 +12,7 @@ import GRDB
 struct CustomThemeSettingsView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
     @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
+    @EnvironmentObject private var snackbarManager: SnackbarManager
     
     @AppStorage(CustomThemeUserDefaultsUtils.themeKey, store: .theme) private var theme: Int = CustomThemeUserDefaultsUtils.themeDeviceDefault
     @AppStorage(CustomThemeUserDefaultsUtils.amoledDarkKey, store: .theme) private var amoledDark: Bool = false
@@ -110,13 +111,14 @@ struct CustomThemeSettingsView: View {
                 navigationManager.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customThemeId: customThemeViewModel.currentAmoledCustomTheme?.id, predefindCustomThemeName: "Indigo Amoled"))
             }, onImportTheme: {
                 if let clipboardText = UIPasteboard.general.string {
-                    print(clipboardText)
                     do {
                         let customTheme = try CustomTheme.fromJSON(clipboardText)
                         navigationManager.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(importedCustomTheme: customTheme))
                     } catch {
-                        print(error.localizedDescription)
+                        snackbarManager.showSnackbar(.info("The copied content isn’t in the right format."))
                     }
+                } else {
+                    snackbarManager.showSnackbar(.info("The copied content isn’t in the right format."))
                 }
             })
         }
