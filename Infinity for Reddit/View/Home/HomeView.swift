@@ -42,7 +42,7 @@ struct HomeView: View {
     @StateObject private var videoFullScreenViewModel: VideoFullScreenViewModel
     
     @State private var selectedTab: Tab = .home
-    @State private var showNewFeatureSheet: Bool = false
+    @State private var showChangelogsSheet: Bool = false
     
     @AppStorage(GesturesButtonsUserDefaultsUtils.minimizeTabBarOnScrollDownKey, store: .gesturesButtons)
     private var minimizeTabBarOnScrollDown: Bool = false
@@ -413,11 +413,9 @@ struct HomeView: View {
                 currentSnackbarManager.dismiss()
             }
         }
-        .sheet(isPresented: $showNewFeatureSheet) {
-            SheetRootView {
-                NewFeatureView()
-            }
-            .interactiveDismissDisabled()
+        .sheet(isPresented: $showChangelogsSheet) {
+            ChangelogsSheet()
+                .interactiveDismissDisabled()
         }
     }
     
