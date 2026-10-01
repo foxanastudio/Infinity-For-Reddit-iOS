@@ -31,8 +31,8 @@ struct ChangelogsSheet: View {
                         """)
                         .themedMarkdown()
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 32)
+                .padding(.horizontal, 32)
+                .padding(.top, 32)
                 
                 Spacer()
                 
@@ -44,7 +44,9 @@ struct ChangelogsSheet: View {
                     }
                     .frame(maxWidth: .infinity)
                 }
-                .padding(16)
+                .padding(.horizontal, 32)
+                .padding(.top, 32)
+                .padding(.bottom, 16)
                 .filledButton()
             }
         }
