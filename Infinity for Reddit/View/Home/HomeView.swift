@@ -261,7 +261,7 @@ struct HomeView: View {
             }
             
             if InternalStateUserDefaultsUtils.currentBuildNumber <= Bundle.main.buildNumber {
-                //showNewFeatureSheet = true
+                showNewFeatureSheet = true
                 InternalStateUserDefaultsUtils.setCurrentBuildNumber()
             }
         }
