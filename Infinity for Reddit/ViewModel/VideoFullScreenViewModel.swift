@@ -387,6 +387,7 @@ class VideoFullScreenViewModel: ObservableObject {
         
         removeControllerTimer()
         
+        currentTime = 0
         canPlay = true
         isPlaying = false
         userPaused = false
