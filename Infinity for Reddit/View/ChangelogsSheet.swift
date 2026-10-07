@@ -19,15 +19,7 @@ struct ChangelogsSheet: View {
                         .primaryText(.f22)
                     
                     Markdown("""
-                        You can now **import and export themes**!
-                        
-                        **Import a Theme:**
-                        
-                        Go to Settings → Theme, tap the **+** button, then select **Import Theme**.
-                        
-                        **Export a Theme:**
-                        
-                        Go to Settings → Theme → Manage Theme, swipe left on a theme you created, then tap **Share**.
+                        Fixed an issue where videos started at an incorrect time in fullscreen mode.
                         """)
                         .themedMarkdown()
                 }
