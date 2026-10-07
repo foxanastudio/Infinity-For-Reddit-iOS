@@ -161,16 +161,16 @@ struct Infinity: App {
                 ReminderManager.shared.checkRemindersIfNecessary()
             }
         }
-        
-        var themeType: ColorScheme? {
-            switch theme {
-            case CustomThemeUserDefaultsUtils.themeLight:
-                return .light
-            case CustomThemeUserDefaultsUtils.themeDark:
-                return .dark
-            default:
-                return nil
-            }
+    }
+    
+    var themeType: ColorScheme? {
+        switch theme {
+        case CustomThemeUserDefaultsUtils.themeLight:
+            return .light
+        case CustomThemeUserDefaultsUtils.themeDark:
+            return .dark
+        default:
+            return nil
         }
     }
     

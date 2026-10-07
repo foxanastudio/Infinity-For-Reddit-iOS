@@ -105,13 +105,13 @@ struct PostListingView: View {
         }
         self.handleToolbarMenu = false
         self.showFilterPostsOption = showFilterPostsOption
-        self.scrollProxy = scrollProxy
         self.pauseLazyModeExternalFlag = pauseLazyModeExternalFlag
         self.onStartLazyMode = onStartLazyMode
         self.onStopLazyMode = onStopLazyMode
         self.onScroll = onScroll
         self.isPresented = isPresented
         
+        _scrollProxy = State(initialValue: scrollProxy)
         _postListingViewModel = StateObject(
             wrappedValue: PostListingViewModel(
                 postListingMetadata: postListingMetadata,

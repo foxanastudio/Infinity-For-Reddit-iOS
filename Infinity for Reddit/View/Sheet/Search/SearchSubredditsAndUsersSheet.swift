@@ -44,32 +44,32 @@ struct SearchSubredditsAndUsersSheet: View {
                 SubredditAndUserSearchResultSheet(query: queryItem.query, thingSelectionMode: modifiedThingSelectionMode)
             }
         }
-        
-        var modifiedThingSelectionMode: ThingSelectionMode {
-            switch thingSelectionMode {
-            case .noSelection:
-                return thingSelectionMode
-            case .thingSelection(let onSelectThing):
-                return .thingSelection(onSelectThing: { thing in
-                    onSelectThing(thing)
-                    dismiss()
-                })
-            case .subredditAndUserMultiSelection(let selectedSubredditsAndUsers, let onConfirmSelection):
-                return .subredditAndUserMultiSelection(selectedSubredditsAndUsers: selectedSubredditsAndUsers, onConfirmSelection: { things in
-                    onConfirmSelection(things)
-                    dismiss()
-                })
-            case .subredditMultiSelection(let selectedSubreddits, let onConfirmSelection):
-                return .subredditMultiSelection(selectedSubreddits: selectedSubreddits, onConfirmSelection: { things in
-                    onConfirmSelection(things)
-                    dismiss()
-                })
-            case .userMultiSelection(let selectedUsers, let onConfirmSelection):
-                return .userMultiSelection(selectedUsers: selectedUsers, onConfirmSelection: { things in
-                    onConfirmSelection(things)
-                    dismiss()
-                })
-            }
+    }
+    
+    var modifiedThingSelectionMode: ThingSelectionMode {
+        switch thingSelectionMode {
+        case .noSelection:
+            return thingSelectionMode
+        case .thingSelection(let onSelectThing):
+            return .thingSelection(onSelectThing: { thing in
+                onSelectThing(thing)
+                dismiss()
+            })
+        case .subredditAndUserMultiSelection(let selectedSubredditsAndUsers, let onConfirmSelection):
+            return .subredditAndUserMultiSelection(selectedSubredditsAndUsers: selectedSubredditsAndUsers, onConfirmSelection: { things in
+                onConfirmSelection(things)
+                dismiss()
+            })
+        case .subredditMultiSelection(let selectedSubreddits, let onConfirmSelection):
+            return .subredditMultiSelection(selectedSubreddits: selectedSubreddits, onConfirmSelection: { things in
+                onConfirmSelection(things)
+                dismiss()
+            })
+        case .userMultiSelection(let selectedUsers, let onConfirmSelection):
+            return .userMultiSelection(selectedUsers: selectedUsers, onConfirmSelection: { things in
+                onConfirmSelection(things)
+                dismiss()
+            })
         }
     }
     
