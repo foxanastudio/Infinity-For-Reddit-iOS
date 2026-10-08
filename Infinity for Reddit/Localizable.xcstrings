@@ -126,9 +126,6 @@
     "Copy" : {
 
     },
-    "Create Mod Mail" : {
-
-    },
     "Date and Time" : {
 
     },
@@ -187,6 +184,9 @@
 
     },
     "Followed" : {
+
+    },
+    "From" : {
 
     },
     "Fully collapse" : {
@@ -277,6 +277,9 @@
 
     },
     "No message" : {
+
+    },
+    "No moderated subreddits" : {
 
     },
     "No posts" : {
@@ -2003,6 +2006,9 @@
         }
       }
     },
+    "To" : {
+
+    },
     "To only see sensitive or spoiler posts, please turn on the corresponding switch." : {
 
     },
@@ -2025,6 +2031,9 @@
 
     },
     "Unable to load mod mail. Tap to retry. Error: %@" : {
+
+    },
+    "Unable to load moderated subreddits. Tap to retry. Error: %@" : {
 
     },
     "Unable to load post and comments. Tap to retry. Error: %@" : {
