@@ -204,7 +204,7 @@ struct CustomNavigationStack<Content: View>: View {
                         SettingsView()
                             .environmentObject(navigationManager)
                     case .test:
-                        TestView()
+                        ContentView()
                             .environmentObject(navigationManager)
                     case .modmail:
                         ModMailView()

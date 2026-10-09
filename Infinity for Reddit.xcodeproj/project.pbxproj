@@ -24,6 +24,7 @@
 		55AAB5322D3A9E3E006816B2 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 55AAB5312D3A9E3E006816B2 /* MarkdownUI */; };
 		55BA78B52F21D4270087037D /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 55BA78B42F21D4270087037D /* AppIcon.icon */; };
 		55BA78BA2F3AE62D0087037D /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 55BA78B92F3AE62D0087037D /* Launch Screen.storyboard */; };
+		55C4196A307985A2008D8932 /* PluginLayout in Frameworks */ = {isa = PBXBuildFile; productRef = 55C41969307985A2008D8932 /* PluginLayout */; };
 		55C7421F2CFD1E4300853D4E /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 55C7421E2CFD1E4300853D4E /* SwiftyJSON */; };
 		824357B22CFCFF1A0091EFF1 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 824357B12CFCFF1A0091EFF1 /* Alamofire */; };
 /* End PBXBuildFile section */
@@ -152,6 +153,7 @@
 				55C7421F2CFD1E4300853D4E /* SwiftyJSON in Frameworks */,
 				559389B12E459F600062724F /* Kingfisher in Frameworks */,
 				55AAB5322D3A9E3E006816B2 /* MarkdownUI in Frameworks */,
+				55C4196A307985A2008D8932 /* PluginLayout in Frameworks */,
 				554918CB2E26D8ED00355B48 /* Flow in Frameworks */,
 				5588B8552E0A30A1004CDAA2 /* IdentifiedCollections in Frameworks */,
 				824357B22CFCFF1A0091EFF1 /* Alamofire in Frameworks */,
@@ -264,6 +266,7 @@
 				5582E51A2EFF32550031EDE7 /* SeekBar */,
 				555866B62F0ABFA800A609C5 /* Lottie */,
 				4682C5442F63211A007569A0 /* MijickCamera */,
+				55C41969307985A2008D8932 /* PluginLayout */,
 			);
 			productName = "Infinity for Reddit";
 			productReference = 559BD2332CF7D58500621685 /* Infinity for Reddit.app */;
@@ -366,6 +369,7 @@
 				5582E5192EFF32550031EDE7 /* XCRemoteSwiftPackageReference "SeekBar" */,
 				555866B52F0ABFA800A609C5 /* XCRemoteSwiftPackageReference "lottie-ios" */,
 				4682C5432F63211A007569A0 /* XCRemoteSwiftPackageReference "Camera" */,
+				55C41968307985A2008D8932 /* XCRemoteSwiftPackageReference "PluginLayout" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 559BD2342CF7D58500621685 /* Products */;
@@ -947,6 +951,14 @@
 				kind = branch;
 			};
 		};
+		55C41968307985A2008D8932 /* XCRemoteSwiftPackageReference "PluginLayout" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stefanomondino/PluginLayout";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		55C7421D2CFD1E4300853D4E /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SwiftyJSON/SwiftyJSON.git";
@@ -1030,6 +1042,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 55AAB5302D3A9E3E006816B2 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
 			productName = MarkdownUI;
+		};
+		55C41969307985A2008D8932 /* PluginLayout */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 55C41968307985A2008D8932 /* XCRemoteSwiftPackageReference "PluginLayout" */;
+			productName = PluginLayout;
 		};
 		55C7421E2CFD1E4300853D4E /* SwiftyJSON */ = {
 			isa = XCSwiftPackageProductDependency;

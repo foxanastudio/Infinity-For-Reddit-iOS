@@ -1,5 +1,5 @@
 {
-  "originHash" : "fa9216cf74f8c3065ec5514a8f130ce5e81a315a1d6b0cdf5c1ab4fab89ca72b",
+  "originHash" : "f9ae9b35c185d5a0af6b929242bb4a6c0cb088d77cd7c6acbc651446bf7a41c8",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -79,6 +79,15 @@
       "state" : {
         "revision" : "2849f5323265386e200484b0d0f896e73c3411b9",
         "version" : "6.0.1"
+      }
+    },
+    {
+      "identity" : "pluginlayout",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/stefanomondino/PluginLayout",
+      "state" : {
+        "branch" : "main",
+        "revision" : "aace2f406817f7bccf676ad8e0c87971487d31b8"
       }
     },
     {
