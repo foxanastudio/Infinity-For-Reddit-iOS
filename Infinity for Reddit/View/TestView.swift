@@ -26,7 +26,7 @@ ItemIdentifierType: Hashable & Sendable
     private let cellProvider: DataSource.CellProvider
     
     private let updateQueue: DispatchQueue = DispatchQueue(
-        label: "com.foxana.infinity",
+        label: "label",
         qos: .userInteractive
     )
     
@@ -107,9 +107,20 @@ ItemIdentifierType: Hashable & Sendable
 extension CollectionView: UIViewRepresentable {
     final class Coordinator {
         var delegate: UICollectionViewDelegate?
+        var pinterestDelegate: PinterestLayoutDataSourceProxy
         
         init(delegate: UICollectionViewDelegate?) {
             self.delegate = delegate
+            self.pinterestDelegate = PinterestLayoutDataSourceProxy()
+            
+            // Configure data rules here or bind them to your view model
+            pinterestDelegate.itemHeightProvider = { indexPath in
+                // Custom logic derived from item data if needed, e.g. based on image aspect ratio
+                return CGFloat(150 + (indexPath.item % 3) * 50)
+            }
+            pinterestDelegate.adsFrequencyProvider = {
+                return 0 // Inject ad frequency rules cleanly
+            }
         }
     }
     
@@ -125,21 +136,11 @@ extension CollectionView: UIViewRepresentable {
             cellProvider: cellProvider,
             supplementaryViewProvider: supplementaryViewProvider
         )
-        
         collectionView.delegate = context.coordinator.delegate
         
-        //let totalSpacing = (numberOfColumns - 1) * spacing
-//        let totalSpacing: CGFloat = 0
-//        let availableWidth = collectionView.bounds.width - totalSpacing - collectionView.contentInset.left - collectionView.contentInset.right
-//        
-//        // Width per cell
-//        let numberOfColumns: CGFloat = 3
-//        let itemWidth = floor(availableWidth / numberOfColumns)
-//        if let flowLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
-//            flowLayout.itemSize = CGSize(width: itemWidth, height: itemWidth) // Square cells
-//            flowLayout.minimumInteritemSpacing = 16
-//            flowLayout.minimumLineSpacing = 16
-//        }
+        if let layout = collectionView.collectionViewLayout as? PinterestLayout {
+            layout.delegate = context.coordinator.pinterestDelegate
+        }
         return collectionView
     }
     
@@ -150,19 +151,6 @@ extension CollectionView: UIViewRepresentable {
             animatingDifferences: animatingDifferences,
             completion: updateCallBack
         )
-        
-//        let totalSpacing: CGFloat = 0
-//        let availableWidth = uiView.bounds.width - totalSpacing - uiView.contentInset.left - uiView.contentInset.right
-//        
-//        // Width per cell
-//        let numberOfColumns: CGFloat = 3
-//        let itemWidth = floor(availableWidth / numberOfColumns)
-//        if let flowLayout = uiView.collectionViewLayout as? UICollectionViewFlowLayout {
-//            print(itemWidth)
-//            flowLayout.itemSize = CGSize(width: itemWidth, height: itemWidth) // Square cells
-//            flowLayout.minimumInteritemSpacing = 0
-//            flowLayout.minimumLineSpacing = 0
-//        }
     }
 }
 
@@ -221,7 +209,7 @@ struct ContentView: View {
         ZStack(alignment: .bottom) {
             CollectionView(
                 snapshot: snapshot,
-                collectionViewLayout: createStaggeredLayout,
+                collectionViewLayout: collectionViewLayout,
                 cellProvider: cellProviderWithRegistration
             )
             
@@ -237,64 +225,14 @@ struct ContentView: View {
     }
     
     let cellRegistration: UICollectionView.CellRegistration = .hosting { (idx: IndexPath, item: Item) in
-        //Text("\(item * 10000)")
-//        SimpleTouchItemRow(text: "Add account", icon: "person.crop.circle.badge.plus") {
-//            //onLogin()
-//            print("fuck")
-//        }
         Text(Utils.randomString(length: item))
     }
 }
 
 extension ContentView {
     func collectionViewLayout() -> UICollectionViewLayout {
-        let noOfCellsInRow = 2
-        let flowLayout = UICollectionViewFlowLayout()
-        //flowLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
-//        let totalSpace = flowLayout.sectionInset.left
-//        + flowLayout.sectionInset.right
-//        + (flowLayout.minimumInteritemSpacing * CGFloat(noOfCellsInRow - 1))
-//        
-//        let size = Int((collectionView.bounds.width - totalSpace) / CGFloat(noOfCellsInRow))
-
-        return flowLayout
-    }
-    
-    func createStaggeredLayout() -> UICollectionViewLayout {
-        // 1. Define a single item that takes up the full width/height of its column container
-        let itemSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: .estimated(100) // Self-sizing or dynamic height
-        )
-        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        
-        // 2. Create vertical groups (these act as your columns)
-        let columnSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(0.5), // 2 columns (0.5 each)
-            heightDimension: .estimated(1000)
-        )
-        
-        // Left column group
-        let leftGroup = NSCollectionLayoutGroup.vertical(layoutSize: columnSize, subitems: [item])
-        // Right column group
-        let rightGroup = NSCollectionLayoutGroup.vertical(layoutSize: columnSize, subitems: [item])
-        
-        // 3. Combine the columns into a horizontal container group
-        let containerSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: .estimated(1000)
-        )
-        let containerGroup = NSCollectionLayoutGroup.horizontal(
-            layoutSize: containerSize,
-            subitems: [leftGroup, rightGroup]
-        )
-        containerGroup.interItemSpacing = .fixed(10) // Spacing between columns
-        
-        // 4. Create the section and layout
-        let section = NSCollectionLayoutSection(group: containerGroup)
-        section.interGroupSpacing = 10 // Spacing between rows
-        
-        return UICollectionViewCompositionalLayout(section: section)
+        let pinterestLayout = PinterestLayout()
+        return pinterestLayout
     }
     
     func collectionViewConfiguration(_ collectionView: UICollectionView) {
@@ -343,8 +281,6 @@ extension UICollectionView.CellRegistration {
                 cell.contentConfiguration = UIHostingConfiguration {
                     content(indexPath, item)
                 }
-                //cell.translatesAutoresizingMaskIntoConstraints = false
-                //cell.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.size.width).isActive = true
             }
         }
 }
@@ -359,6 +295,213 @@ extension ContentView {
             item: item
         )
         
+        cell.backgroundColor = .blue
+        
         return cell
+    }
+}
+
+
+
+
+final class PinterestLayoutDataSourceProxy: PinterestLayoutDelegate {
+    // Optional closure or reference to fetch your model items dynamically
+    var itemHeightProvider: ((IndexPath) -> CGFloat)?
+    var bannerHeightProvider: ((IndexPath) -> CGFloat)?
+    var adsFrequencyProvider: (() -> Int)?
+
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout: PinterestLayout,
+        heightForItemAtIndexPath indexPath: IndexPath
+    ) -> CGFloat {
+        return itemHeightProvider?(indexPath) ?? 180
+    }
+
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout: PinterestLayout,
+        heightForBannerAtIndexPath indexPath: IndexPath
+    ) -> CGFloat {
+        return bannerHeightProvider?(indexPath) ?? 220
+    }
+
+    func numberOfItemsBeforeAds(
+        in collectionView: UICollectionView
+    ) -> Int {
+        return adsFrequencyProvider?() ?? 5 // e.g., show banner every 5 items
+    }
+}
+
+protocol PinterestLayoutDelegate: AnyObject {
+    func collectionView(_ collectionView: UICollectionView, layout: PinterestLayout, heightForItemAtIndexPath indexPath: IndexPath) -> CGFloat
+    func collectionView(_ collectionView: UICollectionView, layout: PinterestLayout, heightForBannerAtIndexPath indexPath: IndexPath) -> CGFloat
+    func numberOfItemsBeforeAds(in collectionView: UICollectionView) -> Int
+}
+
+extension PinterestLayoutDelegate {
+    func collectionView(_ collectionView: UICollectionView, layout: PinterestLayout, heightForBannerAtIndexPath indexPath: IndexPath) -> CGFloat { return 0 }
+    func numberOfItemsBeforeAds(in collectionView: UICollectionView) -> Int { return Int.max }
+}
+
+class PinterestLayout: UICollectionViewLayout {
+    static let elementKindBanner: String = "PinterestLayoutElementKindBanner"
+    typealias AttributeCache = [UICollectionViewLayoutAttributes]
+    
+    weak var delegate: PinterestLayoutDelegate?
+
+    private var itemCache: AttributeCache = []
+    private var supplementaryCache: [String: AttributeCache] = [:]
+    
+    private lazy var contentBounds: CGRect = {
+        guard let collectionView = collectionView else { return .zero }
+        let size = collectionView.bounds.inset(by: collectionView.contentInset).size
+        return CGRect(origin: .zero, size: size)
+    }()
+    
+    private var adFrequency: Int {
+        guard let collectionView = collectionView,
+              let count = delegate?.numberOfItemsBeforeAds(in: collectionView) else { return Int.max }
+        return count
+    }
+    
+    var cellPadding: CGFloat = 6 {
+        didSet { if oldValue != cellPadding { invalidateLayout() } }
+    }
+    
+    var numberOfColumns = 2 {
+        didSet { if oldValue != numberOfColumns { invalidateLayout() } }
+    }
+    
+    var cellWidth: CGFloat {
+        return (contentBounds.width / CGFloat(numberOfColumns)) - (cellPadding * 2)
+    }
+    
+    override func prepare() {
+        guard let collectionView = collectionView, collectionView.numberOfSections > 0 else { return }
+
+        itemCache.removeAll()
+        supplementaryCache.removeAll()
+         
+        var xOffsets: [CGFloat] = .init(repeating: 0, count: numberOfColumns)
+        xOffsets = xOffsets.indices.map { CGFloat($0) * contentBounds.width / CGFloat(numberOfColumns) }
+         
+        var yOffsets: [CGFloat] = .init(repeating: 0, count: numberOfColumns)
+        let count = collectionView.numberOfItems(inSection: 0)
+         
+        var column = 0
+        var itemIndex = 0
+        var adIndex = 0
+        let frequency = adFrequency
+         
+        while itemIndex < count {
+            let indexPath = IndexPath(item: itemIndex, section: 0)
+             
+            let photoHeight = delegate?.collectionView(collectionView, layout: self, heightForItemAtIndexPath: indexPath) ?? 180
+            let height = (cellPadding * 2) + photoHeight
+            let width = contentBounds.width / CGFloat(numberOfColumns)
+            let frame = CGRect(x: xOffsets[column], y: yOffsets[column], width: width, height: height)
+             
+            let insetFrame = frame.insetBy(dx: cellPadding, dy: cellPadding)
+            let attributes = UICollectionViewLayoutAttributes(forCellWith: indexPath)
+            attributes.frame = insetFrame
+            itemCache.append(attributes)
+            contentBounds = contentBounds.union(frame)
+            yOffsets[column] = frame.maxY
+            column = yOffsets.indexOfMin ?? 0
+            itemIndex += 1
+             
+            if frequency > 0, itemIndex % frequency == 0 {
+                let bannerIndexPath = IndexPath(item: adIndex, section: 0)
+                let bannerHeight = delegate?.collectionView(collectionView, layout: self, heightForBannerAtIndexPath: bannerIndexPath) ?? 200
+                let bannerFrame = CGRect(x: 0, y: yOffsets.max() ?? 0, width: contentBounds.width, height: bannerHeight)
+                 
+                let bannerInsetFrame = bannerFrame.insetBy(dx: cellPadding, dy: cellPadding)
+                let bannerAttributes = UICollectionViewLayoutAttributes(forSupplementaryViewOfKind: Self.elementKindBanner, with: bannerIndexPath)
+                bannerAttributes.frame = bannerInsetFrame
+                supplementaryCache.updateCollection(keyedBy: PinterestLayout.elementKindBanner, with: bannerAttributes)
+                contentBounds = contentBounds.union(bannerFrame)
+                yOffsets = yOffsets.map { _ in bannerFrame.maxY }
+                adIndex += 1
+            }
+        }
+    }
+    
+    override var collectionViewContentSize: CGSize { contentBounds.size }
+    
+    override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
+        guard let collectionView = collectionView else { return false }
+        return !newBounds.size.equalTo(collectionView.bounds.size)
+    }
+    
+    override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+        return itemCache[safe: indexPath.item]
+    }
+    
+    override func layoutAttributesForSupplementaryView(ofKind elementKind: String, at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+        return supplementaryCache[elementKind]?[safe: indexPath.item]
+    }
+    
+    override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+        var result = [UICollectionViewLayoutAttributes]()
+        result.append(contentsOf: binSearchAttributes(in: itemCache, intersecting: rect))
+        supplementaryCache.keys.forEach { key in
+            if let cache = supplementaryCache[key] {
+                result.append(contentsOf: binSearchAttributes(in: cache, intersecting: rect))
+            }
+        }
+        return result
+    }
+    
+    func binSearchAttributes(in cache: AttributeCache, intersecting rect: CGRect) -> AttributeCache {
+        var result = [UICollectionViewLayoutAttributes]()
+        let start = cache.startIndex
+        guard let end = cache.indices.last,
+              let firstMatchIndex = findPivot(in: cache, for: rect, start: start, end: end) else { return result }
+         
+        for attributes in cache[..<firstMatchIndex].reversed() {
+            guard attributes.frame.maxY >= rect.minY else { break }
+            result.append(attributes)
+        }
+        for attributes in cache[firstMatchIndex...] {
+            guard attributes.frame.minY <= rect.maxY else { break }
+            result.append(attributes)
+        }
+        return result
+    }
+    
+    func findPivot(in cache: AttributeCache, for rect: CGRect, start: Int, end: Int) -> Int? {
+        if end < start { return nil }
+        let mid = (start + end) / 2
+        let attr = cache[mid]
+        if attr.frame.intersects(rect) {
+            return mid
+        } else if attr.frame.maxY < rect.minY {
+            return findPivot(in: cache, for: rect, start: (mid + 1), end: end)
+        } else {
+            return findPivot(in: cache, for: rect, start: start, end: (mid - 1))
+        }
+    }
+}
+
+// MARK: - Helpers Extensions
+extension Dictionary where Value: RangeReplaceableCollection {
+    mutating func updateCollection(keyedBy key: Key, with element: Value.Element) {
+        var collection = self[key] ?? Value()
+        collection.append(element)
+        self[key] = collection
+    }
+}
+
+extension Array where Element: Comparable {
+    var indexOfMin: Int? {
+        guard let min = self.min() else { return nil }
+        return self.firstIndex(of: min)
+    }
+}
+
+extension Array {
+    subscript(safe index: Int) -> Element? {
+        indices.contains(index) ? self[index] : nil
     }
 }
