@@ -39,6 +39,8 @@ public class PostListingViewModel: ObservableObject {
     @Published var postLayout: PostLayout
     @Published var isScrollIdle: Bool = false
     
+    // Index to Height
+    var postItemHeightCache: [Post: CGFloat] = [:]
     var appearedPosts: IdentifiedArrayOf<Post> = []
     var lazyModeScrolledPost: Post?
     
@@ -278,6 +280,8 @@ public class PostListingViewModel: ObservableObject {
             
             let processedPosts = await self.postProcessPosts(postListing.posts)
             
+            await precalculateHeights(posts: processedPosts, width: 180)
+            
             try Task.checkCancellation()
             
             if (processedPosts.isEmpty) {
@@ -430,6 +434,50 @@ public class PostListingViewModel: ObservableObject {
     
     func modifyPostBody(_ post: Post) {
         MarkdownUtils.parseRedditImagesBlock(post)
+    }
+    
+    @MainActor
+    private func precalculateHeights(posts: [Post], width: CGFloat) {
+        let customThemeViewModel = CustomThemeViewModel()
+        let snackbarManager = SnackbarManager()
+        let networkManager = NetworkManager()
+        let fullScreenMediaViewModel = FullScreenMediaViewModel()
+        for post in posts {
+            // Skip if already measured
+            guard postItemHeightCache[post] == nil else {
+                return
+            }
+            
+            // Wrap your SwiftUI item view to measure it off-screen
+            let swiftUIView = PostView(
+                post: post,
+                postLayout: postLayout,
+                iconType: .subreddit,
+                isParentVisible: false,
+                postFeedScrollIdle: true,
+                postFeedGeometry: nil,
+                onUpvote: {},
+                onDownvote: {},
+                onToggleSave: {},
+                onPostTypeTap: {},
+                onSensitiveTap: {},
+                onLongPressPost: {},
+                onShare: {},
+                onReadPost: {}
+            )
+                .environmentObject(AccountViewModel.shared)
+                .environmentObject(customThemeViewModel)
+                .environmentObject(snackbarManager)
+                .environmentObject(networkManager)
+                .environmentObject(fullScreenMediaViewModel)
+            let hostingController = UIHostingController(rootView: swiftUIView)
+            
+            // Ask SwiftUI for its natural "wrap content" height given the exact column width
+            let targetSize = CGSize(width: width, height: UIView.noIntrinsicMetric)
+            let fittingSize = hostingController.sizeThatFits(in: targetSize)
+            
+            postItemHeightCache[post] = fittingSize.height
+        }
     }
     
     func fetchPostFilter() async {

@@ -34,7 +34,7 @@ struct PostViewCard: View {
     let iconType: IconType
     let isParentVisible: Bool
     let postFeedScrollIdle: Bool
-    let postFeedGeometry: GeometryProxy
+    let postFeedGeometry: GeometryProxy?
     let onPostTap: (Double) -> Void
     let onIconTap: () -> Void
     let onSubredditTap: () -> Void
@@ -58,7 +58,7 @@ struct PostViewCard: View {
         iconType: IconType,
         isParentVisible: Bool,
         postFeedScrollIdle: Bool,
-        postFeedGeometry: GeometryProxy,
+        postFeedGeometry: GeometryProxy?,
         onPostTap: @escaping (Double) -> Void,
         onIconTap: @escaping () -> Void,
         onSubredditTap: @escaping () -> Void,

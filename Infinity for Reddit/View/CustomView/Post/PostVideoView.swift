@@ -31,7 +31,7 @@ struct PostVideoView: View {
     let inPostListing: Bool
     let playbackTimeToSeekToInitially: Double
     let postFeedScrollIdle: Bool
-    let postFeedGeometry: GeometryProxy
+    let postFeedGeometry: GeometryProxy?
     let onReadPost: (() -> Void)?
     
     init(
@@ -41,7 +41,7 @@ struct PostVideoView: View {
         inPostListing: Bool = false,
         playbackTimeToSeekToInitially: Double = 0,
         postFeedScrollIdle: Bool,
-        postFeedGeometry: GeometryProxy,
+        postFeedGeometry: GeometryProxy?,
         videoPlayerViewModel: VideoPlayerViewModel,
         onReadPost: (() -> Void)? = nil
     ) {
@@ -168,8 +168,10 @@ struct PostVideoView: View {
         .onChange(of: muteAutoplayingVideo) { _, newValue in
             videoPlayerViewModel.hasSetIsMuted = false
         }
-        .onVisiblePercentageChange(in: .named("postfeed"), containerGeometry: postFeedGeometry) { percent in
-            canPlay = percent > 0.5 || (postFeedGeometry.size.height < 500 && percent > 0.15)
+        .applyIf(postFeedGeometry != nil) {
+            $0.onVisiblePercentageChange(in: .named("postfeed"), containerGeometry: postFeedGeometry!) { percent in
+                canPlay = percent > 0.5 || (postFeedGeometry!.size.height < 500 && percent > 0.15)
+            }
         }
     }
     

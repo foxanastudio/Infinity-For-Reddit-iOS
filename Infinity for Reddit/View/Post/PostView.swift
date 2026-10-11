@@ -17,7 +17,7 @@ struct PostView: View {
     let iconType: IconType
     let isParentVisible: Bool
     let postFeedScrollIdle: Bool
-    let postFeedGeometry: GeometryProxy
+    let postFeedGeometry: GeometryProxy?
     let onUpvote: () async -> Void
     let onDownvote: () async -> Void
     let onToggleSave: () async -> Void
@@ -33,7 +33,7 @@ struct PostView: View {
         iconType: IconType,
         isParentVisible: Bool,
         postFeedScrollIdle: Bool,
-        postFeedGeometry: GeometryProxy,
+        postFeedGeometry: GeometryProxy?,
         onUpvote: @escaping () async -> Void,
         onDownvote: @escaping () async -> Void,
         onToggleSave: @escaping () async -> Void,
