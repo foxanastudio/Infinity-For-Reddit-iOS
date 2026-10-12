@@ -52,13 +52,13 @@ struct ModMailSubredditChooserView: View {
                     } else {
                         InitialLetterAvatarImageFallbackView(name: selectedSubreddit.name, size: iconSize)
                     }
+                    
+                    Spacer()
+                        .frame(width: 24)
                 } else {
                     Spacer()
-                        .frame(width: iconSize)
+                        .frame(width: 10)
                 }
-                
-                Spacer()
-                    .frame(width: 24)
                 
                 RowText(selectedSubreddit?.name ?? "Choose a subreddit")
                     .primaryText()

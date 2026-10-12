@@ -9,7 +9,15 @@ import Foundation
 
 @MainActor
 class CreateModMailConversationViewModel: ObservableObject {
-    @Published var recipientType: ModMailRecipientType = .moderators
+    @Published var recipientType: ModMailRecipientType = .moderators {
+        didSet {
+            if oldValue != recipientType {
+                recipient = ""
+            }
+        }
+    }
+    @Published var recipient: String = ""
+    @Published var isAuthorHidden: Bool = true
     @Published var selectedSubreddit: ModeratedSubreddit?
     
     private let createModMailConversationRepository: CreateModMailConversationRepositoryProtocol
