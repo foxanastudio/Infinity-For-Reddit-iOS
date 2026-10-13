@@ -19,6 +19,16 @@ class CreateModMailConversationViewModel: ObservableObject {
     @Published var recipient: String = ""
     @Published var isAuthorHidden: Bool = true
     @Published var selectedSubreddit: ModeratedSubreddit?
+    @Published var subject: String = "" {
+        didSet {
+            if subject.count > subjectCharacterLimit {
+                subject = String(subject.prefix(subjectCharacterLimit))
+            }
+        }
+    }
+    @Published var content: String = ""
+    
+    let subjectCharacterLimit = 100
     
     private let createModMailConversationRepository: CreateModMailConversationRepositoryProtocol
     
