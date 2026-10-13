@@ -20,37 +20,29 @@ class CreateModMailConversationRepository: CreateModMailConversationRepositoryPr
     }
     
     func fetchModeratedSubreddits() async throws -> [ModeratedSubreddit] {
-        var subreddits = [ModeratedSubreddit]()
-        var after: String? = nil
+        let response = await self.session.request(
+            RedditOAuthAPI.getModMailSubreddits
+        )
+        .validate()
+        .serializingData()
+        .response
         
-        repeat {
-            let response = await self.session.request(
-                RedditOAuthAPI.getModeratedSubreddits(queries: ["after": after ?? ""])
-            )
-                .validate()
-                .serializingData()
-                .response
-            
-            if let statusCode = response.response?.statusCode {
-                printInDebugOnly("Status code: \(statusCode)")
-            }
-            
-            guard let data = response.data else {
-                throw APIError.networkError("Status code: \(response.response?.statusCode ?? 0)")
-            }
-            
-            try Task.checkCancellation()
-            
-            let json = JSON(data)
-            if let error = json.error {
-                throw APIError.jsonDecodingError(error.localizedDescription)
-            }
-            
-            let listing = try ModeratedSubredditListing(fromJson: json)
-            subreddits.append(contentsOf: listing.subreddits)
-            after = listing.after
-        } while after?.isEmpty == false
+        if let statusCode = response.response?.statusCode {
+            printInDebugOnly("Status code: \(statusCode)")
+        }
         
-        return subreddits
+        guard let data = response.data else {
+            throw APIError.networkError("Status code: \(response.response?.statusCode ?? 0)")
+        }
+        
+        try Task.checkCancellation()
+        
+        let json = JSON(data)
+        if let error = json.error {
+            throw APIError.jsonDecodingError(error.localizedDescription)
+        }
+        
+        return try ModeratedSubredditListing(fromJson: json).subreddits
+            .filter { !$0.name.hasPrefix("u_") }
     }
 }

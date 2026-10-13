@@ -9,7 +9,6 @@ import Foundation
 import SwiftyJSON
 
 class ModeratedSubredditListing: NSObject {
-    var after: String?
     var subreddits: [ModeratedSubreddit] = []
     
     init(fromJson json: JSON!) throws {
@@ -17,16 +16,14 @@ class ModeratedSubredditListing: NSObject {
             throw JSONError.invalidData
         }
         
-        let dataJson = json["data"]
-        if dataJson.isEmpty {
+        let subredditsJson = json["subreddits"]
+        if subredditsJson.type != .dictionary {
             throw JSONError.invalidData
         }
-
-        after = dataJson["after"].string
         
-        for childJson in dataJson["children"].arrayValue {
+        for (_, subredditJson):(String, JSON) in subredditsJson {
             do {
-                subreddits.append(try ModeratedSubreddit(fromJson: childJson["data"]))
+                subreddits.append(try ModeratedSubreddit(fromJson: subredditJson))
             } catch {
                 printInDebugOnly("Error parsing ModeratedSubreddit: \(error.localizedDescription)")
             }
@@ -44,11 +41,11 @@ class ModeratedSubreddit: NSObject, Identifiable {
             throw JSONError.invalidData
         }
         
-        id = json["name"].stringValue
-        name = json["display_name"].stringValue
+        id = json["id"].stringValue
+        name = json["name"].stringValue
         
-        let iconImg = json["icon_img"].stringValue
-        let communityIcon = json["community_icon"].stringValue
-        iconUrl = !iconImg.isEmpty ? iconImg : (!communityIcon.isEmpty ? communityIcon : nil)
+        let communityIcon = json["communityIcon"].stringValue
+        let icon = json["icon"].stringValue
+        iconUrl = !communityIcon.isEmpty ? communityIcon : (!icon.isEmpty ? icon : nil)
     }
 }

@@ -77,7 +77,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
     case getModMailConversation(conversationId: String)
     case bulkReadModMail(params: [String: String])
     case sendModMailMessage(conversationId: String, params: [String: String])
-    case getModeratedSubreddits(queries: [String: String])
+    case getModMailSubreddits
     
     private var baseURL: String {
         return "https://oauth.reddit.com"
@@ -85,7 +85,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
     
     var method: HTTPMethod {
         switch self {
-        case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getSearchPostsInSpecificThing, .getCustomFeedPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getUserSavedComments, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox, .getRules, .getFlairs, .getInfo, .getUserFlairs, .getCustomFeedInfo, .getWikiPage, .subredditAutoComplete, .getRedditSettings, .getModMailConversations, .getModMailConversation, .getModeratedSubreddits:
+        case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getSearchPostsInSpecificThing, .getCustomFeedPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getUserSavedComments, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox, .getRules, .getFlairs, .getInfo, .getUserFlairs, .getCustomFeedInfo, .getWikiPage, .subredditAutoComplete, .getRedditSettings, .getModMailConversations, .getModMailConversation, .getModMailSubreddits:
             return .get
         case .vote, .subsrcribeToSubreddit, .saveThing, .unsaveThing, .getMoreCommentsForCommentMore, .sendCommentOrReplyToMessage, .favoriteThing, .favoriteCustomFeed, .submitPost, .uploadMediaMetadata, .submitGalleryPost, .submitPollPost, .editPostOrComment, .deletePostOrComment, .hidePost, .unhidePost, .readMessage, .readAllMessages, .markSensitive, .unmarkSensitive, .markSpoiler, .unmarkSpoiler, .selectFlair, .selectUserFlair, .composeMessage, .createCustomFeed, .copyCustomFeed, .report, .approveThing, .removeThing, .toggleStickyPost, .lockThing, .unlockThing, .toggleDistinguishedThing, .blockUser, .bulkReadModMail, .sendModMailMessage:
             return .post
@@ -234,8 +234,8 @@ enum RedditOAuthAPI: URLRequestConvertible {
             return "/api/mod/conversations/bulk/read"
         case .sendModMailMessage(let conversationId, _):
             return "/api/mod/conversations/\(conversationId)"
-        case .getModeratedSubreddits:
-            return "/subreddits/mine/moderator"
+        case .getModMailSubreddits:
+            return "/api/mod/conversations/subreddits"
         }
     }
     
@@ -318,8 +318,6 @@ enum RedditOAuthAPI: URLRequestConvertible {
             return ["limit": "100"].merging(queries, uniquingKeysWith: { _, new in new })
         case .getModMailConversation:
             return ["markRead": "true"]
-        case .getModeratedSubreddits(let queries):
-            return ["raw_json": "1", "limit": "100"].merging(queries, uniquingKeysWith: { _, new in new })
         default:
             return nil
         }
