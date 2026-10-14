@@ -7,4 +7,12 @@
 
 protocol CreateModMailConversationRepositoryProtocol {
     func fetchModeratedSubreddits() async throws -> [ModeratedSubreddit]
+    
+    func createConversation(
+        subredditName: String,
+        subject: String,
+        body: String,
+        to: String?,
+        isAuthorHidden: Bool
+    ) async throws -> ModMailConversationDetail
 }

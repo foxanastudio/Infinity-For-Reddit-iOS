@@ -23,9 +23,9 @@ class CreateModMailConversationRepository: CreateModMailConversationRepositoryPr
         let response = await self.session.request(
             RedditOAuthAPI.getModMailSubreddits
         )
-        .validate()
-        .serializingData()
-        .response
+            .validate()
+            .serializingData()
+            .response
         
         if let statusCode = response.response?.statusCode {
             printInDebugOnly("Status code: \(statusCode)")
@@ -44,5 +44,54 @@ class CreateModMailConversationRepository: CreateModMailConversationRepositoryPr
         
         return try ModeratedSubredditListing(fromJson: json).subreddits
             .filter { !$0.name.hasPrefix("u_") }
+    }
+    
+    func createConversation(
+        subredditName: String,
+        subject: String,
+        body: String,
+        to: String?,
+        isAuthorHidden: Bool
+    ) async throws -> ModMailConversationDetail {
+        var params = [
+            "srName": subredditName,
+            "subject": subject,
+            "body": body,
+            "isAuthorHidden": String(isAuthorHidden)
+        ]
+        if let to {
+            params["to"] = to
+        }
+        
+        let response = await self.session.request(
+            RedditOAuthAPI.createModMailConversation(params: params)
+        )
+            .serializingData(automaticallyCancelling: true)
+            .response
+        
+        if let statusCode = response.response?.statusCode, !(200...299).contains(statusCode) {
+            let explanation = response.data.map { JSON($0)["explanation"].stringValue } ?? ""
+            if !explanation.isEmpty {
+                throw APIError.invalidResponse(explanation.capitalizedFirst)
+            }
+            throw APIError.networkError("Mod mail conversation creation failed with status code \(statusCode)")
+        }
+        
+        if let error = response.error {
+            throw APIError.networkError(error.localizedDescription)
+        }
+        
+        guard let data = response.data else {
+            throw APIError.networkError("Mod mail conversation creation failed. No data available.")
+        }
+        
+        try Task.checkCancellation()
+        
+        let json = JSON(data)
+        if let error = json.error {
+            throw APIError.jsonDecodingError(error.localizedDescription)
+        }
+        
+        return try ModMailConversationDetail(fromJson: json)
     }
 }
