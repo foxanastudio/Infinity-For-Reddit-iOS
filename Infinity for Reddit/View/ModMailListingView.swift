@@ -139,7 +139,7 @@ struct ModMailConversationItemView: View {
             TouchRipple(action: onTap) {
                 VStack(spacing: 4) {
                     HStack(alignment: .top, spacing: 8) {
-                        RowText("u/\(conversation.participant.name ?? "-"), \(conversation.replyCount) replies")
+                        RowText("\(conversation.participantDisplayName), \(conversation.replyCount) replies")
                             .username()
                         
                         Spacer()
