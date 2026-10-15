@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct CreateModMailConversationView: View {
+    @EnvironmentObject private var navigationManager: NavigationManager
+    @EnvironmentObject private var snackbarManager: SnackbarManager
+    
     @StateObject private var createModMailConversationViewModel: CreateModMailConversationViewModel
     
     @FocusState private var markdownToolbarFocusedField: MarkdownFieldType?
@@ -39,10 +42,10 @@ struct CreateModMailConversationView: View {
                                     Text("To")
                                         .secondaryText()
                                         .frame(width: labelWidth, alignment: .leading)
-                                
+                                    
                                     Spacer()
                                         .frame(width: 10)
-                                
+                                    
                                     SegmentedPicker(
                                         selectedValue: Binding(
                                             get: { createModMailConversationViewModel.recipientType.rawValue },
@@ -50,7 +53,7 @@ struct CreateModMailConversationView: View {
                                         ),
                                         values: ModMailRecipientType.allCases.map(\.title)
                                     )
-                                
+                                    
                                     Spacer(minLength: 0)
                                 }
                                 .padding(.horizontal, 16)
@@ -60,7 +63,7 @@ struct CreateModMailConversationView: View {
                                     HStack(spacing: 0) {
                                         Spacer()
                                             .frame(width: labelWidth + 18)
-                                
+                                        
                                         CustomTextField(
                                             createModMailConversationViewModel.recipientType == .user ? "u/Username" : "r/Community name",
                                             text: $createModMailConversationViewModel.recipient,
@@ -72,7 +75,7 @@ struct CreateModMailConversationView: View {
                                             focusedField: $focusedField
                                         )
                                         .submitLabel(.done)
-                                
+                                        
                                         Spacer()
                                             .frame(width: 16)
                                     }
@@ -92,10 +95,10 @@ struct CreateModMailConversationView: View {
                                         Text("As")
                                             .secondaryText()
                                             .frame(width: labelWidth, alignment: .leading)
-                                
+                                        
                                         Spacer()
                                             .frame(width: 12)
-                                
+                                        
                                         SegmentedPicker(
                                             selectedValue: Binding(
                                                 get: { createModMailConversationViewModel.isAuthorHidden ? 0 : 1 },
@@ -103,7 +106,7 @@ struct CreateModMailConversationView: View {
                                             ),
                                             values: ["Mod Team", "u/\(AccountViewModel.shared.account.username)"]
                                         )
-                                
+                                        
                                         Spacer(minLength: 0)
                                     }
                                     .padding(.horizontal, 16)
@@ -168,12 +171,29 @@ struct CreateModMailConversationView: View {
                 }
                 
                 Button {
-                    // Sending is implemented in a later step
+                    createModMailConversationViewModel.createConversation()
                 } label: {
                     SwiftUI.Image(systemName: "paperplane.fill")
                 }
+                .disabled(createModMailConversationViewModel.createConversationTask != nil)
             }
         }
+        .onChange(of: createModMailConversationViewModel.createConversationTask) { _, newValue in
+            if newValue != nil {
+                snackbarManager.showSnackbar(
+                    .info("Sending. Please wait..."),
+                    autoDismiss: false,
+                    canDismissByGesture: false
+                )
+            }
+        }
+        .onChange(of: createModMailConversationViewModel.createdConversationDetail) { _, newValue in
+            if let detail = newValue {
+                snackbarManager.dismiss()
+                navigationManager.replaceCurrentScreen(AppNavigation.modMailConversation(conversation: detail.conversation))
+            }
+        }
+        .showErrorUsingSnackbar(createModMailConversationViewModel.$error)
         .sheet(isPresented: $showMarkdownPreview) {
             MarkdownViewerSheet(markdown: createModMailConversationViewModel.content)
         }
