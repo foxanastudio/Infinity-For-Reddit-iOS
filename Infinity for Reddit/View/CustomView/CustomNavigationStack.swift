@@ -334,7 +334,7 @@ struct CustomNavigationStack<Content: View>: View {
                 navigationManager.viewShouldHideNavigationBarOnScroll = Array(navigationManager.viewShouldHideNavigationBarOnScroll.prefix(newCount))
             }
         }
-        .introspect(.navigationStack, on: .iOS(.v16, .v17, .v18, .v26)) {
+        .introspect(.navigationStack, on: .iOS(.v16, .v17, .v18, .v26, .v27)) {
             // UINavigationController
             $0.hidesBarsOnSwipe = hideNavigationBarOnScrollDown && navigationManager.hideNavigationBarOnScrollDown
         }
