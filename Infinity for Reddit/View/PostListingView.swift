@@ -21,6 +21,7 @@ struct PostListingView: View {
     @StateObject var postListingVideoManager: PostListingVideoManager = .init()
     
     @State private var isListAppeared: Bool = false
+    @State private var isListScrolledToTop: Bool = true
     @State private var scrollProxy: ScrollViewProxy? = nil
     @State private var showSortTypeKindSheet: Bool = false
     @State private var showSortTypeTimeSheet: Bool = false
@@ -289,6 +290,14 @@ struct PostListingView: View {
                         }
                         .onDisappear {
                             isListAppeared = false
+                        }
+                        .onScrollGeometryChange(for: Bool.self) { scrollGeometry in
+                            scrollGeometry.contentOffset.y <= -scrollGeometry.contentInsets.top + 1
+                        } action: { _, newValue in
+                            isListScrolledToTop = newValue
+                        }
+                        .onChange(of: navigationManager.scrollToTopOrRefreshFlag) {
+                            scrollToTopOrRefresh(proxy: proxy)
                         }
                         .onScrollPhaseChange { _, phase in
                             switch phase {
@@ -762,6 +771,20 @@ struct PostListingView: View {
         lazyMode?.cancel()
         lazyMode = nil
         startLazyMode()
+    }
+    
+    private func scrollToTopOrRefresh(proxy: ScrollViewProxy) {
+        guard isListAppeared else {
+            return
+        }
+        
+        if isListScrolledToTop {
+            postListingViewModel.refreshPosts()
+        } else if let firstPost = postListingViewModel.posts.first {
+            withAnimation {
+                proxy.scrollTo(ObjectIdentifier(firstPost), anchor: .top)
+            }
+        }
     }
     
     private func onSwipe(_ action: SwipeAction, post: Post) {

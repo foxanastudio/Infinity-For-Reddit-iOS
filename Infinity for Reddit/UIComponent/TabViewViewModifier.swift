@@ -12,7 +12,7 @@ struct TabViewCustomThemeViewModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .introspect(.tabView, on: .iOS(.v13, .v14, .v15, .v16, .v17, .v18, .v26)) { tabBarController in
+            .introspect(.tabView, on: .iOS(.v13, .v14, .v15, .v16, .v17, .v18, .v26, .v27)) { tabBarController in
                 let appearance = UITabBarAppearance()
                 
                 appearance.configureWithOpaqueBackground()

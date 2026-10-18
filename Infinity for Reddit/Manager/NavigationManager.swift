@@ -11,6 +11,8 @@ import Alamofire
 class NavigationManager: ObservableObject {
     @Published var path = NavigationPath()
     
+    @Published var scrollToTopOrRefreshFlag: Bool = false
+    
     var viewShouldHideNavigationBarOnScroll: [Bool] = []
     
     var fullScreenMediaViewModel: FullScreenMediaViewModel

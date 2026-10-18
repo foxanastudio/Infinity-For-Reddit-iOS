@@ -36,7 +36,7 @@ extension View {
     func navigationBarPrimaryText() -> some View {
         self.modifier(NavigationBarPrimaryTextViewModifier())
     }
-
+    
     func navigationBarTitleGlassEffect() -> some View {
         self.modifier(NavigationBarTitleGlassEffectViewModifier())
     }
@@ -63,6 +63,10 @@ extension View {
     
     func themedTabView() -> some View {
         self.modifier(TabViewCustomThemeViewModifier())
+    }
+    
+    func interceptTabReselection(perform action: @escaping () -> Bool) -> some View {
+        self.modifier(TabReselectionViewModifier(onReselect: action))
     }
     
     func listSectionHeader() -> some View {

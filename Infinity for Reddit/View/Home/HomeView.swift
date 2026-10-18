@@ -228,6 +228,9 @@ struct HomeView: View {
             }
         }
         .themedTabView()
+        .interceptTabReselection {
+            handleTabReselection()
+        }
         .modify {
             if #available(iOS 26.0, *) {
                 $0.tabBarMinimizeBehavior(minimizeTabBarOnScrollDown ? .onScrollDown : .never)
@@ -353,7 +356,7 @@ struct HomeView: View {
         .onReceive(NotificationCenter.default.publisher(for: .modMailDeepLink)) { note in
             let accountName = (note.userInfo?[AppDeepLink.accountNameKey] as? String) ?? ""
             let conversationId = note.userInfo?[AppDeepLink.conversationIdKey] as? String
-
+            
             if !accountName.isEmpty {
                 Task {
                     if !(await accountViewModel.switchToAccountIfNeeded(accountName)) {
@@ -455,6 +458,19 @@ struct HomeView: View {
         case .more:
             return tab5NavigationManager
         }
+    }
+    
+    private func handleTabReselection() -> Bool {
+        guard selectedTab == .home else {
+            return false
+        }
+        
+        if tab1NavigationManager.path.count > 1 {
+            tab1NavigationManager.path.removeLast(tab1NavigationManager.path.count - 1)
+        } else {
+            tab1NavigationManager.scrollToTopOrRefreshFlag.toggle()
+        }
+        return true
     }
     
     private func openModMailListing(conversationId: String?) {
