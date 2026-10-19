@@ -106,6 +106,13 @@ struct SubredditDetailsView: View {
                         }
                         .frame(maxHeight: getScreenHeight(proxy) / 2)
                         .fixedSize(horizontal: false, vertical: true)
+                        .modify {
+                            if #available(iOS 26, *) {
+                                $0.scrollEdgeEffectHidden(true, for: .top)
+                            } else {
+                                $0
+                            }
+                        }
                     } else {
                         Spacer()
                             .frame(height: proxy.safeAreaInsets.top)

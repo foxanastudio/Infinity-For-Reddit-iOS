@@ -233,6 +233,13 @@ struct HomeView: View {
         }
         .modify {
             if #available(iOS 26.0, *) {
+                $0.scrollEdgeEffectStyle(.soft, for: .top)
+            } else {
+                $0
+            }
+        }
+        .modify {
+            if #available(iOS 26.0, *) {
                 $0.tabBarMinimizeBehavior(minimizeTabBarOnScrollDown ? .onScrollDown : .never)
             } else {
                 $0
