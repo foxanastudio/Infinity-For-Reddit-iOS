@@ -7,6 +7,8 @@
 
 import SwiftUI
 import UIKit
+import Kingfisher
+import Flow
 
 struct TestView: View {
     var body: some View {
@@ -14,9 +16,7 @@ struct TestView: View {
     }
 }
 
-final class CollectionViewWithDataSource<SectionIdentifierType, ItemIdentifierType>: UICollectionView
-where
-
+class CollectionViewWithDataSource<SectionIdentifierType, ItemIdentifierType>: UICollectionView where
 SectionIdentifierType: Hashable & Sendable,
 ItemIdentifierType: Hashable & Sendable
 {
@@ -68,17 +68,17 @@ ItemIdentifierType: Hashable & Sendable
     }
 }
 
-extension CollectionView {
+struct CollectionView<SectionIdentifierType, ItemIdentifierType>: UIViewRepresentable where
+SectionIdentifierType: Hashable & Sendable,
+ItemIdentifierType: Hashable & Sendable
+{
     typealias UIKitCollectionView = CollectionViewWithDataSource<SectionIdentifierType, ItemIdentifierType>
     typealias DataSource =  UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>
     typealias Snapshot = NSDiffableDataSourceSnapshot<SectionIdentifierType, ItemIdentifierType>
     typealias UpdateCompletion = () -> Void
-}
-
-struct CollectionView<SectionIdentifierType, ItemIdentifierType> where
-SectionIdentifierType: Hashable & Sendable,
-ItemIdentifierType: Hashable & Sendable
-{
+    
+    @ObservedObject var postListingViewModel: PostListingViewModel
+    
     private let snapshot: Snapshot
     private let configuration: ((UICollectionView) -> Void)
     private let cellProvider: DataSource.CellProvider
@@ -94,29 +94,37 @@ ItemIdentifierType: Hashable & Sendable
          collectionViewLayout: @escaping () -> UICollectionViewLayout,
          configuration: @escaping ((UICollectionView) -> Void) = { _ in },
          cellProvider: @escaping  DataSource.CellProvider,
-         supplementaryViewProvider: DataSource.SupplementaryViewProvider? = nil
+         supplementaryViewProvider: DataSource.SupplementaryViewProvider? = nil,
+         postViewListingViewModel: PostListingViewModel
     ) {
         self.snapshot = snapshot
         self.configuration = configuration
         self.cellProvider = cellProvider
         self.supplementaryViewProvider = supplementaryViewProvider
         self.collectionViewLayout = collectionViewLayout
+        self.postListingViewModel = postViewListingViewModel
     }
-}
-
-extension CollectionView: UIViewRepresentable {
-    final class Coordinator {
+    
+    class Coordinator {
         var delegate: UICollectionViewDelegate?
         var pinterestDelegate: PinterestLayoutDataSourceProxy
+        var postViewListingViewModel: PostListingViewModel
         
-        init(delegate: UICollectionViewDelegate?) {
+        init(
+            delegate: UICollectionViewDelegate?,
+            postViewListingViewModel: PostListingViewModel
+        ) {
             self.delegate = delegate
             self.pinterestDelegate = PinterestLayoutDataSourceProxy()
+            self.postViewListingViewModel = postViewListingViewModel
             
             // Configure data rules here or bind them to your view model
             pinterestDelegate.itemHeightProvider = { indexPath in
                 // Custom logic derived from item data if needed, e.g. based on image aspect ratio
-                return CGFloat(150 + (indexPath.item % 3) * 50)
+                return postViewListingViewModel.postItemHeightCache[
+                    postViewListingViewModel.posts[indexPath.item]
+                ] ?? 180
+                //return CGFloat(150 + (indexPath.item % 3) * 50)
             }
             pinterestDelegate.adsFrequencyProvider = {
                 return 0 // Inject ad frequency rules cleanly
@@ -125,7 +133,10 @@ extension CollectionView: UIViewRepresentable {
     }
     
     func makeCoordinator() -> Coordinator {
-        Coordinator(delegate: collectionViewDelegate?())
+        Coordinator(
+            delegate: collectionViewDelegate?(),
+            postViewListingViewModel: postListingViewModel
+        )
     }
     
     func makeUIView(context: Context) -> UIKitCollectionView {
@@ -144,17 +155,17 @@ extension CollectionView: UIViewRepresentable {
         return collectionView
     }
     
-    func updateUIView(_ uiView: UIKitCollectionView,
-                      context: Context) {
+    func updateUIView(
+        _ uiView: UIKitCollectionView,
+        context: Context
+    ) {
         uiView.apply(
             snapshot,
             animatingDifferences: animatingDifferences,
             completion: updateCallBack
         )
     }
-}
-
-extension CollectionView {
+    
     func animateDifferences(_ animate: Bool) -> Self {
         var selfCopy = self
         selfCopy.animatingDifferences = animate
@@ -174,7 +185,7 @@ extension CollectionView {
     }
 }
 
-final class CollectionViewDelegateProxy: NSObject, UICollectionViewDelegate {
+class CollectionViewDelegateProxy: NSObject, UICollectionViewDelegate {
     let didScroll: (UIScrollView) -> Void
     let didSelect: (UICollectionView, IndexPath) -> Void
     
@@ -195,44 +206,88 @@ final class CollectionViewDelegateProxy: NSObject, UICollectionViewDelegate {
 }
 
 struct ContentView: View {
-    typealias Item = Int
     typealias Section = Int
-    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Item>
+    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Post>
+
+    @StateObject private var postListingViewModel: PostListingViewModel
     
-    @State var snapshot: Snapshot = {
-        var initialSnapshot = Snapshot()
-        initialSnapshot.appendSections([0])
-        return initialSnapshot
-    }()
+//    @State var snapshot: Snapshot = {
+//        var initialSnapshot = Snapshot()
+//        initialSnapshot.appendSections([0])
+//        initialSnapshot.appendItems(postListingViewModel.posts.elements)
+//        return initialSnapshot
+//    }()
+    
+    private func buildSnapshot(_ items: [Post]) -> Snapshot {
+        var snapshot = Snapshot()
+        snapshot.appendSections([0])
+        snapshot.appendItems(items, toSection: 0)
+        return snapshot
+    }
+    
+    init() {
+        _postListingViewModel = StateObject(wrappedValue: PostListingViewModel(
+            postListingMetadata: PostListingMetadata(postListingType: .subreddit(subredditName: "funny")),
+            externalPostFilter: nil,
+            postListingRepository: PostListingRepository(),
+            historyPostsRepository: HistoryPostsRepository(),
+            thingModerationRepository: ThingModerationRepository(),
+            postRepository: PostRepository())
+        )
+    }
     
     var body: some View {
+        let snapshot = buildSnapshot(postListingViewModel.posts.elements)
+        
         ZStack(alignment: .bottom) {
             CollectionView(
                 snapshot: snapshot,
                 collectionViewLayout: collectionViewLayout,
-                cellProvider: cellProviderWithRegistration
+                cellProvider: cellProviderWithRegistration,
+                postViewListingViewModel: postListingViewModel
             )
             
             Button(
                 action: {
-                    let itemsCount = snapshot.numberOfItems(inSection: 0)
-                    snapshot.appendItems([itemsCount + 1], toSection: 0)
+//                    let itemsCount = snapshot.numberOfItems(inSection: 0)
+//                    snapshot.appendItems([itemsCount + 1], toSection: 0)
                 }, label: {
                     Text("Add More Items")
                 }
             )
         }
+        .task {
+            await postListingViewModel.initialLoadPosts(saveLastSeenPostInFrontPage: false)
+        }
     }
     
-    let cellRegistration: UICollectionView.CellRegistration = .hosting { (idx: IndexPath, item: Item) in
-        Text(Utils.randomString(length: item))
+    let cellRegistration: UICollectionView.CellRegistration = .hosting { (idx: IndexPath, post: Post) in
+        //Text(Utils.randomString(length: item))
+//        PostView(
+//            post: post,
+//            postLayout: .card,
+//            iconType: .subreddit,
+//            isParentVisible: true,
+//            postFeedScrollIdle: true,
+//            postFeedGeometry: nil,
+//            onUpvote: {},
+//            onDownvote: {},
+//            onToggleSave: {},
+//            onPostTypeTap: {},
+//            onSensitiveTap: {},
+//            onLongPressPost: {},
+//            onShare: {},
+//            onReadPost: {}
+//        )
+        UIC(post: post)
+            .environmentObject(CustomThemeViewModel())
+            .environmentObject(NetworkManager())
     }
-}
-
-extension ContentView {
+    
     func collectionViewLayout() -> UICollectionViewLayout {
-        let pinterestLayout = PinterestLayout()
-        return pinterestLayout
+//        let pinterestLayout = PinterestLayout()
+//        return pinterestLayout
+        return UICollectionViewFlowLayout()
     }
     
     func collectionViewConfiguration(_ collectionView: UICollectionView) {
@@ -251,7 +306,7 @@ extension ContentView {
     func cellProvider(
         _ collectionView: UICollectionView,
         indexPath: IndexPath,
-        item: Item
+        item: Post
     ) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: "CellReuseId",
@@ -271,6 +326,21 @@ extension ContentView {
             for: indexPath
         )
     }
+    
+    func cellProviderWithRegistration(
+        _ collectionView: UICollectionView,
+        indexPath: IndexPath,
+        item: Post
+    ) -> UICollectionViewCell {
+        let cell = collectionView.dequeueConfiguredReusableCell(
+            using: cellRegistration,
+            for: indexPath,
+            item: item
+        )
+        
+        cell.backgroundColor = .blue
+        return cell
+    }
 }
 
 extension UICollectionView.CellRegistration {
@@ -285,24 +355,18 @@ extension UICollectionView.CellRegistration {
         }
 }
 
-extension ContentView {
-    func cellProviderWithRegistration(_ collectionView: UICollectionView,
-                                      indexPath: IndexPath,
-                                      item: Item) -> UICollectionViewCell {
-        let cell = collectionView.dequeueConfiguredReusableCell(
-            using: cellRegistration,
-            for: indexPath,
-            item: item
-        )
-        
-        cell.backgroundColor = .blue
-        
-        return cell
-    }
+
+
+protocol PinterestLayoutDelegate: AnyObject {
+    func collectionView(_ collectionView: UICollectionView, layout: PinterestLayout, heightForItemAtIndexPath indexPath: IndexPath) -> CGFloat
+    func collectionView(_ collectionView: UICollectionView, layout: PinterestLayout, heightForBannerAtIndexPath indexPath: IndexPath) -> CGFloat
+    func numberOfItemsBeforeAds(in collectionView: UICollectionView) -> Int
 }
 
-
-
+extension PinterestLayoutDelegate {
+    func collectionView(_ collectionView: UICollectionView, layout: PinterestLayout, heightForBannerAtIndexPath indexPath: IndexPath) -> CGFloat { return 0 }
+    func numberOfItemsBeforeAds(in collectionView: UICollectionView) -> Int { return Int.max }
+}
 
 final class PinterestLayoutDataSourceProxy: PinterestLayoutDelegate {
     // Optional closure or reference to fetch your model items dynamically
@@ -331,17 +395,6 @@ final class PinterestLayoutDataSourceProxy: PinterestLayoutDelegate {
     ) -> Int {
         return adsFrequencyProvider?() ?? 5 // e.g., show banner every 5 items
     }
-}
-
-protocol PinterestLayoutDelegate: AnyObject {
-    func collectionView(_ collectionView: UICollectionView, layout: PinterestLayout, heightForItemAtIndexPath indexPath: IndexPath) -> CGFloat
-    func collectionView(_ collectionView: UICollectionView, layout: PinterestLayout, heightForBannerAtIndexPath indexPath: IndexPath) -> CGFloat
-    func numberOfItemsBeforeAds(in collectionView: UICollectionView) -> Int
-}
-
-extension PinterestLayoutDelegate {
-    func collectionView(_ collectionView: UICollectionView, layout: PinterestLayout, heightForBannerAtIndexPath indexPath: IndexPath) -> CGFloat { return 0 }
-    func numberOfItemsBeforeAds(in collectionView: UICollectionView) -> Int { return Int.max }
 }
 
 class PinterestLayout: UICollectionViewLayout {
@@ -400,6 +453,7 @@ class PinterestLayout: UICollectionViewLayout {
             let photoHeight = delegate?.collectionView(collectionView, layout: self, heightForItemAtIndexPath: indexPath) ?? 180
             let height = (cellPadding * 2) + photoHeight
             let width = contentBounds.width / CGFloat(numberOfColumns)
+            print("fjck==wh \(width)")
             let frame = CGRect(x: xOffsets[column], y: yOffsets[column], width: width, height: height)
              
             let insetFrame = frame.insetBy(dx: cellPadding, dy: cellPadding)
@@ -503,5 +557,213 @@ extension Array where Element: Comparable {
 extension Array {
     subscript(safe index: Int) -> Element? {
         indices.contains(index) ? self[index] : nil
+    }
+}
+
+struct UIC: View {
+    @EnvironmentObject private var themeViewModel: CustomThemeViewModel
+    
+    let post: Post
+    
+    var body: some View {
+//        VStack {
+//            Text("This is just a test so bear with me lol i don't know shit")
+//                .fixedSize(horizontal: false, vertical: true)
+//            
+//            Text("This is just a test so bear with me lol i don't know shit")
+//                .fixedSize(horizontal: false, vertical: true)
+//            
+//            Text("This is just a test so bear with me lol i don't know shit")
+//                .background(.red)
+//                .fixedSize(horizontal: false, vertical: true)
+//            
+//            KFAnimatedImage(URL(string: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSOYvQs_n_fIqfduy9oMhjkC2OQ5bZf2kUroJVvn8xq7dpvtyk42QMdGhLd&s=10"))
+//                .frame(width: 201, height: 134)
+//        }
+//        HStack {
+//            KFAnimatedImage(URL(string: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSOYvQs_n_fIqfduy9oMhjkC2OQ5bZf2kUroJVvn8xq7dpvtyk42QMdGhLd&s=10"))
+//                .frame(width: 24, height: 24)
+//            
+//            VStack(alignment: .leading) {
+//                Text("asdfsadfasdf")
+//
+//                Text("username")
+//            }
+//            .padding(.leading, 4)
+//            
+//            Spacer()
+//            
+//            Text("This is just a test so bear with me lol i don't know shit")
+//                .fixedSize(horizontal: false, vertical: true)
+//        }
+//        .padding(.horizontal, 16)
+//        .padding(.bottom, 16)
+//        .contentShape(Rectangle())
+        
+        
+//        HFlow(alignment: .center) {
+//            SpoilerTag()
+//            
+//            SensitiveTag()
+//            
+//            ArchivedTag()
+//            
+//            LockedTag()
+//            
+//            CrosspostTag(parentPost: nil)
+//            
+//            Text("google.com")
+//                .secondaryText()
+//        }
+//        .frame(maxWidth: .infinity, alignment: .leading)
+//        .padding(.horizontal, 16)
+//        .padding(.vertical, 8)
+//        .contentShape(Rectangle())
+        
+        
+//        HStack(spacing: 0) {
+//            HStack(spacing: 0) {
+//                Button(action: {
+//                    
+//                }) {
+//                    SwiftUI.Image(systemName: post.likes == 1 ? "arrowshape.up.fill" : "arrowshape.up")
+//                        .postIconTemplateRendering()
+//                        .applyIf(post.archived) {
+//                            $0.voteAndReplyUnavailbleIcon()
+//                        }
+//                        .applyIf(!post.archived) {
+//                            $0.postUpvoteIcon(isUpvoted: post.likes == 1)
+//                        }
+//                }
+//                .buttonStyle(.borderless)
+//                .padding(8)
+//                .contentShape(Rectangle())
+//                
+//                Button(action: {
+//                    
+//                }) {
+//                    SwiftUI.Image(systemName: post.likes == -1 ? "arrowshape.down.fill" : "arrowshape.down")
+//                        .postIconTemplateRendering()
+//                }
+//                .buttonStyle(.borderless)
+//                .padding(8)
+//                .contentShape(Rectangle())
+//            }
+//            .environment(\.layoutDirection, .leftToRight)
+//            .padding(.vertical, 8)
+//            .contentShape(Rectangle())
+//            .onTapGesture {}
+//            
+//            HStack {
+//                HStack() {
+//                    SwiftUI.Image(systemName: "text.bubble")
+//                        .postIconTemplateRendering()
+//                        .postIcon()
+//                    
+//                    Text(String(post.numComments))
+//                        .postInfo()
+//                }
+//                
+//                Spacer()
+//            }
+//            .padding(.leading, 16)
+//            .environment(\.layoutDirection, .leftToRight)
+//            
+//            Button(action: {
+//                
+//            }) {
+//                SwiftUI.Image(systemName: post.saved ? "bookmark.fill" : "bookmark")
+//                    .postIconTemplateRendering()
+//                    .postIcon()
+//            }
+//            .buttonStyle(.borderless)
+//            .padding(8)
+//            .contentShape(Rectangle())
+//            
+//            Button(action: {}) {
+//                SwiftUI.Image(systemName: "square.and.arrow.up")
+//                    .postIconTemplateRendering()
+//                    .postIcon()
+//            }
+//            .buttonStyle(.borderless)
+//            .padding(8)
+//            .contentShape(Rectangle())
+//        }
+//        .environment(\.layoutDirection, .leftToRight)
+//        .padding(.horizontal, 8)
+//        .contentShape(Rectangle())
+        
+//        if let galleryData = post.galleryData,
+//           !galleryData.items.isEmpty,
+//           let mediaMetadata = post.mediaMetadata,
+//           let preview = mediaMetadata[galleryData.items[0].mediaId] {
+//            Spacer()
+//                .frame(height: 10)
+//            
+//            // May not have a preview!!!!!!
+//            GalleryCarousel(post: post) {
+//
+//            }
+//            .applyIf(preview.s?.aspectRatio != nil) {
+//                $0.aspectRatio(preview.s!.aspectRatio, contentMode: .fit)
+//            }
+//            .contentShape(Rectangle())
+//        } else if case .text = post.postType, let selftextTruncated = post.selftextTruncated, !selftextTruncated.isEmpty {
+//            Spacer()
+//                .frame(height: 6)
+//            
+//            Text(selftextTruncated)
+//                .postContent(isRead: post.isRead)
+//                .padding(.horizontal, 16)
+//                .contentShape(Rectangle())
+//        } else if case .redditVideo(let videoUrlString, _) = post.postType {
+//            Spacer()
+//                .frame(height: 10)
+//            
+//            PostVideoView(
+//                post: post,
+//                videoUrlString: videoUrlString,
+//                isParentVisible: true,
+//                inPostListing: true,
+//                postFeedScrollIdle: true,
+//                postFeedGeometry: nil,
+//                videoPlayerViewModel: VideoPlayerViewModel()
+//            ) {
+//            }
+//        } else if case .video(let videoUrlString, _) = post.postType {
+//            Spacer()
+//                .frame(height: 10)
+//            
+//            PostVideoView(
+//                post: post,
+//                videoUrlString: videoUrlString,
+//                isParentVisible: true,
+//                inPostListing: true,
+//                postFeedScrollIdle: true,
+//                postFeedGeometry: nil,
+//                videoPlayerViewModel: VideoPlayerViewModel()
+//            ) {
+//            }
+//        } else if post.postType.isMedia {
+//            Spacer()
+//                .frame(height: 10)
+//            
+//            PostPreviewView(post: post, inPostListing: true) {
+//                
+//            }
+//            .contentShape(Rectangle())
+//        }
+        
+        if false {
+            Text("as;dflkajsdf; adsf;laskjdf ;adkljf a;dlkfj a;lfkja d;flkajd fa sdfa sdfasd;fas dfadsfasf;lakdfj adfadsfasd fadfadfadfasfd adsf adfasdf")
+                .postContent(isRead: post.isRead)
+            //.padding(.horizontal, 16)
+            //.contentShape(Rectangle())
+        } else {
+            Text("lolololololol ;alksjdf;lakdsjf adf adfaldsfjads;flakjd fadfadfadf;alkjdf adf adsfadsfadfadfa;ldkjf adfadf;a;ldjf adfadfad fadsfadf;alkdsjf adlfkja dfad f;lkaj dsfakjd f;ajdf")
+                .postContent(isRead: post.isRead)
+                //.padding(.horizontal, 16)
+                //.contentShape(Rectangle())
+        }
     }
 }

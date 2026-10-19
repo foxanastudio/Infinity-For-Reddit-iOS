@@ -280,7 +280,7 @@ public class PostListingViewModel: ObservableObject {
             
             let processedPosts = await self.postProcessPosts(postListing.posts)
             
-            await precalculateHeights(posts: processedPosts, width: 180)
+            await precalculateHeights(posts: processedPosts, width: 201)
             
             try Task.checkCancellation()
             
@@ -449,32 +449,56 @@ public class PostListingViewModel: ObservableObject {
             }
             
             // Wrap your SwiftUI item view to measure it off-screen
-            let swiftUIView = PostView(
-                post: post,
-                postLayout: postLayout,
-                iconType: .subreddit,
-                isParentVisible: false,
-                postFeedScrollIdle: true,
-                postFeedGeometry: nil,
-                onUpvote: {},
-                onDownvote: {},
-                onToggleSave: {},
-                onPostTypeTap: {},
-                onSensitiveTap: {},
-                onLongPressPost: {},
-                onShare: {},
-                onReadPost: {}
-            )
-                .environmentObject(AccountViewModel.shared)
+//            let swiftUIView = PostView(
+//                post: post,
+//                postLayout: postLayout,
+//                iconType: .subreddit,
+//                isParentVisible: false,
+//                postFeedScrollIdle: true,
+//                postFeedGeometry: nil,
+//                onUpvote: {},
+//                onDownvote: {},
+//                onToggleSave: {},
+//                onPostTypeTap: {},
+//                onSensitiveTap: {},
+//                onLongPressPost: {},
+//                onShare: {},
+//                onReadPost: {}
+//            )
+//                .environmentObject(AccountViewModel.shared)
+//                .environmentObject(customThemeViewModel)
+//                .environmentObject(snackbarManager)
+//                .environmentObject(networkManager)
+//                .environmentObject(fullScreenMediaViewModel)
+            let swiftUIView = UIC(post: post)
                 .environmentObject(customThemeViewModel)
-                .environmentObject(snackbarManager)
                 .environmentObject(networkManager)
-                .environmentObject(fullScreenMediaViewModel)
             let hostingController = UIHostingController(rootView: swiftUIView)
             
-            // Ask SwiftUI for its natural "wrap content" height given the exact column width
-            let targetSize = CGSize(width: width, height: UIView.noIntrinsicMetric)
-            let fittingSize = hostingController.sizeThatFits(in: targetSize)
+//            // Ask SwiftUI for its natural "wrap content" height given the exact column width
+//            let targetSize = CGSize(width: width, height: UIView.noIntrinsicMetric)
+//            let fittingSize = hostingController.sizeThatFits(in: targetSize)
+            
+            
+            hostingController.view.bounds = CGRect(origin: .zero, size: CGSize(width: width, height: 0))
+
+            // 2. Trigger a layout pass so Text knows its wrapping boundaries
+            hostingController.view.setNeedsLayout()
+            hostingController.view.layoutIfNeeded()
+
+            // 3. Now ask for the target fitting size
+            let targetSize = CGSize(width: width, height: UIView.layoutFittingCompressedSize.height)
+//            let fittingSize = hostingController.sizeThatFits(
+//                in: targetSize
+//            )
+            
+            let fittingSize = hostingController.view.systemLayoutSizeFitting(
+                CGSize(width: width, height: UIView.layoutFittingCompressedSize.height),
+                withHorizontalFittingPriority: .required,
+                verticalFittingPriority: .fittingSizeLevel
+            )
+            
+            print("height \(fittingSize.height)")
             
             postItemHeightCache[post] = fittingSize.height
         }
