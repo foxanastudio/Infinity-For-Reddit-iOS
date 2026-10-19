@@ -19,7 +19,7 @@ struct ChangelogsSheet: View {
                         .primaryText(.f22)
                     
                     Markdown("""
-                        Fixed an issue where videos started at an incorrect time in fullscreen mode.
+                        Fixed an issue that caused a blank screen when tapping the Home tab.
                         """)
                         .themedMarkdown()
                 }
