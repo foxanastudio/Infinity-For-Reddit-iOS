@@ -9,9 +9,9 @@ import SwiftUI
 import SwiftUIIntrospect
 
 struct TabReselectionViewModifier: ViewModifier {
-    @State private var delegateProxy = TabReselectionDelegateProxy()
-    
     let onReselect: () -> Bool
+    
+    private let delegateProxy = TabReselectionDelegateProxy()
     
     func body(content: Content) -> some View {
         content

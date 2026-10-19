@@ -297,7 +297,7 @@ struct PostListingView: View {
                             isListScrolledToTop = newValue
                         }
                         .onChange(of: navigationManager.scrollToTopOrRefreshFlag) {
-                            scrollToTopOrRefresh(proxy: proxy)
+                            scrollToTopOrRefresh()
                         }
                         .onScrollPhaseChange { _, phase in
                             switch phase {
@@ -773,8 +773,8 @@ struct PostListingView: View {
         startLazyMode()
     }
     
-    private func scrollToTopOrRefresh(proxy: ScrollViewProxy) {
-        guard isListAppeared else {
+    private func scrollToTopOrRefresh() {
+        guard isListAppeared, let scrollProxy else {
             return
         }
         
@@ -782,7 +782,7 @@ struct PostListingView: View {
             postListingViewModel.refreshPosts()
         } else if let firstPost = postListingViewModel.posts.first {
             withAnimation {
-                proxy.scrollTo(ObjectIdentifier(firstPost), anchor: .top)
+                scrollProxy.scrollTo(ObjectIdentifier(firstPost), anchor: .top)
             }
         }
     }
