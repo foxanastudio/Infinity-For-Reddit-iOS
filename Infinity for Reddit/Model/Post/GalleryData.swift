@@ -60,7 +60,7 @@ class GalleryItem : NSObject, Identifiable {
         caption = json["caption"].stringValue
         
         mimeType = media.m
-        if media.m.contains("jpg") || media.m.contains("png") {
+        if media.m.starts(with: "image/") && media.m != "image/gif" {
             urlString = media.s?.u
             mediaType = .image
             
