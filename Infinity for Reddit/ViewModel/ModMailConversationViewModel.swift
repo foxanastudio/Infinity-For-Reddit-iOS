@@ -32,6 +32,16 @@ class ModMailConversationViewModel: ObservableObject {
         conversation.participant.name
     }
 
+    var navigationBarTitle: String {
+        if !participantUsername.isEmpty {
+            return participantUsername
+        }
+        if let subredditName = conversation.participantSubredditName {
+            return "r/\(subredditName)"
+        }
+        return conversation.subject ?? ""
+    }
+    
     func loadModMailConversation() async {
         isLoading = true
         error = nil

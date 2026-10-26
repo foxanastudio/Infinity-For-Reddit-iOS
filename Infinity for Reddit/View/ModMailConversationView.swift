@@ -145,25 +145,40 @@ struct ModMailConversationView: View {
             }
         }
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar(modMailConversationViewModel.participantUsername)
+        .addTitleToInlineNavigationBar(modMailConversationViewModel.navigationBarTitle)
         .showErrorUsingSnackbar(modMailConversationViewModel.$sendMessageError)
         .toolbar {
             NavigationBarMenu()
         }
         .onAppear {
-            if let key = navigationBarMenuKey {
-                navigationBarMenuManager.pop(key: key)
-            }
-            navigationBarMenuKey = navigationBarMenuManager.push([
-                NavigationBarMenuItem(title: "View Profile") {
-                    navigationManager.append(AppNavigation.userDetails(username: modMailConversationViewModel.participantUsername))
-                }
-            ])
+            setUpMenu()
+        }
+        .onChange(of: modMailConversationViewModel.conversation) {
+            setUpMenu()
         }
         .onDisappear {
             guard let navigationBarMenuKey else { return }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
+    }
+    
+    private func setUpMenu() {
+        if let key = navigationBarMenuKey {
+            navigationBarMenuManager.pop(key: key)
+        }
+        
+        var menuItems: [NavigationBarMenuItem] = []
+        let participantUsername = modMailConversationViewModel.participantUsername
+        if !participantUsername.isEmpty {
+            menuItems.append(NavigationBarMenuItem(title: "View Profile") {
+                navigationManager.append(AppNavigation.userDetails(username: participantUsername))
+            })
+        } else if let subredditName = modMailConversationViewModel.conversation.participantSubredditName {
+            menuItems.append(NavigationBarMenuItem(title: "View Subreddit") {
+                navigationManager.append(AppNavigation.subredditDetails(subredditName: subredditName))
+            })
+        }
+        navigationBarMenuKey = navigationBarMenuManager.push(menuItems)
     }
     
     private func sendMessage() {

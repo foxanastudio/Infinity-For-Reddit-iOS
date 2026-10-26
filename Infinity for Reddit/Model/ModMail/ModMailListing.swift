@@ -147,10 +147,17 @@ public class ModMailConversation: NSObject, Identifiable {
         if let name = participant.name, !name.isEmpty {
             return "u/\(name)"
         }
-        if let subredditName = participantSubreddit?["name"].string, !subredditName.isEmpty {
+        if let subredditName = participantSubredditName {
             return "r/\(subredditName)"
         }
         return "-"
+    }
+    
+    var participantSubredditName: String? {
+        guard let subredditName = participantSubreddit?["name"].string, !subredditName.isEmpty else {
+            return nil
+        }
+        return subredditName
     }
     
     var isUnread: Bool {
