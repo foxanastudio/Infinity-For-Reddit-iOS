@@ -22,7 +22,8 @@ public class ModMailListing: NSObject {
         
         viewerId = json["viewerId"].stringValue
         conversationIds = json["conversationIds"].arrayValue.map(\.stringValue)
-        after = json["after"].string
+        // The mod mail API doesn't return "after". The next page starts after the last conversation.
+        after = conversationIds.last
         
         for (conversationId, conversationJson):(String, JSON) in json["conversations"] {
             do {
