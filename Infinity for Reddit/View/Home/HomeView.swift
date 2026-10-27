@@ -257,7 +257,9 @@ struct HomeView: View {
                 selectedTab = .inbox
                 accountViewModel.pendingInboxTabAfterNotificationClicked = false
             } else if accountViewModel.pendingOpenModMailAfterNotificationClicked {
-                openModMailListing(conversationId: accountViewModel.pendingModMailConversationId)
+                // No previous page to return to after switching accounts.
+                selectedTab = .more
+                openModMail(conversationId: accountViewModel.pendingModMailConversationId, navigationManager: tab5NavigationManager)
                 accountViewModel.pendingOpenModMailAfterNotificationClicked = false
                 accountViewModel.pendingModMailConversationId = nil
             } else if let context = accountViewModel.pendingContextAfterNotificationClicked {
@@ -368,7 +370,7 @@ struct HomeView: View {
                 Task {
                     if !(await accountViewModel.switchToAccountIfNeeded(accountName)) {
                         await MainActor.run {
-                            openModMailListing(conversationId: conversationId)
+                            openModMail(conversationId: conversationId, navigationManager: currentNavigationManager)
                         }
                     } else {
                         await MainActor.run {
@@ -480,15 +482,11 @@ struct HomeView: View {
         return true
     }
     
-    private func openModMailListing(conversationId: String?) {
-        selectedTab = .more
-        tab5NavigationManager.append(MoreViewNavigation.modmail)
-        
-        guard let conversationId, !conversationId.isEmpty else {
-            return
-        }
-        Task { @MainActor in
-            tab5NavigationManager.append(AppNavigation.modMailConversation(conversation: ModMailConversation(localId: conversationId)))
+    private func openModMail(conversationId: String?, navigationManager: NavigationManager) {
+        if let conversationId, !conversationId.isEmpty {
+            navigationManager.append(AppNavigation.modMailConversation(conversation: ModMailConversation(localId: conversationId)))
+        } else {
+            navigationManager.append(MoreViewNavigation.modmail)
         }
     }
     
