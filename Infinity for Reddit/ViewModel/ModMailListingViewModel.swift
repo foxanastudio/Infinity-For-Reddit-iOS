@@ -208,9 +208,13 @@ public class ModMailListingViewModel: ObservableObject {
             return
         }
         
-        messages.merge(detail.messages) { _, new in new }
-        
         let existingIndex = conversations.firstIndex(where: { $0.id == conversationId})
+        
+        guard existingIndex != nil || updatedConversation.isInternal == (modMailState == .mod) else {
+            return
+        }
+        
+        messages.merge(detail.messages) { _, new in new }
         
         if let existingIndex {
             conversations.remove(at: existingIndex)
