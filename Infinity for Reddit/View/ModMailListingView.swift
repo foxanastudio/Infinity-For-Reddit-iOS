@@ -14,6 +14,7 @@ struct ModMailListingView: View {
     
     @StateObject var modMailListingViewModel: ModMailListingViewModel
     @State private var navigationBarMenuKey: UUID?
+    @State private var showModMailStateSheet: Bool = false
     
     init() {
         _modMailListingViewModel = StateObject(
@@ -79,6 +80,7 @@ struct ModMailListingView: View {
         .task(id: modMailListingViewModel.loadModMailFlag) {
             await modMailListingViewModel.initialLoadModMailListing()
         }
+        .addTitleToInlineNavigationBar(modMailListingViewModel.modMailState.title)
         .toolbar {
             NavigationBarMenu()
         }
@@ -92,6 +94,11 @@ struct ModMailListingView: View {
             }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
+        .wrapContentSheet(isPresented: $showModMailStateSheet) {
+            ModMailStateSheet(currentModMailState: modMailListingViewModel.modMailState) { modMailState in
+                modMailListingViewModel.changeModMailState(modMailState)
+            }
+        }
     }
     
     private func setUpMenu() {
@@ -100,6 +107,9 @@ struct ModMailListingView: View {
         }
         
         navigationBarMenuKey = navigationBarMenuManager.push([
+            NavigationBarMenuItem(title: "Filter Mod Mail") {
+                showModMailStateSheet = true
+            },
             NavigationBarMenuItem(title: "Mark All as Read") {
                 Task {
                     do {

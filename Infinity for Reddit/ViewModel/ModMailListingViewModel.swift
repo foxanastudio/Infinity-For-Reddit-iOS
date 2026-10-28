@@ -10,6 +10,7 @@ import IdentifiedCollections
 
 @MainActor
 public class ModMailListingViewModel: ObservableObject {
+    @Published var modMailState: ModMailState = .all
     @Published var conversations: IdentifiedArrayOf<ModMailConversation> = []
     @Published var loadModMailFlag: Bool = false
     @Published var isInitialLoad: Bool = true
@@ -21,6 +22,7 @@ public class ModMailListingViewModel: ObservableObject {
     private var messages: [String: ModMailMessage] = [:]
     private var conversationIds: Set<String> = []
     private var after: String? = nil
+    private var loadGeneration: Int = 0
     private var refreshModMailListingContinuation: CheckedContinuation<Void, Never>?
     
     public let modMailListingRepository: ModMailListingRepositoryProtocol
@@ -51,6 +53,7 @@ public class ModMailListingViewModel: ObservableObject {
         }
         
         let isInitialLoadCopy = isInitialLoad
+        let generation = loadGeneration
         
         if conversations.isEmpty || isRefreshWithContinuation {
             isInitialLoading = true
@@ -70,13 +73,17 @@ public class ModMailListingViewModel: ObservableObject {
             let modMailListing = try await modMailListingRepository.fetchModMailListing(
                 queries: [
                     "after": isRefreshWithContinuation ? "" : (after ?? ""),
-                    "state": "all",
+                    "state": modMailState.rawValue,
                     "sort": "recent"
                 ],
                 interceptor: nil
             )
             
             try Task.checkCancellation()
+            
+            guard generation == loadGeneration else {
+                return
+            }
             
             let existingConversationIds = isRefreshWithContinuation ? Set<String>() : conversationIds
             let newConversations = modMailListing.orderedConversations.filter { !existingConversationIds.contains($0.id) }
@@ -107,6 +114,10 @@ public class ModMailListingViewModel: ObservableObject {
             self.isInitialLoading = false
             self.isLoadingMore = false
         } catch {
+            guard generation == loadGeneration else {
+                return
+            }
+            
             if !(error is CancellationError) {
                 self.error = error
                 printInDebugOnly("Error fetching mod mail listing: \(error)")
@@ -136,6 +147,7 @@ public class ModMailListingViewModel: ObservableObject {
     }
     
     func refreshModMailListing() {
+        loadGeneration += 1
         isInitialLoad = true
         isInitialLoading = false
         isLoadingMore = false
@@ -149,6 +161,13 @@ public class ModMailListingViewModel: ObservableObject {
         }
         
         loadModMailFlag.toggle()
+    }
+    
+    func changeModMailState(_ modMailState: ModMailState) {
+        if modMailState != self.modMailState {
+            self.modMailState = modMailState
+            refreshModMailListing()
+        }
     }
     
     func finishPullToRefresh() {
@@ -169,7 +188,7 @@ public class ModMailListingViewModel: ObservableObject {
         
         try await modMailListingRepository.markAllModMailAsRead(
             subredditNames: subredditNames,
-            state: "all"
+            state: modMailState.rawValue
         )
         
         hasMarkedAllAsRead = true

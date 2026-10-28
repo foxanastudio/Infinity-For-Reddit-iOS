@@ -13,6 +13,5 @@ struct ModMailView: View {
             ModMailListingView()
         }
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar("Mod Mail")
     }
 }
