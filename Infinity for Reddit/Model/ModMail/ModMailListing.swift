@@ -140,18 +140,20 @@ public class ModMailConversation: NSObject, Identifiable {
         isInternal = false
     }
     
-    var replyCount: Int {
-        max(0, numMessages - 1)
-    }
-    
-    var participantDisplayName: String {
-        if let name = participant.name, !name.isEmpty {
-            return "u/\(name)"
+    var participantDisplayNames: [ModMailParticipantDisplayName] {
+        var participantDisplayNames: [ModMailParticipantDisplayName] = []
+        if (participant.name ?? "").isEmpty, let subredditName = participantSubredditName {
+            participantDisplayNames.append(ModMailParticipantDisplayName(name: "r/\(subredditName)", isSubreddit: true, isModerator: false))
         }
-        if let subredditName = participantSubredditName {
-            return "r/\(subredditName)"
+        
+        for author in authors.filter({ $0.isOp == true }) + authors.filter({ $0.isOp != true }) {
+            guard let name = author.name, !name.isEmpty, !participantDisplayNames.contains(where: { $0.name == "u/\(name)" }) else {
+                continue
+            }
+            participantDisplayNames.append(ModMailParticipantDisplayName(name: "u/\(name)", isSubreddit: false, isModerator: author.isMod == true && author.isParticipant != true))
         }
-        return "-"
+        
+        return participantDisplayNames
     }
     
     var participantSubredditName: String? {
@@ -164,6 +166,12 @@ public class ModMailConversation: NSObject, Identifiable {
     var isUnread: Bool {
         lastUnread != nil
     }
+}
+
+struct ModMailParticipantDisplayName {
+    let name: String
+    let isSubreddit: Bool
+    let isModerator: Bool
 }
 
 public class ModMailOwner: NSObject {

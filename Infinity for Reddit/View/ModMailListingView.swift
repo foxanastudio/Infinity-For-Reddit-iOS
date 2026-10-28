@@ -11,7 +11,7 @@ struct ModMailListingView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
     @EnvironmentObject private var navigationBarMenuManager: NavigationBarMenuManager
     @EnvironmentObject private var modMailShareableViewModel: ModMailShareableViewModel
-
+    
     @StateObject var modMailListingViewModel: ModMailListingViewModel
     @State private var navigationBarMenuKey: UUID?
     
@@ -93,12 +93,12 @@ struct ModMailListingView: View {
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
     }
-
+    
     private func setUpMenu() {
         if let key = navigationBarMenuKey {
             navigationBarMenuManager.pop(key: key)
         }
-
+        
         navigationBarMenuKey = navigationBarMenuManager.push([
             NavigationBarMenuItem(title: "Mark All as Read") {
                 Task {
@@ -116,12 +116,12 @@ struct ModMailListingView: View {
             }
         ])
     }
-
+    
     private func updateSharedConversationIfNeeded() {
         guard let detail = modMailShareableViewModel.consumeUpdatedConversationDetail() else {
             return
         }
-
+        
         modMailListingViewModel.updateConversation(detail)
     }
 }
@@ -139,8 +139,11 @@ struct ModMailConversationItemView: View {
             TouchRipple(action: onTap) {
                 VStack(spacing: 4) {
                     HStack(alignment: .top, spacing: 8) {
-                        RowText("\(conversation.participantDisplayName), \(conversation.replyCount) replies")
-                            .username()
+                        ModMailParticipantsView(
+                            participantDisplayNames: conversation.participantDisplayNames,
+                            messageCount: conversation.numMessages
+                        )
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         
                         Spacer()
                         
