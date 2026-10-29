@@ -210,7 +210,7 @@ public class ModMailListingViewModel: ObservableObject {
         
         let existingIndex = conversations.firstIndex(where: { $0.id == conversationId})
         
-        guard existingIndex != nil || updatedConversation.isInternal == (modMailState == .mod) else {
+        guard existingIndex != nil || modMailState.contains(updatedConversation) else {
             return
         }
         
