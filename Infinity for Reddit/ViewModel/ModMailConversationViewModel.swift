@@ -17,6 +17,7 @@ class ModMailConversationViewModel: ObservableObject {
     @Published var error: Error?
     @Published var sendMessageError: Error?
     @Published var listScrollTarget: String?
+    @Published private var userSelectedReplyAsOption: ModMailReplyAsOption?
 
     private let modMailConversationRepository: ModMailConversationRepositoryProtocol
     
@@ -30,6 +31,22 @@ class ModMailConversationViewModel: ObservableObject {
 
     var participantUsername: String {
         conversation.participant.name
+    }
+
+    var isInternalConversation: Bool {
+        conversation.isInternal == true
+    }
+
+    var selectedReplyAsOption: ModMailReplyAsOption {
+        get {
+            if let userSelectedReplyAsOption, userSelectedReplyAsOption.isAvailable(isInternalConversation: isInternalConversation) {
+                return userSelectedReplyAsOption
+            }
+            return ModMailReplyAsOption.getDefault(isInternalConversation: isInternalConversation)
+        }
+        set {
+            userSelectedReplyAsOption = newValue
+        }
     }
 
     var navigationBarTitle: String {

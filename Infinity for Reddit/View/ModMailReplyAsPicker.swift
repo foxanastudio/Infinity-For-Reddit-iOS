@@ -11,6 +11,7 @@ struct ModMailReplyAsPicker: View {
     @Binding var selectedReplyAsOption: ModMailReplyAsOption
     
     let subredditName: String
+    let isInternalConversation: Bool
     
     var body: some View {
         Menu {
@@ -24,6 +25,7 @@ struct ModMailReplyAsPicker: View {
                         )
                     )
                 }
+                .disabled(!option.isAvailable(isInternalConversation: isInternalConversation))
             }
         } label: {
             HStack(spacing: 12) {

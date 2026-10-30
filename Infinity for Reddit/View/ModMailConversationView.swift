@@ -20,7 +20,6 @@ struct ModMailConversationView: View {
     @State private var messageText: String = ""
     @State private var sendMessageTask: Task<Void, Never>?
     @State private var navigationBarMenuKey: UUID?
-    @State private var selectedReplyAsOption: ModMailReplyAsOption
     @FocusState private var focusedField: FieldType?
     
     init(conversation: ModMailConversation) {
@@ -30,7 +29,6 @@ struct ModMailConversationView: View {
                 modMailConversationRepository: ModMailConversationRepository()
             )
         )
-        _selectedReplyAsOption = State(initialValue: conversation.isInternal == true ? .modsOnly : .subreddit)
     }
     
     var body: some View {
@@ -85,8 +83,9 @@ struct ModMailConversationView: View {
                     if modMailConversationDetail.conversation.isRepliable {
                         VStack(spacing: 12) {
                             ModMailReplyAsPicker(
-                                selectedReplyAsOption: $selectedReplyAsOption,
-                                subredditName: modMailConversationViewModel.conversation.owner.displayName
+                                selectedReplyAsOption: $modMailConversationViewModel.selectedReplyAsOption,
+                                subredditName: modMailConversationViewModel.conversation.owner.displayName,
+                                isInternalConversation: modMailConversationViewModel.isInternalConversation
                             )
                             
                             HStack(spacing: 12) {
@@ -189,6 +188,7 @@ struct ModMailConversationView: View {
         
         let messageToSend = messageText
         let subredditName = modMailConversationViewModel.conversation.owner.displayName ?? ""
+        let selectedReplyAsOption = modMailConversationViewModel.selectedReplyAsOption
         let authorName = selectedReplyAsOption.getAuthorName(
             subredditName: subredditName
         )

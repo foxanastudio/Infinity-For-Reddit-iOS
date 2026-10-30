@@ -11,7 +11,7 @@ enum ModMailReplyAsOption: String, CaseIterable, Hashable {
     case subreddit
     case user
     case modsOnly
-
+    
     var isAuthorHidden: Bool {
         switch self {
         case .subreddit:
@@ -20,11 +20,19 @@ enum ModMailReplyAsOption: String, CaseIterable, Hashable {
             return false
         }
     }
-
+    
     var isInternal: Bool {
         self == .modsOnly
     }
-
+    
+    static func getDefault(isInternalConversation: Bool) -> ModMailReplyAsOption {
+        isInternalConversation ? .user : .subreddit
+    }
+    
+    func isAvailable(isInternalConversation: Bool) -> Bool {
+        !(isInternalConversation && self == .subreddit)
+    }
+    
     func getAuthorName(subredditName: String) -> String {
         switch self {
         case .subreddit:
@@ -33,7 +41,7 @@ enum ModMailReplyAsOption: String, CaseIterable, Hashable {
             return AccountViewModel.shared.account.username
         }
     }
-
+    
     func getTitle(subredditName: String) -> String {
         switch self {
         case .subreddit:
