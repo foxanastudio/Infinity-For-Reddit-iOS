@@ -79,6 +79,10 @@ enum RedditOAuthAPI: URLRequestConvertible {
     case sendModMailMessage(conversationId: String, params: [String: String])
     case getModMailSubreddits
     case createModMailConversation(params: [String: String])
+    case archiveModMailConversation(conversationId: String)
+    case unarchiveModMailConversation(conversationId: String)
+    case highlightModMailConversation(conversationId: String)
+    case unhighlightModMailConversation(conversationId: String)
     
     private var baseURL: String {
         return "https://oauth.reddit.com"
@@ -88,9 +92,9 @@ enum RedditOAuthAPI: URLRequestConvertible {
         switch self {
         case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getSearchPostsInSpecificThing, .getCustomFeedPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getUserSavedComments, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox, .getRules, .getFlairs, .getInfo, .getUserFlairs, .getCustomFeedInfo, .getWikiPage, .subredditAutoComplete, .getRedditSettings, .getModMailConversations, .getModMailConversation, .getModMailSubreddits:
             return .get
-        case .vote, .subsrcribeToSubreddit, .saveThing, .unsaveThing, .getMoreCommentsForCommentMore, .sendCommentOrReplyToMessage, .favoriteThing, .favoriteCustomFeed, .submitPost, .uploadMediaMetadata, .submitGalleryPost, .submitPollPost, .editPostOrComment, .deletePostOrComment, .hidePost, .unhidePost, .readMessage, .readAllMessages, .markSensitive, .unmarkSensitive, .markSpoiler, .unmarkSpoiler, .selectFlair, .selectUserFlair, .composeMessage, .createCustomFeed, .copyCustomFeed, .report, .approveThing, .removeThing, .toggleStickyPost, .lockThing, .unlockThing, .toggleDistinguishedThing, .blockUser, .bulkReadModMail, .sendModMailMessage, .createModMailConversation:
+        case .vote, .subsrcribeToSubreddit, .saveThing, .unsaveThing, .getMoreCommentsForCommentMore, .sendCommentOrReplyToMessage, .favoriteThing, .favoriteCustomFeed, .submitPost, .uploadMediaMetadata, .submitGalleryPost, .submitPollPost, .editPostOrComment, .deletePostOrComment, .hidePost, .unhidePost, .readMessage, .readAllMessages, .markSensitive, .unmarkSensitive, .markSpoiler, .unmarkSpoiler, .selectFlair, .selectUserFlair, .composeMessage, .createCustomFeed, .copyCustomFeed, .report, .approveThing, .removeThing, .toggleStickyPost, .lockThing, .unlockThing, .toggleDistinguishedThing, .blockUser, .bulkReadModMail, .sendModMailMessage, .createModMailConversation, .archiveModMailConversation, .unarchiveModMailConversation, .highlightModMailConversation:
             return .post
-        case .deleteCustomFeed:
+        case .deleteCustomFeed, .unhighlightModMailConversation:
             return .delete
         case .updateCustomFeed:
             return .put
@@ -239,6 +243,14 @@ enum RedditOAuthAPI: URLRequestConvertible {
             return "/api/mod/conversations/subreddits"
         case .createModMailConversation:
             return "/api/mod/conversations"
+        case .archiveModMailConversation(let conversationId):
+            return "/api/mod/conversations/\(conversationId)/archive"
+        case .unarchiveModMailConversation(let conversationId):
+            return "/api/mod/conversations/\(conversationId)/unarchive"
+        case .highlightModMailConversation(let conversationId):
+            return "/api/mod/conversations/\(conversationId)/highlight"
+        case .unhighlightModMailConversation(let conversationId):
+            return "/api/mod/conversations/\(conversationId)/highlight"
         }
     }
     

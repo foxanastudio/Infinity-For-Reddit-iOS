@@ -166,6 +166,10 @@ public class ModMailConversation: NSObject, Identifiable {
     var isUnread: Bool {
         lastUnread != nil
     }
+    
+    var isArchived: Bool {
+        state == 2
+    }
 }
 
 struct ModMailParticipantDisplayName {

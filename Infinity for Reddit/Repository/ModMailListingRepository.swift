@@ -96,4 +96,30 @@ public class ModMailListingRepository: ModMailListingRepositoryProtocol {
             throw APIError.networkError(error.localizedDescription)
         }
     }
+    
+    public func toggleArchiveConversation(_ conversation: ModMailConversation) async throws {
+        try Task.checkCancellation()
+        
+        _ = try await self.session.request(
+            conversation.isArchived
+            ? RedditOAuthAPI.unarchiveModMailConversation(conversationId: conversation.id)
+            : RedditOAuthAPI.archiveModMailConversation(conversationId: conversation.id)
+        )
+        .validate()
+        .serializingData(automaticallyCancelling: true)
+        .value
+    }
+    
+    public func toggleHighlightConversation(_ conversation: ModMailConversation) async throws {
+        try Task.checkCancellation()
+        
+        _ = try await self.session.request(
+            conversation.isHighlighted
+            ? RedditOAuthAPI.unhighlightModMailConversation(conversationId: conversation.id)
+            : RedditOAuthAPI.highlightModMailConversation(conversationId: conversation.id)
+        )
+        .validate()
+        .serializingData(automaticallyCancelling: true)
+        .value
+    }
 }

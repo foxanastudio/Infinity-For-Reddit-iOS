@@ -77,7 +77,7 @@ enum ModMailState: String, CaseIterable {
     func contains(_ conversation: ModMailConversation) -> Bool {
         switch self {
         case .all:
-            return conversation.isInternal != true
+            return conversation.isInternal != true && !conversation.isArchived
         case .new:
             return conversation.isInternal != true && conversation.isAuto != true && conversation.state == 0
         case .inProgress:
@@ -86,7 +86,9 @@ enum ModMailState: String, CaseIterable {
             return conversation.isHighlighted == true
         case .mod:
             return conversation.isInternal == true
-        case .archived, .appeals, .joinRequests, .filtered, .notifications, .admin:
+        case .archived:
+            return conversation.isArchived
+        case .appeals, .joinRequests, .filtered, .notifications, .admin:
             return false
         }
     }
