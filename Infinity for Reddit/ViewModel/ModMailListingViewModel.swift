@@ -194,6 +194,42 @@ public class ModMailListingViewModel: ObservableObject {
         hasMarkedAllAsRead = true
     }
     
+    func toggleArchiveConversation(_ conversation: ModMailConversation) {
+        Task {
+            do {
+                try await modMailListingRepository.toggleArchiveConversation(conversation)
+                
+                conversation.state = conversation.isArchived ? 1 : 2
+                if modMailState.contains(conversation) {
+                    conversations[id: conversation.id] = conversation
+                } else {
+                    conversationIds.remove(conversation.id)
+                    conversations.remove(id: conversation.id)
+                }
+            } catch {
+                self.error = error
+            }
+        }
+    }
+    
+    func toggleHighlightConversation(_ conversation: ModMailConversation) {
+        Task {
+            do {
+                try await modMailListingRepository.toggleHighlightConversation(conversation)
+                
+                conversation.isHighlighted.toggle()
+                if modMailState == .highlighted && !conversation.isHighlighted {
+                    conversationIds.remove(conversation.id)
+                    conversations.remove(id: conversation.id)
+                } else {
+                    conversations[id: conversation.id] = conversation
+                }
+            } catch {
+                self.error = error
+            }
+        }
+    }
+    
     func getLatestMessagePreview(for conversation: ModMailConversation) -> String {
         ModMailListing.getLatestMessagePreview(for: conversation, messages: messages)
     }

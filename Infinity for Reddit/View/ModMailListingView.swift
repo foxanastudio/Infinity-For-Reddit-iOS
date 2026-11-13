@@ -15,6 +15,8 @@ struct ModMailListingView: View {
     @StateObject var modMailListingViewModel: ModMailListingViewModel
     @State private var navigationBarMenuKey: UUID?
     @State private var showModMailStateSheet: Bool = false
+    @State private var showConversationOptionsSheet: Bool = false
+    @State private var conversationForOptionsSheet: ModMailConversation?
     
     init() {
         _modMailListingViewModel = StateObject(
@@ -49,11 +51,16 @@ struct ModMailListingView: View {
                         ModMailConversationItemView(
                             conversation: conversation,
                             latestMessagePreview: conversation.latestMessagePreview,
+                            isHighlighted: conversation.isHighlighted,
                             hasMarkedAllAsRead: modMailListingViewModel.hasMarkedAllAsRead,
                             onTap: {
                                 navigationManager.append(
                                     AppNavigation.modMailConversation(conversation: conversation)
                                 )
+                            },
+                            onLongPress: {
+                                conversationForOptionsSheet = conversation
+                                showConversationOptionsSheet = true
                             }
                         )
                         .limitedWidth()
@@ -97,6 +104,19 @@ struct ModMailListingView: View {
         .wrapContentSheet(isPresented: $showModMailStateSheet) {
             ModMailStateSheet(currentModMailState: modMailListingViewModel.modMailState) { modMailState in
                 modMailListingViewModel.changeModMailState(modMailState)
+            }
+        }
+        .wrapContentSheet(isPresented: $showConversationOptionsSheet) {
+            if let conversationForOptionsSheet {
+                ModMailConversationOptionsSheet(
+                    conversation: conversationForOptionsSheet,
+                    onToggleArchive: {
+                        modMailListingViewModel.toggleArchiveConversation(conversationForOptionsSheet)
+                    },
+                    onToggleHighlight: {
+                        modMailListingViewModel.toggleHighlightConversation(conversationForOptionsSheet)
+                    }
+                )
             }
         }
     }
@@ -144,12 +164,14 @@ struct ModMailConversationItemView: View {
     
     let conversation: ModMailConversation
     let latestMessagePreview: String
+    let isHighlighted: Bool
     let hasMarkedAllAsRead: Bool
     let onTap: () -> Void
+    let onLongPress: () -> Void
     
     var body: some View {
         VStack(spacing: 0) {
-            TouchRipple(action: onTap) {
+            TouchRipple(action: onTap, onLongPress: onLongPress) {
                 VStack(spacing: 4) {
                     HStack(alignment: .top, spacing: 8) {
                         ModMailParticipantsView(
@@ -160,8 +182,16 @@ struct ModMailConversationItemView: View {
                         
                         Spacer()
                         
-                        TimeText(timeUTCInSeconds: conversation.lastUpdatedUtc, forceShowElapsedTime: true)
-                            .primaryText()
+                        HStack(spacing: 4) {
+                            if isHighlighted {
+                                SwiftUI.Image(systemName: "star.fill")
+                                    .customFont(fontSize: .f13)
+                                    .stickiedTag()
+                            }
+                            
+                            TimeText(timeUTCInSeconds: conversation.lastUpdatedUtc, forceShowElapsedTime: true)
+                                .primaryText()
+                        }
                     }
                     
                     RowText("r/\(conversation.owner.displayName ?? "-")")
