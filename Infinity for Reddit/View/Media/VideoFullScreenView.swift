@@ -13,8 +13,9 @@ struct VideoFullScreenView<Content: View>: View {
     @EnvironmentObject private var videoPlayerPool: VideoPlayerPool
     
     @ObservedObject private var videoFullScreenViewModel: VideoFullScreenViewModel
-
+    
     @State private var dismissStarted: Bool = false
+    @State private var safeAreaInsets: EdgeInsets = EdgeInsets()
     
     let urlString: String
     let post: Post?
@@ -103,6 +104,7 @@ struct VideoFullScreenView<Content: View>: View {
                     downloadError: videoFullScreenViewModel.downloadError,
                     hasDescription: hasDescription,
                     canDownload: canDownload,
+                    safeAreaInsets: safeAreaInsets,
                     onTogglePlayPause: {
                         if videoFullScreenViewModel.isPlaying {
                             videoFullScreenViewModel.pause(userPaused: true)
@@ -206,10 +208,23 @@ struct VideoFullScreenView<Content: View>: View {
         .task {
             await videoFullScreenViewModel.loadAndPlay(urlString: urlString, videoType: videoType, muteVideo: muteVideo, playbackTimeToSeekToInitially: playbackTimeToSeekToInitially)
         }
+        .background {
+            GeometryReader { proxy in
+                Color.clear
+                    .onAppear {
+                        safeAreaInsets = proxy.safeAreaInsets
+                    }
+                    .onChange(of: proxy.safeAreaInsets) { _, newValue in
+                        safeAreaInsets = newValue
+                    }
+            }
+        }
     }
 }
 
 struct VideoController<Content: View>: View {
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
+    
     let isPlaying: Bool
     @Binding var duration: Double
     @Binding var currentTime: Double
@@ -227,6 +242,7 @@ struct VideoController<Content: View>: View {
     let downloadError: Error?
     let hasDescription: Bool
     let canDownload: Bool
+    let safeAreaInsets: EdgeInsets
     let onTogglePlayPause: () -> Void
     let onFastForward: () -> Void
     let onRewind: () -> Void
@@ -254,6 +270,7 @@ struct VideoController<Content: View>: View {
         downloadError: Error?,
         hasDescription: Bool,
         canDownload: Bool,
+        safeAreaInsets: EdgeInsets = EdgeInsets(),
         onTogglePlayPause: @escaping () -> Void,
         onFastForward: @escaping () -> Void,
         onRewind: @escaping () -> Void,
@@ -280,6 +297,7 @@ struct VideoController<Content: View>: View {
         self.downloadError = downloadError
         self.hasDescription = hasDescription
         self.canDownload = canDownload
+        self.safeAreaInsets = safeAreaInsets
         self.onTogglePlayPause = onTogglePlayPause
         self.onFastForward = onFastForward
         self.onRewind = onRewind
@@ -369,6 +387,8 @@ struct VideoController<Content: View>: View {
                 Spacer()
             }
             .padding(.top, 48)
+            .padding(.leading, verticalSizeClass == .compact ? 0 : safeAreaInsets.leading)
+            .padding(.trailing, verticalSizeClass == .compact ? 0 : safeAreaInsets.trailing)
             
             HStack(spacing: 48) {
                 Button {
